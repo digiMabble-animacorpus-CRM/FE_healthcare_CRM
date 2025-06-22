@@ -1,0 +1,19 @@
+[
+    {
+      "id": "conv_001",
+      "lead_id": "lead_001",
+      "agent_id": "agent_001",
+      "channel": "Email",
+      "message": "Hello, I'm interested in the 2BHK near Rue Royale.",
+      "timestamp": "2025-04-18T09:00:00"
+    },
+    {
+      "id": "conv_002",
+      "lead_id": "lead_002",
+      "agent_id": "agent_002",
+      "channel": "WhatsApp",
+      "message": "Can I schedule a visit this week?",
+      "timestamp": "2025-04-18T10:15:00"
+    }
+  ]
+  

@@ -1,0 +1,21 @@
+[
+    {
+      "id": "prop_001",
+      "title": "2BHK in Central Brussels",
+      "location": "Rue Royale 122, Brussels",
+      "price": 350000,
+      "type": "Apartment",
+      "status": "Available",
+      "agent_id": "agent_001"
+    },
+    {
+      "id": "prop_002",
+      "title": "Loft in Antwerp Port",
+      "location": "Docklands, Antwerp",
+      "price": 495000,
+      "type": "Loft",
+      "status": "Sold",
+      "agent_id": "agent_002"
+    }
+  ]
+  

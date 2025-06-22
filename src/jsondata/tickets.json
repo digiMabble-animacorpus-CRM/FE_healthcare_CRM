@@ -1,0 +1,19 @@
+[
+    {
+      "id": "ticket_001",
+      "property_id": "prop_001",
+      "issue": "Water leakage in bathroom",
+      "priority": "High",
+      "status": "Open",
+      "created_at": "2025-04-18T08:00:00"
+    },
+    {
+      "id": "ticket_002",
+      "property_id": "prop_002",
+      "issue": "Elevator not working",
+      "priority": "Medium",
+      "status": "In Progress",
+      "created_at": "2025-04-17T11:30:00"
+    }
+  ]
+  

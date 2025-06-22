@@ -1,0 +1,19 @@
+[
+    {
+      "id": "app_001",
+      "lead_id": "lead_001",
+      "property_id": "prop_001",
+      "agent_id": "agent_001",
+      "date": "2025-04-22T10:00:00",
+      "status": "Scheduled"
+    },
+    {
+      "id": "app_002",
+      "lead_id": "lead_002",
+      "property_id": "prop_002",
+      "agent_id": "agent_002",
+      "date": "2025-04-23T14:30:00",
+      "status": "Completed"
+    }
+  ]
+  

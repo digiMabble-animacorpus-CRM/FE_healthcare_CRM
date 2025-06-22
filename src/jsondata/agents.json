@@ -1,0 +1,21 @@
+[
+    {
+      "id": "agent_001",
+      "name": "Sophie Martin",
+      "email": "sophie@regence.com",
+      "phone": "+32470111234",
+      "region": "Brussels",
+      "role": "Senior Agent",
+      "active": true
+    },
+    {
+      "id": "agent_002",
+      "name": "Louis Dubois",
+      "email": "louis@regence.com",
+      "phone": "+32470114567",
+      "region": "Antwerp",
+      "role": "Junior Agent",
+      "active": true
+    }
+  ]
+  

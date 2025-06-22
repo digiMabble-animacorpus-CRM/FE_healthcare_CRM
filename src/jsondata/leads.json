@@ -1,0 +1,23 @@
+[
+    {
+      "id": "lead_001",
+      "name": "Emily Janssen",
+      "email": "emily@gmail.com",
+      "phone": "+32470111111",
+      "interest": "Apartment",
+      "status": "Hot",
+      "property_id": "prop_001",
+      "assigned_agent": "agent_001"
+    },
+    {
+      "id": "lead_002",
+      "name": "Thomas Müller",
+      "email": "thomas.m@gmail.com",
+      "phone": "+32470112222",
+      "interest": "Loft",
+      "status": "Cold",
+      "property_id": "prop_002",
+      "assigned_agent": "agent_002"
+    }
+  ]
+  
