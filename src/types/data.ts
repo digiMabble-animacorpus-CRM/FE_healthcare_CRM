@@ -61,6 +61,26 @@ export type UserType = {
   emailMessage?: string
 }
 
+export type PatientType = {
+  _id: IdType;
+  name: string;
+  email: string;
+  number: string;
+  dob: string;
+  description: string;
+  zipCode: string;
+  gender: string;
+  language: string;
+  tags: string[];
+  city: string;
+  country: string;
+  status: 'available' | 'unavailable';
+  lastUpdated: string;
+  branch: 'Gembloux - Orneau' | 'Gembloux - Tout Vent' | 'Anima Corpus Namur';
+};
+
+
+
 export type AgentType = {
   id: IdType
   address: string
