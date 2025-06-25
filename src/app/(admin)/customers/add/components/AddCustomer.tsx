@@ -1,9 +1,7 @@
 "use client";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import TextAreaFormInput from "@/components/from/TextAreaFormInput";
-import TextFormInput from "@/components/from/TextFormInput";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import {
   Button,
   Card,
@@ -13,27 +11,79 @@ import {
   Col,
   Row,
 } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
+import TextFormInput from "@/components/from/TextFormInput";
+import TextAreaFormInput from "@/components/from/TextAreaFormInput";
+import ChoicesFormInput from "@/components/from/ChoicesFormInput";
+
+type CustomerFormValues = {
+  name: string;
+  email: string;
+  number: string;
+  dob: string;
+  description: string;
+  zipCode: string;
+  gender: string;
+  language: string;
+  tags: string[];
+  city: string;
+  country: string;
+};
+
+const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
+  name: yup.string().required("Please enter name"),
+  email: yup.string().email("Invalid email").required("Please enter email"),
+  number: yup
+    .string()
+    .matches(/^\d{10}$/, "Enter valid 10-digit number")
+    .required("Please enter number"),
+  dob: yup.string().required("Please enter Date of birth"),
+  description: yup.string().required("Please enter address"),
+  zipCode: yup
+    .string()
+    .matches(/^\d{5}$/, "Enter valid Zip-Code")
+    .required("Please enter Zip-Code"),
+  gender: yup.string().required("Please select gender"),
+  language: yup.string().required("Please select language"),
+  tags: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, "Please select at least one tag")
+    .required("Please select tags"),
+  city: yup.string().required("Please select city"),
+  country: yup.string().required("Please select country"),
+});
 
 const AddCustomer = () => {
-  const messageSchema = yup.object({
-    name: yup.string().required("Please enter name"),
-    description: yup.string().required("Please enter description"),
-    zipCode: yup.string().required("Please enter Zip-Code"),
-    email: yup.string().email().required("Please enter email"),
-    number: yup.string().required("Please enter number"),
-    dob: yup.string().required("Please enter Date of birth"),
+  const {
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<CustomerFormValues>({
+    resolver: yupResolver(schema),
+    defaultValues: {
+      name: "",
+      email: "",
+      number: "",
+      dob: "",
+      description: "",
+      zipCode: "",
+      gender: "",
+      language: "",
+      tags: [],
+      city: "",
+      country: "",
+    },
   });
 
-  const { handleSubmit, control } = useForm({
-    resolver: yupResolver(messageSchema),
-  });
+  const onSubmit = (data: CustomerFormValues) => {
+    console.log("✅ Submitted Data:", data);
+  };
+
   return (
-    <form onSubmit={handleSubmit(() => {})}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
-          <CardTitle as={"h4"}>Customer Information</CardTitle>
+          <CardTitle as="h4">Customer Information</CardTitle>
         </CardHeader>
         <CardBody>
           <Row>
@@ -81,66 +131,77 @@ const AddCustomer = () => {
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <label htmlFor="choices-gender" className="form-label">
-                  Gender
-                </label>
-                <ChoicesFormInput
-                  className="form-control"
-                  id="choices-gender"
-                  data-choices
-                  data-choices-groups
-                  data-placeholder="Select Gender"
-                >
-                  <option value="" disabled selected hidden>
-                    Select Gender
-                  </option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="others">Others</option>
-                </ChoicesFormInput>
+                <label className="form-label">Gender</label>
+                <Controller
+                  control={control}
+                  name="gender"
+                  render={({ field }) => (
+                    <ChoicesFormInput className="form-control" {...field}>
+                      <option value="" disabled hidden>
+                        Select Gender
+                      </option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="others">Others</option>
+                    </ChoicesFormInput>
+                  )}
+                />
+                {errors.gender && (
+                  <small className="text-danger">{errors.gender.message}</small>
+                )}
               </div>
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <label htmlFor="choices-lng" className="form-label">
-                  Preferred Language
-                </label>
-                <ChoicesFormInput
-                  className="form-control"
-                  id="choices-lng"
-                  data-choices
-                  data-choices-groups
-                  data-placeholder="Select Preferred Language"
-                >
-                  <option value="" disabled selected hidden>
-                    Select Preferred Language
-                  </option>
-                  <option value="EN">English</option>
-                  <option value="FR">French</option>
-                  <option value="NL">Duch</option>
-                </ChoicesFormInput>
+                <label className="form-label">Preferred Language</label>
+                <Controller
+                  control={control}
+                  name="language"
+                  render={({ field }) => (
+                    <ChoicesFormInput className="form-control" {...field}>
+                      <option value="" disabled hidden>
+                        Select Preferred Language
+                      </option>
+                      <option value="EN">English</option>
+                      <option value="FR">French</option>
+                      <option value="NL">Dutch</option>
+                    </ChoicesFormInput>
+                  )}
+                />
+                {errors.language && (
+                  <small className="text-danger">
+                    {errors.language.message}
+                  </small>
+                )}
               </div>
             </Col>
             <Col lg={12}>
               <div className="mb-3">
-                <label htmlFor="tags" className="form-label">
-                  Tags
-                </label>
-                <ChoicesFormInput
-                  options={{ removeItemButton: true }}
-                  className="form-control"
-                  id="choices-multiple-remove-button"
-                  data-choices
-                  data-choices-removeitem
-                  multiple
-                >
-                  <option value="Blog">Blog</option>
-                  <option value="Business">Business</option>
-                  <option value="Health">Health</option>
-                  <option value="Computer Software">Computer Software</option>
-                  <option value="Lifestyle blogs">Lifestyle blogs</option>
-                  <option value="Fashion">Fashion</option>
-                </ChoicesFormInput>
+                <label className="form-label">Tags</label>
+                <Controller
+                  control={control}
+                  name="tags"
+                  render={({ field }) => (
+                    <ChoicesFormInput
+                      className="form-control"
+                      multiple
+                      options={{ removeItemButton: true }}
+                      {...field}
+                    >
+                      <option value="Blog">Blog</option>
+                      <option value="Business">Business</option>
+                      <option value="Health">Health</option>
+                      <option value="Computer Software">
+                        Computer Software
+                      </option>
+                      <option value="Lifestyle blogs">Lifestyle blogs</option>
+                      <option value="Fashion">Fashion</option>
+                    </ChoicesFormInput>
+                  )}
+                />
+                {errors.tags && (
+                  <small className="text-danger">{errors.tags.message}</small>
+                )}
               </div>
             </Col>
 
@@ -149,15 +210,14 @@ const AddCustomer = () => {
                 <TextAreaFormInput
                   control={control}
                   name="description"
-                  type="text"
                   label="Customer Address"
-                  className="Customer-address"
                   id="schedule-textarea"
                   rows={3}
                   placeholder="Enter address"
                 />
               </div>
             </Col>
+
             <Col lg={4}>
               <div className="mb-3">
                 <TextFormInput
@@ -171,95 +231,60 @@ const AddCustomer = () => {
             </Col>
             <Col lg={4}>
               <div className="mb-3">
-                <label htmlFor="choices-city" className="form-label">
-                  City
-                </label>
-                <ChoicesFormInput
-                  className="form-control"
-                  id="choices-city"
-                  data-choices
-                  data-choices-groups
-                  data-placeholder="Select City"
-                >
-                  <option>Choose a city</option>
-                  <optgroup label="UK">
-                    <option value="London">London</option>
-                    <option value="Manchester">Manchester</option>
-                    <option value="Liverpool">Liverpool</option>
-                  </optgroup>
-                  <optgroup label="FR">
-                    <option value="Paris">Paris</option>
-                    <option value="Lyon">Lyon</option>
-                    <option value="Marseille">Marseille</option>
-                  </optgroup>
-                  <optgroup label="DE" disabled>
-                    <option value="Hamburg">Hamburg</option>
-                    <option value="Munich">Munich</option>
-                    <option value="Berlin">Berlin</option>
-                  </optgroup>
-                  <optgroup label="US">
-                    <option value="New York">New York</option>
-                    <option value="Washington" disabled>
-                      Washington
-                    </option>
-                    <option value="Michigan">Michigan</option>
-                  </optgroup>
-                  <optgroup label="SP">
-                    <option value="Madrid">Madrid</option>
-                    <option value="Barcelona">Barcelona</option>
-                    <option value="Malaga">Malaga</option>
-                  </optgroup>
-                  <optgroup label="CA">
-                    <option value="Montreal">Montreal</option>
-                    <option value="Toronto">Toronto</option>
-                    <option value="Vancouver">Vancouver</option>
-                  </optgroup>
-                </ChoicesFormInput>
+                <label className="form-label">City</label>
+                <Controller
+                  control={control}
+                  name="city"
+                  render={({ field }) => (
+                    <ChoicesFormInput className="form-control" {...field}>
+                      <option value="" disabled hidden>
+                        Choose a city
+                      </option>
+                      <option value="London">London</option>
+                      <option value="Paris">Paris</option>
+                      <option value="New York">New York</option>
+                    </ChoicesFormInput>
+                  )}
+                />
+                {errors.city && (
+                  <small className="text-danger">{errors.city.message}</small>
+                )}
               </div>
             </Col>
             <Col lg={4}>
-              <div className="mb-3">
-                <label htmlFor="choices-country" className="form-label">
-                  Country
-                </label>
-                <ChoicesFormInput
-                  className="form-control"
-                  id="choices-country"
-                  data-choices
-                  data-choices-groups
-                  data-placeholder="Select Country"
-                >
-                  <option>Choose a country</option>
-                  <optgroup>
-                    <option>United Kingdom</option>
-                    <option value="Fran">France</option>
-                    <option value="Netherlands">Netherlands</option>
-                    <option value="Belgium">Belgium</option>
-                    <option value="Denmark">Denmark</option>
-                    <option value="Canada">Canada</option>
-                    <option value="Australia">Australia</option>
-                    <option value="India">India</option>
-                    <option value="Germany">Germany</option>
-                    <option value="Spain">Spain</option>
-                    <option value="United Arab Emirates">
-                      United Arab Emirates
+            <div className="mb-3">
+              <label className="form-label">Country</label>
+              <Controller
+                control={control}
+                name="country"
+                render={({ field }) => (
+                  <ChoicesFormInput className="form-control" {...field}>
+                    <option value="" disabled hidden>
+                      Choose a country
                     </option>
-                  </optgroup>
-                </ChoicesFormInput>
+                    <option value="UK">United Kingdom</option>
+                    <option value="FR">France</option>
+                    <option value="IN">India</option>
+                  </ChoicesFormInput>
+                )}
+              />
+              {errors.country && (
+                <small className="text-danger">{errors.country.message}</small>
+              )}
               </div>
             </Col>
           </Row>
         </CardBody>
       </Card>
       <div className="mb-3 rounded">
-        <Row className="justify-content-end g-2">
+        <Row className="justify-content-end g-2 mt-2">
           <Col lg={2}>
             <Button variant="outline-primary" type="submit" className="w-100">
               Create Customer
             </Button>
           </Col>
           <Col lg={2}>
-            <Button variant="danger" className="w-100">
+            <Button variant="danger" className="w-100" type="button">
               Cancel
             </Button>
           </Col>

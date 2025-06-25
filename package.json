@@ -22,6 +22,7 @@
     "@hookform/resolvers": "^3.3.4",
     "@smastrom/react-rating": "^1.5.0",
     "apexcharts": "^3.52.0",
+    "axios": "^1.10.0",
     "bootstrap": "^5.3.3",
     "choices.js": "^10.2.0",
     "clsx": "^2.1.1",
