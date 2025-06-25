@@ -1,75 +1,149 @@
-'use client'
-import ChoicesFormInput from '@/components/from/ChoicesFormInput'
-import TextAreaFormInput from '@/components/from/TextAreaFormInput'
-import TextFormInput from '@/components/from/TextFormInput'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
+"use client";
+import ChoicesFormInput from "@/components/from/ChoicesFormInput";
+import TextAreaFormInput from "@/components/from/TextAreaFormInput";
+import TextFormInput from "@/components/from/TextFormInput";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { yupResolver } from "@hookform/resolvers/yup";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+} from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
 
 const AddCustomer = () => {
   const messageSchema = yup.object({
-    name: yup.string().required('Please enter name'),
-    description: yup.string().required('Please enter description'),
-    zipCode: yup.string().required('Please enter Zip-Code'),
-    email: yup.string().email().required('Please enter email'),
-    number: yup.string().required('Please enter number'),
-    propertiesNumber: yup.string().required('Please enter Properties Number'),
-    facebookUrl: yup.string().required('Please enter Facebook Url'),
-    instagramUrl: yup.string().required('Please enter Instagram Url'),
-    twitterUrl: yup.string().required('Please enter Twitter Url'),
-    viewProperties: yup.string().required('Please enter view properties'),
-    ownProperties: yup.string().required('Please enter own Properties'),
-  })
+    name: yup.string().required("Please enter name"),
+    description: yup.string().required("Please enter description"),
+    zipCode: yup.string().required("Please enter Zip-Code"),
+    email: yup.string().email().required("Please enter email"),
+    number: yup.string().required("Please enter number"),
+    dob: yup.string().required("Please enter Date of birth"),
+  });
 
   const { handleSubmit, control } = useForm({
     resolver: yupResolver(messageSchema),
-  })
+  });
   return (
     <form onSubmit={handleSubmit(() => {})}>
       <Card>
         <CardHeader>
-          <CardTitle as={'h4'}>Customer Information</CardTitle>
+          <CardTitle as={"h4"}>Customer Information</CardTitle>
         </CardHeader>
         <CardBody>
           <Row>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="name" placeholder="Full Name" label="Customer Name" />
+                <TextFormInput
+                  control={control}
+                  name="name"
+                  placeholder="Full Name"
+                  label="Customer Name"
+                />
               </div>
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="email" placeholder="Enter Email" label="Customer Email" />
+                <TextFormInput
+                  control={control}
+                  name="email"
+                  placeholder="Enter Email"
+                  label="Customer Email"
+                />
               </div>
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="number" type="number" placeholder="Enter Number" label="Customer Number" />
+                <TextFormInput
+                  control={control}
+                  name="number"
+                  type="number"
+                  placeholder="Enter Number"
+                  label="Customer Number"
+                />
               </div>
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="viewProperties" type="number" placeholder="Enter View Properties" label="View Properties" />
+                <TextFormInput
+                  control={control}
+                  name="dob"
+                  type="date"
+                  placeholder=""
+                  label="Date of Birth"
+                />
               </div>
             </Col>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="ownProperties" type="number" placeholder="Enter Own Properties" label="Own Properties" />
+                <label htmlFor="choices-gender" className="form-label">
+                  Gender
+                </label>
+                <ChoicesFormInput
+                  className="form-control"
+                  id="choices-gender"
+                  data-choices
+                  data-choices-groups
+                  data-placeholder="Select Gender"
+                >
+                  <option value="" disabled selected hidden>
+                    Select Gender
+                  </option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
+                  <option value="others">Others</option>
+                </ChoicesFormInput>
               </div>
             </Col>
             <Col lg={6}>
-              <label htmlFor="invest-property" className="form-label">
-                Invest Property
-              </label>
-              <div className="input-group mb-3">
-                <span className="input-group-text fs-20 px-2 py-0">
-                  <IconifyIcon icon="ri:money-dollar-circle-line" />
-                </span>
-                <input type="number" id="invest-property" className="form-control" placeholder={'000'} />
+              <div className="mb-3">
+                <label htmlFor="choices-lng" className="form-label">
+                  Preferred Language
+                </label>
+                <ChoicesFormInput
+                  className="form-control"
+                  id="choices-lng"
+                  data-choices
+                  data-choices-groups
+                  data-placeholder="Select Preferred Language"
+                >
+                  <option value="" disabled selected hidden>
+                    Select Preferred Language
+                  </option>
+                  <option value="EN">English</option>
+                  <option value="FR">French</option>
+                  <option value="NL">Duch</option>
+                </ChoicesFormInput>
               </div>
             </Col>
+            <Col lg={12}>
+              <div className="mb-3">
+                <label htmlFor="tags" className="form-label">
+                  Tags
+                </label>
+                <ChoicesFormInput
+                  options={{ removeItemButton: true }}
+                  className="form-control"
+                  id="choices-multiple-remove-button"
+                  data-choices
+                  data-choices-removeitem
+                  multiple
+                >
+                  <option value="Blog">Blog</option>
+                  <option value="Business">Business</option>
+                  <option value="Health">Health</option>
+                  <option value="Computer Software">Computer Software</option>
+                  <option value="Lifestyle blogs">Lifestyle blogs</option>
+                  <option value="Fashion">Fashion</option>
+                </ChoicesFormInput>
+              </div>
+            </Col>
+
             <Col lg={12}>
               <div className="mb-3">
                 <TextAreaFormInput
@@ -86,7 +160,13 @@ const AddCustomer = () => {
             </Col>
             <Col lg={4}>
               <div className="mb-3">
-                <TextFormInput control={control} name="zipCode" type="number" placeholder="Zip-Code" label="Zip-Code" />
+                <TextFormInput
+                  control={control}
+                  name="zipCode"
+                  type="number"
+                  placeholder="Zip-Code"
+                  label="Zip-Code"
+                />
               </div>
             </Col>
             <Col lg={4}>
@@ -94,7 +174,13 @@ const AddCustomer = () => {
                 <label htmlFor="choices-city" className="form-label">
                   City
                 </label>
-                <ChoicesFormInput className="form-control" id="choices-city" data-choices data-choices-groups data-placeholder="Select City">
+                <ChoicesFormInput
+                  className="form-control"
+                  id="choices-city"
+                  data-choices
+                  data-choices-groups
+                  data-placeholder="Select City"
+                >
                   <option>Choose a city</option>
                   <optgroup label="UK">
                     <option value="London">London</option>
@@ -136,7 +222,13 @@ const AddCustomer = () => {
                 <label htmlFor="choices-country" className="form-label">
                   Country
                 </label>
-                <ChoicesFormInput className="form-control" id="choices-country" data-choices data-choices-groups data-placeholder="Select Country">
+                <ChoicesFormInput
+                  className="form-control"
+                  id="choices-country"
+                  data-choices
+                  data-choices-groups
+                  data-placeholder="Select Country"
+                >
                   <option>Choose a country</option>
                   <optgroup>
                     <option>United Kingdom</option>
@@ -149,36 +241,9 @@ const AddCustomer = () => {
                     <option value="India">India</option>
                     <option value="Germany">Germany</option>
                     <option value="Spain">Spain</option>
-                    <option value="United Arab Emirates">United Arab Emirates</option>
-                  </optgroup>
-                </ChoicesFormInput>
-              </div>
-            </Col>
-            <Col lg={4}>
-              <div className="mb-3">
-                <TextFormInput control={control} name="facebookUrl" placeholder="Enter URL" label="Facebook URL" />
-              </div>
-            </Col>
-            <Col lg={4}>
-              <div className="mb-3">
-                <TextFormInput control={control} name="instagramUrl" placeholder="Enter URL" label="Instagram URL" />
-              </div>
-            </Col>
-            <Col lg={4}>
-              <div className="mb-3">
-                <TextFormInput control={control} name="twitterUrl" placeholder="Enter URL" label="Twitter URL" />
-              </div>
-            </Col>
-            <Col lg={4}>
-              <div className="mb-3">
-                <label htmlFor="choices-status" className="form-label">
-                  Status
-                </label>
-                <ChoicesFormInput className="form-control" id="choices-status" data-choices data-choices-groups data-placeholder="Select status">
-                  <option>Choose a Status</option>
-                  <optgroup>
-                    <option>Available</option>
-                    <option value="Fran">Unavailable</option>
+                    <option value="United Arab Emirates">
+                      United Arab Emirates
+                    </option>
                   </optgroup>
                 </ChoicesFormInput>
               </div>
@@ -201,7 +266,7 @@ const AddCustomer = () => {
         </Row>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default AddCustomer
+export default AddCustomer;
