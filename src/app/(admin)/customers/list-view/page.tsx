@@ -20,6 +20,7 @@ import {
   Row,
   Spinner,
 } from "react-bootstrap";
+import { useRouter } from "next/navigation";
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -34,6 +35,7 @@ const CustomersListPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const router = useRouter();
 
   const fetchPatients = async (page: number, branch?: string) => {
     setLoading(true);
@@ -56,6 +58,9 @@ const CustomersListPage = () => {
     if (page !== currentPage) {
       setCurrentPage(page);
     }
+  };
+  const handleView = (id: string) => {
+    router.push(`/customers/details/${id}`);
   };
 
   return (
@@ -175,7 +180,11 @@ const CustomersListPage = () => {
                           <td>{item.lastUpdated}</td>
                           <td>
                             <div className="d-flex gap-2">
-                              <Button variant="light" size="sm">
+                              <Button
+                                variant="light"
+                                size="sm"
+                                onClick={() => handleView(item._id)}
+                              >
                                 <IconifyIcon
                                   icon="solar:eye-broken"
                                   className="align-middle fs-18"

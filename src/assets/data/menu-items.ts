@@ -113,7 +113,7 @@ export const MENU_ITEMS: MenuItemType[] = [
       {
         key: 'customer-details',
         label: 'Customer Details',
-        url: '/customers/details',
+        url: '/customers/details/:id',
         parentKey: 'customers',
       },
       {

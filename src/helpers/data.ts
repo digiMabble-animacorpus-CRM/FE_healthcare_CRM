@@ -156,6 +156,19 @@ export const getAllPatients = async (
     totalCount: filteredData.length,
   };
 };
+export const getPatientById = async (
+  id?: string
+): Promise<{ data: PatientType[] }> => {
+  await sleep();
+
+  if (!id) {
+    return { data: [] };
+  }
+
+  const result = patientData.filter((p) => p._id === id);
+
+  return { data: result };
+};
 
 export const getAllReview = async (): Promise<CustomerReviewsType[]> => {
   const data = customerReviewsData.map((item) => {

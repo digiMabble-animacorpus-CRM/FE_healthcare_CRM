@@ -1,23 +1,11 @@
-import properties11 from "@/assets/images/properties/p-11.jpg";
-import properties13 from "@/assets/images/properties/p-13.jpg";
-import properties14 from "@/assets/images/properties/p-14.jpg";
-import properties15 from "@/assets/images/properties/p-15.jpg";
 import avatar2 from "@/assets/images/users/avatar-2.jpg";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import Image from "next/image";
-import Link from "next/link";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardTitle,
-  Carousel,
-  CarouselItem,
-  Col,
-  Row,
-} from "react-bootstrap";
+import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
+import type { PatientType } from "@/types/data";
 
-const CustomersDetails = () => {
+const CustomersDetails = ({ data }: { data: PatientType }) => {
+  console.log(data, "patient");
   return (
     <Card>
       <CardBody>
@@ -26,12 +14,13 @@ const CustomersDetails = () => {
             <Image
               src={avatar2}
               alt="avatar"
+              priority
               className="rounded-circle avatar-xl img-thumbnail"
             />
             <div>
-              <h3 className="fw-semibold mb-1">Daavid Nummi</h3>
+              <h3 className="fw-semibold mb-1">{data.name}</h3>
               <p className="link-primary fw-medium fs-14">
-                Dob | Gender
+                {data.dob} | {data.gender}
               </p>
             </div>
           </div>
@@ -57,47 +46,33 @@ const CustomersDetails = () => {
           </div>
         </div>
         <Row className="my-4">
-          <Col lg={3}>
+          <Col lg={4}>
             <p className="text-dark fw-semibold fs-16 mb-1">Email Address :</p>
-            <p className="mb-0">daavidnumminen@teleworm.be</p>
-          </Col>
-          <Col lg={3}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
-            <p className="mb-0">+32 06-75820711</p>
+            <p className="mb-0">{data.email}</p>
           </Col>
           <Col lg={4}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Location :</p>
-            <p className="mb-0">Schoolstraat 161 5151 HH Drunen </p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
+            <p className="mb-0">{data.number}</p>
           </Col>
-          <Col lg={2}>
+          <Col lg={4}>
+            <p className="text-dark fw-semibold fs-16 mb-1">Branch :</p>
+            <p className="mb-0">{data.branch} </p>
+          </Col>
+          {/* <Col lg={2}>
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
             <p className="mb-0">
               <span className="badge bg-success text-white fs-12 px-2 py-1">
                 Available
               </span>{" "}
             </p>
-          </Col>
+          </Col> */}
         </Row>
         <Row className="my-4">
           <Col lg={12}>
             <CardTitle as={"h4"} className="mb-2">
               Address :
             </CardTitle>
-            <p className="mb-0">
-              <IconifyIcon
-                icon="ri:circle-fill"
-                className="fs-10 me-2 text-success"
-              />{" "}
-              3-4 bedrooms, 2-3 bathrooms
-            </p>
-            <p className="mb-0">
-              <IconifyIcon
-                icon="ri:circle-fill"
-                className="fs-10 me-2 text-success"
-              />{" "}
-              Close to public transportation, good school district, backyard,
-              modern kitchen
-            </p>
+            <p className="mb-0">{data.description}</p>
           </Col>
         </Row>
         <Row>
@@ -106,21 +81,16 @@ const CustomersDetails = () => {
               Tags :
             </CardTitle>
             <div className="d-flex gap-2">
-              <p className="mb-0">
-                <IconifyIcon
-                  icon="ri:circle-fill"
-                  className="fs-10 me-2 text-success"
-                />{" "}
-                3-4 bedrooms, 2-3 bathrooms
-              </p>
-              <p className="mb-0">
-                <IconifyIcon
-                  icon="ri:circle-fill"
-                  className="fs-10 me-2 text-success"
-                />{" "}
-                Close to public transportation, good school district, backyard,
-                modern kitchen
-              </p>
+              {Array.isArray(data?.tags) &&
+                data.tags.map((tag: string, i: number) => (
+                  <p className="mb-0 d-flex align-items-center" key={i}>
+                    <IconifyIcon
+                      icon="ri:circle-fill"
+                      className="fs-10 me-2 text-success"
+                    />
+                    {tag}
+                  </p>
+                ))}
             </div>
           </Col>
         </Row>
