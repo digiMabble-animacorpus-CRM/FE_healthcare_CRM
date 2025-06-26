@@ -68,6 +68,7 @@ export type PatientType = {
   number: string;
   dob: string;
   description: string;
+  address: string;
   zipCode: string;
   gender: string;
   language: string;

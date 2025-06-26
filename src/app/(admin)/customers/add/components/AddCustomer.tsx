@@ -21,9 +21,11 @@ type CustomerFormValues = {
   number: string;
   dob: string;
   description: string;
+  address: string;
   zipCode: string;
   gender: string;
   language: string;
+  branch: string;
   tags: string[];
   city: string;
   country: string;
@@ -37,12 +39,14 @@ const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
     .matches(/^\d{10}$/, "Enter valid 10-digit number")
     .required("Please enter number"),
   dob: yup.string().required("Please enter Date of birth"),
-  description: yup.string().required("Please enter address"),
+  address: yup.string().required("Please enter address"),
+  description: yup.string().required("Please enter description"),
   zipCode: yup
     .string()
     .matches(/^\d{5}$/, "Enter valid Zip-Code")
     .required("Please enter Zip-Code"),
   gender: yup.string().required("Please select gender"),
+  branch: yup.string().required("Please select branch"),
   language: yup.string().required("Please select language"),
   tags: yup
     .array()
@@ -66,9 +70,11 @@ const AddCustomer = () => {
       number: "",
       dob: "",
       description: "",
+      address: "",
       zipCode: "",
       gender: "",
       language: "",
+      branch: "",
       tags: [],
       city: "",
       country: "",
@@ -175,7 +181,7 @@ const AddCustomer = () => {
                 )}
               </div>
             </Col>
-            <Col lg={12}>
+            <Col lg={6}>
               <div className="mb-3">
                 <label className="form-label">Tags</label>
                 <Controller
@@ -204,16 +210,50 @@ const AddCustomer = () => {
                 )}
               </div>
             </Col>
+            <Col lg={6}>
+              <div className="mb-3">
+                <label className="form-label">Branch</label>
+                <Controller
+                  control={control}
+                  name="branch"
+                  render={({ field }) => (
+                    <ChoicesFormInput className="form-control" {...field}>
+                      <option value="" disabled hidden>
+                        Select Branch
+                      </option>
+                      <option value="Gembloux - Orneau">Gembloux - Orneau</option>
+                      <option value="Gembloux - Tout Vent">Gembloux - Tout Vent</option>
+                      <option value="Anima Corpus Namur">Anima Corpus Namur</option>
+                    </ChoicesFormInput>
+                  )}
+                />
+                {errors.branch && (
+                  <small className="text-danger">{errors.branch.message}</small>
+                )}
+              </div>
+            </Col>
 
-            <Col lg={12}>
+            <Col lg={6}>
               <div className="mb-3">
                 <TextAreaFormInput
                   control={control}
-                  name="description"
+                  name="address"
                   label="Customer Address"
                   id="schedule-textarea"
                   rows={3}
                   placeholder="Enter address"
+                />
+              </div>
+            </Col>
+            <Col lg={6}>
+              <div className="mb-3">
+                <TextAreaFormInput
+                  control={control}
+                  name="description"
+                  label="Description"
+                  id="schedule-textarea"
+                  rows={3}
+                  placeholder="Any Description"
                 />
               </div>
             </Col>

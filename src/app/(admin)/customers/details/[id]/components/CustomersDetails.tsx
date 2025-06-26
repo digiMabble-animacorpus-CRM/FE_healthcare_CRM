@@ -72,6 +72,14 @@ const CustomersDetails = ({ data }: { data: PatientType }) => {
             <CardTitle as={"h4"} className="mb-2">
               Address :
             </CardTitle>
+            <p className="mb-0">{data.address}</p>
+          </Col>
+        </Row>
+        <Row className="my-4">
+          <Col lg={12}>
+            <CardTitle as={"h4"} className="mb-2">
+              Description :
+            </CardTitle>
             <p className="mb-0">{data.description}</p>
           </Col>
         </Row>
