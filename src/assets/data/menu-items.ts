@@ -110,18 +110,24 @@ export const MENU_ITEMS: MenuItemType[] = [
         url: '/customers/grid-view',
         parentKey: 'customers',
       },
-      {
-        key: 'customer-details',
-        label: 'Customer Details',
-        url: '/customers/details/:id',
-        parentKey: 'customers',
-      },
+      // {
+      //   key: 'customer-details',
+      //   label: 'Customer Details',
+      //   url: '/customers/details/:id',
+      //   parentKey: 'customers',
+      // },
       {
         key: 'add-customer',
         label: 'Add Customer',
         url: '/customers/add',
         parentKey: 'customers',
       },
+      // {
+      //   key: 'edit-customer',
+      //   label: 'Edit Customer',
+      //   url: '/customers/edit/:id',
+      //   parentKey: 'customers',
+      // },
     ],
   },
   {

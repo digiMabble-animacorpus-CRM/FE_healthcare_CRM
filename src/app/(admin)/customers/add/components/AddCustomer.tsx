@@ -1,4 +1,6 @@
 "use client";
+
+import { useEffect, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -10,7 +12,12 @@ import {
   CardTitle,
   Col,
   Row,
+  Spinner,
 } from "react-bootstrap";
+import { useRouter } from "next/navigation";
+
+import { getPatientById } from "@/helpers/data";
+import type { PatientType } from "@/types/data";
 import TextFormInput from "@/components/from/TextFormInput";
 import TextAreaFormInput from "@/components/from/TextAreaFormInput";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
@@ -57,39 +64,90 @@ const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
   country: yup.string().required("Please select country"),
 });
 
-const AddCustomer = () => {
+interface Props {
+  params: { id?: string };
+}
+
+const AddCustomer = ({ params }: Props) => {
+  const router = useRouter();
+  const isEditMode = !!params.id;
+
+  const [loading, setLoading] = useState<boolean>(isEditMode);
+  const [defaultValues, setDefaultValues] = useState<CustomerFormValues>({
+    name: "",
+    email: "",
+    number: "",
+    dob: "",
+    description: "",
+    address: "",
+    zipCode: "",
+    gender: "",
+    language: "",
+    branch: "",
+    tags: [],
+    city: "",
+    country: "",
+  });
+
   const {
     handleSubmit,
     control,
+    reset,
     formState: { errors },
   } = useForm<CustomerFormValues>({
     resolver: yupResolver(schema),
-    defaultValues: {
-      name: "",
-      email: "",
-      number: "",
-      dob: "",
-      description: "",
-      address: "",
-      zipCode: "",
-      gender: "",
-      language: "",
-      branch: "",
-      tags: [],
-      city: "",
-      country: "",
-    },
+    defaultValues,
   });
 
-  const onSubmit = (data: CustomerFormValues) => {
-    console.log("✅ Submitted Data:", data);
+  useEffect(() => {
+    if (isEditMode) {
+      const fetchData = async () => {
+        try {
+          const response = await getPatientById(params.id!);
+          const data = response.data;
+          console.log(data, "edit details");
+          if (Array.isArray(data) && data.length > 0) {
+            const patient: PatientType = data[0];
+            setDefaultValues(patient as CustomerFormValues);
+            reset(patient as CustomerFormValues);
+          } else {
+            console.error("Patient not found or data format incorrect");
+          }
+        } catch (error) {
+          console.error("Failed to fetch patient:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchData();
+    }
+  }, [isEditMode, params.id, reset]);
+
+  const onSubmit = async (data: CustomerFormValues) => {
+    if (isEditMode) {
+      console.log("Edit Submitted Data:", data);
+      // TODO: Update API call here
+    } else {
+      console.log("Create Submitted Data:", data);
+      // TODO: Create API call here
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
-          <CardTitle as="h4">Customer Information</CardTitle>
+          <CardTitle as="h4">
+            {isEditMode ? "Edit Customer" : "Add Customer"}
+          </CardTitle>
         </CardHeader>
         <CardBody>
           <Row>
@@ -221,9 +279,15 @@ const AddCustomer = () => {
                       <option value="" disabled hidden>
                         Select Branch
                       </option>
-                      <option value="Gembloux - Orneau">Gembloux - Orneau</option>
-                      <option value="Gembloux - Tout Vent">Gembloux - Tout Vent</option>
-                      <option value="Anima Corpus Namur">Anima Corpus Namur</option>
+                      <option value="Gembloux - Orneau">
+                        Gembloux - Orneau
+                      </option>
+                      <option value="Gembloux - Tout Vent">
+                        Gembloux - Tout Vent
+                      </option>
+                      <option value="Anima Corpus Namur">
+                        Anima Corpus Namur
+                      </option>
                     </ChoicesFormInput>
                   )}
                 />
@@ -292,25 +356,27 @@ const AddCustomer = () => {
               </div>
             </Col>
             <Col lg={4}>
-            <div className="mb-3">
-              <label className="form-label">Country</label>
-              <Controller
-                control={control}
-                name="country"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Choose a country
-                    </option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="FR">France</option>
-                    <option value="IN">India</option>
-                  </ChoicesFormInput>
+              <div className="mb-3">
+                <label className="form-label">Country</label>
+                <Controller
+                  control={control}
+                  name="country"
+                  render={({ field }) => (
+                    <ChoicesFormInput className="form-control" {...field}>
+                      <option value="" disabled hidden>
+                        Choose a country
+                      </option>
+                      <option value="UK">United Kingdom</option>
+                      <option value="FR">France</option>
+                      <option value="IN">India</option>
+                    </ChoicesFormInput>
+                  )}
+                />
+                {errors.country && (
+                  <small className="text-danger">
+                    {errors.country.message}
+                  </small>
                 )}
-              />
-              {errors.country && (
-                <small className="text-danger">{errors.country.message}</small>
-              )}
               </div>
             </Col>
           </Row>
@@ -320,11 +386,15 @@ const AddCustomer = () => {
         <Row className="justify-content-end g-2 mt-2">
           <Col lg={2}>
             <Button variant="outline-primary" type="submit" className="w-100">
-              Create Customer
+              {isEditMode ? "Update" : "Create"} Customer
             </Button>
           </Col>
           <Col lg={2}>
-            <Button variant="danger" className="w-100" type="button">
+            <Button
+              variant="danger"
+              className="w-100"
+              onClick={() => router.back()}
+            >
               Cancel
             </Button>
           </Col>

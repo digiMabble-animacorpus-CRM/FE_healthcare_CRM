@@ -138,15 +138,42 @@ export const getAllCustomer = async (): Promise<CustomerType[]> => {
 export const getAllPatients = async (
   page: number = 1,
   limit: number = 10,
-  branch?: string
+  branch?: string,
+  from?: string,
+  to?: string,
+  search?: string
 ): Promise<{ data: PatientType[]; totalCount: number }> => {
   await sleep();
 
   let filteredData = patientData;
+
+  // Branch Filter
   if (branch) {
-    filteredData = patientData.filter((item) => item.branch === branch);
+    filteredData = filteredData.filter((item) => item.branch === branch);
   }
 
+  // Date Range Filter
+  if (from && to) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    filteredData = filteredData.filter((item) => {
+      const itemDate = new Date(item.lastUpdated);
+      return itemDate >= fromDate && itemDate <= toDate;
+    });
+  }
+
+  // Search Filter
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    filteredData = filteredData.filter(
+      (item) =>
+        item.name.toLowerCase().includes(lowerSearch) ||
+        item.email.toLowerCase().includes(lowerSearch) ||
+        item.number.toLowerCase().includes(lowerSearch)
+    );
+  }
+
+  // Pagination
   const start = (page - 1) * limit;
   const end = start + limit;
   const paginatedData = filteredData.slice(start, end);
