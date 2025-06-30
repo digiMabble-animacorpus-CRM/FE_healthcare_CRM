@@ -9,6 +9,10 @@ import { useEffect } from 'react'
 import { Card, CardBody, Col, Container, Row } from 'react-bootstrap'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
+import useResetPassword from './useResetPassword'
+import { useSearchParams } from 'next/navigation'
+
+
 
 const ResetPassword = () => {
   useEffect(() => {
@@ -21,10 +25,45 @@ const ResetPassword = () => {
   const messageSchema = yup.object({
     email: yup.string().email().required('Please enter Email'),
   })
+  
+  type ForgotPasswordFormData = {
+  email: string
+}
+type ResetPasswordFormData = {
+  password: string
+  confirmPassword: string
+}
+  const searchParams = useSearchParams()
+  const token = searchParams.get('token') ?? ''
 
-  const { handleSubmit, control } = useForm({
-    resolver: yupResolver(messageSchema),
-  })
+ const forgotPasswordSchema = yup.object({
+  email: yup.string().email().required('Please enter your email'),
+})
+
+const resetPasswordSchema = yup.object({
+  password: yup.string().min(8, 'Password must be at least 8 characters').required('Please enter new password'),
+  confirmPassword: yup
+    .string()
+    .oneOf([yup.ref('password')], 'Passwords must match')
+    .required('Please confirm your password'),
+})
+const schema = token ? resetPasswordSchema : forgotPasswordSchema
+
+const { handleSubmit, control } = useForm<ForgotPasswordFormData | ResetPasswordFormData>({
+  resolver: yupResolver(schema as any),
+})
+
+  const { resetPassword, requestResetLink, loading } = useResetPassword()
+
+
+   const onSubmit = (data: any) => {
+    if (token) {
+      resetPassword(token, data.password, data.confirmPassword)
+    } else {
+      requestResetLink(data.email)
+    }
+  
+}
   return (
     <div className="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
       <Container>
@@ -45,7 +84,7 @@ const ResetPassword = () => {
                   Enter your email address and we&apos;ll send you an email with instructions <br /> to reset your password.
                 </p>
                 <div className="px-4">
-                  <form onSubmit={handleSubmit(() => {})} className="authentication-form">
+                  <form onSubmit={handleSubmit(onSubmit)} className="authentication-form">
                     <div className="mb-3">
                       <TextFormInput
                         control={control}
