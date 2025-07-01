@@ -23,15 +23,18 @@
      }
 
      .logo-lg {
-          height: $logo-lg-height;
+          height: 100px;
+          
      }
 
      .logo-light {
           display: none;
+          
      }
 
      .logo-dark {
           display: block;
+          padding: 10px 0 10px 35px;
      }
 }
 
@@ -101,6 +104,10 @@
                          &:hover,
                          &:focus {
                               color: $main-nav-item-hover-color;
+                         }
+                         &:hover{
+                              background-color:#f9f1fb;
+                              transform: translateX(2px);
                          }
 
                          &.active {
