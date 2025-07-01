@@ -104,12 +104,12 @@ export const MENU_ITEMS: MenuItemType[] = [
         url: '/customers/list-view',
         parentKey: 'customers',
       },
-      {
-        key: 'grid-view',
-        label: 'Grid View',
-        url: '/customers/grid-view',
-        parentKey: 'customers',
-      },
+      // {
+      //   key: 'grid-view',
+      //   label: 'Grid View',
+      //   url: '/customers/grid-view',
+      //   parentKey: 'customers',
+      // },
       // {
       //   key: 'customer-details',
       //   label: 'Customer Details',
@@ -121,6 +121,43 @@ export const MENU_ITEMS: MenuItemType[] = [
         label: 'Add Customer',
         url: '/customers/add',
         parentKey: 'customers',
+      },
+      // {
+      //   key: 'edit-customer',
+      //   label: 'Edit Customer',
+      //   url: '/customers/edit/:id',
+      //   parentKey: 'customers',
+      // },
+    ],
+  },
+  {
+    key: 'therapists',
+    label: 'Therapist',
+    icon: 'ri:contacts-book-3-line',
+    children: [
+      {
+        key: 'list-view',
+        label: 'List View',
+        url: '/therapists/list-view',
+        parentKey: 'therapists',
+      },
+      // {
+      //   key: 'grid-view',
+      //   label: 'Grid View',
+      //   url: '/customers/grid-view',
+      //   parentKey: 'customers',
+      // },
+      // {
+      //   key: 'customer-details',
+      //   label: 'Customer Details',
+      //   url: '/customers/details/:id',
+      //   parentKey: 'customers',
+      // },
+      {
+        key: 'add-therapist',
+        label: 'Add Therapist',
+        url: '/therapists/add',
+        parentKey: 'therapists',
       },
       // {
       //   key: 'edit-customer',

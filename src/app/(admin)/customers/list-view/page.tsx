@@ -297,7 +297,8 @@ const CustomersListPage = () => {
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Age | Gender</th>
-                        <th>Location</th>
+                        <th>Branch</th>
+                        <th>Source</th>
                         <th>Status</th>
                         <th>Last Activity</th>
                         <th>Action</th>
@@ -323,6 +324,7 @@ const CustomersListPage = () => {
                             {formatGender(item.gender)}
                           </td>
                           <td>{item.branch}</td>
+                          <td>{item.source}</td>
                           <td>
                             <span
                               className={`badge bg-${

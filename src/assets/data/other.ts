@@ -56,6 +56,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-22T10:15:00Z',
     branch: 'Gembloux - Orneau',
+    source: 'Website form',
   },
   {
     _id: '2',
@@ -74,6 +75,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-21T14:32:00Z',
     branch: 'Gembloux - Tout Vent',
+    source: 'Call/offline',
   },
   {
     _id: '3',
@@ -92,6 +94,7 @@ export const patientData: PatientType[] = [
     status: 'old',
     lastUpdated: '2025-06-20T09:47:00Z',
     branch: 'Anima Corpus Namur',
+    source: 'Chatbot',
   },
   {
     _id: '4',
@@ -110,6 +113,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-19T16:20:00Z',
     branch: 'Gembloux - Orneau',
+    source: 'Website form',
   },
   {
     _id: '5',
@@ -128,6 +132,7 @@ export const patientData: PatientType[] = [
     status: 'old',
     lastUpdated: '2025-06-18T11:05:00Z',
     branch: 'Anima Corpus Namur',
+    source: 'Call/offline',
   },
   {
     _id: '6',
@@ -146,6 +151,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-23T08:25:00Z',
     branch: 'Gembloux - Tout Vent',
+    source: 'Chatbot',
   },
   {
     _id: '7',
@@ -164,6 +170,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-24T13:10:00Z',
     branch: 'Gembloux - Orneau',
+    source: 'Website form',
   },
   {
     _id: '8',
@@ -182,6 +189,7 @@ export const patientData: PatientType[] = [
     status: 'old',
     lastUpdated: '2025-06-25T09:00:00Z',
     branch: 'Gembloux - Tout Vent',
+    source: 'Call/offline',
   },
   {
     _id: '9',
@@ -200,6 +208,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-20T11:45:00Z',
     branch: 'Anima Corpus Namur',
+    source: 'Website form',
   },
   {
     _id: '10',
@@ -218,6 +227,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-21T12:00:00Z',
     branch: 'Gembloux - Orneau',
+    source: 'Chatbot',
   },
   {
     _id: '11',
@@ -236,6 +246,7 @@ export const patientData: PatientType[] = [
     status: 'old',
     lastUpdated: '2025-06-23T15:25:00Z',
     branch: 'Gembloux - Tout Vent',
+    source: 'Call/offline',
   },
   {
     _id: '12',
@@ -254,6 +265,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-20T10:45:00Z',
     branch: 'Anima Corpus Namur',
+    source: 'Website form',
   },
   {
     _id: '13',
@@ -272,6 +284,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-22T13:00:00Z',
     branch: 'Gembloux - Orneau',
+    source: 'Call/offline',
   },
   {
     _id: '14',
@@ -290,6 +303,7 @@ export const patientData: PatientType[] = [
     status: 'old',
     lastUpdated: '2025-06-24T17:40:00Z',
     branch: 'Gembloux - Tout Vent',
+    source: 'Website form',
   },
   {
     _id: '15',
@@ -308,6 +322,7 @@ export const patientData: PatientType[] = [
     status: 'new',
     lastUpdated: '2025-06-25T08:30:00Z',
     branch: 'Anima Corpus Namur',
+    source: 'Chatbot',
   },
 ];
 

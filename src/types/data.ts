@@ -77,6 +77,7 @@ export type PatientType = {
   country: string;
   status: 'new' | 'old';
   lastUpdated: string;
+  source: string;
   branch: 'Gembloux - Orneau' | 'Gembloux - Tout Vent' | 'Anima Corpus Namur';
 };
 

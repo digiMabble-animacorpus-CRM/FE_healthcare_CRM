@@ -43,7 +43,7 @@ const CustomersDetails = ({ data }: { data: PatientType }) => {
                 <IconifyIcon icon="ri:edit-fill" />
               </span>
             </Button>
-            <Button
+            {/* <Button
               variant="primary"
               className="avatar-sm d-flex align-items-center justify-content-center fs-20"
             >
@@ -51,7 +51,7 @@ const CustomersDetails = ({ data }: { data: PatientType }) => {
                 {" "}
                 <IconifyIcon icon="ri:share-fill" />
               </span>
-            </Button>
+            </Button> */}
           </div>
         </div>
         <Row className="my-4">
@@ -59,44 +59,44 @@ const CustomersDetails = ({ data }: { data: PatientType }) => {
             <p className="text-dark fw-semibold fs-16 mb-1">Email Address :</p>
             <p className="mb-0">{data.email}</p>
           </Col>
-          <Col lg={4}>
+          <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
             <p className="mb-0">{data.number}</p>
           </Col>
-          <Col lg={4}>
+          <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">Branch :</p>
             <p className="mb-0">{data.branch} </p>
           </Col>
-          {/* <Col lg={2}>
+          <Col lg={2}>
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
-            <p className="mb-0">
-              <span className="badge bg-success text-white fs-12 px-2 py-1">
-                Available
-              </span>{" "}
-            </p>
-          </Col> */}
+            <span
+              className={`badge bg-${
+                data.status === "new" ? "success" : "danger"
+              } text-white fs-12 px-2 py-1`}
+            >
+              {data.status}
+            </span>
+          </Col>
         </Row>
         <Row className="my-4">
-          <Col lg={12}>
-            <CardTitle as={"h4"} className="mb-2">
-              Address :
-            </CardTitle>
+          <Col lg={9}>
+            <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
             <p className="mb-0">{data.address}</p>
+          </Col>
+          <Col lg={3}>
+            <p className="text-dark fw-semibold fs-16 mb-1">Mode of Register :</p>
+            <p className="mb-0">Online</p>
           </Col>
         </Row>
         <Row className="my-4">
           <Col lg={12}>
-            <CardTitle as={"h4"} className="mb-2">
-              Description :
-            </CardTitle>
+            <p className="text-dark fw-semibold fs-16 mb-1">Description :</p>
             <p className="mb-0">{data.description}</p>
           </Col>
         </Row>
         <Row>
           <Col lg={12}>
-            <CardTitle as={"h4"} className="mb-2">
-              Tags :
-            </CardTitle>
+            <p className="text-dark fw-semibold fs-16 mb-1">Tags :</p>
             <div className="d-flex gap-2">
               {Array.isArray(data?.tags) &&
                 data.tags.map((tag: string, i: number) => (
