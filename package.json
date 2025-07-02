@@ -49,7 +49,7 @@
     "react-dropzone": "^14.2.3",
     "react-flatpickr": "^3.10.13",
     "react-hook-form": "^7.53.0",
-    "react-quill": "^2.0.0",
+    "react-quill": "^0.0.2",
     "react-select": "^5.8.0",
     "react-sweetalert2": "^0.5.2",
     "react-text-mask-legacy": "^5.5.3",
