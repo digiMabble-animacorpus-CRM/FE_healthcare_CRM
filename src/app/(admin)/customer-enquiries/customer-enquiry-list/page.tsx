@@ -110,11 +110,11 @@ const CustomersListPage = () => {
   };
 
   const handleView = (id: string) => {
-    router.push(`/customers/details/${id}`);
+    router.push(`/customer-enquiries/details/${id}`);
   };
 
   const handleEditClick = (id: string) => {
-    router.push(`/customers/edit/${id}`);
+    router.push(`/customer-enquiries/edit-enquiry/${id}`);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -159,13 +159,13 @@ const CustomersListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Customers" title="Customer List" />
+      <PageTitle subName="Customer Enquiries" title="Customer Enquiry List" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Customer List
+                All Customer Enquiry List
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">

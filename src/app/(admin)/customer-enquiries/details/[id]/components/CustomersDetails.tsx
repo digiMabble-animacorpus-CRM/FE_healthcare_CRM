@@ -11,7 +11,7 @@ const CustomersDetails = ({ data }: { data: PatientType }) => {
   const router = useRouter();
 
   const handleEditClick = (id: string) => {
-    router.push(`/customers/edit/${id}`);
+    router.push(`/customer-enquiries/edit-enquiry/${id}`);
   };
 
   return (
