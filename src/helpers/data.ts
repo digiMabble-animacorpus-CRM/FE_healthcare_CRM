@@ -7,6 +7,7 @@ import {
   pricingData,
   projectsData,
   propertyData,
+  therapistData,
   timelineData,
   transactionData,
   userData,
@@ -31,6 +32,7 @@ import {
   TodoType,
   TransactionType,
   UserType,
+  TherapistType,
 } from "@/types/data";
 import { db } from "@/utils/firebase";
 import { sleep } from "@/utils/promise";
@@ -183,6 +185,56 @@ export const getAllCustomerEnquiries = async (
     totalCount: filteredData.length,
   };
 };
+// 
+export const getAllTherapists = async (
+  page: number = 1,
+  limit: number = 10,
+  branch?: string,
+  from?: string,
+  to?: string,
+  search?: string
+): Promise<{ data: TherapistType[]; totalCount: number }> => {
+  await sleep();
+
+  let filteredData = therapistData;
+
+  // Branch Filter
+  if (branch) {
+    filteredData = filteredData.filter((item) => item.branch === branch);
+  }
+
+  // Date Range Filter
+  if (from && to) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    filteredData = filteredData.filter((item) => {
+      const itemDate = new Date(item.lastUpdated);
+      return itemDate >= fromDate && itemDate <= toDate;
+    });
+  }
+
+  // Search Filter
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    filteredData = filteredData.filter(
+      (item) =>
+        item.name.toLowerCase().includes(lowerSearch) ||
+        item.email.toLowerCase().includes(lowerSearch) ||
+        item.number.toLowerCase().includes(lowerSearch)
+    );
+  }
+
+  // Pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginatedData = filteredData.slice(start, end);
+
+  return {
+    data: paginatedData,
+    totalCount: filteredData.length,
+  };
+};
+
 export const getPatientById = async (
   id?: string
 ): Promise<{ data: CustomerEnquiriesType[] }> => {

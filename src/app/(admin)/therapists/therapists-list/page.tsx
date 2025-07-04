@@ -2,9 +2,9 @@
 
 import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { getAllCustomerEnquiries } from "@/helpers/data";
+import { getAllTherapists } from "@/helpers/data";
 import { useEffect, useState } from "react";
-import type { CustomerEnquiriesType } from "@/types/data";
+import type { TherapistType } from "@/types/data";
 import dayjs from "dayjs";
 import {
   Button,
@@ -32,7 +32,7 @@ const BRANCHES = [
 ];
 
 const CustomersListPage = () => {
-  const [patients, setPatients] = useState<CustomerEnquiriesType[]>([]);
+  const [patients, setPatients] = useState<TherapistType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -82,7 +82,7 @@ const CustomersListPage = () => {
     setLoading(true);
     try {
       const { from, to } = getDateRange();
-      const response = await getAllCustomerEnquiries(
+      const response = await getAllTherapists(
         page,
         PAGE_LIMIT,
         selectedBranch || undefined,
@@ -305,7 +305,7 @@ const CustomersListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {patients.map((item: CustomerEnquiriesType, idx: number) => (
+                      {patients.map((item: TherapistType, idx: number) => (
                         <tr key={idx}>
                           <td>
                             <div className="form-check">
@@ -328,7 +328,7 @@ const CustomersListPage = () => {
                           <td>
                             <span
                               className={`badge bg-${
-                                item.status === "new" ? "success" : "danger"
+                                item.status === "active" ? "success" : "danger"
                               } text-white fs-12 px-2 py-1`}
                             >
                               {item.status}
