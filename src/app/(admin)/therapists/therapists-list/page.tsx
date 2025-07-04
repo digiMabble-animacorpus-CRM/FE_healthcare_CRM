@@ -31,8 +31,8 @@ const BRANCHES = [
   "Anima Corpus Namur",
 ];
 
-const CustomersListPage = () => {
-  const [patients, setPatients] = useState<TherapistType[]>([]);
+const TherapistsListPage = () => {
+  const [therapists, setTherapists] = useState<TherapistType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -78,7 +78,7 @@ const CustomersListPage = () => {
     }
   };
 
-  const fetchPatients = async (page: number) => {
+  const fetchTherapists = async (page: number) => {
     setLoading(true);
     try {
       const { from, to } = getDateRange();
@@ -90,7 +90,7 @@ const CustomersListPage = () => {
         to,
         searchTerm
       );
-      setPatients(response.data);
+      setTherapists(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
       console.error("Failed to fetch enquiries data:", error);
@@ -100,7 +100,7 @@ const CustomersListPage = () => {
   };
 
   useEffect(() => {
-    fetchPatients(currentPage);
+    fetchTherapists(currentPage);
   }, [currentPage, selectedBranch, searchTerm, dateFilter]);
 
   const handlePageChange = (page: number) => {
@@ -126,11 +126,11 @@ const CustomersListPage = () => {
     if (!selectedPatientId) return;
 
     try {
-      await fetch(`/api/patients/${selectedPatientId}`, {
+      await fetch(`/api/therapists/${selectedPatientId}`, {
         method: "DELETE",
       });
 
-      fetchPatients(currentPage); // refresh list
+      fetchTherapists(currentPage); // refresh list
     } catch (error) {
       console.error("Failed to delete enquiries:", error);
     } finally {
@@ -305,7 +305,7 @@ const CustomersListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {patients.map((item: TherapistType, idx: number) => (
+                      {therapists.map((item: TherapistType, idx: number) => (
                         <tr key={idx}>
                           <td>
                             <div className="form-check">
@@ -451,4 +451,4 @@ const CustomersListPage = () => {
   );
 };
 
-export default CustomersListPage;
+export default TherapistsListPage;

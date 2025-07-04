@@ -32,7 +32,7 @@ const BRANCHES = [
 ];
 
 const CustomersListPage = () => {
-  const [patients, setPatients] = useState<CustomerEnquiriesType[]>([]);
+  const [enquirys, setEnquirys] = useState<CustomerEnquiriesType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -78,7 +78,7 @@ const CustomersListPage = () => {
     }
   };
 
-  const fetchPatients = async (page: number) => {
+  const fetchEnquirys = async (page: number) => {
     setLoading(true);
     try {
       const { from, to } = getDateRange();
@@ -90,7 +90,7 @@ const CustomersListPage = () => {
         to,
         searchTerm
       );
-      setPatients(response.data);
+      setEnquirys(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
       console.error("Failed to fetch enquiries data:", error);
@@ -100,7 +100,7 @@ const CustomersListPage = () => {
   };
 
   useEffect(() => {
-    fetchPatients(currentPage);
+    fetchEnquirys(currentPage);
   }, [currentPage, selectedBranch, searchTerm, dateFilter]);
 
   const handlePageChange = (page: number) => {
@@ -126,11 +126,11 @@ const CustomersListPage = () => {
     if (!selectedPatientId) return;
 
     try {
-      await fetch(`/api/patients/${selectedPatientId}`, {
+      await fetch(`/api/enquirys/${selectedPatientId}`, {
         method: "DELETE",
       });
 
-      fetchPatients(currentPage); // refresh list
+      fetchEnquirys(currentPage);
     } catch (error) {
       console.error("Failed to delete enquiries:", error);
     } finally {
@@ -305,7 +305,7 @@ const CustomersListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {patients.map((item: CustomerEnquiriesType, idx: number) => (
+                      {enquirys.map((item: CustomerEnquiriesType, idx: number) => (
                         <tr key={idx}>
                           <td>
                             <div className="form-check">
