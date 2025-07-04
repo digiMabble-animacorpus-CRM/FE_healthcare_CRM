@@ -136,9 +136,9 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri:contacts-book-3-line',
     children: [
       {
-        key: 'list-view',
-        label: 'List View',
-        url: '/therapists/list-view',
+        key: 'therapists-list',
+        label: 'Therapists List',
+        url: '/therapists/therapists-list',
         parentKey: 'therapists',
       },
       // {
@@ -156,7 +156,7 @@ export const MENU_ITEMS: MenuItemType[] = [
       {
         key: 'add-therapist',
         label: 'Add Therapist',
-        url: '/therapists/add',
+        url: '/therapists/add-therapist',
         parentKey: 'therapists',
       },
       // {

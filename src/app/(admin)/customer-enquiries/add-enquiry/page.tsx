@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Customers Add" };
 const CustomerAddPage = () => {
   return (
     <>
-      <PageTitle title="Add Patients" subName="" />
+      <PageTitle title="Add Enquiry" subName="" />
       <AddCustomer params={{}} />;
     </>
   );
