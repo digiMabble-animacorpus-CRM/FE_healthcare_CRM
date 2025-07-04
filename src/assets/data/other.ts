@@ -11,7 +11,7 @@ import {
   AgentType,
   CustomerReviewsType,
   CustomerType,
-  PatientType,
+  CustomerEnquiriesType,
   Employee,
   PricingType,
   ProjectType,
@@ -38,7 +38,7 @@ import paypal from '@/assets/images/card/paypal.svg'
 import visa from '@/assets/images/card/visa.svg'
 import { currency } from '@/context/constants'
 
-export const patientData: PatientType[] = [
+export const customerEnquiriesData: CustomerEnquiriesType[] = [
   {
     _id: '1',
     name: 'Emma Johnson',

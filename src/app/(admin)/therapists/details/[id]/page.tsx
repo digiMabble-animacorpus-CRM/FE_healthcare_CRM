@@ -3,7 +3,7 @@ import { getAllProperty, getPatientById } from "@/helpers/data";
 import CustomersDetails from "./components/CustomersDetails";
 import WeeklyInquiry from "./components/WeeklyInquiry";
 import TransactionHistory from "./components/TransactionHistory";
-import type { PatientType } from "@/types/data";
+import type { CustomerEnquiriesType } from "@/types/data";
 import { Col, Row } from "react-bootstrap";
 import { Metadata } from "next";
 
@@ -17,7 +17,7 @@ const CustomerDetailsPage = async ({ params }: Props) => {
   const patientId = params.id;
   const propertyData = await getAllProperty();
   const response = await getPatientById(patientId);
-  const patients: PatientType[] = response.data;
+  const patients: CustomerEnquiriesType[] = response.data;
 
   return (
     <>

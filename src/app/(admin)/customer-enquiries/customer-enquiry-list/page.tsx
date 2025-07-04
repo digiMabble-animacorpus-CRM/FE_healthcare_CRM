@@ -2,9 +2,9 @@
 
 import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { getAllPatients } from "@/helpers/data";
+import { getAllCustomerEnquiries } from "@/helpers/data";
 import { useEffect, useState } from "react";
-import type { PatientType } from "@/types/data";
+import type { CustomerEnquiriesType } from "@/types/data";
 import dayjs from "dayjs";
 import {
   Button,
@@ -32,7 +32,7 @@ const BRANCHES = [
 ];
 
 const CustomersListPage = () => {
-  const [patients, setPatients] = useState<PatientType[]>([]);
+  const [patients, setPatients] = useState<CustomerEnquiriesType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -82,7 +82,7 @@ const CustomersListPage = () => {
     setLoading(true);
     try {
       const { from, to } = getDateRange();
-      const response = await getAllPatients(
+      const response = await getAllCustomerEnquiries(
         page,
         PAGE_LIMIT,
         selectedBranch || undefined,
@@ -93,7 +93,7 @@ const CustomersListPage = () => {
       setPatients(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error("Failed to fetch patient data:", error);
+      console.error("Failed to fetch enquiries data:", error);
     } finally {
       setLoading(false);
     }
@@ -132,7 +132,7 @@ const CustomersListPage = () => {
 
       fetchPatients(currentPage); // refresh list
     } catch (error) {
-      console.error("Failed to delete patient:", error);
+      console.error("Failed to delete enquiries:", error);
     } finally {
       setShowDeleteModal(false);
       setSelectedPatientId(null);
@@ -305,7 +305,7 @@ const CustomersListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {patients.map((item: PatientType, idx: number) => (
+                      {patients.map((item: CustomerEnquiriesType, idx: number) => (
                         <tr key={idx}>
                           <td>
                             <div className="form-check">

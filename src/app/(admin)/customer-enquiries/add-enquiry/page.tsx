@@ -11,7 +11,7 @@ const CustomerAddPage = () => {
   return (
     <>
       <PageTitle title="Add Enquiry" subName="" />
-      <AddCustomer params={{}} />;
+      <AddCustomer params={{}} />
     </>
   );
 };

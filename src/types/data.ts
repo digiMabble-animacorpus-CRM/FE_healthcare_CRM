@@ -61,7 +61,7 @@ export type UserType = {
   emailMessage?: string
 }
 
-export type PatientType = {
+export type CustomerEnquiriesType = {
   _id: IdType;
   name: string;
   email: string;

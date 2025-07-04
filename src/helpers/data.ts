@@ -1,7 +1,7 @@
 import {
   agentData,
   customerData,
-  patientData,
+  customerEnquiriesData,
   customerReviewsData,
   dataTableRecords,
   pricingData,
@@ -19,7 +19,7 @@ import {
   AgentType,
   CustomerReviewsType,
   CustomerType,
-  PatientType,
+  CustomerEnquiriesType,
   EmailCountType,
   Employee,
   GroupType,
@@ -135,17 +135,17 @@ export const getAllCustomer = async (): Promise<CustomerType[]> => {
   return data;
 };
 // Patients Api Call
-export const getAllPatients = async (
+export const getAllCustomerEnquiries = async (
   page: number = 1,
   limit: number = 10,
   branch?: string,
   from?: string,
   to?: string,
   search?: string
-): Promise<{ data: PatientType[]; totalCount: number }> => {
+): Promise<{ data: CustomerEnquiriesType[]; totalCount: number }> => {
   await sleep();
 
-  let filteredData = patientData;
+  let filteredData = customerEnquiriesData;
 
   // Branch Filter
   if (branch) {
@@ -185,14 +185,14 @@ export const getAllPatients = async (
 };
 export const getPatientById = async (
   id?: string
-): Promise<{ data: PatientType[] }> => {
+): Promise<{ data: CustomerEnquiriesType[] }> => {
   await sleep();
 
   if (!id) {
     return { data: [] };
   }
 
-  const result = patientData.filter((p) => p._id === id);
+  const result = customerEnquiriesData.filter((p) => p._id === id);
 
   return { data: result };
 };

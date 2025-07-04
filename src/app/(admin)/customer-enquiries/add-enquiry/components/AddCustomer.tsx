@@ -17,7 +17,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { getPatientById } from "@/helpers/data";
-import type { PatientType } from "@/types/data";
+import type { CustomerEnquiriesType } from "@/types/data";
 import TextFormInput from "@/components/from/TextFormInput";
 import TextAreaFormInput from "@/components/from/TextAreaFormInput";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
@@ -107,14 +107,14 @@ const AddCustomer = ({ params }: Props) => {
           const data = response.data;
           console.log(data, "edit details");
           if (Array.isArray(data) && data.length > 0) {
-            const patient: PatientType = data[0];
-            setDefaultValues(patient as CustomerFormValues);
-            reset(patient as CustomerFormValues);
+            const enquiries: CustomerEnquiriesType = data[0];
+            setDefaultValues(enquiries as CustomerFormValues);
+            reset(enquiries as CustomerFormValues);
           } else {
-            console.error("Patient not found or data format incorrect");
+            console.error("enquiries not found or data format incorrect");
           }
         } catch (error) {
-          console.error("Failed to fetch patient:", error);
+          console.error("Failed to fetch enquiries:", error);
         } finally {
           setLoading(false);
         }

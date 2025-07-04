@@ -22,7 +22,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import { getPatientById } from "@/helpers/data";
-import type { PatientType } from "@/types/data";
+import type { CustomerEnquiriesType } from "@/types/data";
 import TextFormInput from "@/components/from/TextFormInput";
 import TextAreaFormInput from "@/components/from/TextAreaFormInput";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
@@ -168,7 +168,7 @@ const AddTherapist = ({ params }: Props) => {
             reset(data[0] as unknown as TherapistFormValues);
           }
         } catch (error) {
-          console.error("Failed to fetch patient:", error);
+          console.error("Failed to fetch enquiries:", error);
         } finally {
           setLoading(false);
         }

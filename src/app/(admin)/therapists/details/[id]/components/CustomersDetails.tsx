@@ -4,10 +4,10 @@ import avatar2 from "@/assets/images/users/avatar-2.jpg";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import Image from "next/image";
 import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
-import type { PatientType } from "@/types/data";
+import type { CustomerEnquiriesType } from "@/types/data";
 import { useRouter } from "next/navigation";
 
-const CustomersDetails = ({ data }: { data: PatientType }) => {
+const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
   const router = useRouter();
 
   const handleEditClick = (id: string) => {
