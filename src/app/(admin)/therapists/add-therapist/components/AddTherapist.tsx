@@ -166,8 +166,6 @@ const AddTherapist = ({ params }: Props) => {
           const data = response.data;
           if (Array.isArray(data) && data.length > 0) {
             reset(data[0] as unknown as TherapistFormValues);
-          } else {
-            console.error("Patient not found or data format incorrect");
           }
         } catch (error) {
           console.error("Failed to fetch patient:", error);
@@ -180,10 +178,7 @@ const AddTherapist = ({ params }: Props) => {
   }, [isEditMode, params.id, reset]);
 
   const onSubmit = async (data: TherapistFormValues) => {
-    console.log(
-      isEditMode ? "Edit Submitted Data:" : "Create Submitted Data:",
-      data
-    );
+    console.log(isEditMode ? "Edit Submitted Data:" : "Create Submitted Data:", data);
   };
 
   if (loading) {
