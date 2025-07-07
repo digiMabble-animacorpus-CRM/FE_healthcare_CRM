@@ -6,7 +6,7 @@ import AddTherapist from "../../add-therapist/components/AddTherapist";
 
 export const metadata: Metadata = { title: "Customers Add" };
 
-const CustomerEditPage = ({ params }: { params: { id: string } }) => {
+const TherapistEditPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
       <PageTitle title="Edit Customer" subName="" />
@@ -15,4 +15,4 @@ const CustomerEditPage = ({ params }: { params: { id: string } }) => {
   );
 };
 
-export default CustomerEditPage;
+export default TherapistEditPage;

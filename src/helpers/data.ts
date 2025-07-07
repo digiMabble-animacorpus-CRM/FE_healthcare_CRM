@@ -235,7 +235,7 @@ export const getAllTherapists = async (
   };
 };
 
-export const getPatientById = async (
+export const getCustomerEnquiriesById = async (
   id?: string
 ): Promise<{ data: CustomerEnquiriesType[] }> => {
   await sleep();
@@ -245,6 +245,20 @@ export const getPatientById = async (
   }
 
   const result = customerEnquiriesData.filter((p) => p._id === id);
+
+  return { data: result };
+};
+
+export const getTherapistById = async (
+  id?: string
+): Promise<{ data: TherapistType[] }> => {
+  await sleep();
+
+  if (!id) {
+    return { data: [] };
+  }
+
+  const result = therapistData.filter((p) => p._id === id);
 
   return { data: result };
 };

@@ -16,7 +16,7 @@ import {
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 
-import { getPatientById } from "@/helpers/data";
+import { getCustomerEnquiriesById } from "@/helpers/data";
 import type { CustomerEnquiriesType } from "@/types/data";
 import TextFormInput from "@/components/from/TextFormInput";
 import TextAreaFormInput from "@/components/from/TextAreaFormInput";
@@ -103,7 +103,7 @@ const AddCustomer = ({ params }: Props) => {
     if (isEditMode) {
       const fetchData = async () => {
         try {
-          const response = await getPatientById(params.id!);
+          const response = await getCustomerEnquiriesById(params.id!);
           const data = response.data;
           console.log(data, "edit details");
           if (Array.isArray(data) && data.length > 0) {

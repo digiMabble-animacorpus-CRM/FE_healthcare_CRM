@@ -1,5 +1,5 @@
 import PageTitle from "@/components/PageTitle";
-import { getAllProperty, getPatientById } from "@/helpers/data";
+import { getAllProperty, getCustomerEnquiriesById } from "@/helpers/data";
 import CustomersDetails from "./components/CustomersDetails";
 import WeeklyInquiry from "./components/WeeklyInquiry";
 import TransactionHistory from "./components/TransactionHistory";
@@ -16,15 +16,15 @@ interface Props {
 const CustomerDetailsPage = async ({ params }: Props) => {
   const patientId = params.id;
   const propertyData = await getAllProperty();
-  const response = await getPatientById(patientId);
-  const patients: CustomerEnquiriesType[] = response.data;
+  const response = await getCustomerEnquiriesById(patientId);
+  const customers: CustomerEnquiriesType[] = response.data;
 
   return (
     <>
       <PageTitle subName="Customers" title="Customer Overview" />
       <Row>
         <Col xl={8} lg={12}>
-          <CustomersDetails data={patients[0]} />
+          <CustomersDetails data={customers[0]} />
         </Col>
         <Col xl={4} lg={12}>
           <WeeklyInquiry />

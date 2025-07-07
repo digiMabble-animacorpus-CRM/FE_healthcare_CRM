@@ -110,11 +110,11 @@ const TherapistsListPage = () => {
   };
 
   const handleView = (id: string) => {
-    router.push(`/customer-enquiries/details/${id}`);
+    router.push(`/therapists/details/${id}`);
   };
 
   const handleEditClick = (id: string) => {
-    router.push(`/customer-enquiries/edit-enquiry/${id}`);
+    router.push(`/therapists/edit-therapist/${id}`);
   };
 
   const handleDeleteClick = (id: string) => {

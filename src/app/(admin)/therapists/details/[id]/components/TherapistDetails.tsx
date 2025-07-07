@@ -4,14 +4,14 @@ import avatar2 from "@/assets/images/users/avatar-2.jpg";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import Image from "next/image";
 import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
-import type { CustomerEnquiriesType } from "@/types/data";
+import type { TherapistType } from "@/types/data";
 import { useRouter } from "next/navigation";
 
-const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
+const TherapistDetails = ({ data }: { data: TherapistType }) => {
   const router = useRouter();
 
   const handleEditClick = (id: string) => {
-    router.push(`/customer-enquiries/edit-enquiry/${id}`);
+    router.push(`/therapists/edit-therapist/${id}`);
   };
 
   return (
@@ -71,7 +71,7 @@ const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
             <span
               className={`badge bg-${
-                data.status === "new" ? "success" : "danger"
+                data.status === "active" ? "success" : "danger"
               } text-white fs-12 px-2 py-1`}
             >
               {data.status}
@@ -116,4 +116,4 @@ const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
   );
 };
 
-export default CustomersDetails;
+export default TherapistDetails;

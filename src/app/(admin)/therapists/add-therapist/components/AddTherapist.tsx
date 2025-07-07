@@ -21,7 +21,7 @@ import {
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 
-import { getPatientById } from "@/helpers/data";
+import { getTherapistById } from "@/helpers/data";
 import type { CustomerEnquiriesType } from "@/types/data";
 import TextFormInput from "@/components/from/TextFormInput";
 import TextAreaFormInput from "@/components/from/TextAreaFormInput";
@@ -162,7 +162,7 @@ const AddTherapist = ({ params }: Props) => {
     if (isEditMode) {
       const fetchData = async () => {
         try {
-          const response = await getPatientById(params.id!);
+          const response = await getTherapistById(params.id!);
           const data = response.data;
           if (Array.isArray(data) && data.length > 0) {
             reset(data[0] as unknown as TherapistFormValues);
