@@ -30,3 +30,13 @@ export type TabMenuItem = {
   icon: string
   tab: ReactNode
 }
+
+const menuItems = [
+  {
+    key: 'dashboard',
+    label: 'Dashboard',
+    icon: <DashboardIcon />, // Use your custom SVG here
+    url: '/dashboard',
+  },
+  // ...other items
+]

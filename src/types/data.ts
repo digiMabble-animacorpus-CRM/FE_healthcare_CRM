@@ -61,6 +61,62 @@ export type UserType = {
   emailMessage?: string
 }
 
+export type CustomerEnquiriesType = {
+  _id: IdType;
+  name: string;
+  email: string;
+  number: string;
+  dob: string;
+  description: string;
+  address: string;
+  zipCode: string;
+  gender: string;
+  language: string;
+  tags: string[];
+  city: string;
+  country: string;
+  status: 'new' | 'old';
+  lastUpdated: string;
+  source: string;
+  branch: 'Gembloux - Orneau' | 'Gembloux - Tout Vent' | 'Anima Corpus Namur';
+};
+
+export type TherapistType = {
+  _id: string;
+  name: string;
+  email: string;
+  number: string;
+  dob: string;
+  description: string;
+  address: string;
+  zipCode: string;
+  gender: string;
+  language: string;
+  city: string;
+  country: string;
+  specialization: string;
+  experience: string;
+  education: string;
+  certificationFiles: {
+    path: string;
+    preview: string | null;
+    formattedSize: string;
+  }[];
+  registrationNumber: string;
+  availability: {
+    day: string; // e.g., "Monday"
+    from: string; // e.g., "09:00"
+    to: string;   // e.g., "14:00"
+  }[];
+  tags: string[];
+  status: 'active' | 'inactive';
+  lastUpdated: string;
+  source: string;
+  branch: 'Gembloux - Orneau' | 'Gembloux - Tout Vent' | 'Anima Corpus Namur';
+};
+
+
+
 export type AgentType = {
   id: IdType
   address: string

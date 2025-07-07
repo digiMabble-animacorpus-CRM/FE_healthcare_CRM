@@ -36,11 +36,11 @@ html[data-bs-theme="dark"],
 
 /* Main Menu Light */
 html[data-menu-color="light"]{
-    --#{$prefix}main-nav-bg:                               #eeeef3;
-    --#{$prefix}main-nav-item-color:                       #696b84;
-    --#{$prefix}main-nav-item-hover-bg:                    #{$gray-100};
-    --#{$prefix}main-nav-item-hover-color:                 #{$primary};
-    --#{$prefix}main-nav-item-active-color:                #{$primary};
+    --#{$prefix}main-nav-bg:                               #F7F8FA;
+    --#{$prefix}main-nav-item-color:                       #333333;
+    --#{$prefix}main-nav-item-hover-bg:                    	#E8D9F2;
+    --#{$prefix}main-nav-item-hover-color:                #662483;
+    --#{$prefix}main-nav-item-active-color:                #662483;
     --#{$prefix}main-nav-border-color:                     #eaedf1;
 }
 
@@ -50,8 +50,8 @@ html[data-menu-color="dark"] {
     --#{$prefix}main-nav-bg:                               #1C252E;
     --#{$prefix}main-nav-item-color:                       #a8b2b5;
     --#{$prefix}main-nav-item-hover-bg:                    #{rgba($white, 0.06)};
-    --#{$prefix}main-nav-item-hover-color:                 #{$white};
-    --#{$prefix}main-nav-item-active-color:                 #{$gray-200};
+    --#{$prefix}main-nav-item-hover-color:                 #662483;
+    --#{$prefix}main-nav-item-active-color:                 #{$gray-100};
     --#{$prefix}main-nav-border-color:                     #2f3944;
 }
 

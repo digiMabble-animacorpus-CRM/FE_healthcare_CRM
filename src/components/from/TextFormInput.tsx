@@ -1,11 +1,24 @@
-import { type InputHTMLAttributes } from 'react'
-import { FormControl, FormGroup, FormLabel, type FormControlProps } from 'react-bootstrap'
-import Feedback from 'react-bootstrap/esm/Feedback'
-import { Controller, type FieldPath, type FieldValues, type PathValue } from 'react-hook-form'
+import { type InputHTMLAttributes } from "react";
+import {
+  FormControl,
+  FormGroup,
+  FormLabel,
+  type FormControlProps,
+} from "react-bootstrap";
+import Feedback from "react-bootstrap/esm/Feedback";
+import {
+  Controller,
+  type FieldPath,
+  type FieldValues,
+  type PathValue,
+} from "react-hook-form";
 
-import type { FormInputProps } from '@/types/component-props'
+import type { FormInputProps } from "@/types/component-props";
 
-const TextFormInput = <TFieldValues extends FieldValues = FieldValues, TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>>({
+const TextFormInput = <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
+>({
   name,
   containerClassName: containerClass,
   control,
@@ -14,28 +27,39 @@ const TextFormInput = <TFieldValues extends FieldValues = FieldValues, TName ext
   noValidate,
   labelClassName: labelClass,
   ...other
-}: FormInputProps<TFieldValues> & FormControlProps & InputHTMLAttributes<HTMLInputElement>) => {
+}: FormInputProps<TFieldValues> &
+  FormControlProps &
+  InputHTMLAttributes<HTMLInputElement>) => {
   return (
     <Controller<TFieldValues, TName>
       name={name as TName}
-      defaultValue={'' as PathValue<TFieldValues, TName>}
+      defaultValue={"" as PathValue<TFieldValues, TName>}
       control={control}
       render={({ field, fieldState }) => (
         <FormGroup className={containerClass}>
           {label &&
-            (typeof label === 'string' ? (
+            (typeof label === "string" ? (
               <FormLabel htmlFor={id ?? name} className={labelClass}>
                 {label}
               </FormLabel>
             ) : (
               <>{label}</>
             ))}
-          <FormControl id={id ?? name} {...other} {...field} isInvalid={Boolean(fieldState.error?.message)} />
-          {!noValidate && fieldState.error?.message && <Feedback type="invalid">{fieldState.error?.message}</Feedback>}
+          <FormControl
+            id={id ?? name}
+            {...other}
+            {...field}
+            isInvalid={Boolean(fieldState.error?.message)}
+          />
+          {!noValidate && fieldState.error?.message && (
+            <>
+              <small className="text-danger">{fieldState.error.message}</small>
+            </>
+          )}
         </FormGroup>
       )}
     />
-  )
-}
+  );
+};
 
-export default TextFormInput
+export default TextFormInput;
