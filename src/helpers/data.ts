@@ -11,6 +11,7 @@ import {
   timelineData,
   transactionData,
   userData,
+  staffData,
 } from "@/assets/data/other";
 import { sellersData } from "@/assets/data/product";
 import { emailsData, socialGroupsData } from "@/assets/data/social";
@@ -33,6 +34,7 @@ import {
   TransactionType,
   UserType,
   TherapistType,
+  StaffType,
 } from "@/types/data";
 import { db } from "@/utils/firebase";
 import { sleep } from "@/utils/promise";
@@ -185,7 +187,58 @@ export const getAllCustomerEnquiries = async (
     totalCount: filteredData.length,
   };
 };
-// 
+
+export const getAllStaff = async (
+  page: number = 1,
+  limit: number = 10,
+  branch?: string,
+  from?: string,
+  to?: string,
+  search?: string
+): Promise<{ data: StaffType[]; totalCount: number }> => {
+  await sleep(); // simulate delay
+
+  let filteredData = staffData;
+
+  // Branch Filter (matches any assigned branch)
+  if (branch) {
+    filteredData = filteredData.filter((item) =>
+      item.branches.some((b) => b.name === branch)
+    );
+  }
+
+  // Date Range Filter (based on updatedAt)
+  if (from && to) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    filteredData = filteredData.filter((item) => {
+      const updatedDate = new Date(item.updatedAt ?? item.createdAt);
+      return updatedDate >= fromDate && updatedDate <= toDate;
+    });
+  }
+
+  // Search Filter (name, email, phoneNumber)
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    filteredData = filteredData.filter(
+      (item) =>
+        item.name.toLowerCase().includes(lowerSearch) ||
+        item.email?.toLowerCase().includes(lowerSearch) ||
+        item.phoneNumber.toLowerCase().includes(lowerSearch)
+    );
+  }
+
+  // Pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginatedData = filteredData.slice(start, end);
+
+  return {
+    data: paginatedData,
+    totalCount: filteredData.length,
+  };
+};
+
 export const getAllTherapists = async (
   page: number = 1,
   limit: number = 10,
@@ -233,6 +286,20 @@ export const getAllTherapists = async (
     data: paginatedData,
     totalCount: filteredData.length,
   };
+};
+
+export const getStaffById = async (
+  id?: string
+): Promise<{ data: StaffType[] }> => {
+  await sleep();
+
+  if (!id) {
+    return { data: [] };
+  }
+
+  const result = staffData.filter((p) => p._id === id);
+
+  return { data: result };
 };
 
 export const getCustomerEnquiriesById = async (
