@@ -187,6 +187,12 @@ export const MENU_ITEMS: MenuItemType[] = [
     ],
   },
   {
+    key: "languages",
+    label: "Languages",
+    icon: "ri:home-office-line",
+    url: "/languages",
+  },
+  {
     key: "orders",
     label: "Orders",
     icon: "ri:home-office-line",
