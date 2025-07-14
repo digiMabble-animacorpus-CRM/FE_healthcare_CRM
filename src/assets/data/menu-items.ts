@@ -193,6 +193,12 @@ export const MENU_ITEMS: MenuItemType[] = [
     url: "/languages",
   },
   {
+    key: "StaffRoles",
+    label: "Staff Roles",
+    icon: "ri:home-office-line",
+    url: "/staff-role",
+  },
+  {
     key: "orders",
     label: "Orders",
     icon: "ri:home-office-line",

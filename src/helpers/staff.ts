@@ -49,7 +49,8 @@ export const getAllStaff = async (
     const toDate = new Date(to);
     filteredData = filteredData.filter((item) => {
       const lastUpdated =
-        item.updatedBy?.[item.updatedBy.length - 1]?.updatedAt || item.createdAt;
+        item.updatedBy?.[item.updatedBy.length - 1]?.updatedAt ||
+        item.createdAt;
       const updatedDate = new Date(lastUpdated);
 
       return (
@@ -113,9 +114,8 @@ export const getAllStaff = async (
       .filter(Boolean) as BranchType[];
 
     // Expand selectedBranch id to full branch object
-    const selectedBranchDetailed = branches.find(
-      (br) => br._id === staff.selectedBranch
-    ) || null;
+    const selectedBranchDetailed =
+      branches.find((br) => br._id === staff.selectedBranch) || null;
 
     return {
       ...staff,
@@ -133,7 +133,6 @@ export const getAllStaff = async (
     totalCount: filteredData.length,
   };
 };
-
 
 export const getStaffById = async (
   id?: string
@@ -162,7 +161,12 @@ export const getStaffById = async (
     const permissionsDetailed = (staff.permissions || []).map((perm) => {
       const permDetails = permissionData.find((p) => p._id === perm._id);
       return {
-        ...(permDetails || { _id: perm._id, key: "", label: "", description: "" }),
+        ...(permDetails || {
+          _id: perm._id,
+          key: "",
+          label: "",
+          description: "",
+        }),
         enabled: perm.enabled,
       };
     });
@@ -192,13 +196,12 @@ export const getStaffById = async (
 
 // Optionally, get all roles and access levels for dropdowns
 export const getAllRoles = (): StaffRoleType[] => {
-  return staffRoleData.filter(role => role.tag === "Role");
+  return staffRoleData.filter((role) => role.tag === "Role");
 };
 
 export const getAllAccessLevels = (): StaffRoleType[] => {
-  return staffRoleData.filter(role => role.tag === "AccessLevel");
+  return staffRoleData.filter((role) => role.tag === "AccessLevel");
 };
-
 
 export const getDefaultStaffById = async (
   id?: string
@@ -212,4 +215,98 @@ export const getDefaultStaffById = async (
   const result = staffData.filter((p) => p._id === id);
 
   return { data: result };
+};
+
+export const getAllStaffRoll = async (
+  page: number = 1,
+  limit: number = 10,
+  tag?: string,
+  search?: string
+): Promise<{
+  data: (StaffRoleType & { permissionsDetailed: PermissionType[] })[];
+  totalCount: number;
+}> => {
+  await sleep();
+
+  let filteredData = staffRoleData;
+
+  // ✅ Filter by Tag
+  if (tag) {
+    filteredData = filteredData.filter((item) => item.tag === tag);
+  }
+
+  // ✅ Search Filter
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    filteredData = filteredData.filter(
+      (item) =>
+        item.key?.toLowerCase().includes(lowerSearch) ||
+        item.label?.toLowerCase().includes(lowerSearch)
+    );
+  }
+
+  // ✅ Pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginatedData = filteredData.slice(start, end);
+
+  // ✅ Enrich Roles with Permission Details
+  const enrichedData = paginatedData.map((role) => {
+    const permissionsDetailed = (role.defaultPermissions || []).map(
+      (permKey) => {
+        return (
+          permissionData.find((p) => p.key === permKey) || {
+            _id: permKey,
+            key: permKey,
+            label: permKey,
+            description: "",
+          }
+        );
+      }
+    );
+
+    return {
+      ...role,
+      permissionsDetailed,
+    };
+  });
+
+  return {
+    data: enrichedData,
+    totalCount: filteredData.length,
+  };
+};
+
+export const getStaffRoleById = async (
+  id?: string
+): Promise<{ data: StaffRoleType[] }> => {
+  await sleep();
+
+  if (!id) {
+    return { data: [] };
+  }
+
+  const filtered = staffRoleData.filter((p) => p._id === id);
+
+  const enriched = filtered.map((staff) => {
+    const defaultPermissionsDetailed = (staff.defaultPermissions || []).map((perm) => {
+      const permDetails = permissionData.find((p) => p.key === perm);
+      return {
+        ...(permDetails || {
+          _id: perm,
+          key: perm,
+          label: "",
+          description: "",
+        }),
+      };
+    });
+    return {
+      ...staff,
+      defaultPermissionsDetailed,
+    };
+  });
+
+  return {
+    data: enriched,
+  };
 };

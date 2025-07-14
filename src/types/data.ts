@@ -119,6 +119,7 @@ export type StaffRoleType = {
   label: string;
   description?: string;
   defaultPermissions?: string[];
+  defaultPermissionsDetailed?: PermissionType[];
   internal?: boolean;
   requiresDetails?: boolean;
   requiresAvailability?: boolean;
