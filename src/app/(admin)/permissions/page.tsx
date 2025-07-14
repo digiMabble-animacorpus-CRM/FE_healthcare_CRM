@@ -3,7 +3,7 @@
 import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import { useEffect, useState } from "react";
-import type { LanguageType, StaffType } from "@/types/data";
+import type { PermissionType } from "@/types/data";
 import {
   Button,
   Card,
@@ -17,37 +17,36 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
-import { getLanguages } from "@/helpers/languages";
+import { getPermissions } from "@/helpers/permission";
 
 const PAGE_LIMIT = 10;
 
-const LanguageListPage = () => {
-  const [languages, setLanguages] = useState<LanguageType[]>([]);
+const PermissionsListPage = () => {
+  const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
-  );
+  const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
+
   const router = useRouter();
 
-  const fetchLanguages = async (page: number) => {
+  const fetchPermissionsList = async (page: number) => {
     setLoading(true);
     try {
-      const response = await getLanguages(page, PAGE_LIMIT, searchTerm);
-      setLanguages(response.data);
+      const response = await getPermissions(page, PAGE_LIMIT, searchTerm);
+      setPermissions(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error("Failed to fetch enquiries data:", error);
+      console.error("Failed to fetch permissions:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchLanguages(currentPage);
+    fetchPermissionsList(currentPage);
   }, [currentPage, searchTerm]);
 
   const handlePageChange = (page: number) => {
@@ -56,41 +55,41 @@ const LanguageListPage = () => {
     }
   };
 
-  const handleEditClick = (id: string) => {
-    router.push(`languages/language-form/${id}/edit`);
+  const handleEditPermission = (id: string) => {
+    router.push(`/permissions/permission-form/${id}/edit`);
   };
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedPatientId(id);
+  const handleDeletePermission = (id: string) => {
+    setSelectedPermissionId(id);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!selectedPatientId) return;
+  const confirmDeletePermission = async () => {
+    if (!selectedPermissionId) return;
 
     try {
-      await fetch(`/api/languages/${selectedPatientId}`, {
+      await fetch(`/api/permissions/${selectedPermissionId}`, {
         method: "DELETE",
       });
 
-      fetchLanguages(currentPage); // refresh list
+      fetchPermissionsList(currentPage);
     } catch (error) {
-      console.error("Failed to delete enquiries:", error);
+      console.error("Failed to delete permission:", error);
     } finally {
       setShowDeleteModal(false);
-      setSelectedPatientId(null);
+      setSelectedPermissionId(null);
     }
   };
 
   return (
     <>
-      <PageTitle subName="Languages" title="Languages List" />
+      <PageTitle subName="Permissions" title="Permissions List" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Languages List
+                All Permissions
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -98,7 +97,7 @@ const LanguageListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Search by name, email, number..."
+                    placeholder="Search by key, label, description..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -106,8 +105,8 @@ const LanguageListPage = () => {
                     }}
                   />
                 </div>
-                <Button variant="primary" onClick={() => router.push("/languages/language-form/create")}>
-                  Add Language
+                <Button variant="primary" onClick={() => router.push("/permissions/permission-form/create")}>
+                  Create New Permission
                 </Button>
               </div>
             </CardHeader>
@@ -122,61 +121,33 @@ const LanguageListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>
-                          <div className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id="customCheck1"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="customCheck1"
-                            />
-                          </div>
-                        </th>
-                        {/* <th>Id</th> */}
                         <th>Key</th>
                         <th>Label</th>
-                        <th>Action</th>
+                        <th>Description</th>
+                        <th style={{ width: 100 }}>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {languages.map((item: LanguageType, idx: number) => (
+                      {permissions.map((permission: PermissionType, idx: number) => (
                         <tr key={idx}>
-                          <td>
-                            <div className="form-check">
-                              <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={`check-${idx}`}
-                              />
-                            </div>
-                          </td>
-                          {/* <td>{item._id}</td> */}
-                          <td>{item.key}</td>
-                          <td>{item.label}</td>
+                          <td>{permission.key}</td>
+                          <td>{permission.label}</td>
+                          <td>{permission.description}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
                                 variant="soft-primary"
                                 size="sm"
-                                onClick={() => handleEditClick(item._id)}
+                                onClick={() => handleEditPermission(permission._id)}
                               >
-                                <IconifyIcon
-                                  icon="solar:pen-2-broken"
-                                  className="align-middle fs-18"
-                                />
+                                <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
                               </Button>
                               <Button
                                 variant="soft-danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
+                                onClick={() => handleDeletePermission(permission._id)}
                               >
-                                <IconifyIcon
-                                  icon="solar:trash-bin-minimalistic-2-broken"
-                                  className="align-middle fs-18"
-                                />
+                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
                               </Button>
                             </div>
                           </td>
@@ -191,9 +162,7 @@ const LanguageListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                  >
+                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -204,9 +173,7 @@ const LanguageListPage = () => {
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
                     <li
-                      className={`page-item ${
-                        currentPage === index + 1 ? "active" : ""
-                      }`}
+                      className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
                       key={index}
                     >
                       <Button
@@ -218,11 +185,7 @@ const LanguageListPage = () => {
                       </Button>
                     </li>
                   ))}
-                  <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
+                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -238,24 +201,22 @@ const LanguageListPage = () => {
         </Col>
       </Row>
 
-      {/* Delete Confirmation Modal */}
       <Modal
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}
         centered
       >
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this customer? This action cannot be
-          undone.
+          Are you sure you want to delete this permission? This action cannot be undone.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Cancel
           </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
+          <Button variant="danger" onClick={confirmDeletePermission}>
             Delete
           </Button>
         </Modal.Footer>
@@ -264,4 +225,4 @@ const LanguageListPage = () => {
   );
 };
 
-export default LanguageListPage;
+export default PermissionsListPage;

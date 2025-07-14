@@ -159,8 +159,14 @@ export const MENU_ITEMS: MenuItemType[] = [
   {
     key: "StaffRoles",
     label: "Staff Roles",
-    icon: "ri:home-office-line",
+    icon: "ri:discuss-line",
     url: "/staff-role",
+  },
+  {
+    key: "permissions",
+    label: "Permissions",
+    icon: "ri:chat-quote-line",
+    url: "/permissions",
   },
   // {
   //   key: "orders",
