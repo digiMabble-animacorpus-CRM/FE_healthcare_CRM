@@ -1,11 +1,12 @@
 import PageTitle from "@/components/PageTitle";
-import { getAllProperty, getStaffById } from "@/helpers/data";
+import { getAllProperty } from "@/helpers/data";
 import WeeklyInquiry from "./components/WeeklyInquiry";
 import TransactionHistory from "./components/TransactionHistory";
 import type { StaffType, TherapistType } from "@/types/data";
 import { Col, Row } from "react-bootstrap";
 import { Metadata } from "next";
 import StaffDetails from "./components/StaffDetails";
+import { getStaffById } from "@/helpers/staff";
 
 export const metadata: Metadata = { title: "Staff Overview" };
 

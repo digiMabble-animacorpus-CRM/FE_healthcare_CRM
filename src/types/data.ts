@@ -1,6 +1,5 @@
 import { StaticImageData } from "next/image";
 import { BootstrapVariantType } from "./component-props";
-
 export type IdType = string;
 
 export type EmailLabelType =
@@ -86,21 +85,54 @@ export type CustomerEnquiriesType = {
   branch: "Gembloux - Orneau" | "Gembloux - Tout Vent" | "Anima Corpus Namur";
 };
 
-export type BranchName =
-  | ""
-  | "Gembloux - Orneau"
-  | "Gembloux - Tout Vent"
-  | "Anima Corpus Namur";
+export type BranchType = {
+  _id: string;
 
-export type PermissionType =
-  | "view-patients"
-  | "edit-patients"
-  | "manage-appointments"
-  | "prescribe-meds"
-  | "manage-inventory"
-  | "access-billing"
-  | "admin-access"
-  | "custom";
+  name: string;
+  code?: string;
+  email?: string;
+  phoneNumber?: string;
+  address?: Address;
+  status: "active" | "inactive";
+
+  createdBy: string;
+  updatedBy: {
+    staffId: string;
+    updatedAt: string;
+  }[];
+
+  createdAt: string;
+};
+
+export type PermissionType = {
+  _id: string;
+  key: string;
+  label: string;
+  description?: string;
+  category?: string;
+};
+
+export type StaffRoleType = {
+  _id: string;
+  tag: "Role" | "AccessLevel";
+  key: string;
+  label: string;
+  description?: string;
+  defaultPermissions?: string[];
+  internal?: boolean;
+  requiresDetails?: boolean;
+  requiresAvailability?: boolean;
+};
+
+// export type PermissionType =
+//   | "view-patients"
+//   | "edit-patients"
+//   | "manage-appointments"
+//   | "prescribe-meds"
+//   | "manage-inventory"
+//   | "access-billing"
+//   | "admin-access"
+//   | "custom";
 
 export type StaffRole =
   | ""
@@ -113,6 +145,7 @@ export type StaffRole =
   | "Technician"
   | "SupportStaff"
   | "LabTechnician"
+  | "Assistant"
   | "Other";
 
 export type AvailabilitySlot = {
@@ -121,9 +154,10 @@ export type AvailabilitySlot = {
   to: string; // "14:00"
 };
 
-export type AssignedBranch = {
-  name: BranchName;
-  isPrimary?: boolean;
+export type LanguageType = {
+  _id: string;
+  key: string;
+  label: string;
 };
 
 export type Language = "french" | "dutch" | "english";
@@ -137,24 +171,24 @@ export type Address = {
 };
 
 export type StaffType = {
+  [x: string]: any;
   _id: string;
   name: string;
   phoneNumber: string;
   email: string;
 
   gender: string;
-  languages: Language[];
+  languages: string[];
 
   address?: Address;
   description?: string;
   dob?: string;
 
-  role: StaffRole;
-  accessLevel: "" | "staff" | "branch-admin" | "super-admin";
+  roleId: string;
+  accessLevelId?: string;
 
-  branches: AssignedBranch[];
-  selectedBranch: BranchName;
-
+  branches: { id: string; isPrimary?: boolean }[];
+  selectedBranch: string;
   specialization?: string;
   experience?: string;
   education?: string;
@@ -171,7 +205,7 @@ export type StaffType = {
   status: "active" | "inactive";
 
   permissions: {
-    key: PermissionType;
+    _id: string;
     enabled: boolean;
   }[];
 
@@ -185,8 +219,10 @@ export type StaffType = {
   createdBy: string;
   createdAt: string;
 
-  updatedBy?: string;
-  updatedAt?: string;
+  updatedBy: {
+    staffId: string;
+    updatedAt: string;
+  }[];
 };
 
 export type TherapistType = {

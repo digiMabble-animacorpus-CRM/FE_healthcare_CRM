@@ -14,7 +14,7 @@ const CreateStaffPage = () => {
       // 🔁 Replace with actual API call
       console.log('Creating staff...', data)
       toast.success('Staff created successfully!')
-      router.push('/staffs')
+      // router.push('/staffs')
     } catch (error) {
       toast.error('Failed to create staff.')
     }

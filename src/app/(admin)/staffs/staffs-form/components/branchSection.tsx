@@ -1,16 +1,11 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useFormContext, Controller, useWatch } from "react-hook-form";
 import { Col, Row, FormCheck } from "react-bootstrap";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import type { StaffType, BranchName, AssignedBranch } from "@/types/data";
-
-const branchOptions: BranchName[] = [
-  "Gembloux - Orneau",
-  "Gembloux - Tout Vent",
-  "Anima Corpus Namur",
-];
+import type { StaffType, BranchType } from "@/types/data";
+import { getAllBranch } from "@/helpers/branch";
 
 const BranchSection = () => {
   const {
@@ -22,24 +17,37 @@ const BranchSection = () => {
   const assignedBranches = useWatch({ control, name: "branches" }) || [];
   const selectedBranch = useWatch({ control, name: "selectedBranch" });
 
+  // ✅ Get all branches as full objects
+  const allBranches = useMemo<BranchType[]>(() => {
+    const branches = getAllBranch();
+    return branches;
+  }, []);
+
+  // For rendering options in dropdown
+  const branchOptions = allBranches.map((b) => ({
+    _id: b._id,
+    name: b.name,
+  }));
+
   // 🔄 Auto-select or clear primary branch based on selection count
   useEffect(() => {
+
     if (assignedBranches.length === 1) {
-      const branchName =
+      const branchId =
         typeof assignedBranches[0] === "string"
           ? assignedBranches[0]
-          : assignedBranches[0].name;
-      setValue("selectedBranch", branchName, { shouldValidate: true });
+          : assignedBranches[0].id;
+      setValue("selectedBranch", branchId, { shouldValidate: true });
     } else if (assignedBranches.length > 1) {
       const isCurrentSelectedValid = assignedBranches.some(
-        (b) => (typeof b === "string" ? b : b.name) === selectedBranch
+        (b) => (typeof b === "string" ? b : b.id) === selectedBranch
       );
 
       if (!selectedBranch || !isCurrentSelectedValid) {
         const firstBranch =
           typeof assignedBranches[0] === "string"
             ? assignedBranches[0]
-            : assignedBranches[0].name;
+            : assignedBranches[0].id;
         setValue("selectedBranch", firstBranch, { shouldValidate: true });
       }
     } else {
@@ -60,27 +68,32 @@ const BranchSection = () => {
             <Controller
               control={control}
               name="branches"
-              render={({ field: { onChange, value, ...rest } }) => (
-                <ChoicesFormInput
-                  className="form-control"
-                  multiple
-                  options={{ removeItemButton: true }}
-                  value={value.map((v) => (typeof v === "string" ? v : v.name))}
-                  onChange={(val) => {
-                    const converted = Array.isArray(val)
-                      ? val.map((v) => ({ name: v }))
-                      : [{ name: val }];
-                    onChange(converted);
-                  }}
-                  {...rest}
-                >
-                  {branchOptions.map((branch) => (
-                    <option key={branch} value={branch}>
-                      {branch}
-                    </option>
-                  ))}
-                </ChoicesFormInput>
-              )}
+              render={({ field: { onChange, value = [], ...rest } }) => {
+                return (
+                  <ChoicesFormInput
+                    className="form-control"
+                    multiple
+                    options={{ removeItemButton: true }}
+                    value={value.map((v) => (typeof v === "string" ? v : v.id))}
+                    onChange={(val) => {
+                      const converted = Array.isArray(val)
+                        ? val.map((v) => ({
+                            id: v,
+                            isPrimary: false,
+                          }))
+                        : [{ id: val, isPrimary: false }];
+                      onChange(converted);
+                    }}
+                    {...rest}
+                  >
+                    {branchOptions.map(({ _id, name }) => (
+                      <option key={_id} value={_id}>
+                        {name}
+                      </option>
+                    ))}
+                  </ChoicesFormInput>
+                );
+              }}
             />
             {errors.branches && (
               <small className="text-danger">{errors.branches.message}</small>
@@ -95,24 +108,29 @@ const BranchSection = () => {
                 Select Primary Branch <span className="text-danger">*</span>
               </label>
               <Row>
-                {assignedBranches.map((branch: AssignedBranch | string) => {
+                {assignedBranches.map((branch) => {
+                  const branchId =
+                    typeof branch === "string" ? branch : branch.id;
                   const branchName =
-                    typeof branch === "string" ? branch : branch.name;
+                    allBranches.find((b) => b._id === branchId)?.name ||
+                    branchId;
 
                   return (
-                    <Col lg={4} key={branchName}>
+                    <Col lg={4} key={branchId}>
                       <Controller
                         name="selectedBranch"
                         control={control}
                         render={({ field }) => (
                           <FormCheck
                             type="radio"
-                            id={`primary-${branchName}`}
+                            id={`primary-${branchId}`}
                             name="selectedBranch"
                             label={branchName}
-                            value={branchName}
-                            checked={field.value === branchName}
-                            onChange={() => field.onChange(branchName)}
+                            value={branchId}
+                            checked={field.value === branchId}
+                            onChange={() => {
+                              field.onChange(branchId);
+                            }}
                           />
                         )}
                       />

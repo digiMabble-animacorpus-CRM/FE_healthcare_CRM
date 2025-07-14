@@ -13,8 +13,10 @@ import BranchSection from "./components/branchSection";
 import ContactInfo from "./components/contactInfo";
 import AvailabilitySection from "./components/availabilitySection";
 import PermissionsSection from "./components/permissionSection";
+import { useMemo } from "react";
+import { getAllRoles } from "@/helpers/staff";
 
-// ✅ Schema
+// ✅ Schema aligned with StaffType
 const schema: yup.ObjectSchema<any> = yup.object().shape({
   name: yup.string().required("Name is required"),
   email: yup.string().email().required("Email is required"),
@@ -22,9 +24,18 @@ const schema: yup.ObjectSchema<any> = yup.object().shape({
   gender: yup.string().required("Gender is required"),
   dob: yup.string().required("Date of birth is required"),
   description: yup.string(),
-  role: yup.string().required("Role is required"),
-  accessLevel: yup.string().required("Access Level is required"),
-  branches: yup.array().min(1, "Select at least one branch").required(),
+  roleId: yup.string().required("Role is required"),
+  accessLevelId: yup.string().required("Access Level is required"),
+  branches: yup
+    .array()
+    .of(
+      yup.object().shape({
+        id: yup.string().required("Branch ID is required"),
+        isPrimary: yup.boolean().optional(),
+      })
+    )
+    .min(1, "Select at least one branch")
+    .required(),
   selectedBranch: yup.string().required("Select primary branch"),
   address: yup.object().shape({
     line1: yup.string().required("Address Line 1 is required"),
@@ -42,33 +53,35 @@ const schema: yup.ObjectSchema<any> = yup.object().shape({
   ),
   permissions: yup.array().of(
     yup.object().shape({
-      key: yup.string().required(),
+      _id: yup.string().required("Permission ID is required"),
       enabled: yup.boolean().required(),
     })
   ),
 });
 
-// ✅ Props
 interface Props {
   defaultValues?: Partial<StaffType>;
   isEditMode?: boolean;
   onSubmitHandler: (data: StaffType) => Promise<void>;
 }
 
-const StaffForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
+const StaffForm = ({
+  defaultValues,
+  isEditMode = false,
+  onSubmitHandler,
+}: Props) => {
   const router = useRouter();
 
   const methods = useForm<StaffType>({
     resolver: yupResolver(schema),
     defaultValues: {
       ...defaultValues,
-      gender: defaultValues?.gender || "",
-      role: defaultValues?.role || "",
-      accessLevel: defaultValues?.accessLevel || "",
-      permissions: defaultValues?.permissions || [],
       branches: defaultValues?.branches || [],
+      permissions: defaultValues?.permissions || [],
       availability: defaultValues?.availability || [],
       languages: defaultValues?.languages || [],
+      roleId: defaultValues?.roleId || "",
+      accessLevelId: defaultValues?.accessLevelId || "",
       address: defaultValues?.address || {
         line1: "",
         city: "",
@@ -84,7 +97,10 @@ const StaffForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props
     formState: { errors },
   } = methods;
 
-  const role = watch("role") || "";
+  const roleId = watch("roleId") || "";
+  const selectedRole = useMemo(() => {
+    return getAllRoles().find((r) => r._id === roleId);
+  }, [roleId]);
 
   return (
     <FormProvider {...methods}>
@@ -100,9 +116,7 @@ const StaffForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props
             <ProfessionalInfo />
             <BranchSection />
             <ContactInfo />
-            {["Doctor", "Therapist", "Nurse", "Pharmacist", "Technician"].includes(role) && (
-              <AvailabilitySection />
-            )}
+            {selectedRole?.requiresAvailability && <AvailabilitySection />}
             <PermissionsSection />
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">

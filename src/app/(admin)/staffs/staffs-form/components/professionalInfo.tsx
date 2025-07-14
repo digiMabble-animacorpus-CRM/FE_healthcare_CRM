@@ -1,10 +1,11 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Col, Row } from "react-bootstrap";
 import TextFormInput from "@/components/from/TextFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import type { StaffType } from "@/types/data";
+import type { StaffRoleType, StaffType } from "@/types/data";
+import { getAllAccessLevels, getAllRoles } from "@/helpers/staff";
 
 const ProfessionalInfo = () => {
   const {
@@ -12,22 +13,27 @@ const ProfessionalInfo = () => {
     formState: { errors },
     watch,
   } = useFormContext<StaffType>();
-  const role = watch("role");
 
-  // Roles that require specialization & experience
-  const requiresDetails = [
-    "Doctor",
-    "Therapist",
-    "Nurse",
-    "Pharmacist",
-    "Technician",
-    "LabTechnician",
-  ];
+  const roleId = watch("roleId");
+  const [roleOptions, setRoleOptions] = useState<StaffRoleType[]>([]);
+  const [accessLevelOptions, setAccessLevelOptions] = useState<StaffRoleType[]>([]);
+
+  useEffect(() => {
+    setRoleOptions(getAllRoles());
+    setAccessLevelOptions(getAllAccessLevels());
+  }, []);
+
+  const selectedRole = useMemo(() => {
+    return roleOptions.find((role) => role._id === roleId);
+  }, [roleOptions, roleId]);
+
+  const shouldShowDetails = selectedRole?.requiresDetails;
 
   return (
     <div className="mb-4">
       <h5 className="mb-3">Professional Information</h5>
       <Row>
+        {/* Role */}
         <Col lg={6}>
           <div className="mb-3">
             <label className="form-label">
@@ -35,32 +41,32 @@ const ProfessionalInfo = () => {
             </label>
             <Controller
               control={control}
-              name="role"
+              name="roleId"
               render={({ field }) => (
-                <ChoicesFormInput className="form-control" {...field}>
+                <select
+                  className="form-control"
+                  {...field}
+                  value={field.value || ""}
+                  onChange={(e) => field.onChange(e.target.value)}
+                >
                   <option value="" disabled hidden>
                     Select Role
                   </option>
-                  <option value="Doctor">Doctor</option>
-                  <option value="Therapist">Therapist</option>
-                  <option value="Nurse">Nurse</option>
-                  <option value="Receptionist">Receptionist</option>
-                  <option value="Admin">Admin</option>
-                  <option value="Pharmacist">Pharmacist</option>
-                  <option value="Technician">Technician</option>
-                  <option value="SupportStaff">Support Staff</option>
-                  <option value="LabTechnician">Lab Technician</option>
-                  <option value="Other">Other</option>
-                </ChoicesFormInput>
+                  {roleOptions.map((r) => (
+                    <option key={r._id} value={r._id}>
+                      {r.label}
+                    </option>
+                  ))}
+                </select>
               )}
             />
-
-            {errors.role && (
-              <small className="text-danger">{errors.role.message}</small>
+            {errors.roleId?.message && (
+              <small className="text-danger">{String(errors.roleId.message)}</small>
             )}
           </div>
         </Col>
 
+        {/* Access Level */}
         <Col lg={6}>
           <div className="mb-3">
             <label className="form-label">
@@ -68,28 +74,33 @@ const ProfessionalInfo = () => {
             </label>
             <Controller
               control={control}
-              name="accessLevel"
+              name="accessLevelId"
               render={({ field }) => (
-                <ChoicesFormInput className="form-control" {...field}>
+                <select
+                  className="form-control"
+                  {...field}
+                  value={field.value || ""}
+                  onChange={(e) => field.onChange(e.target.value)}
+                >
                   <option value="" disabled hidden>
                     Select Access Level
                   </option>
-                  <option value="staff">Staff</option>
-                  <option value="branch-admin">Branch Admin</option>
-                  <option value="super-admin">Super Admin</option>
-                </ChoicesFormInput>
+                  {accessLevelOptions.map((level) => (
+                    <option key={level._id} value={level._id}>
+                      {level.label}
+                    </option>
+                  ))}
+                </select>
               )}
             />
-
-            {errors.accessLevel && (
-              <small className="text-danger">
-                {errors.accessLevel.message}
-              </small>
+            {errors.accessLevelId?.message && (
+              <small className="text-danger">{String(errors.accessLevelId.message)}</small>
             )}
           </div>
         </Col>
 
-        {requiresDetails.includes(role) && (
+        {/* Specialization & Experience */}
+        {shouldShowDetails && (
           <>
             <Col lg={6}>
               <div className="mb-3">
@@ -102,7 +113,6 @@ const ProfessionalInfo = () => {
                 />
               </div>
             </Col>
-
             <Col lg={6}>
               <div className="mb-3">
                 <TextFormInput

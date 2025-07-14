@@ -2,7 +2,6 @@
 
 import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { getAllStaff } from "@/helpers/data";
 import { useEffect, useState } from "react";
 import type { StaffType, TherapistType } from "@/types/data";
 import dayjs from "dayjs";
@@ -23,6 +22,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
+import { getAllStaff } from "@/helpers/staff";
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -147,6 +147,7 @@ const StaffsListPage = () => {
     if (!gender) return "";
     return gender.charAt(0).toUpperCase();
   };
+  console.log(therapists, "therapists");
 
   return (
     <>
@@ -309,12 +310,13 @@ const StaffsListPage = () => {
                           <td>{item.name}</td>
                           <td>{item.email}</td>
                           <td>{item.phoneNumber}</td>
+                          <td>{formatGender(item.gender || "")}</td>
                           <td>
-                            {formatGender(item.gender || "")}
-                          </td>
-                          <td>
-                            {item.branches
-                              .map((branch) => branch.name)
+                            {item.branchesDetailed
+                              .map(
+                                (branch: { [x: string]: any; name: any }) =>
+                                  branch.code
+                              )
                               .join(", ")}
                           </td>
                           <td>
@@ -326,7 +328,7 @@ const StaffsListPage = () => {
                               {item.status}
                             </span>
                           </td>
-                          <td>{item.updatedAt}</td>
+                          <td>{item.createdAt}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button

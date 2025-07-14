@@ -1,76 +1,115 @@
 "use client";
 
-import { useFormContext, useWatch } from "react-hook-form";
-import { FormCheck, Row, Col } from "react-bootstrap";
+import { useEffect, useMemo, useState } from "react";
+import { Controller, useFormContext, useWatch } from "react-hook-form";
+import { Row, Col, FormCheck, FormControl, FormLabel } from "react-bootstrap";
 import type { StaffType, PermissionType } from "@/types/data";
-
-const permissionLabels: Record<PermissionType, string> = {
-  "view-patients": "View Patients",
-  "edit-patients": "Edit Patients",
-  "manage-appointments": "Manage Appointments",
-  "prescribe-meds": "Prescribe Medication",
-  "manage-inventory": "Manage Inventory",
-  "access-billing": "Access Billing",
-  "admin-access": "Admin Access",
-  "custom": "Custom Permission",
-};
-
-const rolePermissions: Record<string, PermissionType[]> = {
-  Doctor: ["view-patients", "edit-patients", "prescribe-meds"],
-  Therapist: ["view-patients", "edit-patients"],
-  Nurse: ["view-patients"],
-  Receptionist: ["manage-appointments"],
-  Admin: ["admin-access", "manage-inventory", "access-billing"],
-  Pharmacist: ["manage-inventory"],
-  Technician: ["view-patients"],
-  LabTechnician: ["view-patients"],
-  SupportStaff: [],
-  Other: ["custom"],
-};
+import ChoicesFormInput from "@/components/from/ChoicesFormInput";
+import { getAllRoles } from "@/helpers/staff";
+import { getAllPermissions } from "@/helpers/permission";
 
 const PermissionsSection = () => {
-  const { setValue } = useFormContext<StaffType>();
-  const role = useWatch({ name: "role" });
+  const {
+    setValue,
+    control,
+    formState: { errors },
+  } = useFormContext<StaffType>();
+
+  const allRoles = useMemo(() => getAllRoles(), []);
+  const allPermissions = useMemo(() => getAllPermissions(), []);
+
+  const roleId = useWatch({ name: "roleId" });
   const selectedPermissions = useWatch({ name: "permissions" }) || [];
 
-  // Don’t show anything if no role is selected
-  if (!role) return null;
+  const [defaultKeys, setDefaultKeys] = useState<string[]>([]);
 
-  const availableKeys = rolePermissions[role] || [];
+  const permissionLabels = useMemo(() => {
+    const map: Record<string, string> = {};
+    allPermissions.forEach((p) => (map[p.key] = p.label));
+    return map;
+  }, [allPermissions]);
 
-  const handleToggle = (key: PermissionType) => {
-    const exists = selectedPermissions.find((p: { key: string; }) => p.key === key);
-    let updated;
-    if (exists) {
-      updated = selectedPermissions.map((p: { key: string; enabled: any; }) =>
-        p.key === key ? { ...p, enabled: !p.enabled } : p
-      );
-    } else {
-      updated = [...selectedPermissions, { key, enabled: true }];
-    }
+  // 🧠 Fetch default permissions based on role
+  useEffect(() => {
+    const role = allRoles.find((r) => r._id === roleId);
+    setDefaultKeys(role?.defaultPermissions || []);
+  }, [roleId, allRoles]);
+
+  // 🚀 Merge default + existing selected permissions on change
+  useEffect(() => {
+    const currentKeys = selectedPermissions.map((p: any) => p._id);
+    const mergedKeys = Array.from(new Set([...defaultKeys, ...currentKeys]));
+    const mapped = mergedKeys.map((key) => ({ _id: key, enabled: true }));
+    setValue("permissions", mapped);
+  }, [defaultKeys]);
+
+  const selectedKeys = selectedPermissions
+    .filter((p: any) => p.enabled)
+    .map((p: any) => p._id);
+
+  const handleToggle = (key: string) => {
+    const updated = selectedPermissions.map((p: any) =>
+      p._id === key ? { ...p, enabled: !p.enabled } : p
+    );
+    setValue("permissions", updated);
+  };
+
+  const handleSelectChange = (val: string[]) => {
+    const updated = val.map((key) => ({
+      _id: key,
+      enabled: true,
+    }));
     setValue("permissions", updated);
   };
 
   return (
     <div className="mb-4">
-      <h5 className="mb-3">Permissions <span className="text-danger">*</span></h5>
-      <Row>
-        {availableKeys.map((key) => {
-          const existing = selectedPermissions.find((p: { key: string; }) => p.key === key);
-          const isChecked = existing?.enabled ?? false;
-          return (
-            <Col lg={4} key={key} className="mb-2">
-              <FormCheck
-                type="checkbox"
-                id={key}
-                label={permissionLabels[key]}
-                checked={isChecked}
-                onChange={() => handleToggle(key)}
-              />
-            </Col>
-          );
-        })}
+      <h5 className="mb-3">
+        Permissions <span className="text-danger">*</span>
+      </h5>
+
+      {/* ✅ Multi Select Dropdown */}
+      <Controller
+        control={control}
+        name="permissions"
+        render={({ field }) => (
+          <ChoicesFormInput
+            className="form-control"
+            multiple
+            options={{ removeItemButton: true }}
+            value={selectedKeys}
+            onChange={(val: any) => handleSelectChange(val as string[])}
+          >
+            {allPermissions.map((p) => (
+              <option key={p.key} value={p.key}>
+                {p.label}
+              </option>
+            ))}
+          </ChoicesFormInput>
+        )}
+      />
+
+      {/* ✅ Checkbox list below for selected permissions */}
+      <Row className="mt-3">
+        {selectedKeys.map((key: string) => (
+          <Col lg={4} key={key} className="mb-2">
+            <FormCheck
+              type="checkbox"
+              id={key}
+              label={permissionLabels[key]}
+              checked={
+                selectedPermissions.find((p: any) => p._id === key)?.enabled ??
+                false
+              }
+              onChange={() => handleToggle(key)}
+            />
+          </Col>
+        ))}
       </Row>
+
+      {errors.permissions && (
+        <small className="text-danger">{errors.permissions.message}</small>
+      )}
     </div>
   );
 };

@@ -1,16 +1,28 @@
 "use client";
 
+import { useEffect, useMemo } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { Col, Row } from "react-bootstrap";
 import TextFormInput from "@/components/from/TextFormInput";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import type { StaffType } from "@/types/data";
+import type { LanguageType, StaffType } from "@/types/data";
+import { getAllLanguages } from "@/helpers/languages";
 
 const ContactInfo = () => {
   const {
     control,
     formState: { errors },
   } = useFormContext<StaffType>();
+
+  const allLangueages = useMemo<LanguageType[]>(() => {
+    const languages = getAllLanguages();
+    return languages;
+  }, []);
+
+  const languagesOptions = allLangueages.map((l) => ({
+    _id: l._id,
+    name: l.label,
+  }));
 
   return (
     <div className="mb-4">
@@ -106,9 +118,11 @@ const ContactInfo = () => {
                   options={{ removeItemButton: true }}
                   {...field}
                 >
-                  <option value="french">French</option>
-                  <option value="dutch">Dutch</option>
-                  <option value="english">English</option>
+                  {languagesOptions.map(({ _id, name }) => (
+                    <option key={_id} value={_id}>
+                      {name}
+                    </option>
+                  ))}
                 </ChoicesFormInput>
               )}
             />

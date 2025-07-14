@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getStaffById } from "@/helpers/data";
 import type { StaffType } from "@/types/data";
 import StaffForm from "../../staffForm";
+import { getDefaultStaffById } from "@/helpers/staff";
 
 interface Props {
   params: { id?: string };
@@ -20,16 +20,15 @@ const EditStaffPage = ({ params }: Props) => {
     if (isEditMode && params.id) {
       const fetchData = async () => {
         try {
-          const response = await getStaffById(params.id);
-          const data = response.data;
-          console.log(data, "edit details");
+          const { data } = await getDefaultStaffById(params.id);
+          const staff = Array.isArray(data) ? data[0] : data;
 
-          if (Array.isArray(data) && data.length > 0) {
-            const staff: StaffType = data[0];
-            setDefaultValues(staff);
-          } else {
-            console.error("Staff not found or data format incorrect");
+          if (!staff || !staff._id) {
+            console.error("Invalid staff response");
+            return;
           }
+
+          setDefaultValues(staff);
         } catch (error) {
           console.error("Failed to fetch staff data:", error);
         } finally {
@@ -52,10 +51,13 @@ const EditStaffPage = ({ params }: Props) => {
       console.error("Error updating staff:", error);
     }
   };
+  console.log(defaultValues, "defaultValues");
 
   return (
     <div className="container mt-4">
-      {!loading && (
+      {loading ? (
+        <div>Loading staff details...</div>
+      ) : (
         <StaffForm
           defaultValues={defaultValues}
           isEditMode

@@ -68,8 +68,8 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
             <p className="mb-0">{data.phoneNumber}</p>
           </Col>
           <Col lg={3}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Branch :</p>
-            <p className="mb-0">{data.selectedBranch} </p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Primary Branch :</p>
+            <p className="mb-0">{data.selectedBranchDetailed?.name} </p>
           </Col>
           <Col lg={2}>
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
