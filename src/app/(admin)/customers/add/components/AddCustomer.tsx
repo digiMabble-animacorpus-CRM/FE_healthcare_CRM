@@ -13,7 +13,12 @@ import {
   Col,
   Row,
   Spinner,
+  Modal, 
 } from "react-bootstrap";
+
+import DocumentUploadCard from "./DocumentUploadCard";
+
+
 import { useRouter } from "next/navigation";
 
 import { getPatientById } from "@/helpers/data";
@@ -88,6 +93,15 @@ const AddCustomer = ({ params }: Props) => {
     city: "",
     country: "",
   });
+
+  const [showPreview, setShowPreview] = useState(false);
+const [previewFile, setPreviewFile] = useState<File | null>(null);
+
+const handleView = (file: File) => {
+  setPreviewFile(file);
+  setShowPreview(true);
+};
+
 
   const {
     handleSubmit,
@@ -194,6 +208,24 @@ const AddCustomer = ({ params }: Props) => {
               </div>
             </Col>
             <Col lg={6}>
+  <div className="mb-3">
+    <label className="form-label">Upload Document(s)</label>
+    <Controller
+      name="document"
+      control={control}
+      render={({ field }) => (
+        <DocumentUploadCard
+          field={field}
+          error={errors.document?.message}
+          // Add 'single={true}' if you want only single upload
+        />
+      )}
+    />
+  </div>
+</Col>
+
+
+            <Col lg={6}>
               <div className="mb-3">
                 <label className="form-label">Gender</label>
                 <Controller
@@ -215,6 +247,8 @@ const AddCustomer = ({ params }: Props) => {
                 )}
               </div>
             </Col>
+            
+            
             <Col lg={6}>
               <div className="mb-3">
                 <label className="form-label">Preferred Language</label>
@@ -296,6 +330,7 @@ const AddCustomer = ({ params }: Props) => {
                 )}
               </div>
             </Col>
+            
 
             <Col lg={6}>
               <div className="mb-3">
@@ -309,6 +344,7 @@ const AddCustomer = ({ params }: Props) => {
                 />
               </div>
             </Col>
+            
             <Col lg={6}>
               <div className="mb-3">
                 <TextAreaFormInput
@@ -400,6 +436,25 @@ const AddCustomer = ({ params }: Props) => {
           </Col>
         </Row>
       </div>
+      <Modal show={showPreview} onHide={() => setShowPreview(false)} size="lg" centered>
+  <Modal.Header closeButton>
+    <Modal.Title>Document Preview</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ height: "70vh" }}>
+    {previewFile?.type === "application/pdf" ? (
+      <iframe
+        src={URL.createObjectURL(previewFile)}
+        title="PDF Preview"
+        width="100%"
+        height="100%"
+        style={{ border: "none" }}
+      />
+    ) : (
+      <p className="text-muted">Preview not available for this file type.</p>
+    )}
+  </Modal.Body>
+</Modal>
+
     </form>
   );
 };

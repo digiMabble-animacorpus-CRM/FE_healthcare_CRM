@@ -1,0 +1,91 @@
+.lorem-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(6px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.lorem-modal-container {
+  background: #fff;
+  color: #111;
+  border-radius: 12px;
+  max-width: 700px;
+  width: 90%;
+  padding: 0;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+  animation: scaleIn 0.25s ease;
+  overflow: hidden;
+}
+
+.lorem-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: #f9f9f9;
+  border-bottom: 1px solid #e0e0e0;
+
+  h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+
+  .lorem-modal-close {
+    font-size: 1.5rem;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+
+    &:hover {
+      color: #000;
+    }
+  }
+}
+
+.lorem-modal-body {
+  padding: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.lorem-modal-footer {
+  padding: 1rem 1.5rem;
+  background: #f9f9f9;
+  text-align: right;
+  border-top: 1px solid #e0e0e0;
+
+  .save-btn {
+    background: #7c3aed; // purple-600
+    border: none;
+    padding: 0.6rem 1.2rem;
+    border-radius: 6px;
+    color: #fff;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: background 0.2s ease;
+
+    &:hover {
+      background: #6d28d9; // purple-700
+    }
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0.96);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
