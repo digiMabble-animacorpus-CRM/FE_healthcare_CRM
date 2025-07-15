@@ -80,7 +80,7 @@ const useSignIn = () => {
         }
 
         //  Unified dashboard redirection
-        push('/dashboard/agent')
+        push('/dashboards/agent')
 
         showNotification({ message: 'Welcome to Anima Corpus CRM', variant: 'success' })
       } else {
