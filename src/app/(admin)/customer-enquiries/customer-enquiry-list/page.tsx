@@ -23,6 +23,9 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
+import "@/assets/scss/components/_edittogglebtn.scss";
+
+
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -184,7 +187,7 @@ const CustomersListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle
-                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                    className="btn btn-sm btn-outline-white d-flex align-items-center"
                     id="branchFilter"
                   >
                     <IconifyIcon
@@ -223,7 +226,7 @@ const CustomersListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle
-                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                    className="btn btn-sm btn-outline-white d-flex align-items-center"
                     id="dateFilter"
                   >
                     <IconifyIcon
@@ -347,16 +350,35 @@ const CustomersListPage = () => {
                                   className="align-middle fs-18"
                                 />
                               </Button>
-                              <Button
-                                variant="soft-primary"
-                                size="sm"
-                                onClick={() => handleEditClick(item._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:pen-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
+                              <Dropdown>
+  <Dropdown.Toggle
+    className="editToggleBtn"
+
+    variant="soft-primary"
+    size="sm"
+    id={`edit-dropdown-${item._id}`}
+    
+    style={{ padding: "4px 8px" }}
+  >
+    <IconifyIcon icon="solar:pen-2-broken" className="fs-18" />
+  </Dropdown.Toggle>
+
+  <Dropdown.Menu>
+    <Dropdown.Item
+      onClick={() => router.push(`/customers/edit/${item._id}`)}
+    >
+      Edit Basic Info
+    </Dropdown.Item>
+    <Dropdown.Item
+      onClick={() => router.push(`/customers/edit/${item._id}`)}
+    >
+      Edit Medical Info
+    </Dropdown.Item>
+  </Dropdown.Menu>
+</Dropdown>
+
+
+
                               <Button
                                 variant="soft-danger"
                                 size="sm"

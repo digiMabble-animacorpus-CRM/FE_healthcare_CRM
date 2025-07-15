@@ -131,25 +131,25 @@ export const MENU_ITEMS: MenuItemType[] = [
       },
     ],
   },
-  {
-    key: "therapists",
-    label: "Therapist",
-    icon: "ri:contacts-book-3-line",
-    children: [
-      {
-        key: "therapists-list",
-        label: "Therapists List",
-        url: "/therapists/therapists-list",
-        parentKey: "therapists",
-      },
-      {
-        key: "add-therapist",
-        label: "Add Therapist",
-        url: "/therapists/add-therapist",
-        parentKey: "therapists",
-      },
-    ],
-  },
+  // {
+  //   key: "therapists",
+  //   label: "Therapist",
+  //   icon: "ri:contacts-book-3-line",
+  //   children: [
+  //     {
+  //       key: "therapists-list",
+  //       label: "Therapists List",
+  //       url: "/therapists/therapists-list",
+  //       parentKey: "therapists",
+  //     },
+  //     {
+  //       key: "add-therapist",
+  //       label: "Add Therapist",
+  //       url: "/therapists/add-therapist",
+  //       parentKey: "therapists",
+  //     },
+  //   ],
+  // },
   {
     key: "languages",
     label: "Languages",

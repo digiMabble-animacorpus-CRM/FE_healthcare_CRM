@@ -19,6 +19,8 @@ import {
   Row,
 } from 'react-bootstrap'
 
+import OrdersModalButton from '@/app/(admin)/agents/add/Component/modal/OrdersModalButton';
+
 export const metadata: Metadata = { title: 'Orders' }
 
 const OrdersPage = async () => {
@@ -30,24 +32,32 @@ const OrdersPage = async () => {
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom">
-              <div>
-                <CardTitle as={'h4'}>All Order List</CardTitle>
-              </div>
-              <Dropdown>
-                <DropdownToggle
-                  as={'a'}
-                  className=" btn btn-sm btn-outline-light rounded content-none icons-center"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false">
-                  This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
-                </DropdownToggle>
-                <DropdownMenu className="dropdown-menu-end">
-                  <DropdownItem>Download</DropdownItem>
-                  <DropdownItem>Export</DropdownItem>
-                  <DropdownItem>Import</DropdownItem>
-                </DropdownMenu>
-              </Dropdown>
-            </CardHeader>
+  <div>
+    <CardTitle as={'h4'}>All Order List</CardTitle>
+  </div>
+  <OrdersModalButton />
+
+
+  <div className="d-flex gap-2 align-items-center">
+    
+    <Dropdown>
+      <DropdownToggle
+        as={'a'}
+        className=" btn btn-sm btn-outline-light rounded content-none icons-center"
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+      </DropdownToggle>
+      <DropdownMenu className="dropdown-menu-end">
+        <DropdownItem>Download</DropdownItem>
+        <DropdownItem>Export</DropdownItem>
+        <DropdownItem>Import</DropdownItem>
+      </DropdownMenu>
+    </Dropdown>
+  </div>
+</CardHeader>
+
             <CardBody className="p-0">
               <div className="table-responsive">
                 <table className="table align-middle text-nowrap table-hover table-centered mb-0">
@@ -98,7 +108,7 @@ const OrdersPage = async () => {
                           <td>{item.property?.location}</td>
                           <td>
                             <span
-                              className={`badge bg-${item.amountStatus == 'Pending' ? 'warning' : item.amountStatus == 'Unpaid' ? 'danger' : 'success'} text-white fs-11`}>
+                              className={`badge bg-${item.amountStatus == 'Pending' ? 'warning' : item.amountStatus == 'Unpaid' ? 'danger2' : 'success'} text-white fs-11`}>
                               {item.amountStatus}
                             </span>
                           </td>

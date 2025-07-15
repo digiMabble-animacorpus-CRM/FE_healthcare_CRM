@@ -49,7 +49,7 @@ html[data-menu-color="light"]{
 html[data-menu-color="dark"] {
     --#{$prefix}main-nav-bg:                               #1C252E;
     --#{$prefix}main-nav-item-color:                       #a8b2b5;
-    --#{$prefix}main-nav-item-hover-bg:                    #{rgba($white, 0.06)};
+    --#{$prefix}main-nav-item-hover-bg:                    #4A164D;
     --#{$prefix}main-nav-item-hover-color:                 #662483;
     --#{$prefix}main-nav-item-active-color:                 #{$gray-100};
     --#{$prefix}main-nav-border-color:                     #2f3944;
@@ -61,7 +61,7 @@ html[data-bs-theme="dark"][data-menu-color="dark"],
 html[data-bs-theme="dark"][data-menu-color="light"] {
     --#{$prefix}main-nav-bg:                               #1C252E;
     --#{$prefix}main-nav-item-color:                       #afb9cf;
-    --#{$prefix}main-nav-item-hover-bg:                    #303943;
+    --#{$prefix}main-nav-item-hover-bg:                    #4A164D;
     --#{$prefix}main-nav-item-hover-color:                 #{$white};
     --#{$prefix}main-nav-item-active-color:                 #{$gray-200};
     --#{$prefix}main-nav-border-color:                     #2f3944;

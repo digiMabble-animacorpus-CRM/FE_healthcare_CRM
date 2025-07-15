@@ -38,11 +38,13 @@ $black: #000000;
 
 
 // scss-docs-start color-variables
-$blue: #caaa71;
+$blue: #9035e3;
 $indigo: #53389f;
 $purple: #9035e3;
 $pink: #ff86c8;
-$red: #caaa71;
+$danger: #d60404;
+$danger2: #d60404; // Deprecated in v5.3.0, use $danger instead
+$red: #6d55ad;
 $orange: #f8b421;
 $yellow: #f8ac59;
 $green: #5cc184;
@@ -57,6 +59,7 @@ $blue: $blue;
 $indigo: $indigo;
 $purple: $purple;
 $pink: $pink;
+$danger2: $danger2;
 $danger: $red;
 $orange: $orange;
 $warning: $orange;
@@ -90,6 +93,7 @@ $theme-colors: (
   "warning": $warning,
   "info": $info,
   "danger": $danger,
+  "danger2":$danger2,
   "red": $red,
   "yellow": $yellow,
   "green": $green,

@@ -1,0 +1,27 @@
+.editToggleBtn {
+  padding: 6px 8px !important;
+  background-color: #f8f0ff !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  // ✅ Remove Bootstrap's default dropdown caret
+  &::after {
+    content: none !important;
+    
+  }
+
+  &:focus,
+  &:active {
+    box-shadow: none !important;
+    background-color: #f0e5ff !important;
+  }
+
+  .iconify {
+    font-size: 18px;
+    color: #9c27b0; // purple shade
+  }
+}
