@@ -1,7 +1,8 @@
 'use client'
+
 import { signIn } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
-import { useState,useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
 import { yupResolver } from '@hookform/resolvers/yup'
@@ -16,7 +17,6 @@ const useSignIn = () => {
   const [rememberMe, setRememberMe] = useState(false)
   const { push } = useRouter()
   const { showNotification } = useNotificationContext()
-
   const queryParams = useQueryParams()
 
   const loginFormSchema = yup.object({
@@ -32,74 +32,68 @@ const useSignIn = () => {
     },
   })
 
-useEffect(() => {
-  const remembered = JSON.parse(localStorage.getItem('checkbox-signin') || '{}')
-  if (remembered?.email) setValue('email', remembered.email)
-  if (remembered?.password) setValue('password', remembered.password)
+  useEffect(() => {
+    const remembered = JSON.parse(localStorage.getItem('checkbox-signin') || '{}')
+    if (remembered?.email) setValue('email', remembered.email)
+    if (remembered?.password) setValue('password', remembered.password)
 
-  // Also pre-check the checkbox visually
-  const checkbox = document.getElementById('checkbox-signin') as HTMLInputElement
-  if (checkbox && remembered?.email) {
-    checkbox.checked = true
-  }
-}, [setValue])
-
-
+    const checkbox = document.getElementById('checkbox-signin') as HTMLInputElement
+    if (checkbox && remembered?.email) {
+      checkbox.checked = true
+    }
+  }, [setValue])
 
   type LoginFormFields = yup.InferType<typeof loginFormSchema>
 
+  const login = handleSubmit(async (values: LoginFormFields) => {
+    console.log('Form submitted with:', values)
+    setLoading(true)
 
-const login = handleSubmit(async (values: LoginFormFields) => {
-  setLoading(true);
+    const encryptedData = encryptAES({
+      email_id: values.email,
+      password: values.password,
+    })
 
-  const encryptedData = encryptAES({
-  email_id: values.email,
-  password: values.password,
-})
+    try {
+      const res = await fetch(`${API_BASE_PATH}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: encryptedData }),
+      })
 
-  try {
-    const res = await fetch(`${API_BASE_PATH}/auth/login`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ data: encryptedData }),
-    });
+      const data = await res.json()
 
-    const data = await res.json();
+      if (res.ok && data.status && data.data?.accessToken) {
+        localStorage.setItem('access_token', data.data.accessToken)
+        localStorage.setItem('user', JSON.stringify(data.data.user))
 
-    if (res.ok && data.status && data.data?.accessToken) {
-      localStorage.setItem('access_token', data.data.accessToken);
-      localStorage.setItem('user', JSON.stringify(data.data.user));
+        const rememberMe = document.getElementById('checkbox-signin') as HTMLInputElement
+        if (rememberMe?.checked) {
+          localStorage.setItem(
+            'checkbox-signin',
+            JSON.stringify({ email: values.email, password: values.password })
+          )
+        } else {
+          localStorage.removeItem('checkbox-signin')
+        }
 
-      const rememberMe = document.getElementById('checkbox-signin') as HTMLInputElement;
-      if (rememberMe?.checked) {
-        localStorage.setItem('checkbox-signin', JSON.stringify({ email: values.email, password: values.password }));
+        //  Unified dashboard redirection
+        push('/dashboard/agent')
+
+        showNotification({ message: 'Welcome to Anima Corpus CRM', variant: 'success' })
       } else {
-        localStorage.removeItem('checkbox-signin');
+        showNotification({ message: data.message || 'Invalid credentials', variant: 'danger' })
       }
-
-      const roleRedirectMap: { [key: string]: string } = {
-        superadmin: '/dashboards/analytics',
-        admin: '/dashboards/agent',
-        therapist: '/dashboards/customer',
-        assistant: '/appointments',
-        viewer: '/view-only',
-      };
-
-      const redirectTo = roleRedirectMap[data.data.user.user_type?.toLowerCase()] || '/auth/sign-in';
-      push(redirectTo);
-
-      showNotification({ message: 'Welcome to Anima Corpus CRM', variant: 'success' });
-    } else {
-      showNotification({ message: data.message || 'Invalid credentials', variant: 'danger' });
+    } catch (err) {
+      showNotification({ message: 'Something went wrong during login', variant: 'danger' })
+      console.error(' Error during login:', err)
     }
-  } catch (err) {
-    showNotification({ message: 'Something went wrong during login', variant: 'danger' });
-  }
 
-  setLoading(false);
-});
+    setLoading(false)
+  })
+
   return { loading, login, control }
 }
 

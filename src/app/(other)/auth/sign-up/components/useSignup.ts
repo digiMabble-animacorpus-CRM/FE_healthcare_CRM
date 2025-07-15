@@ -31,23 +31,24 @@ const useSignup = () => {
       password: formData.password,
     })
     try {
-      const res = await fetch(`${API_BASE_PATH}/auth/signup-admin`, {
+      const res = await fetch(`${API_BASE_PATH}/auth/signup-super-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
      body: JSON.stringify({ data: encryptedPayload }),
       })
 
       const data = await res.json()
-      console.log('✅ Response:', data)
+      console.log('Response:', data)
 
       if (res.ok && data.status) {
+         localStorage.setItem('email_id', formData.email)
         showNotification({ message: 'Signup successful! Please login.', variant: 'success' })
         push('/auth/sign-in')
       } else {
         showNotification({ message: data.message || 'Signup failed', variant: 'danger' })
       }
     } catch (err) {
-      console.error('❌ Error during signup:', err)
+      console.error(' Error during signup:', err)
       showNotification({ message: 'Error during signup', variant: 'danger' })
     } finally {
       setLoading(false)
