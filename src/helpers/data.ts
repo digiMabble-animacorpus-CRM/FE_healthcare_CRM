@@ -14,6 +14,7 @@ import {
 } from "@/assets/data/other";
 import { sellersData } from "@/assets/data/product";
 import { emailsData, socialGroupsData } from "@/assets/data/social";
+import { staffData } from "@/assets/data/staffData";
 import { todoData } from "@/assets/data/task";
 import { notificationsData } from "@/assets/data/topbar";
 import {

@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 
 const StaffDetails = ({ data }: { data: StaffType }) => {
   const router = useRouter();
+  console.log("Staff Details Data: ", data);
 
   const handleEditClick = (id: string) => {
     router.push(`/staffs/staffs-form/${id}/edit`);
@@ -85,7 +86,7 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
         <Row className="my-4">
           <Col lg={9}>
             <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
-            {/* <p className="mb-0">{data.address}</p> */}
+            <p className="mb-0">{data.address?.line1} {data.address?.line2}, {data.address?.city}, {data.address?.country} - {data.address?.zipCode}</p>
           </Col>
           <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">
