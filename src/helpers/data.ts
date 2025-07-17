@@ -1,25 +1,27 @@
 import {
   agentData,
   customerData,
-  patientData,
+  customerEnquiriesData,
   customerReviewsData,
   dataTableRecords,
   pricingData,
   projectsData,
   propertyData,
+  therapistData,
   timelineData,
   transactionData,
   userData,
 } from "@/assets/data/other";
 import { sellersData } from "@/assets/data/product";
 import { emailsData, socialGroupsData } from "@/assets/data/social";
+import { staffData } from "@/assets/data/staffData";
 import { todoData } from "@/assets/data/task";
 import { notificationsData } from "@/assets/data/topbar";
 import {
   AgentType,
   CustomerReviewsType,
   CustomerType,
-  PatientType,
+  CustomerEnquiriesType,
   EmailCountType,
   Employee,
   GroupType,
@@ -31,6 +33,8 @@ import {
   TodoType,
   TransactionType,
   UserType,
+  TherapistType,
+  StaffType,
 } from "@/types/data";
 import { db } from "@/utils/firebase";
 import { sleep } from "@/utils/promise";
@@ -135,17 +139,17 @@ export const getAllCustomer = async (): Promise<CustomerType[]> => {
   return data;
 };
 // Patients Api Call
-export const getAllPatients = async (
+export const getAllCustomerEnquiries = async (
   page: number = 1,
   limit: number = 10,
   branch?: string,
   from?: string,
   to?: string,
   search?: string
-): Promise<{ data: PatientType[]; totalCount: number }> => {
+): Promise<{ data: CustomerEnquiriesType[]; totalCount: number }> => {
   await sleep();
 
-  let filteredData = patientData;
+  let filteredData = customerEnquiriesData;
 
   // Branch Filter
   if (branch) {
@@ -183,16 +187,94 @@ export const getAllPatients = async (
     totalCount: filteredData.length,
   };
 };
-export const getPatientById = async (
+
+export const getAllTherapists = async (
+  page: number = 1,
+  limit: number = 10,
+  branch?: string,
+  from?: string,
+  to?: string,
+  search?: string
+): Promise<{ data: TherapistType[]; totalCount: number }> => {
+  await sleep();
+
+  let filteredData = therapistData;
+
+  // Branch Filter
+  if (branch) {
+    filteredData = filteredData.filter((item) => item.branch === branch);
+  }
+
+  // Date Range Filter
+  if (from && to) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    filteredData = filteredData.filter((item) => {
+      const itemDate = new Date(item.lastUpdated);
+      return itemDate >= fromDate && itemDate <= toDate;
+    });
+  }
+
+  // Search Filter
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    filteredData = filteredData.filter(
+      (item) =>
+        item.name.toLowerCase().includes(lowerSearch) ||
+        item.email.toLowerCase().includes(lowerSearch) ||
+        item.number.toLowerCase().includes(lowerSearch)
+    );
+  }
+
+  // Pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginatedData = filteredData.slice(start, end);
+
+  return {
+    data: paginatedData,
+    totalCount: filteredData.length,
+  };
+};
+
+export const getStaffById = async (
   id?: string
-): Promise<{ data: PatientType[] }> => {
+): Promise<{ data: StaffType[] }> => {
   await sleep();
 
   if (!id) {
     return { data: [] };
   }
 
-  const result = patientData.filter((p) => p._id === id);
+  const result = staffData.filter((p) => p._id === id);
+
+  return { data: result };
+};
+
+export const getCustomerEnquiriesById = async (
+  id?: string
+): Promise<{ data: CustomerEnquiriesType[] }> => {
+  await sleep();
+
+  if (!id) {
+    return { data: [] };
+  }
+
+  const result = customerEnquiriesData.filter((p) => p._id === id);
+
+  return { data: result };
+};
+
+export const getTherapistById = async (
+  id?: string
+): Promise<{ data: TherapistType[] }> => {
+  await sleep();
+
+  if (!id) {
+    return { data: [] };
+  }
+
+  const result = therapistData.filter((p) => p._id === id);
 
   return { data: result };
 };

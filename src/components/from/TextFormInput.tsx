@@ -5,7 +5,6 @@ import {
   FormLabel,
   type FormControlProps,
 } from "react-bootstrap";
-import Feedback from "react-bootstrap/esm/Feedback";
 import {
   Controller,
   type FieldPath,
@@ -20,13 +19,14 @@ const TextFormInput = <
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>,
 >({
   name,
-  containerClassName: containerClass,
+  containerClassName,
   control,
   id,
   label,
   noValidate,
-  labelClassName: labelClass,
-  ...other
+  labelClassName,
+  required,
+  ...rest
 }: FormInputProps<TFieldValues> &
   FormControlProps &
   InputHTMLAttributes<HTMLInputElement>) => {
@@ -36,25 +36,23 @@ const TextFormInput = <
       defaultValue={"" as PathValue<TFieldValues, TName>}
       control={control}
       render={({ field, fieldState }) => (
-        <FormGroup className={containerClass}>
-          {label &&
-            (typeof label === "string" ? (
-              <FormLabel htmlFor={id ?? name} className={labelClass}>
-                {label}
-              </FormLabel>
-            ) : (
-              <>{label}</>
-            ))}
+        <FormGroup className={containerClassName}>
+          {label && (
+            <FormLabel htmlFor={id ?? name} className={labelClassName}>
+              {label}
+              {required && <span className="text-danger"> *</span>}
+            </FormLabel>
+          )}
+
           <FormControl
             id={id ?? name}
-            {...other}
             {...field}
-            isInvalid={Boolean(fieldState.error?.message)}
+            {...rest}
+            isInvalid={!!fieldState.error}
           />
+
           {!noValidate && fieldState.error?.message && (
-            <>
-              <small className="text-danger">{fieldState.error.message}</small>
-            </>
+            <small className="text-danger">{fieldState.error.message}</small>
           )}
         </FormGroup>
       )}
