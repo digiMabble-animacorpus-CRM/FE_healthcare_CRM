@@ -82,8 +82,44 @@ export type CustomerEnquiriesType = {
   status: "new" | "old";
   lastUpdated: string;
   source: string;
-  branch: "Gembloux - Orneau" | "Gembloux - Tout Vent" | "Anima Corpus Namur";
+  branch: string;
 };
+
+export type AppointmentStatus = 
+  | "scheduled"
+  | "completed"
+  | "cancelled"
+  | "no_show";
+
+export type AppointmentSource = 
+  | "phone"
+  | "website"
+  | "walk_in"
+  | "referral"
+  | "other";
+
+export interface AppointmentType {
+  _id: string;              // Unique appointment ID
+  customerId: string;        // Linked to Customer
+  branchId: string;          // Linked to Branch
+  assignedStaffId?: string;  // Optional assigned staff
+
+  date: string;              // YYYY-MM-DD
+  time: string;              // HH:mm (24-hour)
+
+  service?: string;          // Purpose / Service
+  notes?: string;            // Optional notes
+
+  status: AppointmentStatus; // scheduled, completed, cancelled, no_show
+  cancelledReason?: string;  // Reason if cancelled
+
+  source?: AppointmentSource; // How appointment was booked
+  reminderSent?: boolean;     // SMS/Email reminder flag
+
+  createdAt: string;         // ISO timestamp
+  updatedAt: string;         // ISO timestamp
+}
+
 
 export type BranchType = {
   _id: string;

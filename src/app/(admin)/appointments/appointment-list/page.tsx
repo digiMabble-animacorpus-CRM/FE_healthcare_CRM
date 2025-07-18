@@ -2,9 +2,8 @@
 
 import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { getAllCustomerEnquiries } from "@/helpers/data";
 import { useEffect, useState } from "react";
-import type { CustomerEnquiriesType } from "@/types/data";
+import type { StaffType, TherapistType } from "@/types/data";
 import dayjs from "dayjs";
 import {
   Button,
@@ -23,9 +22,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
-import "@/assets/scss/components/_edittogglebtn.scss";
-
-
+import { getAllStaff } from "@/helpers/staff";
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -34,8 +31,8 @@ const BRANCHES = [
   "Anima Corpus Namur",
 ];
 
-const CustomersListPage = () => {
-  const [enquirys, setEnquirys] = useState<CustomerEnquiriesType[]>([]);
+const appointmentListPage = () => {
+  const [therapists, setTherapists] = useState<StaffType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -81,11 +78,11 @@ const CustomersListPage = () => {
     }
   };
 
-  const fetchEnquirys = async (page: number) => {
+  const fetchTherapists = async (page: number) => {
     setLoading(true);
     try {
       const { from, to } = getDateRange();
-      const response = await getAllCustomerEnquiries(
+      const response = await getAllStaff(
         page,
         PAGE_LIMIT,
         selectedBranch || undefined,
@@ -93,7 +90,7 @@ const CustomersListPage = () => {
         to,
         searchTerm
       );
-      setEnquirys(response.data);
+      setTherapists(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
       console.error("Failed to fetch enquiries data:", error);
@@ -103,7 +100,7 @@ const CustomersListPage = () => {
   };
 
   useEffect(() => {
-    fetchEnquirys(currentPage);
+    fetchTherapists(currentPage);
   }, [currentPage, selectedBranch, searchTerm, dateFilter]);
 
   const handlePageChange = (page: number) => {
@@ -113,11 +110,15 @@ const CustomersListPage = () => {
   };
 
   const handleView = (id: string) => {
-    router.push(`/customer-enquiries/details/${id}`);
+    router.push(`/staffs/staffs-details/${id}`);
   };
 
   const handleEditClick = (id: string) => {
-    router.push(`/customer-enquiries/edit-enquiry/${id}`);
+    router.push(`/staffs/staffs-form/${id}/edit`);
+  };
+
+  const handleEditPermissionClick = (id: string) => {
+    router.push(`/staffs/staffs-form/${id}/permission`);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -129,11 +130,11 @@ const CustomersListPage = () => {
     if (!selectedPatientId) return;
 
     try {
-      await fetch(`/api/enquirys/${selectedPatientId}`, {
+      await fetch(`/api/therapists/${selectedPatientId}`, {
         method: "DELETE",
       });
 
-      fetchEnquirys(currentPage);
+      fetchTherapists(currentPage); // refresh list
     } catch (error) {
       console.error("Failed to delete enquiries:", error);
     } finally {
@@ -142,33 +143,21 @@ const CustomersListPage = () => {
     }
   };
 
-  const calculateAge = (dob: string): number => {
-    const birthDate = new Date(dob);
-    const today = new Date();
-    let age = today.getFullYear() - birthDate.getFullYear();
-    const hasBirthdayPassed =
-      today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
-
-    if (!hasBirthdayPassed) age--;
-    return age;
-  };
-
   const formatGender = (gender: string): string => {
     if (!gender) return "";
     return gender.charAt(0).toUpperCase();
   };
+  console.log(therapists, "therapists");
 
   return (
     <>
-      <PageTitle subName="Customer Enquiries" title="Customer Enquiry List" />
+      <PageTitle subName="Therapists" title="Therapists List" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Customer Enquiry List
+                All Appointment List
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -187,7 +176,7 @@ const CustomersListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle
-                    className="btn btn-sm btn-outline-white d-flex align-items-center"
+                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
                     id="branchFilter"
                   >
                     <IconifyIcon
@@ -226,7 +215,7 @@ const CustomersListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle
-                    className="btn btn-sm btn-outline-white d-flex align-items-center"
+                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
                     id="dateFilter"
                   >
                     <IconifyIcon
@@ -270,6 +259,12 @@ const CustomersListPage = () => {
                     )}
                   </DropdownMenu>
                 </Dropdown>
+                <Button
+                  variant="primary"
+                  onClick={() => router.push("/languages/language-form/create")}
+                >
+                  New Appointment
+                </Button>
               </div>
             </CardHeader>
 
@@ -296,19 +291,17 @@ const CustomersListPage = () => {
                             />
                           </div>
                         </th>
-                        <th>Customer name</th>
+                        <th>Patient name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Age | Gender</th>
-                        <th>Branch</th>
-                        <th>Source</th>
+                        <th>Department</th>
                         <th>Status</th>
                         <th>Last Activity</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {enquirys.map((item: CustomerEnquiriesType, idx: number) => (
+                      {therapists.map((item: StaffType, idx: number) => (
                         <tr key={idx}>
                           <td>
                             <div className="form-check">
@@ -321,23 +314,26 @@ const CustomersListPage = () => {
                           </td>
                           <td>{item.name}</td>
                           <td>{item.email}</td>
-                          <td>{item.number}</td>
+                          <td>{item.phoneNumber}</td>
+                          <td>{formatGender(item.gender || "")}</td>
                           <td>
-                            {calculateAge(item.dob)} yrs |{" "}
-                            {formatGender(item.gender)}
+                            {item.branchesDetailed
+                              .map(
+                                (branch: { [x: string]: any; name: any }) =>
+                                  branch.code
+                              )
+                              .join(", ")}
                           </td>
-                          <td>{item.branch}</td>
-                          <td>{item.source}</td>
                           <td>
                             <span
                               className={`badge bg-${
-                                item.status === "new" ? "success" : "danger"
+                                item.status === "active" ? "success" : "danger"
                               } text-white fs-12 px-2 py-1`}
                             >
                               {item.status}
                             </span>
                           </td>
-                          <td>{item.lastUpdated}</td>
+                          <td>{item.createdAt}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
@@ -350,35 +346,16 @@ const CustomersListPage = () => {
                                   className="align-middle fs-18"
                                 />
                               </Button>
-                              <Dropdown>
-  <Dropdown.Toggle
-    className="editToggleBtn"
-
-    variant="soft-primary"
-    size="sm"
-    id={`edit-dropdown-${item._id}`}
-    
-    style={{ padding: "4px 8px" }}
-  >
-    <IconifyIcon icon="solar:pen-2-broken" className="fs-18" />
-  </Dropdown.Toggle>
-
-  <Dropdown.Menu>
-    <Dropdown.Item
-      onClick={() => handleEditClick(item._id)}
-    >
-      Edit 
-    </Dropdown.Item>
-    <Dropdown.Item
-      onClick={() => router.push(`/customers/edit/${item._id}`)}
-    >
-      Edit Medical Info
-    </Dropdown.Item>
-  </Dropdown.Menu>
-</Dropdown>
-
-
-
+                              <Button
+                                variant="soft-primary"
+                                size="sm"
+                                onClick={() => handleEditClick(item._id)}
+                              >
+                                <IconifyIcon
+                                  icon="solar:pen-2-broken"
+                                  className="align-middle fs-18"
+                                />
+                              </Button>
                               <Button
                                 variant="soft-danger"
                                 size="sm"
@@ -402,7 +379,9 @@ const CustomersListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  >
                     <Button
                       variant="link"
                       className="page-link"
@@ -473,4 +452,4 @@ const CustomersListPage = () => {
   );
 };
 
-export default CustomersListPage;
+export default appointmentListPage;

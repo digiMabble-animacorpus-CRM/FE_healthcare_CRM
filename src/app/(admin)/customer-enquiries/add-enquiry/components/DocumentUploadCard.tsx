@@ -23,7 +23,9 @@ const DocumentUploadCard = ({ field, error, single = false }: Props) => {
     const files = e.target.files;
     if (!files) return;
     const selectedFiles = Array.from(files);
-    field.onChange(single ? selectedFiles[0] : [...(field.value || []), ...selectedFiles]);
+    field.onChange(
+      single ? selectedFiles[0] : [...(field.value || []), ...selectedFiles]
+    );
   };
 
   const handleDelete = (index: number) => {
@@ -41,8 +43,8 @@ const DocumentUploadCard = ({ field, error, single = false }: Props) => {
       ? [field.value]
       : []
     : Array.isArray(field.value)
-    ? field.value
-    : [];
+      ? field.value
+      : [];
 
   return (
     <>
@@ -70,10 +72,18 @@ const DocumentUploadCard = ({ field, error, single = false }: Props) => {
             </div>
           </div>
           <div className="d-flex gap-2">
-            <Button size="sm" variant="outline-primary" onClick={() => handleView(file)}>
+            <Button
+              size="sm"
+              variant="outline-primary"
+              onClick={() => handleView(file)}
+            >
               View
             </Button>
-            <Button size="sm" variant="outline-danger" onClick={() => handleDelete(idx)}>
+            <Button
+              size="sm"
+              variant="outline-danger"
+              onClick={() => handleDelete(idx)}
+            >
               Delete
             </Button>
           </div>
@@ -82,7 +92,12 @@ const DocumentUploadCard = ({ field, error, single = false }: Props) => {
 
       {error && <small className="text-danger">{error}</small>}
 
-      <Modal show={showPreview} onHide={() => setShowPreview(false)} size="lg" centered>
+      <Modal
+        show={showPreview}
+        onHide={() => setShowPreview(false)}
+        size="lg"
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Document Preview</Modal.Title>
         </Modal.Header>
@@ -104,3 +119,44 @@ const DocumentUploadCard = ({ field, error, single = false }: Props) => {
 };
 
 export default DocumentUploadCard;
+
+// <Col lg={6}>
+//   <div className="mb-3">
+//     <label className="form-label">Upload Document(s)</label>
+//     <Controller
+//       name="document"
+//       control={control}
+//       render={({ field }) => (
+//         <DocumentUploadCard
+//           field={field}
+//           error={errors.document?.message}
+//           // Add 'single={true}' if you want only single upload
+//         />
+//       )}
+//     />
+//   </div>
+// </Col>
+
+{/* <Modal
+  show={showPreview}
+  onHide={() => setShowPreview(false)}
+  size="lg"
+  centered
+>
+  <Modal.Header closeButton>
+    <Modal.Title>Document Preview</Modal.Title>
+  </Modal.Header>
+  <Modal.Body style={{ height: "70vh" }}>
+    {previewFile?.type === "application/pdf" ? (
+      <iframe
+        src={URL.createObjectURL(previewFile)}
+        title="PDF Preview"
+        width="100%"
+        height="100%"
+        style={{ border: "none" }}
+      />
+    ) : (
+      <p className="text-muted">Preview not available for this file type.</p>
+    )}
+  </Modal.Body>
+</Modal>; */}

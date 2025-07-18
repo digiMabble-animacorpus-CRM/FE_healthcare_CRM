@@ -168,6 +168,12 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: "ri:chat-quote-line",
     url: "/permissions",
   },
+  {
+    key: "appointments",
+    label: "Appointments",
+    icon: "ri:chat-quote-line",
+    url: "/appointments/appointment-form",
+  },
   // {
   //   key: "orders",
   //   label: "Orders",
