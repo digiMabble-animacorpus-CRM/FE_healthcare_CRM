@@ -21,7 +21,7 @@ const useSignup = () => {
   const [loading, setLoading] = useState(false)
 
   const signup = async (formData: SignupFormFields) => {
-    console.log('📤 Signup data:', formData)
+    console.log(' Signup data:', formData)
     setLoading(true)
 
         // Encrypt the payload
@@ -34,7 +34,7 @@ const useSignup = () => {
       const res = await fetch(`${API_BASE_PATH}/auth/signup-super-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-     body: JSON.stringify({ data: encryptedPayload }),
+        body: JSON.stringify({ data: encryptedPayload }),
       })
 
       const data = await res.json()
