@@ -3,7 +3,7 @@
 import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import { useEffect, useState } from "react";
-import type { StaffType, TherapistType } from "@/types/data";
+import type { StaffType } from "@/types/data";
 import dayjs from "dayjs";
 import {
   Button,
@@ -23,6 +23,7 @@ import {
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import { getAllStaff } from "@/helpers/staff";
+import "@/assets/scss/components/_edittogglebtn.scss";
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -40,9 +41,7 @@ const StaffsListPage = () => {
   const [dateFilter, setDateFilter] = useState<string>("all");
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
-  );
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const router = useRouter();
 
   const getDateRange = () => {
@@ -147,6 +146,7 @@ const StaffsListPage = () => {
     if (!gender) return "";
     return gender.charAt(0).toUpperCase();
   };
+
   console.log(therapists, "therapists");
 
   return (
@@ -176,11 +176,13 @@ const StaffsListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle
-                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                    className="btn btn-sm d-flex align-items-center"
                     id="branchFilter"
+                    
                   >
                     <IconifyIcon
                       icon="material-symbols:location-on-outline"
+                      
                       width={18}
                       className="me-1"
                     />
@@ -215,7 +217,7 @@ const StaffsListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle
-                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                    className="btn btn-sm d-flex align-items-center"
                     id="dateFilter"
                   >
                     <IconifyIcon
@@ -341,16 +343,32 @@ const StaffsListPage = () => {
                                   className="align-middle fs-18"
                                 />
                               </Button>
-                              <Button
-                                variant="soft-primary"
-                                size="sm"
-                                onClick={() => handleEditClick(item._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:pen-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
+                              <Dropdown>
+                                <Dropdown.Toggle
+                                  className="editToggleBtn"
+                                  variant="soft-primary"
+                                  size="sm"
+                                  id={`edit-dropdown-${item._id}`}
+                                  style={{ padding: "4px 8px" }}
+                                >
+                                  <IconifyIcon
+                                    icon="solar:pen-2-broken"
+                                    className="fs-18"
+                                  />
+                                </Dropdown.Toggle>
+                                <Dropdown.Menu>
+                                  <DropdownItem
+                                    onClick={() => handleEditClick(item._id)}
+                                  >
+                                    Edit Staff Details
+                                  </DropdownItem>
+                                  <DropdownItem
+                                    onClick={() =>handleEditPermissionClick (item._id)}
+                                  >
+                                    Edit staff Permissions
+                                  </DropdownItem>
+                                </Dropdown.Menu>
+                              </Dropdown>
                               <Button
                                 variant="soft-danger"
                                 size="sm"

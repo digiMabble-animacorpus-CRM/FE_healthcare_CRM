@@ -77,6 +77,7 @@ const StaffForm = ({
     defaultValues: {
       ...defaultValues,
       branches: defaultValues?.branches || [],
+      gender: defaultValues?.gender || "",
       permissions: defaultValues?.permissions || [],
       availability: defaultValues?.availability || [],
       languages: defaultValues?.languages || [],
