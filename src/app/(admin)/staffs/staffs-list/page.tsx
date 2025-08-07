@@ -104,6 +104,7 @@ const StaffListPage = () => {
   }
 
   const formatGender = (gender: string): string => (gender ? gender.charAt(0).toUpperCase() : '')
+                    {console.log(staffList)}
 
   return (
     <>
@@ -216,24 +217,24 @@ const StaffListPage = () => {
                         <th>Gender</th>
                         <th>Branch</th>
                         <th>Status</th>
-                        <th>Last Activity</th>
+                        <th>Role</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
                       {staffList.map((staff, idx) => (
                         <tr key={idx}>
-                          <td>{staff.name}</td>
-                          <td>{staff.email}</td>
-                          <td>{staff.phoneNumber}</td>
-                          <td>{formatGender(staff.gender || '')}</td>
-                          <td>{staff.branchesDetailed.map((b: { code: any }) => b.code).join(', ')}</td>
+                          <td>{staff?.name}</td>
+                          <td>{staff?.email}</td>
+                          <td>{staff?.phoneNumber}</td>
+                          <td>{formatGender(staff?.gender || '')}</td>
+                          <td>{staff?.branchesDetailed.map((b: { code: any }) => b.code).join(', ')}</td>
                           <td>
                             <span className={`badge bg-${staff.status === 'active' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}>
-                              {staff.status}
+                              {staff?.status}
                             </span>
                           </td>
-                          <td>{staff.createdAt}</td>
+                          <td>{staff?.role?.label}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button variant="light" size="sm" onClick={() => handleView(staff._id)}>
