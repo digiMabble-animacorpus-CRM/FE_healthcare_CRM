@@ -1,4 +1,4 @@
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
+import avatar1 from '@/assets/images/users/main-image.jpeg'
 import IconifyIcon from '@/components/wrappers/IconifyIcon'
 import Image from 'next/image'
 import Link from 'next/link'
