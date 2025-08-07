@@ -10,8 +10,11 @@ import { useEffect } from 'react'
 import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap'
 import { useForm } from 'react-hook-form'
 import * as yup from 'yup'
+import useSignup from './useSignup'
 
 const SignUp = () => {
+
+
   useEffect(() => {
     document.body.classList.add('authentication-bg')
     return () => {
@@ -28,6 +31,7 @@ const SignUp = () => {
   const { handleSubmit, control } = useForm({
     resolver: yupResolver(messageSchema),
   })
+const { signup } = useSignup()
 
   return (
     <div className="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
@@ -47,7 +51,13 @@ const SignUp = () => {
                 <h2 className="fw-bold text-uppercase text-center fs-18">Free Account</h2>
                 <p className="text-muted text-center mt-1 mb-4">New to our platform? Sign up now! It only takes a minute.</p>
                 <div className="px-4">
-                  <form onSubmit={handleSubmit(() => {})} className="authentication-form">
+                 <form
+  onSubmit={handleSubmit((data) => {
+    console.log('🚀 Submitting form with:', data)
+    signup(data)
+  })}
+  className="authentication-form"
+>
                     <div className="mb-3">
                       <TextFormInput
                         control={control}
@@ -89,8 +99,8 @@ const SignUp = () => {
                       </button>
                     </div>
                   </form>
-                  <p className="mt-3 fw-semibold no-span">OR sign with</p>
-                  <div className="text-center">
+                  {/* <p className="mt-3 fw-semibold no-span">OR sign with</p> */}
+                  {/* <div className="text-center">
                     <Button variant="outline-light" className="shadow-none">
                       <IconifyIcon icon="bxl:google" className="fs-20" />
                     </Button>
@@ -102,7 +112,7 @@ const SignUp = () => {
                     <Button variant="outline-light" className="shadow-none">
                       <IconifyIcon icon="bxl:github" className="fs-20" />
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
               </CardBody>
             </Card>

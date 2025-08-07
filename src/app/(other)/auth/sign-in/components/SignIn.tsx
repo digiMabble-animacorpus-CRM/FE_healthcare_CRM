@@ -84,8 +84,8 @@ const SignIn = () => {
                       </button>
                     </div>
                   </form>
-                  <p className="mt-3 fw-semibold no-span">OR sign with</p>
-                  <div className="text-center">
+                  {/* <p className="mt-3 fw-semibold no-span">OR sign with</p> */}
+                  {/* <div className="text-center">
                     <Button variant="outline-light" className="shadow-none">
                       <IconifyIcon icon="bxl:google" className="fs-20" />
                     </Button>
@@ -97,7 +97,7 @@ const SignIn = () => {
                     <Button variant="outline-light" className="shadow-none">
                       <IconifyIcon icon="bxl:github" className="fs-20" />
                     </Button>
-                  </div>
+                  </div> */}
                 </div>
               </CardBody>
             </Card>
