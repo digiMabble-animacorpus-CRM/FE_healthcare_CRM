@@ -10,26 +10,7 @@ export const MENU_ITEMS: MenuItemType[] = [
     key: "dashboards",
     label: "Dashboards",
     icon: "ri:dashboard-2-line",
-    children: [
-      {
-        key: "analytics",
-        label: "Analytics",
-        url: "/dashboards/analytics",
-        parentKey: "dashboards",
-      },
-      {
-        key: "agent",
-        label: "Agent",
-        url: "/dashboards/agent",
-        parentKey: "dashboards",
-      },
-      {
-        key: "customer",
-        label: "Customer",
-        url: "/dashboards/customer",
-        parentKey: "dashboards",
-      },
-    ],
+    url: "/dashboards/agent",
   },
   // {
   //   key: "property",
