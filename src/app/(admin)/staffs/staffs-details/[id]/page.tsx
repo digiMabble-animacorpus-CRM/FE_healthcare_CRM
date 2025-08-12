@@ -2,6 +2,7 @@ import PageTitle from "@/components/PageTitle";
 import { getAllProperty } from "@/helpers/data";
 import WeeklyInquiry from "./components/WeeklyInquiry";
 import TransactionHistory from "./components/TransactionHistory";
+import UpcomingAppointmrnt from "./components/upcomingAppointmrnt";
 import type { StaffType, TherapistType } from "@/types/data";
 import { Col, Row } from "react-bootstrap";
 import { Metadata } from "next";
@@ -31,6 +32,7 @@ const StaffDetailPage = async ({ params }: Props) => {
           <WeeklyInquiry />
         </Col>
       </Row>
+      <UpcomingAppointmrnt />
       <TransactionHistory />
     </>
   );

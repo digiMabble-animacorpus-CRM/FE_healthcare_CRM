@@ -1,0 +1,44 @@
+{
+  "users": [
+    {
+      "id": 1,
+      "name": "Super Admin",
+      "email": "superadmin@demo.com",
+      "password": "superadmin123",
+      "role": "superadmin",
+      "location": "Namur"
+    },
+        {
+      "id": 2,
+      "name": "Admin",
+      "email": "admin@demo.com",
+      "password": "admin123",
+      "role": "admin",
+      "location": "Gembloux"
+    },
+    {
+      "id": 3,
+      "name": "Dr. Alice",
+      "email": "doctor@demo.com",
+      "password": "doctor123",
+      "role": "therapist",
+      "location": "Gembloux"
+    },
+       {
+      "id": 4,
+      "name": "assistant",
+      "email": "assistant@demo.com",
+      "password": "assistant123",
+      "role": "assistant",
+      "location": "Gembloux"
+    },
+       {
+      "id": 4,
+      "name": "viewer",
+      "email": "viewer@demo.com",
+      "password": "viewer123",
+      "role": "viewer",
+      "location": "Gembloux"
+    }
+  ]
+}

@@ -31,9 +31,9 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
               className="rounded-circle avatar-xl img-thumbnail"
             />
             <div>
-              <h3 className="fw-semibold mb-1">{data.name}</h3>
+              <h3 className="fw-semibold mb-1">{data?.name}</h3>
               <p className="link-primary fw-medium fs-14">
-                {data.dob} | {data.gender}
+                {data?.dob} | {data?.gender}
               </p>
             </div>
           </div>
@@ -62,33 +62,33 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
         <Row className="my-4">
           <Col lg={4}>
             <p className="text-dark fw-semibold fs-16 mb-1">Email Address :</p>
-            <p className="mb-0">{data.email}</p>
+            <p className="mb-0">{data?.email}</p>
           </Col>
           <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
-            <p className="mb-0">{data.phoneNumber}</p>
+            <p className="mb-0">{data?.phoneNumber}</p>
           </Col>
           <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">Primary Branch :</p>
-            <p className="mb-0">{data.selectedBranchDetailed?.name} </p>
+            <p className="mb-0">{data?.selectedBranchDetailed?.name} </p>
           </Col>
           <Col lg={2}>
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
             <span
               className={`badge bg-${
-                data.status === "active" ? "success" : "danger"
+                data?.status === "active" ? "success" : "danger"
               } text-white fs-12 px-2 py-1`}
             >
-              {data.status}
+              {data?.status}
             </span>
           </Col>
         </Row>
         <Row className="my-4">
-          <Col lg={9}>
+          <Col lg={8}>
             <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
-            <p className="mb-0">{data.address?.line1} {data.address?.line2}, {data.address?.city}, {data.address?.country} - {data.address?.zipCode}</p>
+            <p className="mb-0">{data?.address?.line1} {data?.address?.line2}, {data?.address?.city}, {data.address?.country} - {data.address?.zipCode}</p>
           </Col>
-          <Col lg={3}>
+          <Col lg={4}>
             <p className="text-dark fw-semibold fs-16 mb-1">
               Mode of Register :
             </p>
@@ -98,13 +98,13 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
         <Row className="my-4">
           <Col lg={12}>
             <p className="text-dark fw-semibold fs-16 mb-1">Description :</p>
-            <p className="mb-0">{data.description}</p>
+            <p className="mb-0">{data?.description}</p>
           </Col>
         </Row>
         <Row>
           <Col lg={12}>
             <p className="text-dark fw-semibold fs-16 mb-1">Tags :</p>
-            <div className="d-flex gap-2">
+            <div className="d-flex flex-wrap gap-2">
               {Array.isArray(data?.tags) &&
                 data.tags.map((tag: string, i: number) => (
                   <p className="mb-0 d-flex align-items-center" key={i}>

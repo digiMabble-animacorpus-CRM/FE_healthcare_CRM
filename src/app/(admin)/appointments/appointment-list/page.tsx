@@ -3,8 +3,7 @@
 import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import { useEffect, useState } from "react";
-import type { StaffType } from "@/types/data";
-import Image from 'next/image';
+import type { StaffType, TherapistType } from "@/types/data";
 import dayjs from "dayjs";
 import {
   Button,
@@ -24,7 +23,6 @@ import {
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import { getAllStaff } from "@/helpers/staff";
-import avatar1 from "@/assets/images/users/avatar-1.jpg";
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -33,8 +31,8 @@ const BRANCHES = [
   "Anima Corpus Namur",
 ];
 
-const StaffListPage = () => {
-  const [staffList, setStaffList] = useState<StaffType[]>([]);
+const appointmentListPage = () => {
+  const [therapists, setTherapists] = useState<StaffType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -42,7 +40,9 @@ const StaffListPage = () => {
   const [dateFilter, setDateFilter] = useState<string>("all");
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
+    null
+  );
   const router = useRouter();
 
   const getDateRange = () => {
@@ -78,7 +78,7 @@ const StaffListPage = () => {
     }
   };
 
-  const fetchStaffList = async (page: number) => {
+  const fetchTherapists = async (page: number) => {
     setLoading(true);
     try {
       const { from, to } = getDateRange();
@@ -90,66 +90,76 @@ const StaffListPage = () => {
         to,
         searchTerm
       );
-      setStaffList(response.data);
+      setTherapists(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error("Failed to fetch staff list:", error);
+      console.error("Failed to fetch enquiries data:", error);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchStaffList(currentPage);
+    fetchTherapists(currentPage);
   }, [currentPage, selectedBranch, searchTerm, dateFilter]);
 
   const handlePageChange = (page: number) => {
-    if (page !== currentPage) setCurrentPage(page);
+    if (page !== currentPage) {
+      setCurrentPage(page);
+    }
   };
 
-  const handleView = (id: string) =>
+  const handleView = (id: string) => {
     router.push(`/staffs/staffs-details/${id}`);
-  const handleEdit = (id: string) =>
-    router.push(`/staffs/staffs-form/${id}/edit`);
-  const handlePermission = (id: string) =>
-    router.push(`/staffs/staffs-form/${id}/permission`);
+  };
 
-  const handleDelete = (id: string) => {
-    setSelectedStaffId(id);
+  const handleEditClick = (id: string) => {
+    router.push(`/staffs/staffs-form/${id}/edit`);
+  };
+
+  const handleEditPermissionClick = (id: string) => {
+    router.push(`/staffs/staffs-form/${id}/permission`);
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setSelectedPatientId(id);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedStaffId) return;
+    if (!selectedPatientId) return;
+
     try {
-      await fetch(`/api/therapists/${selectedStaffId}`, {
+      await fetch(`/api/therapists/${selectedPatientId}`, {
         method: "DELETE",
       });
-      fetchStaffList(currentPage);
+
+      fetchTherapists(currentPage); // refresh list
     } catch (error) {
-      console.error("Failed to delete staff:", error);
+      console.error("Failed to delete enquiries:", error);
     } finally {
       setShowDeleteModal(false);
-      setSelectedStaffId(null);
+      setSelectedPatientId(null);
     }
   };
 
-  const formatGender = (gender: string): string =>
-    gender ? gender.charAt(0).toUpperCase() : "";
-  {
-    console.log(staffList);
-  }
+  const formatGender = (gender: string): string => {
+    if (!gender) return "";
+    return gender.charAt(0).toUpperCase();
+  };
+  console.log(therapists, "therapists");
 
   return (
     <>
-      <PageTitle subName="Staff" title="Staff List" />
+      <PageTitle subName="Therapists" title="Therapists List" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Staff List
+                All Appointment List
               </CardTitle>
+
               <div className="d-flex flex-wrap align-items-center gap-2">
                 <div style={{ minWidth: "200px" }}>
                   <input
@@ -163,18 +173,26 @@ const StaffListPage = () => {
                     }}
                   />
                 </div>
-                {/* <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="material-symbols:location-on-outline" width={18} className="me-1" />
-                    {selectedBranch || 'Filter by Branch'}
+
+                <Dropdown>
+                  <DropdownToggle
+                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                    id="branchFilter"
+                  >
+                    <IconifyIcon
+                      icon="material-symbols:location-on-outline"
+                      width={18}
+                      className="me-1"
+                    />
+                    {selectedBranch || "Filter by Branch"}
                   </DropdownToggle>
                   <DropdownMenu>
                     {BRANCHES.map((branch) => (
                       <DropdownItem
                         key={branch}
                         onClick={() => {
-                          setSelectedBranch(branch)
-                          setCurrentPage(1)
+                          setSelectedBranch(branch);
+                          setCurrentPage(1);
                         }}
                         active={selectedBranch === branch}
                       >
@@ -185,8 +203,8 @@ const StaffListPage = () => {
                       <DropdownItem
                         className="text-danger"
                         onClick={() => {
-                          setSelectedBranch(null)
-                          setCurrentPage(1)
+                          setSelectedBranch(null);
+                          setCurrentPage(1);
                         }}
                       >
                         Clear Branch Filter
@@ -196,42 +214,57 @@ const StaffListPage = () => {
                 </Dropdown>
 
                 <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
-                    {dateFilter === 'all' ? 'Filter by Date' : dateFilter.replace('_', ' ').toUpperCase()}
+                  <DropdownToggle
+                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+                    id="dateFilter"
+                  >
+                    <IconifyIcon
+                      icon="mdi:calendar-clock"
+                      width={18}
+                      className="me-1"
+                    />
+                    {dateFilter === "all"
+                      ? "Filter by Date"
+                      : dateFilter.replace("_", " ").toUpperCase()}
                   </DropdownToggle>
                   <DropdownMenu>
                     {[
-                      { label: 'Today', value: 'today' },
-                      { label: 'This Week', value: 'this_week' },
-                      { label: 'Last 15 Days', value: '15_days' },
-                      { label: 'This Month', value: 'this_month' },
-                      { label: 'This Year', value: 'this_year' },
+                      { label: "Today", value: "today" },
+                      { label: "This Week", value: "this_week" },
+                      { label: "Last 15 Days", value: "15_days" },
+                      { label: "This Month", value: "this_month" },
+                      { label: "This Year", value: "this_year" },
                     ].map((f) => (
                       <DropdownItem
                         key={f.value}
                         onClick={() => {
-                          setDateFilter(f.value)
-                          setCurrentPage(1)
+                          setDateFilter(f.value);
+                          setCurrentPage(1);
                         }}
                         active={dateFilter === f.value}
                       >
                         {f.label}
                       </DropdownItem>
                     ))}
-                    {dateFilter !== 'all' && (
+                    {dateFilter !== "all" && (
                       <DropdownItem
                         className="text-danger"
                         onClick={() => {
-                          setDateFilter('all')
-                          setCurrentPage(1)
+                          setDateFilter("all");
+                          setCurrentPage(1);
                         }}
                       >
                         Clear Date Filter
                       </DropdownItem>
                     )}
                   </DropdownMenu>
-                </Dropdown> */}
+                </Dropdown>
+                <Button
+                  variant="primary"
+                  onClick={() => router.push("/languages/language-form/create")}
+                >
+                  New Appointment
+                </Button>
               </div>
             </CardHeader>
 
@@ -245,47 +278,68 @@ const StaffListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>Name</th>
+                        <th style={{ width: 20 }}>
+                          <div className="form-check">
+                            <input
+                              type="checkbox"
+                              className="form-check-input"
+                              id="customCheck1"
+                            />
+                            <label
+                              className="form-check-label"
+                              htmlFor="customCheck1"
+                            />
+                          </div>
+                        </th>
+                        <th>Patient name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Gender</th>
-                        <th>Branch</th>
+                        <th>Department</th>
                         <th>Status</th>
-                        <th>Role</th>
-                        <th>Actions</th>
+                        <th>Last Activity</th>
+                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {staffList.map((staff, idx) => (
+                      {therapists.map((item: StaffType, idx: number) => (
                         <tr key={idx}>
                           <td>
-                            <div className="d-flex align-items-center gap-2">
-                              <Image src={avatar1} className="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-1" />
-                              <span>{staff?.name}</span>
+                            <div className="form-check">
+                              <input
+                                type="checkbox"
+                                className="form-check-input"
+                                id={`check-${idx}`}
+                              />
                             </div>
                           </td>
-                          <td>{staff?.email}</td>
-                          <td>{staff?.phoneNumber}</td>
-                          <td>{formatGender(staff?.gender || "")}</td>
+                          <td>{item.name}</td>
+                          <td>{item.email}</td>
+                          <td>{item.phoneNumber}</td>
+                          <td>{formatGender(item.gender || "")}</td>
                           <td>
-                            {staff?.branchesDetailed
-                              .map((b: { code: any }) => b.code)
+                            {item.branchesDetailed
+                              .map(
+                                (branch: { [x: string]: any; name: any }) =>
+                                  branch.code
+                              )
                               .join(", ")}
                           </td>
                           <td>
                             <span
-                              className={`badge bg-${staff.status === "active" ? "success" : "danger"} text-white fs-12 px-2 py-1`}
+                              className={`badge bg-${
+                                item.status === "active" ? "success" : "danger"
+                              } text-white fs-12 px-2 py-1`}
                             >
-                              {staff?.status}
+                              {item.status}
                             </span>
                           </td>
-                          <td>{staff?.role?.label}</td>
+                          <td>{item.createdAt}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(staff._id)}
+                                onClick={() => handleView(item._id)}
                               >
                                 <IconifyIcon
                                   icon="solar:eye-broken"
@@ -295,7 +349,7 @@ const StaffListPage = () => {
                               <Button
                                 variant="soft-primary"
                                 size="sm"
-                                onClick={() => handleEdit(staff._id)}
+                                onClick={() => handleEditClick(item._id)}
                               >
                                 <IconifyIcon
                                   icon="solar:pen-2-broken"
@@ -305,7 +359,7 @@ const StaffListPage = () => {
                               <Button
                                 variant="soft-danger"
                                 size="sm"
-                                onClick={() => handleDelete(staff._id)}
+                                onClick={() => handleDeleteClick(item._id)}
                               >
                                 <IconifyIcon
                                   icon="solar:trash-bin-minimalistic-2-broken"
@@ -323,7 +377,7 @@ const StaffListPage = () => {
             </CardBody>
 
             <CardFooter>
-              <nav>
+              <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
                   <li
                     className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
@@ -338,7 +392,9 @@ const StaffListPage = () => {
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
                     <li
-                      className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
+                      className={`page-item ${
+                        currentPage === index + 1 ? "active" : ""
+                      }`}
                       key={index}
                     >
                       <Button
@@ -351,7 +407,9 @@ const StaffListPage = () => {
                     </li>
                   ))}
                   <li
-                    className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+                    className={`page-item ${
+                      currentPage === totalPages ? "disabled" : ""
+                    }`}
                   >
                     <Button
                       variant="link"
@@ -368,6 +426,7 @@ const StaffListPage = () => {
         </Col>
       </Row>
 
+      {/* Delete Confirmation Modal */}
       <Modal
         show={showDeleteModal}
         onHide={() => setShowDeleteModal(false)}
@@ -377,7 +436,7 @@ const StaffListPage = () => {
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this staff? This action cannot be
+          Are you sure you want to delete this customer? This action cannot be
           undone.
         </Modal.Body>
         <Modal.Footer>
@@ -393,4 +452,4 @@ const StaffListPage = () => {
   );
 };
 
-export default StaffListPage;
+export default appointmentListPage;

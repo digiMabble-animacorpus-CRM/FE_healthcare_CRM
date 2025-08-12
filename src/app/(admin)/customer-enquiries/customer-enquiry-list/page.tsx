@@ -365,9 +365,9 @@ const CustomersListPage = () => {
 
   <Dropdown.Menu>
     <Dropdown.Item
-      onClick={() => router.push(`/customers/edit/${item._id}`)}
+      onClick={() => handleEditClick(item._id)}
     >
-      Edit Basic Info
+      Edit 
     </Dropdown.Item>
     <Dropdown.Item
       onClick={() => router.push(`/customers/edit/${item._id}`)}

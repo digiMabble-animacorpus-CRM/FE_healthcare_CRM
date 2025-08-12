@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
@@ -13,19 +13,21 @@ import {
   Col,
   Row,
   Spinner,
-  Modal, 
 } from "react-bootstrap";
-
-import DocumentUploadCard from "./DocumentUploadCard";
-
 
 import { useRouter } from "next/navigation";
 
 import { getCustomerEnquiriesById } from "@/helpers/data";
-import type { CustomerEnquiriesType } from "@/types/data";
+import type {
+  BranchType,
+  CustomerEnquiriesType,
+  LanguageType,
+} from "@/types/data";
 import TextFormInput from "@/components/from/TextFormInput";
 import TextAreaFormInput from "@/components/from/TextAreaFormInput";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
+import { getAllLanguages } from "@/helpers/languages";
+import { getAllBranch } from "@/helpers/branch";
 
 type CustomerFormValues = {
   name: string;
@@ -71,9 +73,10 @@ const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
 
 interface Props {
   params: { id?: string };
+  onSubmitHandler?: (data: CustomerEnquiriesType) => void;
 }
 
-const AddCustomer = ({ params }: Props) => {
+const AddCustomer = ({ params, onSubmitHandler }: Props) => {
   const router = useRouter();
   const isEditMode = !!params.id;
 
@@ -94,14 +97,8 @@ const AddCustomer = ({ params }: Props) => {
     country: "",
   });
 
-  const [showPreview, setShowPreview] = useState(false);
-const [previewFile, setPreviewFile] = useState<File | null>(null);
-
-const handleView = (file: File) => {
-  setPreviewFile(file);
-  setShowPreview(true);
-};
-
+  const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
+  const allBranches = useMemo<BranchType[]>(() => getAllBranch(), []);
 
   const {
     handleSubmit,
@@ -119,16 +116,15 @@ const handleView = (file: File) => {
         try {
           const response = await getCustomerEnquiriesById(params.id!);
           const data = response.data;
-          console.log(data, "edit details");
           if (Array.isArray(data) && data.length > 0) {
             const enquiries: CustomerEnquiriesType = data[0];
             setDefaultValues(enquiries as CustomerFormValues);
             reset(enquiries as CustomerFormValues);
           } else {
-            console.error("enquiries not found or data format incorrect");
+            console.error("Customer not found or invalid data format");
           }
         } catch (error) {
-          console.error("Failed to fetch enquiries:", error);
+          console.error("Failed to fetch customer:", error);
         } finally {
           setLoading(false);
         }
@@ -138,6 +134,11 @@ const handleView = (file: File) => {
   }, [isEditMode, params.id, reset]);
 
   const onSubmit = async (data: CustomerFormValues) => {
+    if (onSubmitHandler) {
+      onSubmitHandler(data as CustomerEnquiriesType);
+      return;
+    }
+
     if (isEditMode) {
       console.log("Edit Submitted Data:", data);
       // TODO: Update API call here
@@ -166,255 +167,201 @@ const handleView = (file: File) => {
         <CardBody>
           <Row>
             <Col lg={6}>
-              <div className="mb-3">
-                <TextFormInput
-                  control={control}
-                  name="name"
-                  placeholder="Full Name"
-                  label="Customer Name"
-                />
-              </div>
+              <TextFormInput
+                control={control}
+                name="name"
+                placeholder="Full Name"
+                label="Customer Name"
+              />
             </Col>
             <Col lg={6}>
-              <div className="mb-3">
-                <TextFormInput
-                  control={control}
-                  name="email"
-                  placeholder="Enter Email"
-                  label="Customer Email"
-                />
-              </div>
+              <TextFormInput
+                control={control}
+                name="email"
+                placeholder="Enter Email"
+                label="Customer Email"
+              />
             </Col>
             <Col lg={6}>
-              <div className="mb-3">
-                <TextFormInput
-                  control={control}
-                  name="number"
-                  type="number"
-                  placeholder="Enter Number"
-                  label="Customer Number"
-                />
-              </div>
+              <TextFormInput
+                control={control}
+                name="number"
+                type="number"
+                placeholder="Enter Number"
+                label="Customer Number"
+              />
             </Col>
             <Col lg={6}>
-              <div className="mb-3">
-                <TextFormInput
-                  control={control}
-                  name="dob"
-                  type="date"
-                  placeholder=""
-                  label="Date of Birth"
-                />
-              </div>
+              <TextFormInput
+                control={control}
+                name="dob"
+                type="date"
+                placeholder=""
+                label="Date of Birth"
+              />
             </Col>
-            <Col lg={6}>
-  <div className="mb-3">
-    <label className="form-label">Upload Document(s)</label>
-    <Controller
-      name="document"
-      control={control}
-      render={({ field }) => (
-        <DocumentUploadCard
-          field={field}
-          error={errors.document?.message}
-          // Add 'single={true}' if you want only single upload
-        />
-      )}
-    />
-  </div>
-</Col>
-
 
             <Col lg={6}>
-              <div className="mb-3">
-                <label className="form-label">Gender</label>
-                <Controller
-                  control={control}
-                  name="gender"
-                  render={({ field }) => (
-                    <ChoicesFormInput className="form-control" {...field}>
-                      <option value="" disabled hidden>
-                        Select Gender
-                      </option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="others">Others</option>
-                    </ChoicesFormInput>
-                  )}
-                />
-                {errors.gender && (
-                  <small className="text-danger2">{errors.gender.message}</small>
+              <label className="form-label">Gender</label>
+              <Controller
+                control={control}
+                name="gender"
+                render={({ field }) => (
+                  <ChoicesFormInput className="form-control" {...field}>
+                    <option value="" disabled hidden>
+                      Select Gender
+                    </option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="others">Others</option>
+                  </ChoicesFormInput>
                 )}
-              </div>
+              />
+              {errors.gender && (
+                <small className="text-danger">{errors.gender.message}</small>
+              )}
             </Col>
-            
-            
-            <Col lg={6}>
-              <div className="mb-3">
-                <label className="form-label">Preferred Language</label>
-                <Controller
-                  control={control}
-                  name="language"
-                  render={({ field }) => (
-                    <ChoicesFormInput className="form-control" {...field}>
-                      <option value="" disabled hidden>
-                        Select Preferred Language
-                      </option>
-                      <option value="EN">English</option>
-                      <option value="FR">French</option>
-                      <option value="NL">Dutch</option>
-                    </ChoicesFormInput>
-                  )}
-                />
-                {errors.language && (
-                  <small className="text-danger2">
-                    {errors.language.message}
-                  </small>
-                )}
-              </div>
-            </Col>
-            <Col lg={6}>
-              <div className="mb-3">
-                <label className="form-label">Tags</label>
-                <Controller
-                  control={control}
-                  name="tags"
-                  render={({ field }) => (
-                    <ChoicesFormInput
-                      className="form-control"
-                      multiple
-                      options={{ removeItemButton: true }}
-                      {...field}
-                    >
-                      <option value="Blog">Blog</option>
-                      <option value="Business">Business</option>
-                      <option value="Health">Health</option>
-                      <option value="Computer Software">
-                        Computer Software
-                      </option>
-                      <option value="Lifestyle blogs">Lifestyle blogs</option>
-                      <option value="Fashion">Fashion</option>
-                    </ChoicesFormInput>
-                  )}
-                />
-                {errors.tags && (
-                  <small className="text-danger2">{errors.tags.message}</small>
-                )}
-              </div>
-            </Col>
-            <Col lg={6}>
-              <div className="mb-3">
-                <label className="form-label">Branch</label>
-                <Controller
-                  control={control}
-                  name="branch"
-                  render={({ field }) => (
-                    <ChoicesFormInput className="form-control" {...field}>
-                      <option value="" disabled hidden>
-                        Select Branch
-                      </option>
-                      <option value="Gembloux - Orneau">
-                        Gembloux - Orneau
-                      </option>
-                      <option value="Gembloux - Tout Vent">
-                        Gembloux - Tout Vent
-                      </option>
-                      <option value="Anima Corpus Namur">
-                        Anima Corpus Namur
-                      </option>
-                    </ChoicesFormInput>
-                  )}
-                />
-                {errors.branch && (
-                  <small className="text-danger2">{errors.branch.message}</small>
-                )}
-              </div>
-            </Col>
-            
 
             <Col lg={6}>
-              <div className="mb-3">
-                <TextAreaFormInput
-                  control={control}
-                  name="address"
-                  label="Customer Address"
-                  id="schedule-textarea"
-                  rows={3}
-                  placeholder="Enter address"
-                />
-              </div>
+              <label className="form-label">Preferred Language</label>
+              <Controller
+                control={control}
+                name="language"
+                render={({ field }) => (
+                  <ChoicesFormInput className="form-control" {...field}>
+                    <option value="" disabled hidden>
+                      Select Preferred Language
+                    </option>
+                    {allLanguages.map((lang) => (
+                      <option key={lang.key} value={lang.key}>
+                        {lang.label}
+                      </option>
+                    ))}
+                  </ChoicesFormInput>
+                )}
+              />
+              {errors.language && (
+                <small className="text-danger">{errors.language.message}</small>
+              )}
             </Col>
-            
-            <Col lg={6}>
-  <div className="mb-3">
-    <TextAreaFormInput
-      control={control}
-      name="description"
-      label="Description"
-      id="schedule-textarea"
-      rows={3}
-      placeholder="Any Description"
-    />
-  </div>
-</Col>
 
-<Col lg={4}>
-  <div className="mb-3">
-    <TextFormInput
-      control={control}
-      name="zipCode"
-      type="number"
-      placeholder="Zip-Code"
-      label="Zip-Code"
-    />
-  </div>
-</Col>
+            <Col lg={6}>
+              <label className="form-label">Tags</label>
+              <Controller
+                control={control}
+                name="tags"
+                render={({ field }) => (
+                  <ChoicesFormInput
+                    className="form-control"
+                    multiple
+                    options={{ removeItemButton: true }}
+                    {...field}
+                  >
+                    <option value="Blog">Blog</option>
+                    <option value="Business">Business</option>
+                    <option value="Health">Health</option>
+                    <option value="Computer Software">Computer Software</option>
+                    <option value="Lifestyle blogs">Lifestyle blogs</option>
+                    <option value="Fashion">Fashion</option>
+                  </ChoicesFormInput>
+                )}
+              />
+              {errors.tags && (
+                <small className="text-danger">{errors.tags.message}</small>
+              )}
+            </Col>
+
+            <Col lg={6}>
+              <label className="form-label">Branch</label>
+              <Controller
+                control={control}
+                name="branch"
+                render={({ field }) => (
+                  <ChoicesFormInput className="form-control" {...field}>
+                    <option value="" disabled hidden>
+                      Select Branch
+                    </option>
+                    {allBranches.map((branch) => (
+                      <option key={branch._id} value={branch._id}>
+                        {branch.name}
+                      </option>
+                    ))}
+                  </ChoicesFormInput>
+                )}
+              />
+              {errors.branch && (
+                <small className="text-danger">{errors.branch.message}</small>
+              )}
+            </Col>
+
+            <Col lg={6}>
+              <TextAreaFormInput
+                control={control}
+                name="address"
+                label="Customer Address"
+                rows={3}
+                placeholder="Enter address"
+              />
+            </Col>
+
+            <Col lg={6}>
+              <TextAreaFormInput
+                control={control}
+                name="description"
+                label="Description"
+                rows={3}
+                placeholder="Any Description"
+              />
+            </Col>
 
             <Col lg={4}>
-              <div className="mb-3">
-                <label className="form-label">City</label>
-                <Controller
-                  control={control}
-                  name="city"
-                  render={({ field }) => (
-                    <ChoicesFormInput className="form-control" {...field}>
-                      <option value="" disabled hidden>
-                        Choose a city
-                      </option>
-                      <option value="London">London</option>
-                      <option value="Paris">Paris</option>
-                      <option value="New York">New York</option>
-                    </ChoicesFormInput>
-                  )}
-                />
-                {errors.city && (
-                  <small className="text-danger2">{errors.city.message}</small>
-                )}
-              </div>
+              <TextFormInput
+                control={control}
+                name="zipCode"
+                type="number"
+                placeholder="Zip-Code"
+                label="Zip-Code"
+              />
             </Col>
             <Col lg={4}>
-              <div className="mb-3">
-                <label className="form-label">Country</label>
-                <Controller
-                  control={control}
-                  name="country"
-                  render={({ field }) => (
-                    <ChoicesFormInput className="form-control" {...field}>
-                      <option value="" disabled hidden>
-                        Choose a country
-                      </option>
-                      <option value="UK">United Kingdom</option>
-                      <option value="FR">France</option>
-                      <option value="IN">India</option>
-                    </ChoicesFormInput>
-                  )}
-                />
-                {errors.country && (
-                  <small className="text-danger2">
-                    {errors.country.message}
-                  </small>
+              <label className="form-label">City</label>
+              <Controller
+                control={control}
+                name="city"
+                render={({ field }) => (
+                  <ChoicesFormInput className="form-control" {...field}>
+                    <option value="" disabled hidden>
+                      Choose a city
+                    </option>
+                    <option value="London">London</option>
+                    <option value="Paris">Paris</option>
+                    <option value="New York">New York</option>
+                  </ChoicesFormInput>
                 )}
-              </div>
+              />
+              {errors.city && (
+                <small className="text-danger">{errors.city.message}</small>
+              )}
+            </Col>
+            <Col lg={4}>
+              <label className="form-label">Country</label>
+              <Controller
+                control={control}
+                name="country"
+                render={({ field }) => (
+                  <ChoicesFormInput className="form-control" {...field}>
+                    <option value="" disabled hidden>
+                      Choose a country
+                    </option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="FR">France</option>
+                    <option value="IN">India</option>
+                  </ChoicesFormInput>
+                )}
+              />
+              {errors.country && (
+                <small className="text-danger">{errors.country.message}</small>
+              )}
             </Col>
           </Row>
         </CardBody>
@@ -437,25 +384,6 @@ const handleView = (file: File) => {
           </Col>
         </Row>
       </div>
-      <Modal show={showPreview} onHide={() => setShowPreview(false)} size="lg" centered>
-  <Modal.Header closeButton>
-    <Modal.Title>Document Preview</Modal.Title>
-  </Modal.Header>
-  <Modal.Body style={{ height: "70vh" }}>
-    {previewFile?.type === "application/pdf" ? (
-      <iframe
-        src={URL.createObjectURL(previewFile)}
-        title="PDF Preview"
-        width="100%"
-        height="100%"
-        style={{ border: "none" }}
-      />
-    ) : (
-      <p className="text-muted">Preview not available for this file type.</p>
-    )}
-  </Modal.Body>
-</Modal>
-
     </form>
   );
 };

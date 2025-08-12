@@ -31,12 +31,12 @@ export type TabMenuItem = {
   tab: ReactNode
 }
 
-const menuItems = [
-  {
-    key: 'dashboard',
-    label: 'Dashboard',
-    icon: <DashboardIcon />, // Use your custom SVG here
-    url: '/dashboard',
-  },
-  // ...other items
-]
+// const menuItems = [
+//   {
+//     key: 'dashboard',
+//     label: 'Dashboard',
+//     icon: <DashboardIcon />,
+//     url: '/dashboard',
+//   },
+//   // ...other items
+// ]
