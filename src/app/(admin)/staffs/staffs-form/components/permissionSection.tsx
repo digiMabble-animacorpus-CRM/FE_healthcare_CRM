@@ -114,7 +114,7 @@ const PermissionsSection = () => {
       </Row>
 
       {errors.permissions && (
-        <small className="text-danger">{errors.permissions.message}</small>
+        <small className="text-danger2">{errors.permissions.message}</small>
       )}
     </div>
   );

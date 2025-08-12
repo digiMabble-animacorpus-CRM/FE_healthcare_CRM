@@ -96,7 +96,7 @@ const BranchSection = () => {
               }}
             />
             {errors.branches && (
-              <small className="text-danger">{errors.branches.message}</small>
+              <small className="text-danger2">{errors.branches.message}</small>
             )}
           </div>
         </Col>
@@ -139,7 +139,7 @@ const BranchSection = () => {
                 })}
               </Row>
               {errors.selectedBranch && (
-                <small className="text-danger">
+                <small className="text-danger2">
                   {errors.selectedBranch.message}
                 </small>
               )}

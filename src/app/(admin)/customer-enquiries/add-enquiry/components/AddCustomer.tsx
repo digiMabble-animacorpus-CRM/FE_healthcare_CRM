@@ -243,7 +243,7 @@ const handleView = (file: File) => {
                   )}
                 />
                 {errors.gender && (
-                  <small className="text-danger">{errors.gender.message}</small>
+                  <small className="text-danger2">{errors.gender.message}</small>
                 )}
               </div>
             </Col>
@@ -267,7 +267,7 @@ const handleView = (file: File) => {
                   )}
                 />
                 {errors.language && (
-                  <small className="text-danger">
+                  <small className="text-danger2">
                     {errors.language.message}
                   </small>
                 )}
@@ -298,7 +298,7 @@ const handleView = (file: File) => {
                   )}
                 />
                 {errors.tags && (
-                  <small className="text-danger">{errors.tags.message}</small>
+                  <small className="text-danger2">{errors.tags.message}</small>
                 )}
               </div>
             </Col>
@@ -326,7 +326,7 @@ const handleView = (file: File) => {
                   )}
                 />
                 {errors.branch && (
-                  <small className="text-danger">{errors.branch.message}</small>
+                  <small className="text-danger2">{errors.branch.message}</small>
                 )}
               </div>
             </Col>
@@ -346,29 +346,30 @@ const handleView = (file: File) => {
             </Col>
             
             <Col lg={6}>
-              <div className="mb-3">
-                <TextAreaFormInput
-                  control={control}
-                  name="description"
-                  label="Description"
-                  id="schedule-textarea"
-                  rows={3}
-                  placeholder="Any Description"
-                />
-              </div>
-            </Col>
+  <div className="mb-3">
+    <TextAreaFormInput
+      control={control}
+      name="description"
+      label="Description"
+      id="schedule-textarea"
+      rows={3}
+      placeholder="Any Description"
+    />
+  </div>
+</Col>
 
-            <Col lg={4}>
-              <div className="mb-3">
-                <TextFormInput
-                  control={control}
-                  name="zipCode"
-                  type="number"
-                  placeholder="Zip-Code"
-                  label="Zip-Code"
-                />
-              </div>
-            </Col>
+<Col lg={4}>
+  <div className="mb-3">
+    <TextFormInput
+      control={control}
+      name="zipCode"
+      type="number"
+      placeholder="Zip-Code"
+      label="Zip-Code"
+    />
+  </div>
+</Col>
+
             <Col lg={4}>
               <div className="mb-3">
                 <label className="form-label">City</label>
@@ -387,7 +388,7 @@ const handleView = (file: File) => {
                   )}
                 />
                 {errors.city && (
-                  <small className="text-danger">{errors.city.message}</small>
+                  <small className="text-danger2">{errors.city.message}</small>
                 )}
               </div>
             </Col>
@@ -409,7 +410,7 @@ const handleView = (file: File) => {
                   )}
                 />
                 {errors.country && (
-                  <small className="text-danger">
+                  <small className="text-danger2">
                     {errors.country.message}
                   </small>
                 )}

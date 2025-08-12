@@ -87,7 +87,7 @@ const PersonalInfo = () => {
               )}
             />
             {errors.gender && (
-              <small className="text-danger">{errors.gender.message}</small>
+              <small className="text-danger2">{errors.gender.message}</small>
             )}
           </div>
         </Col>
