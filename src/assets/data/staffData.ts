@@ -5,14 +5,15 @@ export const staffData: StaffType[] = [
     _id: "s1",
     name: "Dr. Claire Martin",
     phoneNumber: "0471234567",
+    phone_number: "0471234567",
     email: "claire.martin@clinic.be",
     gender: "female",
     languages: ["lang-002", "lang-001"], // French, English
 
     address: {
-      line1: "12 Rue de la Santé",
+      street: "12 Rue de la Santé",
       city: "Namur",
-      zipCode: "5000",
+      zip_code: "5000",
       country: "France",
     },
     dob: "1982-05-17",
@@ -61,14 +62,15 @@ export const staffData: StaffType[] = [
     _id: "s2",
     name: "Nurse Paul De Smet",
     phoneNumber: "0466123456",
+    phone_number: "0466123456",
     email: "paul.desmet@nursing.be",
     gender: "male",
     languages: ["lang-003", "lang-002"], // Dutch, French
 
     address: {
-      line1: "45 Avenue de Bruxelles",
+      street: "45 Avenue de Bruxelles",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
 
@@ -114,14 +116,15 @@ export const staffData: StaffType[] = [
     _id: "s3",
     name: "Admin Sophie Dubois",
     phoneNumber: "0488123444",
+    phone_number: "0488123444",
     email: "sophie.dubois@admin.be",
     gender: "female",
     languages: ["lang-002"], // French
 
     address: {
-      line1: "88 Rue de l'Administration",
+      street: "88 Rue de l'Administration",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
 
@@ -155,14 +158,15 @@ export const staffData: StaffType[] = [
     _id: "s4",
     name: "Technician Lars Verbeek",
     phoneNumber: "0490111122",
+    phone_number: "0490111122",
     email: "lars.verbeek@lab.be",
     gender: "male",
     languages: ["lang-003", "lang-001"], // Dutch, English
 
     address: {
-      line1: "5 Technologiepark",
+      street: "5 Technologiepark",
       city: "Namur",
-      zipCode: "5000",
+      zip_code: "5000",
       country: "Belgium",
     },
 
@@ -201,14 +205,15 @@ export const staffData: StaffType[] = [
     _id: "s5",
     name: "Receptionist Emma Lefevre",
     phoneNumber: "0455111133",
+    phone_number: "0455111133",
     email: "emma.lefevre@reception.be",
     gender: "female",
     languages: ["lang-002", "lang-001"], // French, English
 
     address: {
-      line1: "3 Boulevard Central",
+      street: "3 Boulevard Central",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
 
@@ -246,14 +251,15 @@ export const staffData: StaffType[] = [
     _id: "s6",
     name: "Super Admin Lucas Janssen",
     phoneNumber: "0479998877",
+    phone_number: "0479998877",
     email: "lucas.janssen@system.be",
     gender: "male",
     languages: ["lang-003", "lang-001"], // Dutch, English
 
     address: {
-      line1: "1 Rue Centrale",
+      street: "1 Rue Centrale",
       city: "Namur",
-      zipCode: "5000",
+      zip_code: "5000",
       country: "Belgium",
     },
 
@@ -289,14 +295,15 @@ export const staffData: StaffType[] = [
     _id: "s7",
     name: "Dr. Elise Lambert",
     phoneNumber: "0455223344",
+    phone_number: "0455223344",
     email: "elise.lambert@clinic.be",
     gender: "female",
     languages: ["lang-002"], // French
 
     address: {
-      line1: "78 Rue Médicale",
+      street: "78 Rue Médicale",
       city: "Namur",
-      zipCode: "5000",
+      zip_code: "5000",
       country: "Belgium",
     },
 
@@ -344,6 +351,7 @@ export const staffData: StaffType[] = [
     _id: "s8",
     name: "Assistant Noor Vermeulen",
     phoneNumber: "0466557788",
+    phone_number: "0466557788",
     email: "noor.vermeulen@support.be",
     gender: "female",
     languages: ["lang-003", "lang-002"], // Dutch, French
@@ -382,6 +390,7 @@ export const staffData: StaffType[] = [
     _id: "s9",
     name: "Lab Assistant Hugo De Wilde",
     phoneNumber: "0488553322",
+    phone_number: "0488553322",
     email: "hugo.dewilde@lab.be",
     gender: "male",
     languages: ["lang-003"], // Dutch
@@ -421,6 +430,7 @@ export const staffData: StaffType[] = [
     _id: "s10",
     name: "Receptionist Lien Janssens",
     phoneNumber: "0455992244",
+    phone_number: "0455992244",
     email: "lien.janssens@reception.be",
     gender: "female",
     languages: ["lang-002", "lang-001"], // French, English

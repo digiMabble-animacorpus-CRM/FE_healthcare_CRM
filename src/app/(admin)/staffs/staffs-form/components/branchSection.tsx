@@ -17,7 +17,7 @@ const BranchSection = () => {
   const assignedBranches = useWatch({ control, name: "branches" }) || [];
   const selectedBranch = useWatch({ control, name: "selectedBranch" });
 
-  // ✅ Get all branches as full objects
+  //  Get all branches as full objects
   const allBranches = useMemo<BranchType[]>(() => {
     const branches = getAllBranch();
     return branches;
@@ -29,31 +29,35 @@ const BranchSection = () => {
     name: b.name,
   }));
 
-  // 🔄 Auto-select or clear primary branch based on selection count
-  useEffect(() => {
+  //  Auto-select or clear primary branch based on selection count
+useEffect(() => {
+  if (assignedBranches.length === 1) {
+    const branchId = typeof assignedBranches[0] === "string"
+      ? assignedBranches[0]
+      : assignedBranches[0].id;
 
-    if (assignedBranches.length === 1) {
-      const branchId =
-        typeof assignedBranches[0] === "string"
-          ? assignedBranches[0]
-          : assignedBranches[0].id;
+    if (selectedBranch !== branchId) {
       setValue("selectedBranch", branchId, { shouldValidate: true });
-    } else if (assignedBranches.length > 1) {
-      const isCurrentSelectedValid = assignedBranches.some(
-        (b) => (typeof b === "string" ? b : b.id) === selectedBranch
-      );
+    }
+  } else if (assignedBranches.length > 1) {
+    const isCurrentSelectedValid = assignedBranches.some(
+      (b) => (typeof b === "string" ? b : b.id) === selectedBranch
+    );
 
-      if (!selectedBranch || !isCurrentSelectedValid) {
-        const firstBranch =
-          typeof assignedBranches[0] === "string"
-            ? assignedBranches[0]
-            : assignedBranches[0].id;
+    if (!selectedBranch || !isCurrentSelectedValid) {
+      const firstBranch = typeof assignedBranches[0] === "string"
+        ? assignedBranches[0]
+        : assignedBranches[0].id;
+
+      if (selectedBranch !== firstBranch) {
         setValue("selectedBranch", firstBranch, { shouldValidate: true });
       }
-    } else {
-      setValue("selectedBranch", "", { shouldValidate: true });
     }
-  }, [assignedBranches, selectedBranch, setValue]);
+  } else if (selectedBranch !== "") {
+    setValue("selectedBranch", "", { shouldValidate: true });
+  }
+}, [assignedBranches, selectedBranch, setValue]);
+
 
   return (
     <div className="mb-4">

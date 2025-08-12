@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { Row, Col, FormCheck, FormControl, FormLabel } from "react-bootstrap";
-import type { StaffType, PermissionType } from "@/types/data";
+import { Row, Col, FormCheck } from "react-bootstrap";
+import type { StaffType, PermissionType, StaffRoleType } from "@/types/data";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import { getAllRoles } from "@/helpers/staff";
+import { staffRoleData } from "@/assets/data/staffRoleData";
 import { getAllPermissions } from "@/helpers/permission";
 
 const PermissionsSection = () => {
@@ -15,33 +15,52 @@ const PermissionsSection = () => {
     formState: { errors },
   } = useFormContext<StaffType>();
 
-  const allRoles = useMemo(() => getAllRoles(), []);
-  const allPermissions = useMemo(() => getAllPermissions(), []);
-
   const roleId = useWatch({ name: "roleId" });
   const selectedPermissions = useWatch({ name: "permissions" }) || [];
 
   const [defaultKeys, setDefaultKeys] = useState<string[]>([]);
+  const [allRoles, setAllRoles] = useState<StaffRoleType[]>([]);
+  const [allPermissions, setAllPermissions] = useState<PermissionType[]>([]);
 
-  const permissionLabels = useMemo(() => {
-    const map: Record<string, string> = {};
-    allPermissions.forEach((p) => (map[p.key] = p.label));
-    return map;
-  }, [allPermissions]);
+  //  Fetch roles and permissions once
+ useEffect(() => {
+  const roles = staffRoleData.filter((r) => r.tag === "Role");
+  setAllRoles(roles);
 
-  // 🧠 Fetch default permissions based on role
+  const permissionSet = new Set(
+    roles.flatMap((r) => r.defaultPermissions || [])
+  );
+
+  // Generate fake permission objects based on roles
+  const permissions = Array.from(permissionSet).map((key) => ({
+    _id: key,
+    key,
+    label: key.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+  }));
+
+  setAllPermissions(permissions);
+}, []);
+
+
+  //  Fetch default permissions based on role
   useEffect(() => {
     const role = allRoles.find((r) => r._id === roleId);
     setDefaultKeys(role?.defaultPermissions || []);
   }, [roleId, allRoles]);
 
-  // 🚀 Merge default + existing selected permissions on change
+  //  Merge default + existing selected permissions on change
   useEffect(() => {
     const currentKeys = selectedPermissions.map((p: any) => p._id);
     const mergedKeys = Array.from(new Set([...defaultKeys, ...currentKeys]));
     const mapped = mergedKeys.map((key) => ({ _id: key, enabled: true }));
     setValue("permissions", mapped);
   }, [defaultKeys]);
+
+  const permissionLabels = useMemo(() => {
+    const map: Record<string, string> = {};
+    allPermissions.forEach((p) => (map[p.key] = p.label));
+    return map;
+  }, [allPermissions]);
 
   const selectedKeys = selectedPermissions
     .filter((p: any) => p.enabled)
@@ -68,7 +87,7 @@ const PermissionsSection = () => {
         Permissions <span className="text-danger">*</span>
       </h5>
 
-      {/* ✅ Multi Select Dropdown */}
+      {/*  Multi Select Dropdown */}
       <Controller
         control={control}
         name="permissions"
@@ -89,7 +108,7 @@ const PermissionsSection = () => {
         )}
       />
 
-      {/* ✅ Checkbox list below for selected permissions */}
+      {/*  Checkbox list below for selected permissions */}
       <Row className="mt-3">
         {selectedKeys.map((key: string) => (
           <Col lg={4} key={key} className="mb-2">

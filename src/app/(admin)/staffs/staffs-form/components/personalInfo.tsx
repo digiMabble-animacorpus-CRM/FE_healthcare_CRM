@@ -76,7 +76,9 @@ const PersonalInfo = () => {
               control={control}
               name="gender"
               render={({ field }) => (
-                <ChoicesFormInput className="form-control" {...field}>
+                <ChoicesFormInput className="form-control" {...field}
+                value={field.value}
+                onChange={(val) => field.onChange(val)}>
                   <option value="" disabled hidden>
                     Select Gender
                   </option>

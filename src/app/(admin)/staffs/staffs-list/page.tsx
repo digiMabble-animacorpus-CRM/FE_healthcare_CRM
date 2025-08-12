@@ -23,6 +23,8 @@ import {
 } from 'react-bootstrap'
 import { useRouter } from 'next/navigation'
 import { getAllStaff } from '@/helpers/staff'
+import type { BranchDetails } from '@/types/data';
+import { encryptAES } from '@/utils/encryption'
 
 const PAGE_LIMIT = 10
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur']
@@ -57,19 +59,26 @@ const StaffListPage = () => {
     }
   }
 
-  const fetchStaffList = async (page: number) => {
-    setLoading(true)
-    try {
-      const { from, to } = getDateRange()
-      const response = await getAllStaff(page, PAGE_LIMIT, selectedBranch || undefined, from, to, searchTerm)
-      setStaffList(response.data)
-      setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT))
-    } catch (error) {
-      console.error('Failed to fetch staff list:', error)
-    } finally {
-      setLoading(false)
-    }
+const fetchStaffList = async (page: number) => {
+  setLoading(true);
+  console.log(' Fetching staff list...');
+  try {
+    const { from, to } = getDateRange();
+    console.log(' Date filter range:', { from, to });
+
+    const response = await getAllStaff(page, PAGE_LIMIT, selectedBranch || undefined, from, to, searchTerm);
+    
+    console.log(' Response from getAllStaff:', response);
+
+    setStaffList(response.data);
+    setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
+  } catch (error) {
+    console.error(' Failed to fetch staff list:', error);
+  } finally {
+    setLoading(false);
   }
+};
+
 
   useEffect(() => {
     fetchStaffList(currentPage)
@@ -79,9 +88,36 @@ const StaffListPage = () => {
     if (page !== currentPage) setCurrentPage(page)
   }
 
-  const handleView = (id: string) => router.push(`/staffs/staffs-details/${id}`)
-  const handleEdit = (id: string) => router.push(`/staffs/staffs-form/${id}/edit`)
-  const handlePermission = (id: string) => router.push(`/staffs/staffs-form/${id}/permission`)
+
+
+
+
+const handleView = (staffId: number | string) => {
+  const encryptedId = encryptAES(staffId);
+  router.push(`/staffs/staffs-details/${encodeURIComponent(encryptedId)}`);
+};
+
+
+
+const handleEdit = (id: string | number) => {
+  const encrypted = encodeURIComponent(encryptAES(String(id)));
+  router.push(`/staffs/staffs-form/${encrypted}/edit`);
+};
+
+
+
+
+
+
+const handlePermission = (id: string | number) => {
+  const encrypted = encodeURIComponent(encryptAES(String(id)));
+  router.push(`/staffs/staffs-form/${encrypted}/permission`);
+};
+
+
+
+
+
 
   const handleDelete = (id: string) => {
     setSelectedStaffId(id)
@@ -225,24 +261,32 @@ const StaffListPage = () => {
                         <tr key={idx}>
                           <td>{staff.name}</td>
                           <td>{staff.email}</td>
-                          <td>{staff.phoneNumber}</td>
+                          <td>{staff.phone_number}</td>
                           <td>{formatGender(staff.gender || '')}</td>
                           <td>{staff.branchesDetailed.map((b: { code: any }) => b.code).join(', ')}</td>
+ {/* <td>
+  {staff.branchesDetailed?.length
+    ? staff.branchesDetailed.map((branch: BranchDetails) => branch.code).join(', ')
+    : 'N/A'}
+</td> */}
+
+
+
                           <td>
                             <span className={`badge bg-${staff.status === 'active' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}>
                               {staff.status}
                             </span>
                           </td>
-                          <td>{staff.createdAt}</td>
+                          <td>{staff.createdAt ? dayjs(staff.createdAt).format('YYYY-MM-DD HH:mm') : 'N/A'}</td>
                           <td>
                             <div className="d-flex gap-2">
-                              <Button variant="light" size="sm" onClick={() => handleView(staff._id)}>
+                              <Button variant="light" size="sm" onClick={() => handleView(String(staff.id))}>
                                 <IconifyIcon icon="solar:eye-broken" className="align-middle fs-18" />
                               </Button>
-                              <Button variant="soft-primary" size="sm" onClick={() => handleEdit(staff._id)}>
+                              <Button variant="soft-primary" size="sm" onClick={() => handleEdit(String(staff.id))}>
                                 <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
                               </Button>
-                              <Button variant="soft-danger" size="sm" onClick={() => handleDelete(staff._id)}>
+                              <Button variant="soft-danger" size="sm" onClick={() => handleDelete(String(staff.id))}>
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
                               </Button>
                             </div>

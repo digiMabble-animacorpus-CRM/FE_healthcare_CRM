@@ -12,7 +12,7 @@ const PropertyAdd = () => {
   const messageSchema = yup.object({
     name: yup.string().required('Please enter name'),
     description: yup.string().required('Please enter description'),
-    zipCode: yup.string().required('Please enter Zip-Code'),
+    zip_code: yup.string().required('Please enter Zip-Code'),
   })
 
   const { handleSubmit, control } = useForm({
@@ -130,7 +130,7 @@ const PropertyAdd = () => {
               </Col>
               <Col lg={4}>
                 <div className="mb-3">
-                  <TextFormInput control={control} name="zipCode" type="number" placeholder="zip-code" label="Zip-Code" />
+                  <TextFormInput control={control} name="zip_code" type="number" placeholder="zip-code" label="Zip-Code" />
                 </div>
               </Col>
               <Col lg={4}>

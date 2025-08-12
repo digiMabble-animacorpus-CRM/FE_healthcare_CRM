@@ -51,7 +51,7 @@ type TherapistFormValues = {
   dob: string;
   description: string;
   address: string;
-  zipCode: string;
+  zip_code: string;
   gender: string;
   language: string;
   branch: string;
@@ -76,7 +76,7 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
   dob: yup.string().required("Please enter Date of birth"),
   address: yup.string().required("Please enter address"),
   description: yup.string().required("Please enter description"),
-  zipCode: yup
+  zip_code: yup
     .string()
     .matches(/^\d{5}$/, "Enter valid Zip-Code")
     .required("Please enter Zip-Code"),
@@ -131,7 +131,7 @@ const AddTherapist = ({ params }: Props) => {
       dob: "",
       description: "",
       address: "",
-      zipCode: "",
+      zip_code: "",
       gender: "",
       language: "",
       branch: "",
@@ -379,7 +379,7 @@ const AddTherapist = ({ params }: Props) => {
                 <div className="mb-3">
                   <TextFormInput
                     control={control}
-                    name="zipCode"
+                    name="zip_code"
                     type="number"
                     placeholder="Zip-Code"
                     label="Zip-Code"

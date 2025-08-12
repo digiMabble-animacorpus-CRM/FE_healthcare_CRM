@@ -3,20 +3,28 @@
 import { FormProvider, useForm } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Button, Card, CardBody, CardHeader, CardTitle } from "react-bootstrap";
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+} from "react-bootstrap";
 import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
-import type { StaffType } from "@/types/data";
+import type { StaffType, StaffRoleType } from "@/types/data";
 import PersonalInfo from "./components/personalInfo";
 import ProfessionalInfo from "./components/professionalInfo";
 import BranchSection from "./components/branchSection";
 import ContactInfo from "./components/contactInfo";
 import AvailabilitySection from "./components/availabilitySection";
 import PermissionsSection from "./components/permissionSection";
-import { useMemo } from "react";
 import { getAllRoles } from "@/helpers/staff";
 
-// ✅ Schema aligned with StaffType
+// ------------------------
+// Validation Schema
+// ------------------------
 const schema: yup.ObjectSchema<any> = yup.object().shape({
   name: yup.string().required("Name is required"),
   email: yup.string().email().required("Email is required"),
@@ -38,9 +46,9 @@ const schema: yup.ObjectSchema<any> = yup.object().shape({
     .required(),
   selectedBranch: yup.string().required("Select primary branch"),
   address: yup.object().shape({
-    line1: yup.string().required("Address Line 1 is required"),
+    street: yup.string().required("Address Line 1 is required"),
     city: yup.string().required("City is required"),
-    zipCode: yup.string().required("Zip Code is required"),
+    zip_code: yup.string().required("Zip Code is required"),
     country: yup.string().required("Country is required"),
   }),
   languages: yup.array().min(1, "At least one language is required").required(),
@@ -65,46 +73,59 @@ interface Props {
   onSubmitHandler: (data: StaffType) => Promise<void>;
 }
 
-const StaffForm = ({
-  defaultValues,
-  isEditMode = false,
-  onSubmitHandler,
-}: Props) => {
-  const router = useRouter();
 
+
+
+const StaffForm = ({ defaultValues, isEditMode, onSubmitHandler }: Props) => {
   const methods = useForm<StaffType>({
     resolver: yupResolver(schema),
-    defaultValues: {
-      ...defaultValues,
-      branches: defaultValues?.branches || [],
-      permissions: defaultValues?.permissions || [],
-      availability: defaultValues?.availability || [],
-      languages: defaultValues?.languages || [],
-      roleId: defaultValues?.roleId || "",
-      accessLevelId: defaultValues?.accessLevelId || "",
-      address: defaultValues?.address || {
-        line1: "",
-        city: "",
-        zipCode: "",
-        country: "",
-      },
-    },
+    mode: "onTouched",
+    defaultValues: defaultValues || {},
   });
 
-  const {
-    handleSubmit,
-    watch,
-    formState: { errors },
-  } = methods;
 
+  
+
+
+
+   const { watch, getValues, reset, handleSubmit } = methods;
+  const router = useRouter();
+
+
+
+    useEffect(() => {
+    if (defaultValues && Object.keys(defaultValues).length > 0) {
+      reset({ ...defaultValues });
+      console.log(" Form reset with defaultValues", defaultValues);
+    }
+  }, [defaultValues, reset]);
+
+
+  //  Load role and determine if availability is required
   const roleId = watch("roleId") || "";
-  const selectedRole = useMemo(() => {
-    return getAllRoles().find((r) => r._id === roleId);
+  const [selectedRole, setSelectedRole] = useState<StaffRoleType | null>(null);
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      const roles = await getAllRoles();
+      const matchedRole = roles.find((r) => r._id === roleId);
+      setSelectedRole(matchedRole || null);
+    };
+
+    if (roleId) {
+      fetchRole();
+    }
   }, [roleId]);
+
+  //  Debug submit errors
+  const onSubmitError = (formErrors: any) => {
+    console.error(" Form validation errors:", formErrors);
+    console.debug("🧾 Form values at time of error:", getValues());
+  };
 
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmitHandler)}>
+      <form onSubmit={handleSubmit(onSubmitHandler, onSubmitError)}>
         <Card>
           <CardHeader>
             <CardTitle as="h5">
@@ -118,6 +139,7 @@ const StaffForm = ({
             <ContactInfo />
             {selectedRole?.requiresAvailability && <AvailabilitySection />}
             <PermissionsSection />
+
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">
                 {isEditMode ? "Update" : "Create"} Staff
