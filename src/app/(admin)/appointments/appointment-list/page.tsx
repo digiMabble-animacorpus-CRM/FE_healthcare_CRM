@@ -11,6 +11,7 @@ import {
   Form,
   Dropdown,
   ButtonGroup,
+  Modal,
 } from "react-bootstrap";
 import Calendar from "@toast-ui/react-calendar";
 import "@toast-ui/calendar/dist/toastui-calendar.min.css";
@@ -26,6 +27,7 @@ const BRANCHES = [
   "Gembloux - Tout Vent",
   "Anima Corpus Namur",
 ];
+
 const CATEGORIES = [
   { id: "consultation", name: "Consultation", color: "#007bff" },
   { id: "followup", name: "Follow-up", color: "#28a745" },
@@ -49,61 +51,201 @@ const AppointmentCalendarPage = () => {
   );
   const [calendarHeight, setCalendarHeight] = useState("750px");
 
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
+
   const calendarRef = useRef<any>(null);
 
   const dummyAppointments = [
     {
       id: "1",
       calendarId: "consultation",
-      title: "Consultation - Orneau",
+      title: "🩺 Consultation with John Doe",
       category: "time",
+      start: dayjs().hour(8).minute(0).toISOString(),
+      end: dayjs().hour(9).minute(0).toISOString(),
       branch: "Gembloux - Orneau",
-      start: dayjs().toISOString(),
-      end: dayjs().add(30, "minute").toISOString(),
+      raw: {
+        status: "confirmed",
+        location: "Room 101",
+        participants: ["John Doe", "Jane Smith"],
+        notes: "Discuss lab results and next steps.",
+        icon: "🩺",
+      },
     },
     {
       id: "2",
-      calendarId: "followup",
-      title: "Follow-up - Tout Vent",
-      category: "time",
-      branch: "Gembloux - Tout Vent",
-      start: dayjs().add(1, "day").toISOString(),
-      end: dayjs().add(1, "day").add(30, "minute").toISOString(),
+      calendarId: "therapy",
+      title: "💆 Physiotherapy Workshop",
+      category: "allday",
+      start: dayjs().toISOString(),
+      end: dayjs().add(1, "day").toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "pending",
+        location: "Therapy Hall A",
+        participants: ["Trainer Alex", "Group A"],
+        notes: "Bring yoga mats.",
+        icon: "💆",
+      },
     },
     {
       id: "3",
-      calendarId: "therapy",
-      title: "Therapy - Namur",
+      calendarId: "meeting",
+      title: "📊 Weekly Staff Meeting",
       category: "time",
-      branch: "Anima Corpus Namur",
-      start: dayjs().add(2, "day").toISOString(),
-      end: dayjs().add(2, "day").add(1, "hour").toISOString(),
+      start: dayjs().hour(10).minute(30).toISOString(),
+      end: dayjs().hour(11).minute(30).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "confirmed",
+        location: "Conference Room B",
+        participants: ["Dr. Lee", "Admin Team"],
+        notes: "Review KPIs and schedules.",
+        icon: "📊",
+      },
     },
     {
       id: "4",
       calendarId: "surgery",
-      title: "Surgery - Orneau",
+      title: "🔪 Knee Surgery - Mr. Wilson",
       category: "time",
+      start: dayjs().hour(14).minute(0).toISOString(),
+      end: dayjs().hour(16).minute(0).toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "confirmed",
+        location: "OR-2",
+        participants: ["Dr. Patel", "Nurse Amy"],
+        notes: "Patient must fast for 12 hours.",
+        icon: "🔪",
+      },
+    },
+    {
+      id: "5",
+      calendarId: "consultation",
+      title: "👩‍⚕️ Dermatology Checkup",
+      category: "time",
+      start: dayjs().add(1, "day").hour(9).minute(0).toISOString(),
+      end: dayjs().add(1, "day").hour(9).minute(45).toISOString(),
       branch: "Gembloux - Orneau",
-      start: dayjs().add(3, "day").toISOString(),
-      end: dayjs().add(3, "day").add(2, "hour").toISOString(),
+      raw: {
+        status: "pending",
+        location: "Room 203",
+        participants: ["Sarah Johnson"],
+        notes: "Check mole and prescribe treatment.",
+        icon: "👩‍⚕️",
+      },
+    },
+    {
+      id: "6",
+      calendarId: "therapy",
+      title: "🧘 Group Yoga Session",
+      category: "allday",
+      start: dayjs().add(2, "day").toISOString(),
+      end: dayjs().add(3, "day").toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "confirmed",
+        location: "Yoga Hall",
+        participants: ["Instructor Mia", "Group B"],
+        notes: "Wear comfortable clothing.",
+        icon: "🧘",
+      },
+    },
+    {
+      id: "7",
+      calendarId: "meeting",
+      title: "💼 Partner Clinic Collaboration Call",
+      category: "time",
+      start: dayjs().add(3, "day").hour(15).minute(0).toISOString(),
+      end: dayjs().add(3, "day").hour(16).minute(0).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "cancelled",
+        location: "Zoom",
+        participants: ["External Partner", "Admin Team"],
+        notes: "Reschedule for next week.",
+        icon: "💼",
+      },
+    },
+    {
+      id: "8",
+      calendarId: "surgery",
+      title: "🦴 Hip Replacement - Mrs. Clark",
+      category: "time",
+      start: dayjs().add(4, "day").hour(11).minute(0).toISOString(),
+      end: dayjs().add(4, "day").hour(14).minute(0).toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "confirmed",
+        location: "OR-5",
+        participants: ["Dr. Brown", "Nurse Tom"],
+        notes: "Patient needs special post-op care.",
+        icon: "🦴",
+      },
+    },
+    {
+      id: "9",
+      calendarId: "consultation",
+      title: "🩺 Follow-up Consultation - Mark Lee",
+      category: "time",
+      start: dayjs().add(5, "day").hour(8).minute(30).toISOString(),
+      end: dayjs().add(5, "day").hour(9).minute(15).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "confirmed",
+        location: "Room 102",
+        participants: ["Mark Lee"],
+        notes: "Review test results and update meds.",
+        icon: "🩺",
+      },
+    },
+    {
+      id: "10",
+      calendarId: "meeting",
+      title: "📞 Marketing Strategy Call",
+      category: "time",
+      start: dayjs().add(6, "day").hour(13).minute(0).toISOString(),
+      end: dayjs().add(6, "day").hour(14).minute(0).toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "pending",
+        location: "Google Meet",
+        participants: ["Marketing Lead", "Clinic Director"],
+        notes: "Discuss Q4 campaigns.",
+        icon: "📞",
+      },
     },
   ];
 
   useEffect(() => {
     setLoading(true);
-    const filtered = dummyAppointments.filter(
-      (appt) =>
-        selectedBranches.includes(appt.branch) &&
-        selectedCategories.includes(appt.calendarId)
-    );
+    const filtered = dummyAppointments
+      .filter(
+        (appt) =>
+          selectedBranches.includes(appt.branch) &&
+          selectedCategories.includes(appt.calendarId)
+      )
+      .map((appt) => {
+        // Style adjustments based on status
+        let bgColor = CATEGORIES.find((c) => c.id === appt.calendarId)?.color;
+        let borderColor = bgColor;
+        if (appt.raw?.status === "cancelled") {
+          borderColor = "#000";
+          bgColor = "#f8d7da";
+        } else if (appt.raw?.status === "pending") {
+          bgColor = "#fff3cd";
+        }
+        return { ...appt, bgColor, borderColor };
+      });
     setAppointments(filtered);
     setLoading(false);
   }, [selectedBranches, selectedCategories, selectedDate, view]);
 
   useEffect(() => {
     const updateHeight = () => {
-      const offset = 160; // header/tools space
+      const offset = 160;
       setCalendarHeight(window.innerHeight - offset + "px");
     };
     updateHeight();
@@ -122,7 +264,9 @@ const AppointmentCalendarPage = () => {
 
   const handleBranchChange = (branch: string) => {
     setSelectedBranches((prev) =>
-      prev.includes(branch) ? prev.filter((b) => b !== branch) : [...prev, branch]
+      prev.includes(branch)
+        ? prev.filter((b) => b !== branch)
+        : [...prev, branch]
     );
   };
 
@@ -130,6 +274,11 @@ const AppointmentCalendarPage = () => {
     setSelectedCategories((prev) =>
       prev.includes(catId) ? prev.filter((c) => c !== catId) : [...prev, catId]
     );
+  };
+
+  const handleEventClick = (e: any) => {
+    setSelectedEvent(e.event);
+    setShowModal(true);
   };
 
   return (
@@ -147,31 +296,26 @@ const AppointmentCalendarPage = () => {
             minWidth: 0,
           }}
         >
-          {/* Mini calendar (MUI) */}
-          <div className="p-2 border rounded mb-3" style={{ background: "white" }}>
+          <div
+            className="p-2 border rounded mb-3"
+            style={{ background: "white" }}
+          >
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
                 value={selectedDate}
                 onChange={(newValue) => setSelectedDate(newValue || dayjs())}
-                // Make it truly fluid & compact without global CSS:
                 sx={{
                   width: "100%",
                   maxWidth: "100%",
-                  minWidth: 0,                // override MUI's default minWidth ~310px
+                  minWidth: 0,
                   overflow: "hidden",
-                  // Header
                   "& .MuiPickersCalendarHeader-root": { px: 1, mb: 0.5 },
                   "& .MuiPickersCalendarHeader-label": { fontSize: "0.9rem" },
                   "& .MuiPickersArrowSwitcher-root .MuiIconButton-root": {
                     p: 0.5,
                   },
-                  // Weekday row
                   "& .MuiDayCalendar-weekDayLabel": { fontSize: "0.75rem" },
-                  // Day cells
-                  "& .MuiPickersDay-root": {
-                    fontSize: "0.75rem",
-                  },
-                  // Month grid spacing
+                  "& .MuiPickersDay-root": { fontSize: "0.75rem" },
                   "& .MuiDayCalendar-monthContainer": { mx: 0.5 },
                 }}
               />
@@ -221,45 +365,53 @@ const AppointmentCalendarPage = () => {
         </Col>
 
         {/* Main content */}
-        <Col md={9} style={{ display: "flex", flexDirection: "column", minWidth: 0 }}>
-          {/* Top bar */}
+        <Col
+          md={9}
+          style={{ display: "flex", flexDirection: "column", minWidth: 0 }}
+        >
           <div className="d-flex justify-content-between align-items-center mb-3 p-2 border rounded bg-light">
-            {/* Left: View Selector Dropdown */}
             <Dropdown as={ButtonGroup}>
               <Button variant="outline-primary" size="sm">
                 {view.charAt(0).toUpperCase() + view.slice(1)}
               </Button>
               <Dropdown.Toggle split variant="outline-primary" size="sm" />
               <Dropdown.Menu>
-                <Dropdown.Item onClick={() => setView("day")}>Day</Dropdown.Item>
-                <Dropdown.Item onClick={() => setView("week")}>Week</Dropdown.Item>
-                <Dropdown.Item onClick={() => setView("month")}>Month</Dropdown.Item>
+                <Dropdown.Item onClick={() => setView("day")}>
+                  Day
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setView("week")}>
+                  Week
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setView("month")}>
+                  Month
+                </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
 
-            {/* Center: Date */}
             <h5 className="mb-0">{selectedDate.format("MMMM D, YYYY")}</h5>
 
-            {/* Right: View Toggle Icons */}
             <ButtonGroup size="sm">
               <Button
-                variant={calendarViewMode === "calendar" ? "primary" : "outline-primary"}
+                variant={
+                  calendarViewMode === "calendar"
+                    ? "primary"
+                    : "outline-primary"
+                }
                 onClick={() => setCalendarViewMode("calendar")}
-                title="Calendar view"
               >
                 <Icon icon="mdi:calendar-month" width="18" />
               </Button>
               <Button
-                variant={calendarViewMode === "list" ? "primary" : "outline-primary"}
+                variant={
+                  calendarViewMode === "list" ? "primary" : "outline-primary"
+                }
                 onClick={() => setCalendarViewMode("list")}
-                title="List view"
               >
                 <Icon icon="mdi:view-list" width="18" />
               </Button>
             </ButtonGroup>
           </div>
 
-          {/* Calendar or List */}
           <div style={{ flex: 1, minHeight: 0 }}>
             {loading ? (
               <div className="text-center py-5">
@@ -274,6 +426,7 @@ const AppointmentCalendarPage = () => {
                 week={{ showTimezoneCollapseButton: true }}
                 events={appointments}
                 calendars={calendars}
+                onClickEvent={handleEventClick}
               />
             ) : (
               <div
@@ -286,7 +439,9 @@ const AppointmentCalendarPage = () => {
                   appointments.map((appt) => (
                     <div key={appt.id} className="border-bottom py-2">
                       <strong>{appt.title}</strong>
-                      <div>{dayjs(appt.start).format("MMM D, YYYY h:mm A")}</div>
+                      <div>
+                        {dayjs(appt.start).format("MMM D, YYYY h:mm A")}
+                      </div>
                     </div>
                   ))
                 )}
@@ -295,6 +450,48 @@ const AppointmentCalendarPage = () => {
           </div>
         </Col>
       </Row>
+
+      {/* Modal for Event Details */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Appointment Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedEvent && (
+            <>
+              <p>
+                <strong>Title:</strong> {selectedEvent.title}
+              </p>
+              <p>
+                <strong>Branch:</strong> {selectedEvent.branch}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedEvent.raw?.status}
+              </p>
+              <p>
+                <strong>Location:</strong> {selectedEvent.raw?.location}
+              </p>
+              <p>
+                <strong>Participants:</strong>{" "}
+                {selectedEvent.raw?.participants?.join(", ")}
+              </p>
+              <p>
+                <strong>Notes:</strong> {selectedEvent.raw?.notes}
+              </p>
+              <p>
+                <strong>Time:</strong>{" "}
+                {dayjs(selectedEvent.start).format("MMM D, YYYY h:mm A")} -{" "}
+                {dayjs(selectedEvent.end).format("MMM D, YYYY h:mm A")}
+              </p>
+            </>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </>
   );
 };
