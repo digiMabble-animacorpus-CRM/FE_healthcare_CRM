@@ -16,7 +16,7 @@ const figtree = Figtree({
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Pavimmo Nextjs - Real Estate Management Admin Template',
+    template: '%s | Animacorpus CRM',
     default: DEFAULT_PAGE_TITLE,
   },
   description: 'A fully responsive premium admin dashboard template, Real Estate Management Admin Template',
