@@ -78,7 +78,7 @@ export const MENU_ITEMS: MenuItemType[] = [
     key: "appointments",
     label: "Appointments",
     icon: "ri:chat-quote-line",
-    url: "/appointments/appointment-form",
+    url: "/appointments/appointment-list",
   },
   {
     key: "staffs",
