@@ -21,10 +21,12 @@ import {
   Modal,
   Row,
   Spinner,
+  ButtonGroup,
 } from "react-bootstrap";
 import { useRouter } from "next/navigation";
 import { getAllStaff } from "@/helpers/staff";
 import avatar1 from "@/assets/images/users/avatar-1.jpg";
+import "@/assets/scss/components/_dropdown.scss";
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -111,6 +113,8 @@ const StaffListPage = () => {
     router.push(`/staffs/staffs-details/${id}`);
   const handleEdit = (id: string) =>
     router.push(`/staffs/staffs-form/${id}/edit`);
+  const handleEditBranch = (id: string, branch: string) =>
+    router.push(`/staffs/staffs-form/${id}/edit?branch=${encodeURIComponent(branch)}`);
   const handlePermission = (id: string) =>
     router.push(`/staffs/staffs-form/${id}/permission`);
 
@@ -136,9 +140,6 @@ const StaffListPage = () => {
 
   const formatGender = (gender: string): string =>
     gender ? gender.charAt(0).toUpperCase() : "";
-  {
-    console.log(staffList);
-  }
 
   return (
     <>
@@ -163,75 +164,6 @@ const StaffListPage = () => {
                     }}
                   />
                 </div>
-                {/* <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="material-symbols:location-on-outline" width={18} className="me-1" />
-                    {selectedBranch || 'Filter by Branch'}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {BRANCHES.map((branch) => (
-                      <DropdownItem
-                        key={branch}
-                        onClick={() => {
-                          setSelectedBranch(branch)
-                          setCurrentPage(1)
-                        }}
-                        active={selectedBranch === branch}
-                      >
-                        {branch}
-                      </DropdownItem>
-                    ))}
-                    {selectedBranch && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null)
-                          setCurrentPage(1)
-                        }}
-                      >
-                        Clear Branch Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
-                    {dateFilter === 'all' ? 'Filter by Date' : dateFilter.replace('_', ' ').toUpperCase()}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {[
-                      { label: 'Today', value: 'today' },
-                      { label: 'This Week', value: 'this_week' },
-                      { label: 'Last 15 Days', value: '15_days' },
-                      { label: 'This Month', value: 'this_month' },
-                      { label: 'This Year', value: 'this_year' },
-                    ].map((f) => (
-                      <DropdownItem
-                        key={f.value}
-                        onClick={() => {
-                          setDateFilter(f.value)
-                          setCurrentPage(1)
-                        }}
-                        active={dateFilter === f.value}
-                      >
-                        {f.label}
-                      </DropdownItem>
-                    ))}
-                    {dateFilter !== 'all' && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setDateFilter('all')
-                          setCurrentPage(1)
-                        }}
-                      >
-                        Clear Date Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown> */}
               </div>
             </CardHeader>
 
@@ -292,16 +224,27 @@ const StaffListPage = () => {
                                   className="align-middle fs-18"
                                 />
                               </Button>
-                              <Button
-                                variant="soft-primary"
-                                size="sm"
-                                onClick={() => handleEdit(staff._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:pen-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
+
+                              {/* Dropdown Edit Button */}
+                              <Dropdown>
+                                <DropdownToggle variant="soft-primary" size="sm">
+                                  <IconifyIcon
+                                    icon="solar:pen-2-broken"
+                                    className="align-middle fs-18"
+                                  />
+                                </DropdownToggle>
+
+                                <DropdownMenu>
+                                  <DropdownItem onClick={() => handleEditBranch(staff._id, "Branch 1")}>
+                                    Edit Staff details
+                                  </DropdownItem>
+                                  <DropdownItem onClick={() => handleEditBranch(staff._id, "Branch 2")}>
+                                    Edit staff
+                                  </DropdownItem>
+                                </DropdownMenu>
+                              </Dropdown>
+
+
                               <Button
                                 variant="soft-danger"
                                 size="sm"
