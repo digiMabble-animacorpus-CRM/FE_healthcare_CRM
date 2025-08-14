@@ -1,6 +1,6 @@
 import IconifyIcon from '@/components/wrappers/IconifyIcon'
 import { ProgressBar } from 'react-bootstrap'
-import { CustomerType } from '../../data'
+import { CustomerType } from '../data'
 
 const CustomerCard = ({ customer }: { customer: CustomerType }) => {
   const { Property, count, icon, progress, title, variant } = customer
