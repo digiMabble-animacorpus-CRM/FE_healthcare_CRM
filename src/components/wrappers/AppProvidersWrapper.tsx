@@ -1,37 +1,52 @@
-'use client'
-import { SessionProvider } from 'next-auth/react'
-import { useEffect } from 'react'
-import { ToastContainer } from 'react-toastify'
-import { DEFAULT_PAGE_TITLE } from '@/context/constants'
-import dynamic from 'next/dynamic'
-const LayoutProvider = dynamic(() => import('@/context/useLayoutContext').then((mod) => mod.LayoutProvider), {
-  ssr: false,
-})
-import { NotificationProvider } from '@/context/useNotificationContext'
-import { ChildrenType } from '@/types/component-props'
+'use client';
+
+import { SessionProvider } from 'next-auth/react';
+import { useEffect } from 'react';
+import { ToastContainer } from 'react-toastify';
+import { DEFAULT_PAGE_TITLE } from '@/context/constants';
+import dynamic from 'next/dynamic';
+
+const LayoutProvider = dynamic(
+  () => import('@/context/useLayoutContext').then((mod) => mod.LayoutProvider),
+  { ssr: false }
+);
+
+import { NotificationProvider } from '@/context/useNotificationContext';
+import { ChildrenType } from '@/types/component-props';
 
 const AppProvidersWrapper = ({ children }: ChildrenType) => {
   const handleChangeTitle = () => {
-    if (document.visibilityState == 'hidden') document.title = 'Please come back 🥺'
-    else document.title = DEFAULT_PAGE_TITLE
-  }
+    if (document.visibilityState === 'hidden') {
+      document.title = 'Please come back 🥺';
+    } else {
+      document.title = DEFAULT_PAGE_TITLE;
+    }
+  };
 
   useEffect(() => {
-    if (document) {
-      const e = document.querySelector<HTMLDivElement>('#__next_splash')
-      if (e?.hasChildNodes()) {
-        document.querySelector('#splash-screen')?.classList.add('remove')
-      }
-      e?.addEventListener('DOMNodeInserted', () => {
-        document.querySelector('#splash-screen')?.classList.add('remove')
-      })
+    const splash = document.querySelector<HTMLDivElement>('#__next_splash');
+    const screen = document.querySelector('#splash-screen');
+
+    if (splash?.hasChildNodes()) {
+      screen?.classList.add('remove');
     }
 
-    document.addEventListener('visibilitychange', handleChangeTitle)
-    return () => {
-      document.removeEventListener('visibilitychange', handleChangeTitle)
+    // ✅ Use MutationObserver instead of deprecated DOMNodeInserted
+    const observer = new MutationObserver(() => {
+      screen?.classList.add('remove');
+    });
+
+    if (splash) {
+      observer.observe(splash, { childList: true, subtree: true });
     }
-  }, [])
+
+    document.addEventListener('visibilitychange', handleChangeTitle);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleChangeTitle);
+      observer.disconnect(); // cleanup
+    };
+  }, []);
 
   return (
     <SessionProvider>
@@ -42,6 +57,7 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
         </NotificationProvider>
       </LayoutProvider>
     </SessionProvider>
-  )
-}
-export default AppProvidersWrapper
+  );
+};
+
+export default AppProvidersWrapper;

@@ -23,15 +23,18 @@
      }
 
      .logo-lg {
-          height: $logo-lg-height;
+          height: 100px;
+          
      }
 
      .logo-light {
           display: none;
+          padding: 10px 0 10px 35px;
      }
 
      .logo-dark {
           display: block;
+          padding: 10px 0 10px 35px;
      }
 }
 
@@ -101,6 +104,10 @@
                          &:hover,
                          &:focus {
                               color: $main-nav-item-hover-color;
+                         }
+                         &:hover{
+                              background-color:#f9f1fb;
+                              transform: translateX(2px);
                          }
 
                          &.active {
@@ -205,6 +212,182 @@
           }
      }
 }
+
+html[data-bs-theme="dark"] .wrapper {
+     height: 100%;
+     margin: 0 auto;
+     position: relative;
+
+
+     // Main Nav
+     .main-nav {
+          top: 0;
+          bottom: 0;
+          z-index: 1010;
+          margin-left: 0;
+          position: fixed;
+          transition: all 0.3s ease-in-out;
+          width: $main-nav-width;
+          font-family: $font-family-secondary;
+          background: $main-nav-bg;
+          min-width: $main-nav-width;
+          padding-bottom: $spacer;
+
+          .scrollbar {
+               height: calc(100% - $topbar-height);
+          }
+
+
+
+          .menu-title {
+               cursor: default;
+               font-size: 11px;
+               letter-spacing: 0.05em;
+               text-transform: uppercase;
+               color: $main-nav-item-color;
+               opacity: .6;
+               font-weight: $font-weight-semibold;
+               padding: $main-nav-item-padding-y calc($main-nav-item-padding-x * 1.25);
+               transition: all 0.3s ease-in-out;
+               height: 36px;
+          }
+
+          .navbar-nav {
+               margin: 0 15px;
+
+               .nav-item {
+                    padding: calc($main-nav-item-padding-y * 0.1) 0;
+
+                    .nav-link {
+                         display: flex;
+                         gap: 12px;
+                         line-height: 1;
+                         font-weight: 400;
+                         align-items: center;
+                         white-space: nowrap;
+                         transition: all 0.3s ease-in-out;
+                         border-radius: var(--#{$prefix}border-radius);
+                         color: $main-nav-item-color;
+                         font-size: $main-nav-item-font-size;
+                         padding: $main-nav-item-padding-y $main-nav-item-padding-x;
+                         margin: $main-nav-item-margin-y 0;
+
+                         &.show,
+                         &:active,
+                         &.active,
+                         &:hover,
+                         &:focus {
+                              color: $main-nav-item-hover-color;
+                         }
+                         &:hover{
+                              background-color:#6a386c;
+                              transform: translateX(2px);
+                         }
+
+                         &.active {
+                              background-color: $main-nav-item-hover-bg;
+                              font-weight: $font-weight-medium;
+                              color: var(--#{$prefix}main-nav-item-active-color);
+                         }
+
+                         .nav-icon {
+                              display: flex;
+                              align-items: center;
+                              justify-content: center;
+                              font-size: $main-nav-item-icon-size;
+                         }
+
+                         .badge {
+                              margin-left: auto;
+                         }
+
+                         .menu-arrow {
+                              right: calc($main-nav-item-padding-x * 1.5);
+                              display: flex;
+                              content: "\ea4e";
+                              font-family: remixicon;
+                              margin-left: auto;
+                              position: absolute;
+                              transition: transform 0.2s;
+                              color: inherit;
+                              font-size: calc($main-nav-item-font-size * 1.25);
+                              opacity: 0.6;
+                         }
+
+                         &[aria-expanded="true"] {
+                              .menu-arrow {
+                                   transform: rotate(-180deg);
+                                   color: $main-nav-item-hover-color;
+                                   opacity: 1;
+                              }
+                         }
+                    }
+               }
+          }
+
+          .sub-navbar-nav {
+               flex-direction: column;
+               padding-left: $main-nav-item-padding-x;
+
+               .menu-arrow {
+                    &::after {
+                         right: 0;
+                    }
+               }
+
+               .sub-nav-item {
+                    padding: calc($main-nav-item-padding-y * 0.5) $main-nav-item-padding-x;
+
+                    .sub-nav-link {
+                         display: flex;
+                         align-items: center;
+                         position: relative;
+                         white-space: nowrap;
+                         transition: all 0.3s ease-in-out;
+                         color: $main-nav-item-color;
+                         font-size: calc($main-nav-item-font-size * 0.95);
+                         padding: calc($main-nav-item-padding-y * 0.25) $main-nav-item-padding-x;
+
+                         &.active {
+                              font-weight: $font-weight-medium;
+                         }
+
+                         .badge {
+                              margin-left: auto;
+                         }
+
+                         &.active,
+                         &:active,
+                         &:hover,
+                         &:focus {
+                              color: $main-nav-item-hover-color;
+
+                              &::before {
+                                   background-color: $main-nav-item-hover-color;
+                                   opacity: 1;
+                              }
+                         }
+
+                         &:hover {
+                              transform: translateX(5px);
+                              color:#89288F;
+                         }
+                    }
+               }
+
+               .sub-navbar-nav {
+                    padding-left: calc($main-nav-width-sm - $main-nav-item-padding-x * 5.25);
+               }
+          }
+
+          .disabled {
+               opacity: 0.5;
+               pointer-events: none;
+               cursor: default;
+          }
+     }
+}
+
 
 // Main Content
 .page-content {

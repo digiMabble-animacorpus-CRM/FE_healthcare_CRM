@@ -1,24 +1,24 @@
-'use client'
-import logoDark from '@/assets/images/logo-dark.png'
-import LogoLight from '@/assets/images/logo-light.png'
-import TextFormInput from '@/components/from/TextFormInput'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { yupResolver } from '@hookform/resolvers/yup'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
-import useSignIn from './useSignIn'
+"use client";
+import logoDark from "@/assets/images/logo-dark.png";
+import LogoLight from "@/assets/images/logo-light.png";
+import TextFormInput from "@/components/from/TextFormInput";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { yupResolver } from "@hookform/resolvers/yup";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect } from "react";
+import { Button, Card, CardBody, Col, Container, Row } from "react-bootstrap";
+import { useForm } from "react-hook-form";
+import * as yup from "yup";
+import useSignIn from "./useSignIn";
 
 const SignIn = () => {
   useEffect(() => {
-    document.body.classList.add('authentication-bg')
+    document.body.classList.add("authentication-bg");
     return () => {
-      document.body.classList.remove('authentication-bg')
-    }
-  }, [])
+      document.body.classList.remove("authentication-bg");
+    };
+  }, []);
 
   // const messageSchema = yup.object({
   //   email: yup.string().email().required('Please enter Email'),
@@ -29,7 +29,7 @@ const SignIn = () => {
   //   resolver: yupResolver(messageSchema),
   // })
 
-  const { loading, login, control } = useSignIn()
+  const { loading, login, control } = useSignIn();
   return (
     <div className="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
       <Container>
@@ -45,8 +45,12 @@ const SignIn = () => {
                     <Image src={LogoLight} height={28} alt="logo light" />
                   </Link>
                 </div>
-                <h2 className="fw-bold text-uppercase text-center fs-18">Sign In</h2>
-                <p className="text-muted text-center mt-1 mb-4">Enter your email address and password to access admin panel.</p>
+                <h2 className="fw-bold text-uppercase text-center fs-18">
+                  Sign In
+                </h2>
+                <p className="text-muted text-center mt-1 mb-4">
+                  Enter your email address and password to access admin panel.
+                </p>
                 <div className="px-4">
                   <form className="authentication-form" onSubmit={login}>
                     <div className="mb-3">
@@ -59,9 +63,6 @@ const SignIn = () => {
                       />
                     </div>
                     <div className="mb-3">
-                      <Link href="/auth/reset-password" className="float-end text-muted text-unline-dashed ms-1">
-                        Reset password
-                      </Link>
                       <TextFormInput
                         control={control}
                         name="password"
@@ -72,46 +73,32 @@ const SignIn = () => {
                     </div>
                     <div className="mb-3">
                       <div className="form-check">
-                        <input type="checkbox" className="form-check-input" id="checkbox-signin" />
-                        <label className="form-check-label" htmlFor="checkbox-signin">
-                          Remember me
-                        </label>
+                        <Link
+                          href="/auth/reset-password"
+                          className="float-end text-muted text-unline-dashed ms-1"
+                        >
+                          Reset password
+                        </Link>
                       </div>
                     </div>
                     <div className="mb-1 text-center d-grid">
-                      <button disabled={loading} className="btn btn-danger py-2 fw-medium" type="submit">
+                      <button
+                        disabled={loading}
+                        className="btn btn-danger py-2 fw-medium"
+                        type="submit"
+                      >
                         Sign In
                       </button>
                     </div>
                   </form>
-                  <p className="mt-3 fw-semibold no-span">OR sign with</p>
-                  <div className="text-center">
-                    <Button variant="outline-light" className="shadow-none">
-                      <IconifyIcon icon="bxl:google" className="fs-20" />
-                    </Button>
-                    &nbsp;
-                    <Button variant="outline-light" className="shadow-none">
-                      <IconifyIcon icon="ri:facebook-fill" height={32} width={20} className="" />
-                    </Button>
-                    &nbsp;
-                    <Button variant="outline-light" className="shadow-none">
-                      <IconifyIcon icon="bxl:github" className="fs-20" />
-                    </Button>
-                  </div>
                 </div>
               </CardBody>
             </Card>
-            <p className="mb-0 text-center text-white">
-              New here?{' '}
-              <Link href="/auth/sign-up" className="text-reset text-unline-dashed fw-bold ms-1">
-                Sign Up
-              </Link>
-            </p>
           </Col>
         </Row>
       </Container>
     </div>
-  )
-}
+  );
+};
 
-export default SignIn
+export default SignIn;
