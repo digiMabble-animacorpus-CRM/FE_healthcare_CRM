@@ -3,15 +3,19 @@
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import type { StaffRoleType } from "@/types/data";
-import StaffForm from "@/app/(admin)/staffs/staffs-form/staffForm";
-import StaffRoleForm from "../staffRoleForm";
+import dynamic from "next/dynamic";
+
+// Dynamic import prevents SSR from executing DOM-dependent code
+const StaffRoleForm = dynamic(
+  () => import("../staffRoleForm"),
+  { ssr: false }
+);
 
 const CreateStaffRolePage = () => {
   const router = useRouter();
 
   const handleCreate = async (data: Omit<StaffRoleType, "_id">) => {
     try {
-      // 🔧 Replace with your actual API call here:
       console.log("Creating StaffRole...", data);
       // await createStaffRoleAPI(data);
 

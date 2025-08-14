@@ -13,9 +13,14 @@ import {
   ButtonGroup,
   Modal,
 } from "react-bootstrap";
-import Calendar from "@toast-ui/react-calendar";
 import "@toast-ui/calendar/dist/toastui-calendar.min.css";
 import { Icon } from "@iconify/react";
+import dynamic from "next/dynamic";
+
+const Calendar = dynamic(
+  () => import("@toast-ui/react-calendar"),
+  { ssr: false }
+);
 
 // MUI
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -242,16 +247,6 @@ const AppointmentCalendarPage = () => {
     setAppointments(filtered);
     setLoading(false);
   }, [selectedBranches, selectedCategories, selectedDate, view]);
-
-  useEffect(() => {
-    const updateHeight = () => {
-      const offset = 160;
-      setCalendarHeight(window.innerHeight - offset + "px");
-    };
-    updateHeight();
-    window.addEventListener("resize", updateHeight);
-    return () => window.removeEventListener("resize", updateHeight);
-  }, []);
 
   const calendars = CATEGORIES.map((cat) => ({
     id: cat.id,
