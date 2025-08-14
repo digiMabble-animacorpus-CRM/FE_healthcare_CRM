@@ -11,7 +11,6 @@ import {
   CardHeader,
   CardTitle,
   Col,
-  Modal,
   Row,
   Spinner,
 } from "react-bootstrap";
@@ -29,7 +28,6 @@ import TextAreaFormInput from "@/components/from/TextAreaFormInput";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
 import { getAllLanguages } from "@/helpers/languages";
 import { getAllBranch } from "@/helpers/branch";
-import DocumentUploadCard from "./DocumentUploadCard";
 
 type CustomerFormValues = {
   name: string;
@@ -45,7 +43,6 @@ type CustomerFormValues = {
   tags: string[];
   city: string;
   country: string;
-  document?: File | File[]; // Add document field
 };
 
 const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
@@ -99,13 +96,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
     city: "",
     country: "",
   });
-  const [showPreview, setShowPreview] = useState(false);
-const [previewFile, setPreviewFile] = useState<File | null>(null);
 
-const handleView = (file: File) => {
-  setPreviewFile(file);
-  setShowPreview(true);
-};
   const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
   const allBranches = useMemo<BranchType[]>(() => getAllBranch(), []);
 
@@ -227,25 +218,10 @@ const handleView = (file: File) => {
                 )}
               />
               {errors.gender && (
-                <small className="text-danger2">{errors.gender.message}</small>
+                <small className="text-danger">{errors.gender.message}</small>
               )}
             </Col>
-            <Col lg={6}>
-             <div className="mb-3">
-             <label className="form-label">Upload Document(s)</label>
-             <Controller
-              name="document"
-               control={control}
-              render={({ field }) => (
-              <DocumentUploadCard
-              field={field}
-              error={errors.document?.message}
-          // Add 'single={true}' if you want only single upload
-               />
-              )}
-               />
-             </div>
-            </Col>
+
             <Col lg={6}>
               <label className="form-label">Preferred Language</label>
               <Controller
@@ -265,7 +241,7 @@ const handleView = (file: File) => {
                 )}
               />
               {errors.language && (
-                <small className="text-danger2">{errors.language.message}</small>
+                <small className="text-danger">{errors.language.message}</small>
               )}
             </Col>
 
@@ -291,7 +267,7 @@ const handleView = (file: File) => {
                 )}
               />
               {errors.tags && (
-                <small className="text-danger2">{errors.tags.message}</small>
+                <small className="text-danger">{errors.tags.message}</small>
               )}
             </Col>
 
@@ -314,7 +290,7 @@ const handleView = (file: File) => {
                 )}
               />
               {errors.branch && (
-                <small className="text-danger2">{errors.branch.message}</small>
+                <small className="text-danger">{errors.branch.message}</small>
               )}
             </Col>
 
@@ -364,7 +340,7 @@ const handleView = (file: File) => {
                 )}
               />
               {errors.city && (
-                <small className="text-danger2">{errors.city.message}</small>
+                <small className="text-danger">{errors.city.message}</small>
               )}
             </Col>
             <Col lg={4}>
@@ -384,7 +360,7 @@ const handleView = (file: File) => {
                 )}
               />
               {errors.country && (
-                <small className="text-danger2">{errors.country.message}</small>
+                <small className="text-danger">{errors.country.message}</small>
               )}
             </Col>
           </Row>
@@ -408,24 +384,6 @@ const handleView = (file: File) => {
           </Col>
         </Row>
       </div>
-      <Modal show={showPreview} onHide={() => setShowPreview(false)} size="lg" centered>
-  <Modal.Header closeButton>
-    <Modal.Title>Document Preview</Modal.Title>
-  </Modal.Header>
-  <Modal.Body style={{ height: "70vh" }}>
-    {previewFile?.type === "application/pdf" ? (
-      <iframe
-        src={URL.createObjectURL(previewFile)}
-        title="PDF Preview"
-        width="100%"
-        height="100%"
-        style={{ border: "none" }}
-      />
-    ) : (
-      <p className="text-muted">Preview not available for this file type.</p>
-    )}
-  </Modal.Body>
-</Modal>
     </form>
   );
 };
