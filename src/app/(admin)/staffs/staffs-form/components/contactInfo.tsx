@@ -96,7 +96,7 @@ const ContactInfo = () => {
               )}
             />
             {errors.address?.country && (
-              <small className="text-danger">
+              <small className="text-danger2">
                 {errors.address.country.message}
               </small>
             )}
@@ -127,7 +127,7 @@ const ContactInfo = () => {
               )}
             />
             {errors.languages && (
-              <small className="text-danger">{errors.languages.message}</small>
+              <small className="text-danger2">{errors.languages.message}</small>
             )}
           </div>
         </Col>

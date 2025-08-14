@@ -19,30 +19,43 @@ import PermissionsSection from "../../components/permissionSection";
 import { getStaffById } from "@/helpers/data";
 
 const PermissionPage = () => {
-  const { id } = useParams<{ id: string }>();
-  const router = useRouter();
-  const [loading, setLoading] = useState(true);
+  const { id }  = useParams<{ id: string }>();
+  const router  = useRouter();
+
+  const [loading, setLoading]     = useState(true);
   const [staffInfo, setStaffInfo] = useState<StaffType | null>(null);
 
-  const methods = useForm<Pick<StaffType, "permissions" | "role">>({
+  /* form ---------------------------------------------------------------- */
+  const methods = useForm<Pick<StaffType, "permissions" | "roleId">>({
     defaultValues: {
       permissions: [],
-      role: "",
+      roleId: "",
     },
   });
 
   const { handleSubmit, setValue } = methods;
 
+  /* fetch staff ---------------------------------------------------------- */
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getStaffById(id);
-        const data = response?.data?.[0];
+        const data     = response?.data?.[0];
 
         if (data) {
           setStaffInfo(data);
-          setValue("permissions", data.permissions || []);
-          setValue("role", data.role || "");
+
+          /* load permissions but force them DISABLED */
+          setValue(
+            "permissions",
+            (data.permissions || []).map((p: any) => ({
+              _id: p._id,
+              enabled: false,
+            }))
+          );
+
+          /* make sure roleId exists in the form */
+          setValue("roleId", data.roleId || "");
         } else {
           toast.error("Staff not found.");
         }
@@ -54,11 +67,10 @@ const PermissionPage = () => {
       }
     };
 
-    if (id) {
-      fetchData();
-    }
+    if (id) fetchData();
   }, [id, setValue]);
 
+  /* submit -------------------------------------------------------------- */
   const onSubmit = async (data: Pick<StaffType, "permissions">) => {
     try {
       // await updateStaffPermissions(id, data.permissions);
@@ -70,6 +82,7 @@ const PermissionPage = () => {
     }
   };
 
+  /* loading spinner ----------------------------------------------------- */
   if (loading) {
     return (
       <div className="text-center mt-5">
@@ -79,10 +92,11 @@ const PermissionPage = () => {
     );
   }
 
+  /* render -------------------------------------------------------------- */
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* 🧾 Staff Info Card */}
+        {/* staff info card */}
         {staffInfo && (
           <Card className="mb-4">
             <CardHeader>
@@ -90,39 +104,21 @@ const PermissionPage = () => {
             </CardHeader>
             <CardBody>
               <Row>
-                <Col md={6}>
-                  <strong>Name:</strong> {staffInfo.name}
-                </Col>
-                <Col md={6}>
-                  <strong>Email:</strong> {staffInfo.email}
-                </Col>
-                <Col md={6} className="mt-2">
-                  <strong>Phone:</strong> {staffInfo.phoneNumber}
-                </Col>
-                <Col md={6} className="mt-2">
-                  <strong>Gender:</strong> {staffInfo.gender}
-                </Col>
-                <Col md={6} className="mt-2">
-                  <strong>Role:</strong> {staffInfo.role}
-                </Col>
-                <Col md={6} className="mt-2">
-                  <strong>Access Level:</strong> {staffInfo.accessLevel}
-                </Col>
-                <Col md={6} className="mt-2">
-                  <strong>Primary Branch:</strong> {staffInfo.selectedBranch}
-                </Col>
-                <Col md={6} className="mt-2">
-                  <strong>Date of Birth:</strong> {staffInfo.dob}
-                </Col>
-                <Col md={12} className="mt-2">
-                  <strong>Description:</strong> {staffInfo.description || "-"}
-                </Col>
+                <Col md={6}><strong>Name:</strong> {staffInfo.name}</Col>
+                <Col md={6}><strong>Email:</strong> {staffInfo.email}</Col>
+                <Col md={6} className="mt-2"><strong>Phone:</strong> {staffInfo.phoneNumber}</Col>
+                <Col md={6} className="mt-2"><strong>Gender:</strong> {staffInfo.gender}</Col>
+                <Col md={6} className="mt-2"><strong>Role:</strong> {staffInfo.role}</Col>
+                <Col md={6} className="mt-2"><strong>Access Level:</strong> {staffInfo.accessLevel}</Col>
+                <Col md={6} className="mt-2"><strong>Primary Branch:</strong> {staffInfo.selectedBranch}</Col>
+                <Col md={6} className="mt-2"><strong>Date of Birth:</strong> {staffInfo.dob}</Col>
+                <Col md={12} className="mt-2"><strong>Description:</strong> {staffInfo.description || "-"}</Col>
               </Row>
             </CardBody>
           </Card>
         )}
 
-        {/* 🔐 Permissions Update Form */}
+        {/* permissions form */}
         <Card>
           <CardHeader>
             <CardTitle as="h5">Modify Staff Permissions</CardTitle>
@@ -130,12 +126,8 @@ const PermissionPage = () => {
           <CardBody>
             <PermissionsSection />
             <div className="mt-4 d-flex gap-3 justify-content-end">
-              <Button type="submit" variant="primary">
-                Update
-              </Button>
-              <Button variant="secondary" onClick={() => router.back()}>
-                Cancel
-              </Button>
+              <Button type="submit" variant="primary">Update</Button>
+              <Button variant="secondary" onClick={() => router.back()}>Cancel</Button>
             </div>
           </CardBody>
         </Card>

@@ -19,7 +19,9 @@
 
      .logo-sm {
           display: none;
-          height: $logo-sm-height;
+          height: 40px;
+          width: 40px;
+          
      }
 
      .logo-lg {
@@ -28,12 +30,12 @@
      }
 
      .logo-light {
-          display: none;
+          display: block;
           padding: 10px 0 10px 35px;
      }
 
      .logo-dark {
-          display: block;
+          display: none;
           padding: 10px 0 10px 35px;
      }
 }
@@ -412,13 +414,19 @@ html[data-menu-size="condensed"] {
                top: 0;
                z-index: 1020 !important;
                background: $main-nav-bg;
+               display: flex;                // <-- Add this
+               align-items: center;          // <-- Add this
+               justify-content: center;      // <-- Add this
+               padding: 0 30px 0 0;
+               
 
                .logo-lg {
                     display: none;
                }
 
                .logo-sm {
-                    display: inline-block;
+                    display: block;
+                    
                }
 
           }
@@ -663,7 +671,7 @@ html[data-menu-size="sm-hover"] {
                }
 
                .logo-sm {
-                    display: inline-block;
+                    display: block;
                }
           }
 

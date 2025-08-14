@@ -116,7 +116,7 @@ const AvailabilitySection = () => {
         )}
 
         {errors.availability && (
-          <small className="text-danger d-block mt-2">
+          <small className="text-danger2 d-block mt-2">
             {(errors.availability as any)?.message}
           </small>
         )}

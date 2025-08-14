@@ -61,7 +61,7 @@ const ProfessionalInfo = () => {
               )}
             />
             {errors.roleId?.message && (
-              <small className="text-danger">{String(errors.roleId.message)}</small>
+              <small className="text-danger2">{String(errors.roleId.message)}</small>
             )}
           </div>
         </Col>
@@ -94,7 +94,7 @@ const ProfessionalInfo = () => {
               )}
             />
             {errors.accessLevelId?.message && (
-              <small className="text-danger">{String(errors.accessLevelId.message)}</small>
+              <small className="text-danger2">{String(errors.accessLevelId.message)}</small>
             )}
           </div>
         </Col>
