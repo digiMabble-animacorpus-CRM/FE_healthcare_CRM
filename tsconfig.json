@@ -20,11 +20,10 @@
     "baseUrl": ".",
     "paths": {
       "@/*": ["src/*"],
-      "@toast-ui/react-calendar": [
-        "node_modules/@toast-ui/react-calendar/types"
-      ]
+      "@toast-ui/react-calendar": ["node_modules/@toast-ui/react-calendar/types"]
     },
-    "target": "ES2017"
+    "target": "ES2017",
+    "types": ["node", "react", "react-dom", "prop-types"]
   },
   "include": [
     "next-env.d.ts",
