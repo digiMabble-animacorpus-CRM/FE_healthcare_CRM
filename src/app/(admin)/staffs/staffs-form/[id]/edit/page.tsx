@@ -28,12 +28,12 @@ const transformToBackendDto = (formData: StaffType) => {
 
   return {
     ...formData,
-    role_id: Number(formData.roleId),
-    access_level: accessLevel,
+    roleId: Number(formData.roleId),
+    accessLevel: accessLevel,
     branches: formData.branches
       .map((b) => Number(b.id))
       .filter((id) => !isNaN(id)),
-    selected_branch: Number(formData.selectedBranch),
+    selectedBranch: Number(formData.selectedBranch),
     permissions: formData.permissions
       .filter((p) => p.enabled)
       .map((p) => {

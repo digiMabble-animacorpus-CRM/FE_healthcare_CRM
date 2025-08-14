@@ -212,8 +212,8 @@ export type StaffType = {
   [x: string]: any;
   _id?: string;
   name: string;
-  // phoneNumber: string;
-  phone_number: string;
+  phoneNumber: string;
+  // phone_number: string;
   email: string;
 
   gender: string;

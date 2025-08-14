@@ -93,9 +93,9 @@ const fetchStaffList = async (page: number) => {
 
 
 const handleView = (staffId: number | string) => {
-  const encryptedId = encryptAES(staffId);
-  router.push(`/staffs/staffs-details/${encodeURIComponent(encryptedId)}`);
+  router.push(`/staffs/staffs-details/${staffId}`);
 };
+
 
 
 

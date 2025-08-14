@@ -7,11 +7,11 @@ import type { StaffType, StaffRoleType } from '@/types/data';
 export interface StaffUpdatePayload {
   name?: string;
   email?: string;
-  phone_number?: string;
-  role_id?: number;
-  access_level?: 'staff' | 'branch-admin' | 'super-admin';
+  phoneNumber?: string;
+  roleId?: number;
+  accessLevel?: 'staff' | 'branch-admin' | 'super-admin';
   branches?: number[];
-  selected_branch?: number | null;
+  selectedBranch?: number | null;
   permissions?: {
     action: string;
     resource: string;
@@ -35,7 +35,7 @@ export const getAllStaff = async (
   try {
     const token = localStorage.getItem('access_token');
     if (!token) {
-      console.warn(' No access token found.');
+      console.warn('No access token found.');
       return { data: [], totalCount: 0 };
     }
 
@@ -43,50 +43,44 @@ export const getAllStaff = async (
       page: page.toString(),
       limit: limit.toString(),
       ...(branch ? { branch } : {}),
-      ...(from ? { from } : {}),
-      ...(to ? { to } : {}),
-      ...(search ? { search } : {}),
+      ...(from ? { fromDate: from } : {}), // match backend param name
+      ...(to ? { toDate: to } : {}),
+      ...(search ? { searchText: search } : {}),
     };
 
-    console.log(' Filters:', filters);
-    const encrypted = encryptAES(filters);
-    console.log(' Encrypted filters:', encrypted);
+    console.log('Filters (plain):', filters);
 
-    const response = await fetch(
-      `${API_BASE_PATH}/staff?data=${encodeURIComponent(encrypted)}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const queryParams = new URLSearchParams(filters).toString();
+
+    const response = await fetch(`${API_BASE_PATH}/staff?${queryParams}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(' Backend error:', response.status, errorText);
+      console.error('Backend error:', response.status, errorText);
       return { data: [], totalCount: 0 };
     }
 
-    const encryptedText = await response.text();
-    console.log('Encrypted response from server:', encryptedText);
+    const jsonData = await response.json();
+    console.log('Response from server:', jsonData);
 
-    const decrypted = decryptAES(encryptedText);
-    console.log(' Decrypted response:', decrypted);
-
-    const staffData: StaffType[] = Array.isArray(decrypted?.data)
-      ? decrypted.data
-      : decrypted?.data
-      ? [decrypted.data]
+    const staffData: StaffType[] = Array.isArray(jsonData?.data)
+      ? jsonData.data
+      : jsonData?.data
+      ? [jsonData.data]
       : [];
 
     return {
       data: staffData,
-      totalCount: decrypted?.total || 0,
+      totalCount: jsonData?.totalCount || 0,
     };
   } catch (error) {
-    console.error(' Error fetching staff:', error);
+    console.error('Error fetching staff:', error);
     return { data: [], totalCount: 0 };
   }
 };
@@ -95,12 +89,12 @@ export const getAllStaff = async (
 export const getStaffById = async (staffId: string): Promise<StaffType | null> => {
   const token = localStorage.getItem("access_token");
   if (!token) {
-    console.warn(" No access token found.");
+    console.warn("No access token found.");
     return null;
   }
 
-  const url = `${API_BASE_PATH}/staff/${encodeURIComponent(staffId)}`;
-  console.log(" Requesting staff by ID:", url);
+  const url = `${API_BASE_PATH}/staff/${staffId}`;
+  console.log("Requesting staff by ID:", url);
 
   try {
     const response = await fetch(url, {
@@ -111,41 +105,28 @@ export const getStaffById = async (staffId: string): Promise<StaffType | null> =
       },
     });
 
-    console.log(" Response status:", response.status);
+    console.log("Response status:", response.status);
     const result = await response.json();
-    console.log(" Full API response:", result);
+    console.log("Full API response:", result);
 
     if (!response.ok) {
       console.error("Failed to fetch staff:", result?.message || "Unknown error");
       return null;
     }
 
-    const encryptedData = result?.data;
-    if (!encryptedData) {
-      console.error(" No data found in response.");
-      return null;
+    // Directly return the staff data
+    if (result?.data) {
+      return result.data as StaffType;
     }
 
-    //  Check if it's already decrypted
-    if (typeof encryptedData === "object") {
-      console.log(" Staff data already decrypted:", encryptedData);
-      return encryptedData as StaffType;
-    }
-
-    //  If still string, decrypt it
-    const decryptedData = decryptAES(encryptedData);
-    if (!decryptedData) {
-      throw new Error("Decryption returned empty string");
-    }
-
-    console.log(" Decrypted Staff Data:", decryptedData);
-    return decryptedData as StaffType;
-
+    console.warn("No data found in response.");
+    return null;
   } catch (error) {
-    console.error(" Exception during staff fetch:", error);
+    console.error("Exception during staff fetch:", error);
     return null;
   }
 };
+
 
 
 export const updateStaff = async (
