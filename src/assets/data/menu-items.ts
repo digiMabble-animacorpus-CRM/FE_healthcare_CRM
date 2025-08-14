@@ -182,7 +182,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   // },
   // {
   //   key: "messages",
-  //   label: "Pavimmo Chatbot",
+  //   label: "Anima Corpus Chatbot",
   //   icon: "ri:discuss-line",
   //   url: "/messages",
   // },
