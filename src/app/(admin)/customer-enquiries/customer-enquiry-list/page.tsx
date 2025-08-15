@@ -185,7 +185,7 @@ const CustomersListPage = () => {
                   />
                 </div>
 
-                <Dropdown>
+                {/* <Dropdown>
                   <DropdownToggle
                     className="btn btn-sm btn-outline-white d-flex align-items-center"
                     id="branchFilter"
@@ -222,7 +222,7 @@ const CustomersListPage = () => {
                       </DropdownItem>
                     )}
                   </DropdownMenu>
-                </Dropdown>
+                </Dropdown> */}
 
                 <Dropdown>
                   <DropdownToggle
@@ -300,10 +300,10 @@ const CustomersListPage = () => {
                         <th>Email</th>
                         <th>Phone</th>
                         <th>Age | Gender</th>
-                        <th>Branch</th>
+                        {/* <th>Branch</th> */}
                         <th>Source</th>
-                        <th>Status</th>
-                        <th>Last Activity</th>
+                        {/* <th>Status</th> */}
+                        {/* <th>Last Activity</th> */}
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -326,10 +326,10 @@ const CustomersListPage = () => {
                             {calculateAge(item.dob)} yrs |{" "}
                             {formatGender(item.gender)}
                           </td>
-                          <td>{item.branch}</td>
+                          {/* <td>{item.branch}</td> */}
                           <td>{item.source}</td>
-                          <td>
-                            <span
+                          {/* <td> */}
+                            {/* <span
                               className={`badge bg-${
                                 item.status === "new" ? "success" : "danger"
                               } text-white fs-12 px-2 py-1`}
@@ -337,7 +337,7 @@ const CustomersListPage = () => {
                               {item.status}
                             </span>
                           </td>
-                          <td>{item.lastUpdated}</td>
+                          <td>{item.lastUpdated}</td> */}
                           <td>
                             <div className="d-flex gap-2">
                               <Button
