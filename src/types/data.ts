@@ -60,24 +60,29 @@ export type UserType = {
   emailMessage?: string;
 };
 
-export type CustomerEnquiriesType = {
+export type PatientType = {
+  createdAt: string;
   _id: IdType;
-  name: string;
-  email: string;
-  number: string;
-  dob: string;
-  description: string;
-  address: string;
-  zip_code: string;
-  gender: string;
-  language: string;
-  tags: string[];
+  birthdate: string;
   city: string;
   country: string;
-  status: 'new' | 'old';
-  lastUpdated: string;
-  source: string;
-  branch: string;
+  emails: string;
+  firstname: string;
+  id: string;
+  language: string;
+  lastname: string;
+  legalgender: string;
+  middlename: string;
+  mutualitynumber: string;
+  mutualityregistrationnumber: string;
+  note: string;
+  number: string;
+  phones: string[];
+  primarypatientrecordid: string;
+  ssin: string;
+  status: string;
+  street: string;
+  zipcode: string;
 };
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';

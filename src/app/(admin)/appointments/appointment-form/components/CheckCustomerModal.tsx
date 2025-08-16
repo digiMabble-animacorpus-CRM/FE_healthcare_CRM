@@ -51,10 +51,7 @@ const CheckCustomerModal = ({ show, onClose, onCheck, isCustomerNotFound }: Prop
             <Button variant="primary" onClick={() => onCheck(email)}>
               Check Again
             </Button>
-            <Button
-              variant="success"
-              onClick={() => router.push('/customer-enquiries/add-enquiry')}
-            >
+            <Button variant="success" onClick={() => router.push('/patients/add-enquiry')}>
               Create New Customer
             </Button>
           </>

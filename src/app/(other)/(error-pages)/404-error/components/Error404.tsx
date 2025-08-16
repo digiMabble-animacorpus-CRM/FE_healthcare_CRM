@@ -26,10 +26,10 @@ const Error404 = () => {
                     <div className="p-4">
                       <div className="mx-auto mb-4 text-center">
                         <div className="mx-auto text-center auth-logo">
-                          <Link href="/dashboards/analytics" className="logo-dark">
+                          <Link href="/dashboards/agent" className="logo-dark">
                             <Image src={logoDark} height={32} alt="logo dark" />
                           </Link>
-                          <Link href="/dashboards/analytics" className="logo-light">
+                          <Link href="/dashboards/agent" className="logo-light">
                             <Image src={logoLight} height={28} alt="logo light" />
                           </Link>
                         </div>
@@ -40,7 +40,7 @@ const Error404 = () => {
                           the digital wilderness.
                         </p>
                         <div className="text-center">
-                          <Link href="/dashboards/analytics" className="btn btn-danger">
+                          <Link href="/dashboards/agent" className="btn btn-danger">
                             Back to Home
                           </Link>
                         </div>
