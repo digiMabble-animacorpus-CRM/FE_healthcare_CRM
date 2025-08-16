@@ -138,6 +138,26 @@ export const MENU_ITEMS: MenuItemType[] = [
       },
     ],
   },
+  {
+    key: 'teams',
+    label: 'Teams',
+    icon: 'ri:contacts-book-3-line',
+    children: [
+      {
+        key: 'teams-list',
+        label: 'Teams List',
+        url: '/teams/teams-list',
+        parentKey: 'teams',
+      },
+      {
+        key: 'add-teams',
+        label: 'Add Teams',
+        url: '/teams/add-teams',
+        parentKey: 'teams',
+      },
+    ],
+  },
+
 
   {
     key: 'settings',

@@ -404,6 +404,19 @@ export type CustomerType = {
 };
 
 export type CustomerReviewsType = {
+  name: string;
+  email: string;
+  number: string;
+  dob: string;
+  description: string;
+  address: string;
+  zip_code: string;
+  gender: string;
+  language: string;
+  branch: string;
+  tags: never[];
+  city: string;
+  country: string;
   id: IdType;
   rating: number;
   userId: UserType['id'];
