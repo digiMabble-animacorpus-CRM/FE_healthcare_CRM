@@ -1,38 +1,45 @@
-import PageTitle from '@/components/PageTitle';
-import { getAllProperty, getCustomerEnquiriesById } from '@/helpers/data';
-import CustomersDetails from './components/PatientDetails';
-import WeeklyInquiry from './components/WeeklyInquiry';
-import TransactionHistory from './components/TransactionHistory';
-import type { CustomerEnquiriesType } from '@/types/data';
-import { Col, Row } from 'react-bootstrap';
-import { Metadata } from 'next';
+'use client';
 
-export const metadata: Metadata = { title: 'Customer Overview' };
+import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import type { PatientType } from '@/types/data';
+import { getPatientById } from '@/helpers/patient';
+import PatientDetails from './components/PatientDetails';
 
-interface Props {
-  params: { id: string };
-}
+const PatientDetailsPage = () => {
+  const { id } = useParams(); // dynamic route id
+  const router = useRouter();
+  const [data, setData] = useState<PatientType | null>(null);
+  const [loading, setLoading] = useState(true);
 
-const CustomerDetailsPage = async ({ params }: Props) => {
-  const patientId = params.id;
-  const propertyData = await getAllProperty();
-  const response = await getCustomerEnquiriesById(patientId);
-  const customers: CustomerEnquiriesType[] = response.data;
+  useEffect(() => {
+    if (!id) return;
 
-  return (
-    <>
-      <PageTitle subName="Customers" title="Customer Overview" />
-      <Row>
-        <Col xl={8} lg={12}>
-          <CustomersDetails data={customers[0]} />
-        </Col>
-        <Col xl={4} lg={12}>
-          <WeeklyInquiry />
-        </Col>
-      </Row>
-      <TransactionHistory />
-    </>
-  );
+    const fetchPatient = async () => {
+      if (!id) return; // safeguard
+
+      setLoading(true);
+      try {
+        console.log('ew', id);
+        const patient = await getPatientById(id); // convert string to number
+        if (!patient) throw new Error('Failed to fetch patient');
+        setData(patient);
+      } catch (error) {
+        console.error(error);
+        alert('Failed to load patient details');
+        router.push('/patients/patient-list'); // fallback to list
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPatient();
+  }, [id, router]);
+
+  if (loading) return <p>Loading...</p>;
+  if (!data) return <p>No patient found.</p>;
+
+  return <PatientDetails data={data} />;
 };
 
-export default CustomerDetailsPage;
+export default PatientDetailsPage;

@@ -1,7 +1,7 @@
 import {
   agentData,
   customerData,
-  customerEnquiriesData,
+  // customerEnquiriesData,
   customerReviewsData,
   dataTableRecords,
   pricingData,
@@ -21,7 +21,7 @@ import {
   AgentType,
   CustomerReviewsType,
   CustomerType,
-  CustomerEnquiriesType,
+  PatientType,
   EmailCountType,
   Employee,
   GroupType,
@@ -125,153 +125,164 @@ export const getAllPricingPlans = async (): Promise<PricingType[]> => {
   return pricingData;
 };
 
-export const getAllCustomer = async (): Promise<CustomerType[]> => {
-  const data = customerData.map((item) => {
-    const user = userData.find((user) => user.id == item.userId);
-    return {
-      ...item,
-      user,
-    };
-  });
-  await sleep();
-  return data;
-};
+// export const getAllCustomer = async (): Promise<CustomerType[]> => {
+//   const data = customerData.map((item) => {
+//     const user = userData.find((user) => user.id == item.userId);
+//     return {
+//       ...item,
+//       user,
+//     };
+//   });
+//   await sleep();
+//   return data;
+// };
+
 // Patients Api Call
-export const getAllCustomerEnquiries = async (
-  page: number = 1,
-  limit: number = 10,
-  branch?: string,
-  from?: string,
-  to?: string,
-  search?: string,
-): Promise<{ data: CustomerEnquiriesType[]; totalCount: number }> => {
-  await sleep();
+// export const getAllPatients = async (
+//   page: number = 1,
+//   limit: number = 10,
+//   branch?: string,
+//   from?: string,
+//   to?: string,
+//   search?: string,
+// ): Promise<{ data: PatientType[]; totalCount: number }> => {
+//   await sleep();
 
-  let filteredData = customerEnquiriesData;
+//   let filteredData = customerEnquiriesData;
 
-  // Branch Filter
-  if (branch) {
-    filteredData = filteredData.filter((item) => item.branch === branch);
-  }
+//   // Branch Filter
+//   if (branch) {
+//     filteredData = filteredData.filter((item) => item.branch === branch);
+//   }
 
-  // Date Range Filter
-  if (from && to) {
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
-    filteredData = filteredData.filter((item) => {
-      const itemDate = new Date(item.lastUpdated);
-      return itemDate >= fromDate && itemDate <= toDate;
-    });
-  }
+//   // Date Range Filter
+//   if (from && to) {
+//     const fromDate = new Date(from);
+//     const toDate = new Date(to);
+//     filteredData = filteredData.filter((item) => {
+//       const itemDate = new Date(item.lastUpdated);
+//       return itemDate >= fromDate && itemDate <= toDate;
+//     });
+//   }
 
-  // Search Filter
-  if (search) {
-    const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter(
-      (item) =>
-        item.name.toLowerCase().includes(lowerSearch) ||
-        item.email.toLowerCase().includes(lowerSearch) ||
-        item.number.toLowerCase().includes(lowerSearch),
-    );
-  }
+//   // Search Filter
+//   if (search) {
+//     const lowerSearch = search.toLowerCase();
+//     filteredData = filteredData.filter(
+//       (item) =>
+//         item.name.toLowerCase().includes(lowerSearch) ||
+//         item.email.toLowerCase().includes(lowerSearch) ||
+//         item.number.toLowerCase().includes(lowerSearch),
+//     );
+//   }
 
-  // Pagination
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedData = filteredData.slice(start, end);
+//   // Pagination
+//   const start = (page - 1) * limit;
+//   const end = start + limit;
+//   const paginatedData = filteredData.slice(start, end);
 
-  return {
-    data: paginatedData,
-    totalCount: filteredData.length,
-  };
-};
+//   return {
+//     data: paginatedData,
+//     totalCount: filteredData.length,
+//   };
+// };
 
-export const getAllTherapists = async (
-  page: number = 1,
-  limit: number = 10,
-  branch?: string,
-  from?: string,
-  to?: string,
-  search?: string,
-): Promise<{ data: TherapistType[]; totalCount: number }> => {
-  await sleep();
+// export const getAllTherapists = async (
+//   page: number = 1,
+//   limit: number = 10,
+//   branch?: string,
+//   from?: string,
+//   to?: string,
+//   search?: string,
+// ): Promise<{ data: TherapistType[]; totalCount: number }> => {
+//   await sleep();
 
-  let filteredData = therapistData;
+//   let filteredData = therapistData;
 
-  // Branch Filter
-  if (branch) {
-    filteredData = filteredData.filter((item) => item.branch === branch);
-  }
+//   // Branch filter → if backend has team/branch mapping, we can use center_address or team fields
+//   if (branch) {
+//     filteredData = filteredData.filter(
+//       (item) =>
+//         item.center_address?.toLowerCase().includes(branch.toLowerCase()) ||
+//         item.team_namur_1?.toLowerCase().includes(branch.toLowerCase()) ||
+//         item.team_namur_2?.toLowerCase().includes(branch.toLowerCase()),
+//     );
+//   }
 
-  // Date Range Filter
-  if (from && to) {
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
-    filteredData = filteredData.filter((item) => {
-      const itemDate = new Date(item.lastUpdated);
-      return itemDate >= fromDate && itemDate <= toDate;
-    });
-  }
+//   // Date Range Filter → use appointment_start or appointment_end as proxy
+//   if (from && to) {
+//     const fromDate = new Date(from);
+//     const toDate = new Date(to);
+//     filteredData = filteredData.filter((item) => {
+//       if (!item.appointment_start) return false;
+//       const itemDate = new Date(item.appointment_start);
+//       return itemDate >= fromDate && itemDate <= toDate;
+//     });
+//   }
 
-  // Search Filter
-  if (search) {
-    const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter(
-      (item) =>
-        item.name.toLowerCase().includes(lowerSearch) ||
-        item.email.toLowerCase().includes(lowerSearch) ||
-        item.number.toLowerCase().includes(lowerSearch),
-    );
-  }
+//   // Search Filter → match by name, email, phone, specialization
+//   if (search) {
+//     const lowerSearch = search.toLowerCase();
+//     filteredData = filteredData.filter(
+//       (item) =>
+//         item.full_name?.toLowerCase().includes(lowerSearch) ||
+//         item.first_name?.toLowerCase().includes(lowerSearch) ||
+//         item.last_name?.toLowerCase().includes(lowerSearch) ||
+//         item.center_email?.toLowerCase().includes(lowerSearch) ||
+//         item.contact_email?.toLowerCase().includes(lowerSearch) ||
+//         item.center_phone_number?.toLowerCase().includes(lowerSearch) ||
+//         item.contact_phone?.toLowerCase().includes(lowerSearch) ||
+//         item.specialization_1?.toLowerCase().includes(lowerSearch) ||
+//         item.specialization_2?.toLowerCase().includes(lowerSearch),
+//     );
+//   }
 
-  // Pagination
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedData = filteredData.slice(start, end);
+//   // Pagination
+//   const start = (page - 1) * limit;
+//   const end = start + limit;
+//   const paginatedData = filteredData.slice(start, end);
 
-  return {
-    data: paginatedData,
-    totalCount: filteredData.length,
-  };
-};
+//   return {
+//     data: paginatedData,
+//     totalCount: filteredData.length,
+//   };
+// };
 
-export const getStaffById = async (id?: string): Promise<{ data: StaffType[] }> => {
-  await sleep();
+// export const getStaffById = async (id?: string): Promise<{ data: StaffType[] }> => {
+//   await sleep();
 
-  if (!id) {
-    return { data: [] };
-  }
+//   if (!id) {
+//     return { data: [] };
+//   }
 
-  const result = staffData.filter((p) => p._id === id);
+//   const result = staffData.filter((p) => p._id === id);
 
-  return { data: result };
-};
+//   return { data: result };
+// };
 
-export const getCustomerEnquiriesById = async (
-  id?: string,
-): Promise<{ data: CustomerEnquiriesType[] }> => {
-  await sleep();
+// export const getCustomerEnquiriesById = async (id?: string): Promise<{ data: PatientType[] }> => {
+//   await sleep();
 
-  if (!id) {
-    return { data: [] };
-  }
+//   if (!id) {
+//     return { data: [] };
+//   }
 
-  const result = customerEnquiriesData.filter((p) => p._id === id);
+//   const result = customerEnquiriesData.filter((p) => p._id === id);
 
-  return { data: result };
-};
+//   return { data: result };
+// };
 
-export const getTherapistById = async (id?: string): Promise<{ data: TherapistType[] }> => {
-  await sleep();
+// export const getTherapistById = async (id?: string): Promise<{ data: TherapistType[] }> => {
+//   await sleep();
 
-  if (!id) {
-    return { data: [] };
-  }
+//   if (!id) {
+//     return { data: [] };
+//   }
 
-  const result = therapistData.filter((p) => p._id === id);
+//   const result = therapistData.filter((p) => p.id_pro.toString() === id);
 
-  return { data: result };
-};
+//   return { data: result };
+// };
 
 export const getAllReview = async (): Promise<CustomerReviewsType[]> => {
   const data = customerReviewsData.map((item) => {

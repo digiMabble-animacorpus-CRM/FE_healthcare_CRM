@@ -1,18 +1,17 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 
-import { getTherapistById } from '@/helpers/data';
-import type { CustomerEnquiriesType } from '@/types/data';
 import TextFormInput from '@/components/from/TextFormInput';
 import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
 import DropzoneFormInput from '@/components/from/DropzoneFormInput';
+import { getTherapistById, createTherapist, updateTherapist } from '@/helpers/therapist';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -23,153 +22,172 @@ type AvailabilitySlot = {
 };
 
 type TherapistFormValues = {
-  name: string;
-  email: string;
-  number: string;
-  dob: string;
-  description: string;
-  address: string;
-  zip_code: string;
-  gender: string;
-  language: string;
-  branch: string;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website: string;
+  faq: string;
+  agendaLinks: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: AvailabilitySlot[];
   tags: string[];
-  city: string;
-  country: string;
-  specialization: string;
-  experience: string;
-  education: string;
   certificationFiles: File[];
-  registrationNumber: string;
-  availability: AvailabilitySlot[];
 };
 
 const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
-  name: yup.string().required('Please enter name'),
-  email: yup.string().email('Invalid email').required('Please enter email'),
-  number: yup
-    .string()
-    .matches(/^\d{10}$/, 'Enter valid 10-digit number')
-    .required('Please enter number'),
-  dob: yup.string().required('Please enter Date of birth'),
-  address: yup.string().required('Please enter address'),
-  description: yup.string().required('Please enter description'),
-  zip_code: yup
-    .string()
-    .matches(/^\d{5}$/, 'Enter valid Zip-Code')
-    .required('Please enter Zip-Code'),
-  gender: yup.string().required('Please select gender'),
-  branch: yup.string().required('Please select branch'),
-  language: yup.string().required('Please select language'),
-  tags: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'Please select at least one tag')
-    .required('Please select tags'),
-  city: yup.string().required('Please select city'),
-  country: yup.string().required('Please select country'),
-  specialization: yup.string().required('Please select specialization'),
-  experience: yup.string().required('Please enter experience'),
-  education: yup.string().required('Please enter education/degrees'),
+  firstName: yup.string().required('First name required'),
+  lastName: yup.string().required('Last name required'),
+  fullName: yup.string().required('Full name required'),
+  jobTitle: yup.string().required('Job title required'),
+  aboutMe: yup.string().required('About me required'),
+  centerAddress: yup.string().required('Center address required'),
+  centerEmail: yup.string().email('Invalid email').required('Center email required'),
+  centerPhoneNumber: yup.string().required('Center phone required'),
+  contactEmail: yup.string().email('Invalid email').required('Contact email required'),
+  contactPhone: yup.string().required('Contact phone required'),
+  spokenLanguages: yup.string().required('Spoken languages required'),
+  degreesAndTraining: yup.string().required('Degrees & training required'),
+  specializations: yup.string().required('Specializations required'),
+  tags: yup.array().of(yup.string()).min(1, 'Select at least one tag').required(),
   certificationFiles: yup
     .array()
-    .of(yup.mixed<File>().required('File is required'))
-    .min(1, 'Please upload at least one certification file')
-    .required('Please upload certification files'),
-  registrationNumber: yup.string().required('Please enter registration number'),
-  availability: yup
-    .array()
-    .of(
-      yup.object().shape({
-        day: yup.string().required('Day is required'),
-        from: yup.string().required('Start time is required'),
-        to: yup.string().required('End time is required'),
-      }),
-    )
-    .required('Please add at least one availability slot')
-    .min(1, 'Please add at least one availability slot'),
+    .of(yup.mixed<File>().required())
+    .min(1, 'Upload at least one file')
+    .required(),
+  availability: yup.array().of(
+    yup.object().shape({
+      day: yup.string().required(),
+      from: yup.string().required(),
+      to: yup.string().required(),
+    }),
+  ),
 });
 
 interface Props {
-  params: { id?: string };
+  params?: { id?: string };
 }
 
 const AddTherapist = ({ params }: Props) => {
   const router = useRouter();
-  const isEditMode = !!params.id;
-
+  const isEditMode = !!params?.id;
   const [loading, setLoading] = useState<boolean>(isEditMode);
 
   const methods = useForm<TherapistFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: '',
-      email: '',
-      number: '',
-      dob: '',
-      description: '',
-      address: '',
-      zip_code: '',
-      gender: '',
-      language: '',
-      branch: '',
-      tags: [],
-      city: '',
-      country: '',
-      specialization: '',
-      experience: '',
-      education: '',
-      certificationFiles: [],
-      registrationNumber: '',
+      firstName: '',
+      lastName: '',
+      fullName: '',
+      photo: '',
+      jobTitle: '',
+      targetAudience: '',
+      specialization1: '',
+      specialization2: '',
+      aboutMe: '',
+      consultations: '',
+      centerAddress: '',
+      centerEmail: '',
+      centerPhoneNumber: '',
+      contactEmail: '',
+      contactPhone: '',
+      schedule: '',
+      about: '',
+      spokenLanguages: '',
+      paymentMethods: '',
+      degreesAndTraining: '',
+      specializations: '',
+      website: '',
+      faq: '',
+      agendaLinks: '',
+      rosaLink: '',
+      googleAgendaLink: '',
+      appointmentStart: '',
+      appointmentEnd: '',
+      appointmentAlert: '',
       availability: [],
+      tags: [],
+      certificationFiles: [],
     },
   });
 
+  const { control, handleSubmit, reset, formState } = methods;
   const {
-    control,
-    handleSubmit,
-    reset,
-    formState: { errors },
-  } = methods;
-  const { fields, append, remove } = useFieldArray({
+    fields: availabilityFields,
+    append,
+    remove,
+  } = useFieldArray({
     control,
     name: 'availability',
   });
 
   useEffect(() => {
-    if (isEditMode) {
-      const fetchData = async () => {
-        try {
-          const response = await getTherapistById(params.id!);
-          const data = response.data;
-          if (Array.isArray(data) && data.length > 0) {
-            reset(data[0] as unknown as TherapistFormValues);
+    if (isEditMode && params?.id) {
+      setLoading(true);
+      getTherapistById(params.id)
+        .then((response) => {
+          const data = response; // assume response is the object
+          if (data) {
+            // map API response to form values
+            const mapped: TherapistFormValues = {
+              ...data,
+              tags: data.tags || [],
+              certificationFiles: [],
+              availability: data.availability || [],
+            };
+            reset(mapped);
           }
-        } catch (error) {
-          console.error('Failed to fetch enquiries:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
+        })
+        .catch(console.error)
+        .finally(() => setLoading(false));
     }
-  }, [isEditMode, params.id, reset]);
+  }, [isEditMode, params?.id, reset]);
 
   const onSubmit = async (data: TherapistFormValues) => {
-    console.log(isEditMode ? 'Edit Submitted Data:' : 'Create Submitted Data:', data);
+    try {
+      if (isEditMode && params?.id) {
+        const success = await updateTherapist(params.id, data);
+        if (success) alert('Therapist updated successfully');
+      } else {
+        const success = await createTherapist(data);
+        if (success) {
+          alert('Therapist created successfully');
+          reset();
+        }
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      alert('Operation failed');
+    }
   };
 
-  if (loading) {
-    return (
-      <div className="text-center my-5">
-        <Spinner animation="border" variant="primary" />
-      </div>
-    );
-  }
+  if (loading) return <Spinner animation="border" className="my-5 d-block mx-auto" />;
 
   return (
     <FormProvider {...methods}>
       <form onSubmit={handleSubmit(onSubmit)}>
+        {/* Basic Info Card */}
         <Card>
           <CardHeader>
             <CardTitle as="h4">{isEditMode ? 'Edit Therapist' : 'Add Therapist'}</CardTitle>
@@ -177,281 +195,82 @@ const AddTherapist = ({ params }: Props) => {
           <CardBody>
             <Row>
               <Col lg={6}>
-                <div className="mb-3">
-                  <TextFormInput
-                    control={control}
-                    name="name"
-                    placeholder="Full Name"
-                    label="Therapist Name"
-                  />
-                </div>
+                <TextFormInput control={control} name="firstName" label="First Name" />
               </Col>
               <Col lg={6}>
-                <div className="mb-3">
-                  <TextFormInput
-                    control={control}
-                    name="email"
-                    placeholder="Enter Email"
-                    label="Therapist Email"
-                  />
-                </div>
+                <TextFormInput control={control} name="lastName" label="Last Name" />
               </Col>
               <Col lg={6}>
-                <div className="mb-3">
-                  <TextFormInput
-                    control={control}
-                    name="number"
-                    type="number"
-                    placeholder="Enter Number"
-                    label="Therapist Number"
-                  />
-                </div>
+                <TextFormInput control={control} name="fullName" label="Full Name" />
               </Col>
               <Col lg={6}>
-                <div className="mb-3">
-                  <TextFormInput
-                    control={control}
-                    name="dob"
-                    type="date"
-                    placeholder=""
-                    label="Date of Birth"
-                  />
-                </div>
+                <TextFormInput control={control} name="jobTitle" label="Job Title" />
               </Col>
-              <Col lg={6}>
-                <div className="mb-3">
-                  <label className="form-label">Gender</label>
-                  <Controller
-                    control={control}
-                    name="gender"
-                    render={({ field }) => (
-                      <ChoicesFormInput className="form-control" {...field}>
-                        <option value="" disabled hidden>
-                          Select Gender
-                        </option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                        <option value="others">Others</option>
-                      </ChoicesFormInput>
-                    )}
-                  />
-                  {errors.gender && <small className="text-danger">{errors.gender.message}</small>}
-                </div>
-              </Col>
-              <Col lg={6}>
-                <div className="mb-3">
-                  <label className="form-label">Preferred Language</label>
-                  <Controller
-                    control={control}
-                    name="language"
-                    render={({ field }) => (
-                      <ChoicesFormInput className="form-control" {...field}>
-                        <option value="" disabled hidden>
-                          Select Preferred Language
-                        </option>
-                        <option value="EN">English</option>
-                        <option value="FR">French</option>
-                        <option value="NL">Dutch</option>
-                      </ChoicesFormInput>
-                    )}
-                  />
-                  {errors.language && (
-                    <small className="text-danger">{errors.language.message}</small>
-                  )}
-                </div>
-              </Col>
-              <Col lg={6}>
-                <div className="mb-3">
-                  <label className="form-label">Tags</label>
-                  <Controller
-                    control={control}
-                    name="tags"
-                    render={({ field }) => (
-                      <ChoicesFormInput
-                        className="form-control"
-                        multiple
-                        options={{ removeItemButton: true }}
-                        {...field}
-                      >
-                        <option value="Blog">Blog</option>
-                        <option value="Business">Business</option>
-                        <option value="Health">Health</option>
-                        <option value="Computer Software">Computer Software</option>
-                        <option value="Lifestyle blogs">Lifestyle blogs</option>
-                        <option value="Fashion">Fashion</option>
-                      </ChoicesFormInput>
-                    )}
-                  />
-                  {errors.tags && <small className="text-danger">{errors.tags.message}</small>}
-                </div>
-              </Col>
-              <Col lg={6}>
-                <div className="mb-3">
-                  <label className="form-label">Branch</label>
-                  <Controller
-                    control={control}
-                    name="branch"
-                    render={({ field }) => (
-                      <ChoicesFormInput className="form-control" {...field}>
-                        <option value="" disabled hidden>
-                          Select Branch
-                        </option>
-                        <option value="Gembloux - Orneau">Gembloux - Orneau</option>
-                        <option value="Gembloux - Tout Vent">Gembloux - Tout Vent</option>
-                        <option value="Anima Corpus Namur">Anima Corpus Namur</option>
-                      </ChoicesFormInput>
-                    )}
-                  />
-                  {errors.branch && <small className="text-danger">{errors.branch.message}</small>}
-                </div>
-              </Col>
-
-              <Col lg={6}>
-                <div className="mb-3">
-                  <TextAreaFormInput
-                    control={control}
-                    name="address"
-                    label="Therapist Address"
-                    id="schedule-textarea"
-                    rows={3}
-                    placeholder="Enter address"
-                  />
-                </div>
-              </Col>
-              <Col lg={6}>
-                <div className="mb-3">
-                  <TextAreaFormInput
-                    control={control}
-                    name="description"
-                    label="Description"
-                    id="schedule-textarea"
-                    rows={3}
-                    placeholder="Any Description"
-                  />
-                </div>
-              </Col>
-
-              <Col lg={4}>
-                <div className="mb-3">
-                  <TextFormInput
-                    control={control}
-                    name="zip_code"
-                    type="number"
-                    placeholder="Zip-Code"
-                    label="Zip-Code"
-                  />
-                </div>
-              </Col>
-              <Col lg={4}>
-                <div className="mb-3">
-                  <label className="form-label">City</label>
-                  <Controller
-                    control={control}
-                    name="city"
-                    render={({ field }) => (
-                      <ChoicesFormInput className="form-control" {...field}>
-                        <option value="" disabled hidden>
-                          Choose a city
-                        </option>
-                        <option value="London">London</option>
-                        <option value="Paris">Paris</option>
-                        <option value="New York">New York</option>
-                      </ChoicesFormInput>
-                    )}
-                  />
-                  {errors.city && <small className="text-danger">{errors.city.message}</small>}
-                </div>
-              </Col>
-              <Col lg={4}>
-                <div className="mb-3">
-                  <label className="form-label">Country</label>
-                  <Controller
-                    control={control}
-                    name="country"
-                    render={({ field }) => (
-                      <ChoicesFormInput className="form-control" {...field}>
-                        <option value="" disabled hidden>
-                          Choose a country
-                        </option>
-                        <option value="UK">United Kingdom</option>
-                        <option value="FR">France</option>
-                        <option value="IN">India</option>
-                      </ChoicesFormInput>
-                    )}
-                  />
-                  {errors.country && (
-                    <small className="text-danger">{errors.country.message}</small>
-                  )}
-                </div>
+              <Col lg={12}>
+                <TextAreaFormInput control={control} name="aboutMe" label="About Me" rows={3} />
               </Col>
             </Row>
           </CardBody>
         </Card>
+
+        {/* Contact Info Card */}
         <Card>
           <CardHeader>
-            <CardTitle as="h4">Professional Information</CardTitle>
+            <CardTitle as="h4">Contact Information</CardTitle>
           </CardHeader>
           <CardBody>
             <Row>
               <Col lg={6}>
-                <div className="mb-3">
-                  <label className="form-label">Specialization</label>
-                  <Controller
-                    control={control}
-                    name="specialization"
-                    render={({ field }) => (
-                      <ChoicesFormInput className="form-control" {...field}>
-                        <option value="" disabled hidden>
-                          Select Specialization
-                        </option>
-                        <option value="physiotherapy">Physiotherapy</option>
-                        <option value="occupational-therapy">Occupational Therapy</option>
-                        <option value="speech-therapy">Speech Therapy</option>
-                        <option value="cognitive-behavioral-therapy">
-                          Cognitive Behavioral Therapy
-                        </option>
-                        <option value="psychotherapy">Psychotherapy</option>
-                      </ChoicesFormInput>
-                    )}
-                  />
-                  {errors.specialization && (
-                    <small className="text-danger">{errors.specialization.message}</small>
-                  )}
-                </div>
+                <TextFormInput control={control} name="centerAddress" label="Center Address" />
               </Col>
               <Col lg={6}>
-                <TextFormInput
-                  control={control}
-                  name="experience"
-                  placeholder="Enter Experience"
-                  label="Years of Experience"
-                />
+                <TextFormInput control={control} name="centerEmail" label="Center Email" />
               </Col>
               <Col lg={6}>
-                <TextFormInput
-                  control={control}
-                  name="education"
-                  placeholder="Enter Education / Degrees"
-                  label="Education / Degrees"
-                />
+                <TextFormInput control={control} name="centerPhoneNumber" label="Center Phone" />
               </Col>
               <Col lg={6}>
-                <TextFormInput
-                  control={control}
-                  name="registrationNumber"
-                  placeholder="e.g., license ID"
-                  label="Registration Number"
-                />
+                <TextFormInput control={control} name="contactEmail" label="Contact Email" />
+              </Col>
+              <Col lg={6}>
+                <TextFormInput control={control} name="contactPhone" label="Contact Phone" />
+              </Col>
+              <Col lg={6}>
+                <TextFormInput control={control} name="spokenLanguages" label="Spoken Languages" />
               </Col>
             </Row>
           </CardBody>
         </Card>
+
+        {/* Tags Card */}
         <Card>
           <CardHeader>
-            <CardTitle as="h4">Availability / Working Hours</CardTitle>
+            <CardTitle as="h4">Tags</CardTitle>
           </CardHeader>
           <CardBody>
-            {fields.map((item, index) => (
+            <Controller
+              control={control}
+              name="tags"
+              render={({ field }) => (
+                <ChoicesFormInput className="form-control" multiple {...field}>
+                  <option value="Physiotherapy">Physiotherapy</option>
+                  <option value="Occupational Therapy">Occupational Therapy</option>
+                  <option value="Speech Therapy">Speech Therapy</option>
+                  <option value="Cognitive Behavioral Therapy">CBT</option>
+                  <option value="Psychotherapy">Psychotherapy</option>
+                </ChoicesFormInput>
+              )}
+            />
+          </CardBody>
+        </Card>
+
+        {/* Availability Card */}
+        <Card>
+          <CardHeader>
+            <CardTitle as="h4">Availability</CardTitle>
+          </CardHeader>
+          <CardBody>
+            {availabilityFields.map((item, index) => (
               <Row key={item.id} className="mb-2 align-items-end">
                 <Col lg={4}>
                   <Controller
@@ -501,9 +320,11 @@ const AddTherapist = ({ params }: Props) => {
             </Button>
           </CardBody>
         </Card>
+
+        {/* Certification Files */}
         <Card>
           <CardHeader>
-            <CardTitle as={'h4'}>Upload Certifications / Licenses</CardTitle>
+            <CardTitle as="h4">Certifications / Licenses</CardTitle>
           </CardHeader>
           <CardBody>
             <Controller
@@ -512,33 +333,19 @@ const AddTherapist = ({ params }: Props) => {
               render={({ field }) => (
                 <DropzoneFormInput
                   className="py-5"
-                  iconProps={{
-                    icon: 'bx:cloud-upload',
-                    height: 48,
-                    width: 48,
-                    className: 'mb-4 text-primary',
-                  }}
-                  text="Drop your Certifications / Licenses here, or click to browse"
-                  helpText={
-                    <span className="text-muted fs-13">
-                      (1600 x 1200 (4:3) recommended. PNG, JPG and GIF files are allowed )
-                    </span>
-                  }
+                  text="Drop your certification files here or click to browse"
                   showPreview
                   onFileUpload={(files) => field.onChange(files)}
                 />
               )}
             />
-            {errors.certificationFiles && (
-              <small className="text-danger">{errors.certificationFiles.message}</small>
-            )}
           </CardBody>
         </Card>
 
         <div className="mb-3 rounded">
           <Row className="justify-content-end g-2 mt-2">
             <Col lg={2}>
-              <Button variant="outline-primary" type="submit" className="w-100">
+              <Button type="submit" variant="outline-primary" className="w-100">
                 {isEditMode ? 'Update' : 'Create'} Therapist
               </Button>
             </Col>
