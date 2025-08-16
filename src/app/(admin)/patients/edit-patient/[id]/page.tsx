@@ -1,6 +1,6 @@
 import FileUpload from '@/components/FileUpload';
 import PageTitle from '@/components/PageTitle';
-import AddCustomer from '../../add-patient/components/AddPaitent';
+import AddCustomer from '../../add-patient/components/AddPatient';
 import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
 

@@ -9,7 +9,7 @@ import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from
 import { useRouter } from 'next/navigation';
 
 import { getCustomerEnquiriesById } from '@/helpers/data';
-import type { BranchType, CustomerEnquiriesType, LanguageType } from '@/types/data';
+import type { BranchType, CustomerReviewsType, LanguageType } from '@/types/data';
 import TextFormInput from '@/components/from/TextFormInput';
 import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
@@ -60,7 +60,7 @@ const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
 
 interface Props {
   params: { id?: string };
-  onSubmitHandler?: (data: CustomerEnquiriesType) => void;
+  onSubmitHandler?: (data: CustomerReviewsType) => void;
 }
 
 const AddCustomer = ({ params, onSubmitHandler }: Props) => {
@@ -104,9 +104,24 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
           const response = await getCustomerEnquiriesById(params.id!);
           const data = response.data;
           if (Array.isArray(data) && data.length > 0) {
-            const enquiries: CustomerEnquiriesType = data[0];
-            setDefaultValues(enquiries as CustomerFormValues);
-            reset(enquiries as CustomerFormValues);
+            const enquiries: CustomerReviewsType = data[0];
+            const mappedValues: CustomerFormValues = {
+              name: enquiries.name || '',
+              email: enquiries.email || '',
+              number: enquiries.number || '',
+              dob: enquiries.dob || '',
+              description: enquiries.description || '',
+              address: enquiries.address || '',
+              zip_code: enquiries.zip_code || '',
+              gender: enquiries.gender || '',
+              language: enquiries.language || '',
+              branch: enquiries.branch || '',
+              tags: enquiries.tags || [],
+              city: enquiries.city || '',
+              country: enquiries.country || '',
+            };
+            setDefaultValues(mappedValues);
+            reset(mappedValues);
           } else {
             console.error('Customer not found or invalid data format');
           }
@@ -122,7 +137,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
 
   const onSubmit = async (data: CustomerFormValues) => {
     if (onSubmitHandler) {
-      onSubmitHandler(data as CustomerEnquiriesType);
+      onSubmitHandler(data as unknown as CustomerReviewsType);
       return;
     }
 

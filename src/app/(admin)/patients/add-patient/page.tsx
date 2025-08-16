@@ -1,7 +1,7 @@
 import FileUpload from '@/components/FileUpload';
 import PageTitle from '@/components/PageTitle';
 import CustomerAddCard from './components/PaitentAddCard';
-import AddCustomer from './components/AddPaitent';
+import AddCustomer from './components/AddPatient';
 import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
 
