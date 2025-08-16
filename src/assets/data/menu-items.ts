@@ -158,7 +158,6 @@ export const MENU_ITEMS: MenuItemType[] = [
     ],
   },
 
-
   {
     key: 'settings',
     label: 'Settings',
