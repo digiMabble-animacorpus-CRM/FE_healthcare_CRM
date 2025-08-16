@@ -30,10 +30,10 @@ const Maintenance = () => {
                   <Col lg={8}>
                     <div className="p-4">
                       <div className="mx-auto mb-5 text-center auth-logo">
-                        <Link href="/dashboards/analytics" className="logo-dark">
+                        <Link href="/dashboards/agent" className="logo-dark">
                           <Image src={logoDark} height={32} alt="logo dark" />
                         </Link>
-                        <Link href="/dashboards/analytics" className="logo-light">
+                        <Link href="/dashboards/agent" className="logo-light">
                           <Image src={logoLight} height={28} alt="logo light" />
                         </Link>
                       </div>

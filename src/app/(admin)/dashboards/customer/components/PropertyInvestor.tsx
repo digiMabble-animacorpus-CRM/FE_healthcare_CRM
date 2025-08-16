@@ -24,7 +24,7 @@ const PropertyInvestor = () => {
                 </Link>
               </h4>
               <Link href="" className="link-primary fw-medium fs-14">
-                laregence.be
+                animacorpus.be
               </Link>
               <ul className="list-inline d-flex flex-wrap gap-1 mb-0 align-items-center mt-2">
                 <li className="list-inline-item">

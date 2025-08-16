@@ -19,7 +19,7 @@ const Error404AltPage = () => {
                   digital wilderness.
                 </p>
                 <div className="text-center">
-                  <Link href="/dashboards/analytics" className="btn btn-success">
+                  <Link href="/dashboards/agent" className="btn btn-success">
                     Back to Home
                   </Link>
                 </div>

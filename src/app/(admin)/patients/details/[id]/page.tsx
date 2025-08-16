@@ -1,6 +1,6 @@
 import PageTitle from '@/components/PageTitle';
 import { getAllProperty, getCustomerEnquiriesById } from '@/helpers/data';
-import CustomersDetails from './components/CustomersDetails';
+import CustomersDetails from './components/PatientDetails';
 import WeeklyInquiry from './components/WeeklyInquiry';
 import TransactionHistory from './components/TransactionHistory';
 import type { CustomerEnquiriesType } from '@/types/data';
