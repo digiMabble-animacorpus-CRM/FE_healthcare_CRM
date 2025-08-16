@@ -8,10 +8,10 @@ import { useRouter } from "next/navigation";
 import TextFormInput from "@/components/from/TextFormInput";
 
 interface Address {
-  line1: string;
+  street: string;
   line2?: string;
   city: string;
-  zipCode: string;
+  zip_code: string;
   country: string;
 }
 
@@ -29,10 +29,10 @@ const schema = yup.object({
   email: yup.string().email("Invalid email").required("Email is required"),
   phoneNumber: yup.string().required("Phone number is required"),
   address: yup.object({
-    line1: yup.string().required("Address Line 1 is required"),
+    street: yup.string().required("Address Line 1 is required"),
     line2: yup.string(),
     city: yup.string().required("City is required"),
-    zipCode: yup.string().required("Zip Code is required"),
+    zip_code: yup.string().required("Zip Code is required"),
     country: yup.string().required("Country is required"),
   }),
 });
@@ -58,10 +58,10 @@ const BranchForm = ({
       email: defaultValues?.email || "",
       phoneNumber: defaultValues?.phoneNumber || "",
       address: defaultValues?.address || {
-        line1: "",
+        street: "",
         line2: "",
         city: "",
-        zipCode: "",
+        zip_code: "",
         country: "",
       },
     },
@@ -102,7 +102,7 @@ const BranchForm = ({
                 <TextFormInput required control={control} name="phoneNumber" label="Phone Number" placeholder="Ex: +91 9876543210" />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.line1" label="Address Line 1" placeholder="Ex: 123 MG Road" />
+                <TextFormInput required control={control} name="address.street" label="Address Line 1" placeholder="Ex: 123 MG Road" />
               </Col>
               <Col lg={6}>
                 <TextFormInput control={control} name="address.line2" label="Address Line 2 (Optional)" placeholder="Ex: Near Park" />
@@ -111,7 +111,7 @@ const BranchForm = ({
                 <TextFormInput required control={control} name="address.city" label="City" placeholder="Ex: Bangalore" />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.zipCode" label="Zip Code" placeholder="Ex: 560001" />
+                <TextFormInput required control={control} name="address.zip_code" label="Zip Code" placeholder="Ex: 560001" />
               </Col>
               <Col lg={6}>
                 <TextFormInput required control={control} name="address.country" label="Country" placeholder="Ex: India" />

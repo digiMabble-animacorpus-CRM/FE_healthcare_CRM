@@ -21,12 +21,12 @@ import {
   Modal,
   Row,
   Spinner,
-  ButtonGroup,
-} from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import { getAllStaff } from "@/helpers/staff";
+} from 'react-bootstrap'
+import { useRouter } from 'next/navigation'
+import { getAllStaff } from '@/helpers/staff'
+import type { BranchDetails } from '@/types/data';
+import { encryptAES } from '@/utils/encryption'
 import avatar1 from "@/assets/images/users/avatar-1.jpg";
-import "@/assets/scss/components/_dropdown.scss";
 
 const PAGE_LIMIT = 10;
 const BRANCHES = [
@@ -80,26 +80,26 @@ const StaffListPage = () => {
     }
   };
 
-  const fetchStaffList = async (page: number) => {
-    setLoading(true);
-    try {
-      const { from, to } = getDateRange();
-      const response = await getAllStaff(
-        page,
-        PAGE_LIMIT,
-        selectedBranch || undefined,
-        from,
-        to,
-        searchTerm
-      );
-      setStaffList(response.data);
-      setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
-    } catch (error) {
-      console.error("Failed to fetch staff list:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+const fetchStaffList = async (page: number) => {
+  setLoading(true);
+  console.log(' Fetching staff list...');
+  try {
+    const { from, to } = getDateRange();
+    console.log(' Date filter range:', { from, to });
+
+    const response = await getAllStaff(page, PAGE_LIMIT, selectedBranch || undefined, from, to, searchTerm);
+    
+    console.log(' Response from getAllStaff:', response);
+
+    setStaffList(response.data);
+    setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
+  } catch (error) {
+    console.error(' Failed to fetch staff list:', error);
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     fetchStaffList(currentPage);
@@ -109,14 +109,36 @@ const StaffListPage = () => {
     if (page !== currentPage) setCurrentPage(page);
   };
 
-  const handleView = (id: string) =>
-    router.push(`/staffs/staffs-details/${id}`);
-  const handleEdit = (id: string) =>
-    router.push(`/staffs/staffs-form/${id}/edit`);
-  const handleEditBranch = (id: string, branch: string) =>
-    router.push(`/staffs/staffs-form/${id}/edit?branch=${encodeURIComponent(branch)}`);
-  const handlePermission = (id: string) =>
-    router.push(`/staffs/staffs-form/${id}/permission`);
+
+
+
+
+const handleView = (staffId: number | string) => {
+  router.push(`/staffs/staffs-details/${staffId}`);
+};
+
+
+
+
+const handleEdit = (id: string | number) => {
+  const encrypted = encodeURIComponent(encryptAES(String(id)));
+  router.push(`/staffs/staffs-form/${encrypted}/edit`);
+};
+
+
+
+
+
+
+const handlePermission = (id: string | number) => {
+  const encrypted = encodeURIComponent(encryptAES(String(id)));
+  router.push(`/staffs/staffs-form/${encrypted}/permission`);
+};
+
+
+
+
+
 
   const handleDelete = (id: string) => {
     setSelectedStaffId(id);
@@ -190,6 +212,19 @@ const StaffListPage = () => {
                     <tbody>
                       {staffList.map((staff, idx) => (
                         <tr key={idx}>
+                          <td>{staff.name}</td>
+                          <td>{staff.email}</td>
+                          <td>{staff.phone_number}</td>
+                          <td>{formatGender(staff.gender || '')}</td>
+                          <td>{staff.branchesDetailed.map((b: { code: any }) => b.code).join(', ')}</td>
+ {/* <td>
+  {staff.branchesDetailed?.length
+    ? staff.branchesDetailed.map((branch: BranchDetails) => branch.code).join(', ')
+    : 'N/A'}
+</td> */}
+
+
+
                           <td>
                             <div className="d-flex align-items-center gap-2">
                               <Image src={avatar1} className="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-1" />
@@ -211,49 +246,17 @@ const StaffListPage = () => {
                               {staff?.status}
                             </span>
                           </td>
-                          <td>{staff?.role?.label}</td>
+                          <td>{staff.createdAt ? dayjs(staff.createdAt).format('YYYY-MM-DD HH:mm') : 'N/A'}</td>
                           <td>
                             <div className="d-flex gap-2">
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleView(staff._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:eye-broken"
-                                  className="align-middle fs-18"
-                                />
+                              <Button variant="light" size="sm" onClick={() => handleView(String(staff.id))}>
+                                <IconifyIcon icon="solar:eye-broken" className="align-middle fs-18" />
                               </Button>
-
-                              {/* Dropdown Edit Button */}
-                              <Dropdown>
-                                <DropdownToggle variant="soft-primary" size="sm">
-                                  <IconifyIcon
-                                    icon="solar:pen-2-broken"
-                                    className="align-middle fs-18"
-                                  />
-                                </DropdownToggle>
-
-                                <DropdownMenu>
-                                  <DropdownItem onClick={() => handleEditBranch(staff._id, "Branch 1")}>
-                                    Edit Staff details
-                                  </DropdownItem>
-                                  <DropdownItem onClick={() => handleEditBranch(staff._id, "Branch 2")}>
-                                    Edit staff
-                                  </DropdownItem>
-                                </DropdownMenu>
-                              </Dropdown>
-
-
-                              <Button
-                                variant="soft-danger"
-                                size="sm"
-                                onClick={() => handleDelete(staff._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:trash-bin-minimalistic-2-broken"
-                                  className="align-middle fs-18"
-                                />
+                              <Button variant="soft-primary" size="sm" onClick={() => handleEdit(String(staff.id))}>
+                                <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
+                              </Button>
+                              <Button variant="soft-danger" size="sm" onClick={() => handleDelete(String(staff.id))}>
+                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
                               </Button>
                             </div>
                           </td>

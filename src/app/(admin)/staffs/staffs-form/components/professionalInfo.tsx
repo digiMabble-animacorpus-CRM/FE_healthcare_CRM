@@ -6,6 +6,7 @@ import { Col, Row } from "react-bootstrap";
 import TextFormInput from "@/components/from/TextFormInput";
 import type { StaffRoleType, StaffType } from "@/types/data";
 import { getAllAccessLevels, getAllRoles } from "@/helpers/staff";
+import { staffRoleData } from "@/assets/data/staffRoleData";
 
 const ProfessionalInfo = () => {
   const {
@@ -18,9 +19,12 @@ const ProfessionalInfo = () => {
   const [roleOptions, setRoleOptions] = useState<StaffRoleType[]>([]);
   const [accessLevelOptions, setAccessLevelOptions] = useState<StaffRoleType[]>([]);
 
+  //  Fetch roles and access levels
   useEffect(() => {
-    setRoleOptions(getAllRoles());
-    setAccessLevelOptions(getAllAccessLevels());
+const accessLevelOptions = staffRoleData.filter((item) => item.tag === "AccessLevel");
+const roleOptions = staffRoleData.filter((item) => item.tag === "Role");
+      setRoleOptions(roleOptions);
+      setAccessLevelOptions(accessLevelOptions);
   }, []);
 
   const selectedRole = useMemo(() => {
@@ -99,7 +103,7 @@ const ProfessionalInfo = () => {
           </div>
         </Col>
 
-        {/* Specialization & Experience */}
+        {/* Conditional: Specialization & Experience */}
         {shouldShowDetails && (
           <>
             <Col lg={6}>

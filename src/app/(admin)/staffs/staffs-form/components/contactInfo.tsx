@@ -14,32 +14,31 @@ const ContactInfo = () => {
     formState: { errors },
   } = useFormContext<StaffType>();
 
-  const allLangueages = useMemo<LanguageType[]>(() => {
-    const languages = getAllLanguages();
-    return languages;
-  }, []);
+  const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
 
-  const languagesOptions = allLangueages.map((l) => ({
-    _id: l._id,
-    name: l.label,
+  const languageOptions = allLanguages.map((lang) => ({
+    _id: lang._id,
+    name: lang.label,
   }));
 
   return (
     <div className="mb-4">
       <h5 className="mb-3">Contact Information</h5>
       <Row>
+        {/* Address Line 1 */}
         <Col lg={6}>
           <div className="mb-3">
             <TextFormInput
               required
               control={control}
-              name="address.line1"
+              name="address.street"
               label="Address Line 1"
               placeholder="Enter address line 1"
             />
           </div>
         </Col>
 
+        {/* Address Line 2 */}
         <Col lg={6}>
           <div className="mb-3">
             <TextFormInput
@@ -51,6 +50,7 @@ const ContactInfo = () => {
           </div>
         </Col>
 
+        {/* City */}
         <Col lg={4}>
           <div className="mb-3">
             <TextFormInput
@@ -63,12 +63,13 @@ const ContactInfo = () => {
           </div>
         </Col>
 
+        {/* Zip Code */}
         <Col lg={4}>
           <div className="mb-3">
             <TextFormInput
               required
               control={control}
-              name="address.zipCode"
+              name="address.zip_code"
               label="Zip Code"
               placeholder="Enter zip code"
               type="number"
@@ -76,6 +77,7 @@ const ContactInfo = () => {
           </div>
         </Col>
 
+        {/* Country Dropdown */}
         <Col lg={4}>
           <div className="mb-3">
             <label className="form-label">
@@ -85,7 +87,9 @@ const ContactInfo = () => {
               control={control}
               name="address.country"
               render={({ field }) => (
-                <ChoicesFormInput className="form-control" {...field}>
+                <ChoicesFormInput className="form-control" {...field}
+                  value={field.value}
+                  onChange={(val) => field.onChange(val)} >
                   <option value="" disabled hidden>
                     Select country
                   </option>
@@ -96,13 +100,14 @@ const ContactInfo = () => {
               )}
             />
             {errors.address?.country && (
-              <small className="text-danger2">
-                {errors.address.country.message}
+              <small className="text-danger">
+                {(errors.address.country as any)?.message || "Country is required"}
               </small>
             )}
           </div>
         </Col>
 
+        {/* Languages Spoken Multi-Select */}
         <Col lg={6}>
           <div className="mb-3">
             <label className="form-label">
@@ -118,7 +123,10 @@ const ContactInfo = () => {
                   options={{ removeItemButton: true }}
                   {...field}
                 >
-                  {languagesOptions.map(({ _id, name }) => (
+                  <option value="" disabled hidden>
+                    Select languages
+                  </option>
+                  {languageOptions.map(({ _id, name }) => (
                     <option key={_id} value={_id}>
                       {name}
                     </option>
@@ -127,7 +135,9 @@ const ContactInfo = () => {
               )}
             />
             {errors.languages && (
-              <small className="text-danger2">{errors.languages.message}</small>
+              <small className="text-danger">
+                {(errors.languages as any)?.message || "At least one language is required"}
+              </small>
             )}
           </div>
         </Col>

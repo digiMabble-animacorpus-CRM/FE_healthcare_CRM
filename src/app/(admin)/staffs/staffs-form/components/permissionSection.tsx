@@ -3,10 +3,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
 import { Row, Col, FormCheck } from "react-bootstrap";
-import type { StaffType } from "@/types/data";
+import type { StaffType, PermissionType, StaffRoleType } from "@/types/data";
 import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import { getAllRoles } from "@/helpers/staff";
-import { getAllPermissions } from "@/helpers/permission";
+import { staffRoleData } from "@/assets/data/staffRoleData";
 
 const PermissionsSection = () => {
   const {
@@ -15,46 +14,55 @@ const PermissionsSection = () => {
     formState: { errors },
   } = useFormContext<StaffType>();
 
-  const allRoles        = useMemo(() => getAllRoles(), []);
-  const allPermissions  = useMemo(() => getAllPermissions(), []);
-
-  const roleId              = useWatch({ name: "roleId" });
+  const roleId = useWatch({ name: "roleId" });
   const selectedPermissions = useWatch({ name: "permissions" }) || [];
 
   const [defaultKeys, setDefaultKeys] = useState<string[]>([]);
+  const [allRoles, setAllRoles] = useState<StaffRoleType[]>([]);
+  const [allPermissions, setAllPermissions] = useState<PermissionType[]>([]);
 
+  // Fetch roles and permissions once
+  useEffect(() => {
+    const roles = staffRoleData.filter((r) => r.tag === "Role");
+    setAllRoles(roles);
+
+    const permissionSet = new Set(
+      roles.flatMap((r) => r.defaultPermissions || [])
+    );
+
+    // Generate fake permission objects based on roles
+    const permissions = Array.from(permissionSet).map((key) => ({
+      _id: key,
+      key,
+      label: key.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    }));
+
+    setAllPermissions(permissions);
+  }, []);
+
+  // Fetch default permissions based on role
+  useEffect(() => {
+    const role = allRoles.find((r) => r._id === roleId);
+    setDefaultKeys(role?.defaultPermissions || []);
+  }, [roleId, allRoles]);
+
+  // Memoized map of key → label
   const permissionLabels = useMemo(() => {
     const map: Record<string, string> = {};
     allPermissions.forEach((p) => (map[p.key] = p.label));
     return map;
   }, [allPermissions]);
 
- 
-  useEffect(() => {
-    const role = allRoles.find((r) => r._id === roleId);
-    setDefaultKeys(role?.defaultPermissions || []);
-  }, [roleId, allRoles]);
+  // Selected permission keys
+  const selectedKeys = useMemo(
+    () =>
+      selectedPermissions
+        .filter((p: any) => p.enabled)
+        .map((p: any) => p._id),
+    [selectedPermissions]
+  );
 
-  
-  useEffect(() => {
-    if (!selectedPermissions) return; 
-
-    const currentKeys = selectedPermissions.map((p: any) => p._id);
-    const mergedKeys  = Array.from(new Set([...defaultKeys, ...currentKeys]));
-
-    const merged = mergedKeys.map((key) => {
-      const existing = selectedPermissions.find((p: any) => p._id === key);
-      return { _id: key, enabled: existing ? existing.enabled : false };
-    });
-
-    setValue("permissions", merged);
-  }, [defaultKeys, selectedPermissions]);
-
- 
-  const selectedKeys = selectedPermissions
-    .filter((p: any) => p.enabled)
-    .map((p: any) => p._id);
-
+  // Handlers
   const handleToggle = (key: string) => {
     const updated = selectedPermissions.map((p: any) =>
       p._id === key ? { ...p, enabled: !p.enabled } : p
@@ -74,7 +82,7 @@ const PermissionsSection = () => {
         Permissions <span className="text-danger">*</span>
       </h5>
 
-      {/* multi-select dropdown */}
+      {/* Multi Select Dropdown */}
       <Controller
         control={control}
         name="permissions"
@@ -95,7 +103,7 @@ const PermissionsSection = () => {
         )}
       />
 
-      {/* check-box list */}
+      {/* Checkbox list below for selected permissions */}
       <Row className="mt-3">
         {selectedKeys.map((key: string) => (
           <Col lg={4} key={key} className="mb-2">

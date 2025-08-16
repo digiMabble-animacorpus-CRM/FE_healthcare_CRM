@@ -73,7 +73,7 @@ export type CustomerEnquiriesType = {
   dob: string;
   description: string;
   address: string;
-  zipCode: string;
+  zip_code: string;
   gender: string;
   language: string;
   tags: string[];
@@ -161,6 +161,7 @@ export type StaffRoleType = {
   requiresAvailability?: boolean;
 };
 
+export type AccessLevelType = StaffRoleType;
 // export type PermissionType =
 //   | "view-patients"
 //   | "edit-patients"
@@ -200,18 +201,20 @@ export type LanguageType = {
 export type Language = "french" | "dutch" | "english";
 
 export type Address = {
-  line1: string;
+  line1?: string; // street
+  street: string;
   line2?: string;
   city: string;
-  zipCode: string;
+  zip_code: string;
   country: string;
 };
 
 export type StaffType = {
   [x: string]: any;
-  _id: string;
+  _id?: string;
   name: string;
   phoneNumber: string;
+  // phone_number: string;
   email: string;
 
   gender: string;
@@ -223,6 +226,11 @@ export type StaffType = {
 
   roleId: string;
   accessLevelId?: string;
+
+  //  branchesDetailed: {
+  //   code: string;
+  //   name?: string; // optional if not used
+  // }[];
 
   branches: { id: string; isPrimary?: boolean }[];
   selectedBranch: string;
@@ -260,7 +268,14 @@ export type StaffType = {
     staffId: string;
     updatedAt: string;
   }[];
+
 };
+export type BranchDetails = {
+  id: number;
+  name: string;
+  code: string;
+};
+
 
 export type TherapistType = {
   _id: string;
@@ -270,7 +285,7 @@ export type TherapistType = {
   dob: string;
   description: string;
   address: string;
-  zipCode: string;
+  zip_code: string;
   gender: string;
   language: string;
   city: string;

@@ -19,7 +19,7 @@ const TextAreaFormInput = <TFieldValues extends FieldValues = FieldValues, TName
   return (
     <Controller<TFieldValues, TName>
       name={name as TName}
-      defaultValue={'' as PathValue<TFieldValues, TName>}
+      // defaultValue={'' as PathValue<TFieldValues, TName>}
       control={control}
       render={({ field, fieldState }) => (
         <FormGroup className={containerClassName ?? ''}>

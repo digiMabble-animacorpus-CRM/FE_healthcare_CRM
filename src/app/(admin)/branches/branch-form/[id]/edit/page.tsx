@@ -33,10 +33,10 @@ const EditBranchPage = ({ params }: Props) => {
             email: branch.email || "",
             phoneNumber: branch.phoneNumber || "",
             address: {
-              line1: branch.address?.line1 || "",
+              street: branch.address?.street || "",
               line2: branch.address?.line2 || "",
               city: branch.address?.city || "",
-              zipCode: branch.address?.zipCode || "",
+              zip_code: branch.address?.zip_code || "",
               country: branch.address?.country || "",
             },
           });

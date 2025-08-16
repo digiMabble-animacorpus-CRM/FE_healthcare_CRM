@@ -6,17 +6,49 @@ import Image from "next/image";
 import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
 import type { StaffType } from "@/types/data";
 import { useRouter } from "next/navigation";
+import { encryptAES, decryptAES } from "@/utils/encryption";
+import { useParams } from "next/navigation";
+import { string } from "yup";
 
+
+// const StaffDetails = ({ data }: { data: StaffType }) => {
 const StaffDetails = ({ data }: { data: StaffType }) => {
   const router = useRouter();
-  console.log("Staff Details Data: ", data);
+  // const params = useParams();
+  // const encryptedId = params?.id as string;
 
-  const handleEditClick = (id: string) => {
-    router.push(`/staffs/staffs-form/${id}/edit`);
-  };
+  console.log(" Staff Details Data:", data);
+  console.log(" Raw Staff ID:", data?.id);
+
+
+
+const handleEditClick = (id: string) => {
+  console.log("🧪 handleEditClick triggered with id:", id);
+
+  if (!id) {
+    console.error(" Staff ID is missing or undefined in handleEditClick");
+    return;
+  }
+
+  try {
+    const encryptedId = encryptAES(id);
+    const encodedId = encodeURIComponent(encryptedId);
+
+    //  Save the data to sessionStorage
+    sessionStorage.setItem("selectedStaff", JSON.stringify(data));
+
+    console.log(" Navigating to:", `/staffs/staffs-form/${encodedId}/edit`);
+    router.push(`/staffs/staffs-form/${encodedId}/edit`);
+  } catch (error) {
+    console.error(" Error during ID encryption or navigation:", error);
+  }
+};
+
+
   
-  const handleEditPermissionClick = (id: string) => {
-    router.push(`/staffs/staffs-form/${id}/permission`);
+ const handleEditPermissionClick = (id: string) => {
+    const encryptedId = encodeURIComponent(encryptAES(id));
+    router.push(`/staffs/staffs-form/${encryptedId}/permission`);
   };
 
   return (
@@ -31,7 +63,9 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
               className="rounded-circle avatar-xl img-thumbnail"
             />
             <div>
-              <h3 className="fw-semibold mb-1">{data?.name}</h3>
+              {/* <h3 className="fw-semibold mb-1">{data.name}</h3> */}
+              <h3 className="fw-semibold mb-1">{data.staff_name}</h3>
+
               <p className="link-primary fw-medium fs-14">
                 {data?.dob} | {data?.gender}
               </p>
@@ -41,7 +75,9 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
             <Button
               variant="dark"
               className="avatar-sm d-flex align-items-center justify-content-center fs-20"
-              onClick={() => handleEditClick(data._id)}
+          // onClick={() =>  handleEditClick(data.id)}
+              onClick={() => handleEditClick(String(data.id))}
+               
             >
               <span>
                 {" "}
@@ -86,7 +122,7 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
         <Row className="my-4">
           <Col lg={8}>
             <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
-            <p className="mb-0">{data?.address?.line1} {data?.address?.line2}, {data?.address?.city}, {data.address?.country} - {data.address?.zipCode}</p>
+            <p className="mb-0">{data.address?.street} {data.address?.line2}, {data.address?.city}, {data.address?.country} - {data.address?.zip_code}</p>
           </Col>
           <Col lg={4}>
             <p className="text-dark fw-semibold fs-16 mb-1">

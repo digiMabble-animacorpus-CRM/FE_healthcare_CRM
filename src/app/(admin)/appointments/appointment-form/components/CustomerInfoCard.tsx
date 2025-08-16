@@ -43,7 +43,7 @@ const CustomerInfoCard = ({ customerInfo }: Props) => {
             <strong>Country:</strong> {customerInfo.country}
           </Col>
           <Col md={6} className="mt-2">
-            <strong>Zip Code:</strong> {customerInfo.zipCode}
+            <strong>Zip Code:</strong> {customerInfo.zip_code}
           </Col>
           <Col md={12} className="mt-2">
             <strong>Address:</strong> {customerInfo.address}

@@ -42,35 +42,77 @@ const ChoicesFormInput = forwardRef<
 
     useImperativeHandle(ref, () => choicesRef.current as any, []);
 
+    // useEffect(() => {
+    //   if (choicesRef.current) {
+    //     const choices = new Choices(choicesRef.current, {
+    //       ...options,
+    //       placeholder: true,
+    //       allowHTML: true,
+    //       shouldSort: false,
+    //     });
+
+    //     choices.passedElement.element.addEventListener("change", (e: Event) => {
+    //       if (!(e.target instanceof HTMLSelectElement)) return;
+
+    //       if (onChange) {
+    //         if (multiple) {
+    //           const values = Array.from(e.target.selectedOptions).map(
+    //             (opt) => opt.value
+    //           );
+    //           onChange(values);
+    //         } else {
+    //           onChange(e.target.value);
+    //         }
+    //       }
+    //     });
+
+    //     return () => {
+    //       choices.destroy();
+    //     };
+    //   }
+    // }, [choicesRef]);
+
+
     useEffect(() => {
-      if (choicesRef.current) {
-        const choices = new Choices(choicesRef.current, {
-          ...options,
-          placeholder: true,
-          allowHTML: true,
-          shouldSort: false,
-        });
+  if (choicesRef.current) {
+    const choices = new Choices(choicesRef.current, {
+      ...options,
+      placeholder: true,
+      allowHTML: true,
+      shouldSort: false,
+      removeItemButton: multiple,
+    });
 
-        choices.passedElement.element.addEventListener("change", (e: Event) => {
-          if (!(e.target instanceof HTMLSelectElement)) return;
-
-          if (onChange) {
-            if (multiple) {
-              const values = Array.from(e.target.selectedOptions).map(
-                (opt) => opt.value
-              );
-              onChange(values);
-            } else {
-              onChange(e.target.value);
-            }
-          }
-        });
-
-        return () => {
-          choices.destroy();
-        };
+    //  Ensure current value is set on mount
+    if (value) {
+      if (multiple && Array.isArray(value)) {
+        choices.setChoiceByValue(value);
+      } else if (typeof value === "string") {
+        choices.setChoiceByValue([value]);
       }
-    }, [choicesRef]);
+    }
+
+    choices.passedElement.element.addEventListener("change", (e: Event) => {
+      if (!(e.target instanceof HTMLSelectElement)) return;
+
+      if (onChange) {
+        if (multiple) {
+          const values = Array.from(e.target.selectedOptions).map(
+            (opt) => opt.value
+          );
+          onChange(values);
+        } else {
+          onChange(e.target.value);
+        }
+      }
+    });
+
+    return () => {
+      choices.destroy();
+    };
+  }
+}, [choicesRef, value, multiple]);
+
 
     return allowInput ? (
       <input

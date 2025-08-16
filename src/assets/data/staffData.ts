@@ -2,16 +2,75 @@ import type { StaffType } from "@/types/data";
 
 export const staffData: StaffType[] = [
   {
-    _id: "s24",
-    name: "Camille Hoper",
-    phoneNumber: "0492/36.54.50",
-    email: "camille.hoper@animacorpus.be",
-    gender: "female", // Assumed from name
-    languages: ["lang-002"], // Assuming 'lang-002' = French
+    _id: "s1",
+    name: "Dr. Claire Martin",
+    phoneNumber: "0471234567",
+    phone_number: "0471234567",
+    email: "claire.martin@clinic.be",
+    gender: "female",
+    languages: ["lang-002", "lang-001"], // French, English
+
     address: {
-      line1: "15 Place de l'Orneau",
+      street: "12 Rue de la Santé",
+      city: "Namur",
+      zip_code: "5000",
+      country: "France",
+    },
+    dob: "1982-05-17",
+    description: "General practitioner with 15 years of experience.",
+    roleId: "role-001", // Doctor
+    accessLevelId: "al-002", // branch-admin
+
+    branches: [{ id: "b3", isPrimary: true }],
+    selectedBranch: "b3",
+    specialization: "Family Medicine",
+    experience: "15 years",
+    education: "Université catholique de Louvain",
+    registrationNumber: "MD-BE-2025-0001",
+
+    certificationFiles: [],
+
+    availability: [
+      { day: "Monday", from: "09:00", to: "13:00" },
+      { day: "Wednesday", from: "10:00", to: "14:00" },
+    ],
+
+    tags: ["general", "pediatrics"],
+
+    status: "active",
+
+    permissions: [
+      { _id: "perm-001", enabled: true }, // view-patients
+      { _id: "perm-002", enabled: true }, // edit-patients
+      { _id: "perm-004", enabled: true }, // prescribe-meds
+      { _id: "perm-007", enabled: true }, // admin-access
+    ],
+
+    loginDetails: {
+      otpVerified: true,
+      lastLogin: "2025-07-08T09:00:00.000Z",
+      loginCount: 42,
+      deviceInfo: "Chrome - Windows 11",
+    },
+
+    createdBy: "s6",
+    createdAt: "2025-06-01T10:30:00.000Z",
+    updatedBy: [{ staffId: "s6", updatedAt: "2025-07-07T12:00:00.000Z" }],
+  },
+
+  {
+    _id: "s2",
+    name: "Nurse Paul De Smet",
+    phoneNumber: "0466123456",
+    phone_number: "0466123456",
+    email: "paul.desmet@nursing.be",
+    gender: "male",
+    languages: ["lang-003", "lang-002"], // Dutch, French
+
+    address: {
+      street: "45 Avenue de Bruxelles",
       city: "Gembloux",
-      zipCode: "5030",
+      zip_code: "5030",
       country: "Belgium",
     },
     dob: "", // Not available
@@ -19,6 +78,149 @@ export const staffData: StaffType[] = [
       "En tant que nutrithérapeute, je vous accompagne afin de vous aider à allier le plaisir de bien manger avec la satisfaction d’améliorer votre état de santé et de contrôler votre poids. Je vous propose un accompagnement sur-mesure basé sur une approche humaine et bienveillante.",
     roleId: "role-001", // Assumed as similar to "Doctor"
     accessLevelId: "al-001", // staff
+
+    branches: [{ id: "b1", isPrimary: true }],
+    selectedBranch: "b1",
+
+    experience: "8 years",
+    education: "Haute École Vinci",
+
+    certificationFiles: [],
+
+    availability: [
+      { day: "Tuesday", from: "08:00", to: "12:00" },
+      { day: "Friday", from: "14:00", to: "18:00" },
+    ],
+
+    tags: ["injection", "pediatrics"],
+
+    status: "active",
+
+    permissions: [
+      { _id: "perm-001", enabled: true }, // view-patients
+      { _id: "perm-003", enabled: true }, // manage-appointments
+    ],
+
+    loginDetails: {
+      otpVerified: true,
+      lastLogin: "2025-07-06T17:00:00.000Z",
+      loginCount: 30,
+      deviceInfo: "Firefox - MacOS",
+    },
+
+    createdBy: "s3",
+    createdAt: "2025-04-15T14:22:00.000Z",
+    updatedBy: [],
+  },
+
+  {
+    _id: "s3",
+    name: "Admin Sophie Dubois",
+    phoneNumber: "0488123444",
+    phone_number: "0488123444",
+    email: "sophie.dubois@admin.be",
+    gender: "female",
+    languages: ["lang-002"], // French
+
+    address: {
+      street: "88 Rue de l'Administration",
+      city: "Gembloux",
+      zip_code: "5030",
+      country: "Belgium",
+    },
+
+    roleId: "role-011", // Admin
+    accessLevelId: "al-003", // super-admin
+
+    branches: [{ id: "b1" }, { id: "b2" }, { id: "b3" }],
+    selectedBranch: "b2",
+
+    status: "active",
+
+    permissions: [
+      { _id: "perm-007", enabled: true }, // admin-access
+      { _id: "perm-005", enabled: true }, // manage-inventory
+      { _id: "perm-006", enabled: true }, // access-billing
+    ],
+
+    loginDetails: {
+      otpVerified: true,
+      lastLogin: "2025-07-07T08:00:00.000Z",
+      loginCount: 65,
+      deviceInfo: "Edge - Windows 10",
+    },
+
+    createdBy: "s6",
+    createdAt: "2025-03-20T11:45:00.000Z",
+    updatedBy: [{ staffId: "s6", updatedAt: "2025-06-15T10:10:00.000Z" }],
+  },
+
+  {
+    _id: "s4",
+    name: "Technician Lars Verbeek",
+    phoneNumber: "0490111122",
+    phone_number: "0490111122",
+    email: "lars.verbeek@lab.be",
+    gender: "male",
+    languages: ["lang-003", "lang-001"], // Dutch, English
+
+    address: {
+      street: "5 Technologiepark",
+      city: "Namur",
+      zip_code: "5000",
+      country: "Belgium",
+    },
+
+    roleId: "role-006", // Technician
+    accessLevelId: "al-001", // staff
+
+    branches: [{ id: "b3", isPrimary: true }],
+    selectedBranch: "b3",
+
+    education: "Technische Hogeschool Antwerpen",
+    experience: "6 years",
+
+    certificationFiles: [],
+
+    tags: ["blood test", "equipment"],
+
+    status: "active",
+
+    permissions: [
+      { _id: "perm-005", enabled: true }, // manage-inventory
+    ],
+
+    loginDetails: {
+      otpVerified: true,
+      lastLogin: "2025-07-05T15:00:00.000Z",
+      loginCount: 14,
+      deviceInfo: "Safari - iOS",
+    },
+
+    createdBy: "s3",
+    createdAt: "2025-05-05T09:00:00.000Z",
+    updatedBy: [],
+  },
+
+  {
+    _id: "s5",
+    name: "Receptionist Emma Lefevre",
+    phoneNumber: "0455111133",
+    phone_number: "0455111133",
+    email: "emma.lefevre@reception.be",
+    gender: "female",
+    languages: ["lang-002", "lang-001"], // French, English
+
+    address: {
+      street: "3 Boulevard Central",
+      city: "Gembloux",
+      zip_code: "5030",
+      country: "Belgium",
+    },
+
+    roleId: "role-004", // Receptionist
+    accessLevelId: "al-001", // staff
+
     branches: [{ id: "b2", isPrimary: true }],
     selectedBranch: "b2",
     specialization: "Nutritionniste, Naturopathe",
@@ -136,22 +338,68 @@ export const staffData: StaffType[] = [
   },
   {
     _id: "s6",
-    name: "Victoria Davi",
-    phoneNumber: "0494/29.41.45",
-    email: "victoria.davi@animacorpus.be",
-    gender: "female", // Assumed
-    languages: ["lang-002"], // Assuming lang-002 = French
+    name: "Super Admin Lucas Janssen",
+    phoneNumber: "0479998877",
+    phone_number: "0479998877",
+    email: "lucas.janssen@system.be",
+    gender: "male",
+    languages: ["lang-003", "lang-001"], // Dutch, English
+
     address: {
-      line1: "15 Place de l'Orneau",
-      city: "Gembloux",
-      zipCode: "5030",
+      street: "1 Rue Centrale",
+      city: "Namur",
+      zip_code: "5000",
       country: "Belgium",
     },
-    dob: "", // Not provided
-    description:
-      "Je suis psychologue clinicienne, diplômée d’un master en psychologie clinique et psychopathologies à l’Université Libre de Bruxelles. Mon objectif au sein du centre « Anima Corpus » est d'accompagner vos enfants et adolescents dans leur développement et leur bien-être.\n\nChaque enfant, adolescent étant unique, je m'efforce de créer un environnement sûr et bienveillant dans lequel ils pourront s'exprimer librement et en toute confiance. Mon objectif est de les aider à développer des compétences et des outils pour faire face aux défis de la vie tout en renforçant leur estime de soi.\n\nSoucieuse de la qualité de la prise en charge des patients que je rencontre, je m’inscris dans une démarche de formation continue.",
-    roleId: "role-003", // Assumed therapist role
-    accessLevelId: "al-001", // Staff
+
+    roleId: "role-011", // Admin
+    accessLevelId: "al-003", // super-admin
+
+    branches: [{ id: "b1" }, { id: "b2" }, { id: "b3" }],
+    selectedBranch: "b3",
+
+    status: "active",
+
+    permissions: [
+      { _id: "perm-007", enabled: true }, // admin-access
+      { _id: "perm-003", enabled: true }, // manage-appointments
+      { _id: "perm-005", enabled: true }, // manage-inventory
+      { _id: "perm-006", enabled: true }, // access-billing
+      { _id: "perm-001", enabled: true }, // view-patients
+    ],
+
+    loginDetails: {
+      otpVerified: true,
+      loginCount: 75,
+      lastLogin: "2025-07-09T09:00:00.000Z",
+      deviceInfo: "Chrome - Windows 11",
+    },
+
+    createdBy: "s1",
+    createdAt: "2025-01-01T09:00:00.000Z",
+    updatedBy: [],
+  },
+
+  {
+    _id: "s7",
+    name: "Dr. Elise Lambert",
+    phoneNumber: "0455223344",
+    phone_number: "0455223344",
+    email: "elise.lambert@clinic.be",
+    gender: "female",
+    languages: ["lang-002"], // French
+
+    address: {
+      street: "78 Rue Médicale",
+      city: "Namur",
+      zip_code: "5000",
+      country: "Belgium",
+    },
+
+    dob: "1987-02-14",
+    roleId: "role-001", // Doctor
+    accessLevelId: "al-001", // staff
+
     branches: [{ id: "b2", isPrimary: true }],
     selectedBranch: "b2",
     specialization: "Psychologue clinicienne",
@@ -185,24 +433,97 @@ export const staffData: StaffType[] = [
     updatedBy: [],
   },
   {
-    _id: "s25",
-    name: "Marie Durieux",
-    phoneNumber: "0471/58.97.12",
-    email: "marie.durieux@animacorpus.be",
-    gender: "female", // Assumed
-    languages: ["lang-002"], // Assuming "Français" maps to "lang-002"
-    address: {
-      line1: "15 Place de l'Orneau",
-      city: "Gembloux",
-      zipCode: "5030",
-      country: "Belgium",
+    _id: "s8",
+    name: "Assistant Noor Vermeulen",
+    phoneNumber: "0466557788",
+    phone_number: "0466557788",
+    email: "noor.vermeulen@support.be",
+    gender: "female",
+    languages: ["lang-003", "lang-002"], // Dutch, French
+
+    roleId: "role-009", // Assistant
+    accessLevelId: "al-001", // staff
+
+    branches: [{ id: "b1", isPrimary: true }],
+    selectedBranch: "b1",
+
+    experience: "4 years",
+    education: "IFAPME Namur",
+
+    certificationFiles: [],
+
+    status: "active",
+
+    permissions: [
+      { _id: "perm-003", enabled: true }, // manage-appointments
+      { _id: "perm-001", enabled: true }, // view-patients
+    ],
+
+    loginDetails: {
+      otpVerified: true,
+      lastLogin: "2025-07-09T10:30:00.000Z",
+      loginCount: 22,
+      deviceInfo: "Safari - macOS",
     },
-    dob: "", // Not provided
-    description:
-      "Kinésithérapeute diplômée de l'Université Catholique de Louvain en 2014, je me suis spécialisée en pédiatrie en 2015. J'ai travaillé 8 ans en milieu hospitalier (gériatrie, oncologie, chirurgie, etc.) puis me suis réorientée en hypnose médicale via l'ULB.",
-    roleId: "role-003", // Assuming therapist or hypnotherapist role
-    accessLevelId: "al-001", // Assuming basic staff
-    branches: [{ id: "b2", isPrimary: true }], // Gembloux
+
+    createdBy: "s2",
+    createdAt: "2025-05-10T11:00:00.000Z",
+    updatedBy: [],
+  },
+
+  {
+    _id: "s9",
+    name: "Lab Assistant Hugo De Wilde",
+    phoneNumber: "0488553322",
+    phone_number: "0488553322",
+    email: "hugo.dewilde@lab.be",
+    gender: "male",
+    languages: ["lang-003"], // Dutch
+
+    roleId: "role-008", // Lab Technician
+    accessLevelId: "al-001", // staff
+
+    branches: [{ id: "b3", isPrimary: true }],
+    selectedBranch: "b3",
+
+    experience: "2 years",
+    education: "Technobel",
+
+    certificationFiles: [],
+
+    tags: ["equipment"],
+
+    status: "active",
+
+    permissions: [
+      { _id: "perm-005", enabled: true }, // manage-inventory
+    ],
+
+    loginDetails: {
+      otpVerified: true,
+      lastLogin: "2025-07-09T07:30:00.000Z",
+      loginCount: 12,
+      deviceInfo: "Chrome - Linux",
+    },
+
+    createdBy: "s4",
+    createdAt: "2025-06-01T14:00:00.000Z",
+    updatedBy: [],
+  },
+
+  {
+    _id: "s10",
+    name: "Receptionist Lien Janssens",
+    phoneNumber: "0455992244",
+    phone_number: "0455992244",
+    email: "lien.janssens@reception.be",
+    gender: "female",
+    languages: ["lang-002", "lang-001"], // French, English
+
+    roleId: "role-004", // Receptionist
+    accessLevelId: "al-001", // staff
+
+    branches: [{ id: "b2", isPrimary: true }],
     selectedBranch: "b2",
     specialization: "Hypnothérapeute",
     experience: "", // Not specified
