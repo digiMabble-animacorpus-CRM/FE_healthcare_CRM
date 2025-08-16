@@ -100,7 +100,7 @@ useEffect(() => {
               }}
             />
             {errors.branches && (
-              <small className="text-danger">{errors.branches.message}</small>
+              <small className="text-danger2">{errors.branches.message}</small>
             )}
           </div>
         </Col>
@@ -143,7 +143,7 @@ useEffect(() => {
                 })}
               </Row>
               {errors.selectedBranch && (
-                <small className="text-danger">
+                <small className="text-danger2">
                   {errors.selectedBranch.message}
                 </small>
               )}

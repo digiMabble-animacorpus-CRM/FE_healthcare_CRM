@@ -41,7 +41,7 @@ const StaffRoleFormFields = () => {
           )}
         />
         {errors.tag && (
-          <small className="text-danger">{errors.tag.message as string}</small>
+          <small className="text-danger2">{errors.tag.message as string}</small>
         )}
       </div>
       <div className="mb-3">
@@ -97,7 +97,7 @@ const StaffRoleFormFields = () => {
           )}
         />
         {errors.defaultPermissions && (
-          <small className="text-danger">
+          <small className="text-danger2">
             {errors.defaultPermissions.message as string}
           </small>
         )}

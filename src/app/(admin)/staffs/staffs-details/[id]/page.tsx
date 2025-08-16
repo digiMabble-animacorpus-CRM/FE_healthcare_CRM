@@ -6,8 +6,10 @@ import { useEffect, useState } from "react";
 import { Col, Row, Spinner, Alert } from "react-bootstrap";
 import WeeklyInquiry from "./components/WeeklyInquiry";
 import TransactionHistory from "./components/TransactionHistory";
+import UpcomingAppointmrnt from "./components/upcomingAppointmrnt";
+import type { StaffType, TherapistType } from "@/types/data";
+import { Metadata } from "next";
 import StaffDetails from "./components/StaffDetails";
-import type { StaffType } from "@/types/data";
 
 interface Props {
   params: { id: string };
@@ -80,6 +82,7 @@ if (!staff) {
           <WeeklyInquiry />
         </Col>
       </Row>
+      <UpcomingAppointmrnt />
       <TransactionHistory />
     </>
   );

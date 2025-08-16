@@ -1,450 +1,489 @@
 "use client";
 
 import PageTitle from "@/components/PageTitle";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { useEffect, useState } from "react";
-import type { StaffType, TherapistType } from "@/types/data";
-import dayjs from "dayjs";
+import { useEffect, useRef, useState } from "react";
+import dayjs, { Dayjs } from "dayjs";
 import {
   Button,
-  Card,
-  CardBody,
-  CardFooter,
-  CardHeader,
-  CardTitle,
   Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Modal,
   Row,
   Spinner,
+  Form,
+  Dropdown,
+  ButtonGroup,
+  Modal,
 } from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import { getAllStaff } from "@/helpers/staff";
+import "@toast-ui/calendar/dist/toastui-calendar.min.css";
+import { Icon } from "@iconify/react";
+import dynamic from "next/dynamic";
 
-const PAGE_LIMIT = 10;
+const Calendar = dynamic(
+  () => import("@toast-ui/react-calendar"),
+  { ssr: false }
+);
+
+// MUI
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+
 const BRANCHES = [
   "Gembloux - Orneau",
   "Gembloux - Tout Vent",
   "Anima Corpus Namur",
 ];
 
-const appointmentListPage = () => {
-  const [therapists, setTherapists] = useState<StaffType[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState<string>("all");
-  const [loading, setLoading] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
+const CATEGORIES = [
+  { id: "consultation", name: "Consultation", color: "#007bff" },
+  { id: "followup", name: "Follow-up", color: "#28a745" },
+  { id: "therapy", name: "Therapy", color: "#ffc107" },
+  { id: "surgery", name: "Surgery", color: "#dc3545" },
+];
+
+const AppointmentCalendarPage = () => {
+  const [appointments, setAppointments] = useState<any[]>([]);
+  const [selectedBranches, setSelectedBranches] = useState<string[]>([
+    ...BRANCHES,
+  ]);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(
+    CATEGORIES.map((c) => c.id)
   );
-  const router = useRouter();
+  const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
+  const [loading, setLoading] = useState(false);
+  const [view, setView] = useState<"month" | "week" | "day">("month");
+  const [calendarViewMode, setCalendarViewMode] = useState<"calendar" | "list">(
+    "calendar"
+  );
+  const [calendarHeight, setCalendarHeight] = useState("750px");
 
-  const getDateRange = () => {
-    const now = dayjs();
-    switch (dateFilter) {
-      case "today":
-        return {
-          from: now.startOf("day").toISOString(),
-          to: now.endOf("day").toISOString(),
-        };
-      case "this_week":
-        return {
-          from: now.startOf("week").toISOString(),
-          to: now.endOf("week").toISOString(),
-        };
-      case "15_days":
-        return {
-          from: now.subtract(15, "day").startOf("day").toISOString(),
-          to: now.endOf("day").toISOString(),
-        };
-      case "this_month":
-        return {
-          from: now.startOf("month").toISOString(),
-          to: now.endOf("month").toISOString(),
-        };
-      case "this_year":
-        return {
-          from: now.startOf("year").toISOString(),
-          to: now.endOf("year").toISOString(),
-        };
-      default:
-        return {};
-    }
-  };
+  const [selectedEvent, setSelectedEvent] = useState<any>(null);
+  const [showModal, setShowModal] = useState(false);
 
-  const fetchTherapists = async (page: number) => {
-    setLoading(true);
-    try {
-      const { from, to } = getDateRange();
-      const response = await getAllStaff(
-        page,
-        PAGE_LIMIT,
-        selectedBranch || undefined,
-        from,
-        to,
-        searchTerm
-      );
-      setTherapists(response.data);
-      setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
-    } catch (error) {
-      console.error("Failed to fetch enquiries data:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const calendarRef = useRef<any>(null);
+
+  const dummyAppointments = [
+    {
+      id: "1",
+      calendarId: "consultation",
+      title: "🩺 Consultation with John Doe",
+      category: "time",
+      start: dayjs().hour(8).minute(0).toISOString(),
+      end: dayjs().hour(9).minute(0).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "confirmed",
+        location: "Room 101",
+        participants: ["John Doe", "Jane Smith"],
+        notes: "Discuss lab results and next steps.",
+        icon: "🩺",
+      },
+    },
+    {
+      id: "2",
+      calendarId: "therapy",
+      title: "💆 Physiotherapy Workshop",
+      category: "allday",
+      start: dayjs().toISOString(),
+      end: dayjs().add(1, "day").toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "pending",
+        location: "Therapy Hall A",
+        participants: ["Trainer Alex", "Group A"],
+        notes: "Bring yoga mats.",
+        icon: "💆",
+      },
+    },
+    {
+      id: "3",
+      calendarId: "meeting",
+      title: "📊 Weekly Staff Meeting",
+      category: "time",
+      start: dayjs().hour(10).minute(30).toISOString(),
+      end: dayjs().hour(11).minute(30).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "confirmed",
+        location: "Conference Room B",
+        participants: ["Dr. Lee", "Admin Team"],
+        notes: "Review KPIs and schedules.",
+        icon: "📊",
+      },
+    },
+    {
+      id: "4",
+      calendarId: "surgery",
+      title: "🔪 Knee Surgery - Mr. Wilson",
+      category: "time",
+      start: dayjs().hour(14).minute(0).toISOString(),
+      end: dayjs().hour(16).minute(0).toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "confirmed",
+        location: "OR-2",
+        participants: ["Dr. Patel", "Nurse Amy"],
+        notes: "Patient must fast for 12 hours.",
+        icon: "🔪",
+      },
+    },
+    {
+      id: "5",
+      calendarId: "consultation",
+      title: "👩‍⚕️ Dermatology Checkup",
+      category: "time",
+      start: dayjs().add(1, "day").hour(9).minute(0).toISOString(),
+      end: dayjs().add(1, "day").hour(9).minute(45).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "pending",
+        location: "Room 203",
+        participants: ["Sarah Johnson"],
+        notes: "Check mole and prescribe treatment.",
+        icon: "👩‍⚕️",
+      },
+    },
+    {
+      id: "6",
+      calendarId: "therapy",
+      title: "🧘 Group Yoga Session",
+      category: "allday",
+      start: dayjs().add(2, "day").toISOString(),
+      end: dayjs().add(3, "day").toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "confirmed",
+        location: "Yoga Hall",
+        participants: ["Instructor Mia", "Group B"],
+        notes: "Wear comfortable clothing.",
+        icon: "🧘",
+      },
+    },
+    {
+      id: "7",
+      calendarId: "meeting",
+      title: "💼 Partner Clinic Collaboration Call",
+      category: "time",
+      start: dayjs().add(3, "day").hour(15).minute(0).toISOString(),
+      end: dayjs().add(3, "day").hour(16).minute(0).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "cancelled",
+        location: "Zoom",
+        participants: ["External Partner", "Admin Team"],
+        notes: "Reschedule for next week.",
+        icon: "💼",
+      },
+    },
+    {
+      id: "8",
+      calendarId: "surgery",
+      title: "🦴 Hip Replacement - Mrs. Clark",
+      category: "time",
+      start: dayjs().add(4, "day").hour(11).minute(0).toISOString(),
+      end: dayjs().add(4, "day").hour(14).minute(0).toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "confirmed",
+        location: "OR-5",
+        participants: ["Dr. Brown", "Nurse Tom"],
+        notes: "Patient needs special post-op care.",
+        icon: "🦴",
+      },
+    },
+    {
+      id: "9",
+      calendarId: "consultation",
+      title: "🩺 Follow-up Consultation - Mark Lee",
+      category: "time",
+      start: dayjs().add(5, "day").hour(8).minute(30).toISOString(),
+      end: dayjs().add(5, "day").hour(9).minute(15).toISOString(),
+      branch: "Gembloux - Orneau",
+      raw: {
+        status: "confirmed",
+        location: "Room 102",
+        participants: ["Mark Lee"],
+        notes: "Review test results and update meds.",
+        icon: "🩺",
+      },
+    },
+    {
+      id: "10",
+      calendarId: "meeting",
+      title: "📞 Marketing Strategy Call",
+      category: "time",
+      start: dayjs().add(6, "day").hour(13).minute(0).toISOString(),
+      end: dayjs().add(6, "day").hour(14).minute(0).toISOString(),
+      branch: "Anima Corpus Namur",
+      raw: {
+        status: "pending",
+        location: "Google Meet",
+        participants: ["Marketing Lead", "Clinic Director"],
+        notes: "Discuss Q4 campaigns.",
+        icon: "📞",
+      },
+    },
+  ];
 
   useEffect(() => {
-    fetchTherapists(currentPage);
-  }, [currentPage, selectedBranch, searchTerm, dateFilter]);
-
-  const handlePageChange = (page: number) => {
-    if (page !== currentPage) {
-      setCurrentPage(page);
-    }
-  };
-
-  const handleView = (id: string) => {
-    router.push(`/staffs/staffs-details/${id}`);
-  };
-
-  const handleEditClick = (id: string) => {
-    router.push(`/staffs/staffs-form/${id}/edit`);
-  };
-
-  const handleEditPermissionClick = (id: string) => {
-    router.push(`/staffs/staffs-form/${id}/permission`);
-  };
-
-  const handleDeleteClick = (id: string) => {
-    setSelectedPatientId(id);
-    setShowDeleteModal(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!selectedPatientId) return;
-
-    try {
-      await fetch(`/api/therapists/${selectedPatientId}`, {
-        method: "DELETE",
+    setLoading(true);
+    const filtered = dummyAppointments
+      .filter(
+        (appt) =>
+          selectedBranches.includes(appt.branch) &&
+          selectedCategories.includes(appt.calendarId)
+      )
+      .map((appt) => {
+        // Style adjustments based on status
+        let bgColor = CATEGORIES.find((c) => c.id === appt.calendarId)?.color;
+        let borderColor = bgColor;
+        if (appt.raw?.status === "cancelled") {
+          borderColor = "#000";
+          bgColor = "#f8d7da";
+        } else if (appt.raw?.status === "pending") {
+          bgColor = "#fff3cd";
+        }
+        return { ...appt, bgColor, borderColor };
       });
+    setAppointments(filtered);
+    setLoading(false);
+  }, [selectedBranches, selectedCategories, selectedDate, view]);
 
-      fetchTherapists(currentPage); // refresh list
-    } catch (error) {
-      console.error("Failed to delete enquiries:", error);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedPatientId(null);
-    }
+  const calendars = CATEGORIES.map((cat) => ({
+    id: cat.id,
+    name: cat.name,
+    color: "#fff",
+    bgColor: cat.color,
+    dragBgColor: cat.color,
+    borderColor: cat.color,
+  }));
+
+  const handleBranchChange = (branch: string) => {
+    setSelectedBranches((prev) =>
+      prev.includes(branch)
+        ? prev.filter((b) => b !== branch)
+        : [...prev, branch]
+    );
   };
 
-  const formatGender = (gender: string): string => {
-    if (!gender) return "";
-    return gender.charAt(0).toUpperCase();
+  const handleCategoryChange = (catId: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(catId) ? prev.filter((c) => c !== catId) : [...prev, catId]
+    );
   };
-  console.log(therapists, "therapists");
+
+  const handleEventClick = (e: any) => {
+    setSelectedEvent(e.event);
+    setShowModal(true);
+  };
 
   return (
     <>
-      <PageTitle subName="Therapists" title="Therapists List" />
-      <Row>
-        <Col xl={12}>
-          <Card>
-            <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
-              <CardTitle as="h4" className="mb-0">
-                All Appointment List
-              </CardTitle>
+      <PageTitle subName="Appointments" title="Appointment Calendar" />
 
-              <div className="d-flex flex-wrap align-items-center gap-2">
-                <div style={{ minWidth: "200px" }}>
-                  <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="Search by name, email, number..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  />
-                </div>
+      <Row style={{ height: "100%" }}>
+        {/* Sidebar */}
+        <Col
+          md={3}
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            height: "100%",
+            minWidth: 0,
+          }}
+        >
+          <div
+            className="p-2 border rounded mb-3"
+            style={{ background: "white" }}
+          >
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DateCalendar
+                value={selectedDate}
+                onChange={(newValue) => setSelectedDate(newValue || dayjs())}
+                sx={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  minWidth: 0,
+                  overflow: "hidden",
+                  "& .MuiPickersCalendarHeader-root": { px: 1, mb: 0.5 },
+                  "& .MuiPickersCalendarHeader-label": { fontSize: "0.9rem" },
+                  "& .MuiPickersArrowSwitcher-root .MuiIconButton-root": {
+                    p: 0.5,
+                  },
+                  "& .MuiDayCalendar-weekDayLabel": { fontSize: "0.75rem" },
+                  "& .MuiPickersDay-root": { fontSize: "0.75rem" },
+                  "& .MuiDayCalendar-monthContainer": { mx: 0.5 },
+                }}
+              />
+            </LocalizationProvider>
+          </div>
 
-                <Dropdown>
-                  <DropdownToggle
-                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
-                    id="branchFilter"
-                  >
-                    <IconifyIcon
-                      icon="material-symbols:location-on-outline"
-                      width={18}
-                      className="me-1"
+          {/* Branch filter */}
+          <div className="p-3 border rounded mb-3">
+            <h6 className="mb-2">Branches</h6>
+            {BRANCHES.map((branch) => (
+              <Form.Check
+                key={branch}
+                type="checkbox"
+                label={branch}
+                checked={selectedBranches.includes(branch)}
+                onChange={() => handleBranchChange(branch)}
+              />
+            ))}
+          </div>
+
+          {/* Category filter */}
+          <div className="p-3 border rounded">
+            <h6 className="mb-2">Categories</h6>
+            {CATEGORIES.map((cat) => (
+              <Form.Check
+                key={cat.id}
+                type="checkbox"
+                label={
+                  <span>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 12,
+                        height: 12,
+                        backgroundColor: cat.color,
+                        marginRight: 8,
+                      }}
                     />
-                    {selectedBranch || "Filter by Branch"}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {BRANCHES.map((branch) => (
-                      <DropdownItem
-                        key={branch}
-                        onClick={() => {
-                          setSelectedBranch(branch);
-                          setCurrentPage(1);
-                        }}
-                        active={selectedBranch === branch}
-                      >
-                        {branch}
-                      </DropdownItem>
-                    ))}
-                    {selectedBranch && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Branch Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
+                    {cat.name}
+                  </span>
+                }
+                checked={selectedCategories.includes(cat.id)}
+                onChange={() => handleCategoryChange(cat.id)}
+              />
+            ))}
+          </div>
+        </Col>
 
-                <Dropdown>
-                  <DropdownToggle
-                    className="btn btn-sm btn-outline-secondary d-flex align-items-center"
-                    id="dateFilter"
-                  >
-                    <IconifyIcon
-                      icon="mdi:calendar-clock"
-                      width={18}
-                      className="me-1"
-                    />
-                    {dateFilter === "all"
-                      ? "Filter by Date"
-                      : dateFilter.replace("_", " ").toUpperCase()}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {[
-                      { label: "Today", value: "today" },
-                      { label: "This Week", value: "this_week" },
-                      { label: "Last 15 Days", value: "15_days" },
-                      { label: "This Month", value: "this_month" },
-                      { label: "This Year", value: "this_year" },
-                    ].map((f) => (
-                      <DropdownItem
-                        key={f.value}
-                        onClick={() => {
-                          setDateFilter(f.value);
-                          setCurrentPage(1);
-                        }}
-                        active={dateFilter === f.value}
-                      >
-                        {f.label}
-                      </DropdownItem>
-                    ))}
-                    {dateFilter !== "all" && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setDateFilter("all");
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Date Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-                <Button
-                  variant="primary"
-                  onClick={() => router.push("/languages/language-form/create")}
-                >
-                  New Appointment
-                </Button>
+        {/* Main content */}
+        <Col
+          md={9}
+          style={{ display: "flex", flexDirection: "column", minWidth: 0 }}
+        >
+          <div className="d-flex justify-content-between align-items-center mb-3 p-2 border rounded bg-light">
+            <Dropdown as={ButtonGroup}>
+              <Button variant="outline-primary" size="sm">
+                {view.charAt(0).toUpperCase() + view.slice(1)}
+              </Button>
+              <Dropdown.Toggle split variant="outline-primary" size="sm" />
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => setView("day")}>
+                  Day
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setView("week")}>
+                  Week
+                </Dropdown.Item>
+                <Dropdown.Item onClick={() => setView("month")}>
+                  Month
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+
+            <h5 className="mb-0">{selectedDate.format("MMMM D, YYYY")}</h5>
+
+            <ButtonGroup size="sm">
+              <Button
+                variant={
+                  calendarViewMode === "calendar"
+                    ? "primary"
+                    : "outline-primary"
+                }
+                onClick={() => setCalendarViewMode("calendar")}
+              >
+                <Icon icon="mdi:calendar-month" width="18" />
+              </Button>
+              <Button
+                variant={
+                  calendarViewMode === "list" ? "primary" : "outline-primary"
+                }
+                onClick={() => setCalendarViewMode("list")}
+              >
+                <Icon icon="mdi:view-list" width="18" />
+              </Button>
+            </ButtonGroup>
+          </div>
+
+          <div style={{ flex: 1, minHeight: 0 }}>
+            {loading ? (
+              <div className="text-center py-5">
+                <Spinner animation="border" />
               </div>
-            </CardHeader>
-
-            <CardBody className="p-0">
-              {loading ? (
-                <div className="text-center py-5">
-                  <Spinner animation="border" />
-                </div>
-              ) : (
-                <div className="table-responsive">
-                  <table className="table align-middle text-nowrap table-hover table-centered mb-0">
-                    <thead className="bg-light-subtle">
-                      <tr>
-                        <th style={{ width: 20 }}>
-                          <div className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id="customCheck1"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="customCheck1"
-                            />
-                          </div>
-                        </th>
-                        <th>Patient name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Department</th>
-                        <th>Status</th>
-                        <th>Last Activity</th>
-                        <th>Action</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {therapists.map((item: StaffType, idx: number) => (
-                        <tr key={idx}>
-                          <td>
-                            <div className="form-check">
-                              <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={`check-${idx}`}
-                              />
-                            </div>
-                          </td>
-                          <td>{item.name}</td>
-                          <td>{item.email}</td>
-                          <td>{item.phoneNumber}</td>
-                          <td>{formatGender(item.gender || "")}</td>
-                          <td>
-                            {item.branchesDetailed
-                              .map(
-                                (branch: { [x: string]: any; name: any }) =>
-                                  branch.code
-                              )
-                              .join(", ")}
-                          </td>
-                          <td>
-                            <span
-                              className={`badge bg-${
-                                item.status === "active" ? "success" : "danger"
-                              } text-white fs-12 px-2 py-1`}
-                            >
-                              {item.status}
-                            </span>
-                          </td>
-                          <td>{item.createdAt}</td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleView(item._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:eye-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
-                              <Button
-                                variant="soft-primary"
-                                size="sm"
-                                onClick={() => handleEditClick(item._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:pen-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
-                              <Button
-                                variant="soft-danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:trash-bin-minimalistic-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardBody>
-
-            <CardFooter>
-              <nav aria-label="Page navigation example">
-                <ul className="pagination justify-content-end mb-0">
-                  <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                  >
-                    <Button
-                      variant="link"
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage - 1)}
-                    >
-                      Previous
-                    </Button>
-                  </li>
-                  {[...Array(totalPages)].map((_, index) => (
-                    <li
-                      className={`page-item ${
-                        currentPage === index + 1 ? "active" : ""
-                      }`}
-                      key={index}
-                    >
-                      <Button
-                        variant="link"
-                        className="page-link"
-                        onClick={() => handlePageChange(index + 1)}
-                      >
-                        {index + 1}
-                      </Button>
-                    </li>
-                  ))}
-                  <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
-                    <Button
-                      variant="link"
-                      className="page-link"
-                      onClick={() => handlePageChange(currentPage + 1)}
-                    >
-                      Next
-                    </Button>
-                  </li>
-                </ul>
-              </nav>
-            </CardFooter>
-          </Card>
+            ) : calendarViewMode === "calendar" ? (
+              <Calendar
+                ref={calendarRef}
+                height={calendarHeight}
+                view={view}
+                month={{ startDayOfWeek: 1 }}
+                week={{ showTimezoneCollapseButton: true }}
+                events={appointments}
+                calendars={calendars}
+                onClickEvent={handleEventClick}
+              />
+            ) : (
+              <div
+                className="p-3 border rounded bg-white"
+                style={{ height: calendarHeight, overflowY: "auto" }}
+              >
+                {appointments.length === 0 ? (
+                  <p className="text-muted">No appointments found.</p>
+                ) : (
+                  appointments.map((appt) => (
+                    <div key={appt.id} className="border-bottom py-2">
+                      <strong>{appt.title}</strong>
+                      <div>
+                        {dayjs(appt.start).format("MMM D, YYYY h:mm A")}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            )}
+          </div>
         </Col>
       </Row>
 
-      {/* Delete Confirmation Modal */}
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
+      {/* Modal for Event Details */}
+      <Modal show={showModal} onHide={() => setShowModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Appointment Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this customer? This action cannot be
-          undone.
+          {selectedEvent && (
+            <>
+              <p>
+                <strong>Title:</strong> {selectedEvent.title}
+              </p>
+              <p>
+                <strong>Branch:</strong> {selectedEvent.branch}
+              </p>
+              <p>
+                <strong>Status:</strong> {selectedEvent.raw?.status}
+              </p>
+              <p>
+                <strong>Location:</strong> {selectedEvent.raw?.location}
+              </p>
+              <p>
+                <strong>Participants:</strong>{" "}
+                {selectedEvent.raw?.participants?.join(", ")}
+              </p>
+              <p>
+                <strong>Notes:</strong> {selectedEvent.raw?.notes}
+              </p>
+              <p>
+                <strong>Time:</strong>{" "}
+                {dayjs(selectedEvent.start).format("MMM D, YYYY h:mm A")} -{" "}
+                {dayjs(selectedEvent.end).format("MMM D, YYYY h:mm A")}
+              </p>
+            </>
+          )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
-          </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+          <Button variant="secondary" onClick={() => setShowModal(false)}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>
@@ -452,4 +491,4 @@ const appointmentListPage = () => {
   );
 };
 
-export default appointmentListPage;
+export default AppointmentCalendarPage;

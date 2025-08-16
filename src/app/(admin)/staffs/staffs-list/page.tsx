@@ -1,10 +1,11 @@
-'use client'
+"use client";
 
-import PageTitle from '@/components/PageTitle'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { useEffect, useState } from 'react'
-import type { StaffType } from '@/types/data'
-import dayjs from 'dayjs'
+import PageTitle from "@/components/PageTitle";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import { useEffect, useState } from "react";
+import type { StaffType } from "@/types/data";
+import Image from 'next/image';
+import dayjs from "dayjs";
 import {
   Button,
   Card,
@@ -25,39 +26,59 @@ import { useRouter } from 'next/navigation'
 import { getAllStaff } from '@/helpers/staff'
 import type { BranchDetails } from '@/types/data';
 import { encryptAES } from '@/utils/encryption'
+import avatar1 from "@/assets/images/users/avatar-1.jpg";
 
-const PAGE_LIMIT = 10
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur']
+const PAGE_LIMIT = 10;
+const BRANCHES = [
+  "Gembloux - Orneau",
+  "Gembloux - Tout Vent",
+  "Anima Corpus Namur",
+];
 
 const StaffListPage = () => {
-  const [staffList, setStaffList] = useState<StaffType[]>([])
-  const [totalPages, setTotalPages] = useState(1)
-  const [currentPage, setCurrentPage] = useState(1)
-  const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [dateFilter, setDateFilter] = useState<string>('all')
-  const [loading, setLoading] = useState(false)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null)
-  const router = useRouter()
+  const [staffList, setStaffList] = useState<StaffType[]>([]);
+  const [totalPages, setTotalPages] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [loading, setLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
+  const router = useRouter();
 
   const getDateRange = () => {
-    const now = dayjs()
+    const now = dayjs();
     switch (dateFilter) {
-      case 'today':
-        return { from: now.startOf('day').toISOString(), to: now.endOf('day').toISOString() }
-      case 'this_week':
-        return { from: now.startOf('week').toISOString(), to: now.endOf('week').toISOString() }
-      case '15_days':
-        return { from: now.subtract(15, 'day').startOf('day').toISOString(), to: now.endOf('day').toISOString() }
-      case 'this_month':
-        return { from: now.startOf('month').toISOString(), to: now.endOf('month').toISOString() }
-      case 'this_year':
-        return { from: now.startOf('year').toISOString(), to: now.endOf('year').toISOString() }
+      case "today":
+        return {
+          from: now.startOf("day").toISOString(),
+          to: now.endOf("day").toISOString(),
+        };
+      case "this_week":
+        return {
+          from: now.startOf("week").toISOString(),
+          to: now.endOf("week").toISOString(),
+        };
+      case "15_days":
+        return {
+          from: now.subtract(15, "day").startOf("day").toISOString(),
+          to: now.endOf("day").toISOString(),
+        };
+      case "this_month":
+        return {
+          from: now.startOf("month").toISOString(),
+          to: now.endOf("month").toISOString(),
+        };
+      case "this_year":
+        return {
+          from: now.startOf("year").toISOString(),
+          to: now.endOf("year").toISOString(),
+        };
       default:
-        return {}
+        return {};
     }
-  }
+  };
 
 const fetchStaffList = async (page: number) => {
   setLoading(true);
@@ -81,12 +102,12 @@ const fetchStaffList = async (page: number) => {
 
 
   useEffect(() => {
-    fetchStaffList(currentPage)
-  }, [currentPage, selectedBranch, searchTerm, dateFilter])
+    fetchStaffList(currentPage);
+  }, [currentPage, selectedBranch, searchTerm, dateFilter]);
 
   const handlePageChange = (page: number) => {
-    if (page !== currentPage) setCurrentPage(page)
-  }
+    if (page !== currentPage) setCurrentPage(page);
+  };
 
 
 
@@ -120,26 +141,27 @@ const handlePermission = (id: string | number) => {
 
 
   const handleDelete = (id: string) => {
-    setSelectedStaffId(id)
-    setShowDeleteModal(true)
-  }
+    setSelectedStaffId(id);
+    setShowDeleteModal(true);
+  };
 
   const handleConfirmDelete = async () => {
-    if (!selectedStaffId) return
+    if (!selectedStaffId) return;
     try {
       await fetch(`/api/therapists/${selectedStaffId}`, {
         method: "DELETE",
       });
-      fetchStaffList(currentPage)
+      fetchStaffList(currentPage);
     } catch (error) {
-      console.error('Failed to delete staff:', error)
+      console.error("Failed to delete staff:", error);
     } finally {
-      setShowDeleteModal(false)
-      setSelectedStaffId(null)
+      setShowDeleteModal(false);
+      setSelectedStaffId(null);
     }
-  }
+  };
 
-  const formatGender = (gender: string): string => (gender ? gender.charAt(0).toUpperCase() : '')
+  const formatGender = (gender: string): string =>
+    gender ? gender.charAt(0).toUpperCase() : "";
 
   return (
     <>
@@ -152,87 +174,18 @@ const handlePermission = (id: string | number) => {
                 All Staff List
               </CardTitle>
               <div className="d-flex flex-wrap align-items-center gap-2">
-                <div style={{ minWidth: '200px' }}>
+                <div style={{ minWidth: "200px" }}>
                   <input
                     type="text"
                     className="form-control form-control-sm"
                     placeholder="Search by name, email, number..."
                     value={searchTerm}
                     onChange={(e) => {
-                      setSearchTerm(e.target.value)
-                      setCurrentPage(1)
+                      setSearchTerm(e.target.value);
+                      setCurrentPage(1);
                     }}
                   />
                 </div>
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="material-symbols:location-on-outline" width={18} className="me-1" />
-                    {selectedBranch || 'Filter by Branch'}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {BRANCHES.map((branch) => (
-                      <DropdownItem
-                        key={branch}
-                        onClick={() => {
-                          setSelectedBranch(branch)
-                          setCurrentPage(1)
-                        }}
-                        active={selectedBranch === branch}
-                      >
-                        {branch}
-                      </DropdownItem>
-                    ))}
-                    {selectedBranch && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null)
-                          setCurrentPage(1)
-                        }}
-                      >
-                        Clear Branch Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
-                    {dateFilter === 'all' ? 'Filter by Date' : dateFilter.replace('_', ' ').toUpperCase()}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {[
-                      { label: 'Today', value: 'today' },
-                      { label: 'This Week', value: 'this_week' },
-                      { label: 'Last 15 Days', value: '15_days' },
-                      { label: 'This Month', value: 'this_month' },
-                      { label: 'This Year', value: 'this_year' },
-                    ].map((f) => (
-                      <DropdownItem
-                        key={f.value}
-                        onClick={() => {
-                          setDateFilter(f.value)
-                          setCurrentPage(1)
-                        }}
-                        active={dateFilter === f.value}
-                      >
-                        {f.label}
-                      </DropdownItem>
-                    ))}
-                    {dateFilter !== 'all' && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setDateFilter('all')
-                          setCurrentPage(1)
-                        }}
-                      >
-                        Clear Date Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
               </div>
             </CardHeader>
 
@@ -252,7 +205,7 @@ const handlePermission = (id: string | number) => {
                         <th>Gender</th>
                         <th>Branch</th>
                         <th>Status</th>
-                        <th>Last Activity</th>
+                        <th>Role</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -273,8 +226,24 @@ const handlePermission = (id: string | number) => {
 
 
                           <td>
-                            <span className={`badge bg-${staff.status === 'active' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}>
-                              {staff.status}
+                            <div className="d-flex align-items-center gap-2">
+                              <Image src={avatar1} className="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-1" />
+                              <span>{staff?.name}</span>
+                            </div>
+                          </td>
+                          <td>{staff?.email}</td>
+                          <td>{staff?.phoneNumber}</td>
+                          <td>{formatGender(staff?.gender || "")}</td>
+                          <td>
+                            {staff?.branchesDetailed
+                              .map((b: { code: any }) => b.code)
+                              .join(", ")}
+                          </td>
+                          <td>
+                            <span
+                              className={`badge bg-${staff.status === "active" ? "success" : "danger"} text-white fs-12 px-2 py-1`}
+                            >
+                              {staff?.status}
                             </span>
                           </td>
                           <td>{staff.createdAt ? dayjs(staff.createdAt).format('YYYY-MM-DD HH:mm') : 'N/A'}</td>
@@ -302,20 +271,39 @@ const handlePermission = (id: string | number) => {
             <CardFooter>
               <nav>
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                    <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                  <li
+                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
+                  >
+                    <Button
+                      variant="link"
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage - 1)}
+                    >
                       Previous
                     </Button>
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
-                    <li className={`page-item ${currentPage === index + 1 ? 'active' : ''}`} key={index}>
-                      <Button variant="link" className="page-link" onClick={() => handlePageChange(index + 1)}>
+                    <li
+                      className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
+                      key={index}
+                    >
+                      <Button
+                        variant="link"
+                        className="page-link"
+                        onClick={() => handlePageChange(index + 1)}
+                      >
                         {index + 1}
                       </Button>
                     </li>
                   ))}
-                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                    <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                  <li
+                    className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
+                  >
+                    <Button
+                      variant="link"
+                      className="page-link"
+                      onClick={() => handlePageChange(currentPage + 1)}
+                    >
                       Next
                     </Button>
                   </li>
@@ -326,11 +314,18 @@ const handlePermission = (id: string | number) => {
         </Col>
       </Row>
 
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+      <Modal
+        show={showDeleteModal}
+        onHide={() => setShowDeleteModal(false)}
+        centered
+      >
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this staff? This action cannot be undone.</Modal.Body>
+        <Modal.Body>
+          Are you sure you want to delete this staff? This action cannot be
+          undone.
+        </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Cancel
@@ -341,7 +336,7 @@ const handlePermission = (id: string | number) => {
         </Modal.Footer>
       </Modal>
     </>
-  )
-}
+  );
+};
 
-export default StaffListPage
+export default StaffListPage;

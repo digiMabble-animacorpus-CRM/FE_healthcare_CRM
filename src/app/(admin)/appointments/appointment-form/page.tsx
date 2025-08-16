@@ -1,15 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { CustomerEnquiriesType } from "@/types/data";
-import CheckCustomerModal from "./components/CheckCustomerModal";
-import BookAppointmentForm from "./components/BookAppointmentForm";
-import { getUserByEmail } from "@/helpers/customer";
+import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import CustomerInfoCard from "./components/CustomerInfoCard";
+import { CustomerEnquiriesType } from "@/types/data";
+import { getUserByEmail } from "@/helpers/customer";
+
+// Dynamically import components to avoid SSR issues
+const CheckCustomerModal = dynamic(
+  () => import("./components/CheckCustomerModal"),
+  { ssr: false }
+);
+
+const BookAppointmentForm = dynamic(
+  () => import("./components/BookAppointmentForm"),
+  { ssr: false }
+);
+
+const CustomerInfoCard = dynamic(
+  () => import("./components/CustomerInfoCard"),
+  { ssr: false }
+);
 
 const AppointmentPage = () => {
   const router = useRouter();
+
   const [showModal, setShowModal] = useState(true);
   const [isCustomerNotFound, setIsCustomerNotFound] = useState(false);
   const [existingCustomer, setExistingCustomer] =

@@ -40,7 +40,7 @@ const TextFormInput = <
           {label && (
             <FormLabel htmlFor={id ?? name} className={labelClassName}>
               {label}
-              {required && <span className="text-danger"> *</span>}
+              {required && <span className="text-danger2"> *</span>}
             </FormLabel>
           )}
 
@@ -52,7 +52,7 @@ const TextFormInput = <
           />
 
           {!noValidate && fieldState.error?.message && (
-            <small className="text-danger">{fieldState.error.message}</small>
+            <small className="text-danger2">{fieldState.error.message}</small>
           )}
         </FormGroup>
       )}

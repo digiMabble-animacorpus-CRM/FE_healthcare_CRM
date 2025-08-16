@@ -201,6 +201,7 @@ export type LanguageType = {
 export type Language = "french" | "dutch" | "english";
 
 export type Address = {
+  line1?: string; // street
   street: string;
   line2?: string;
   city: string;

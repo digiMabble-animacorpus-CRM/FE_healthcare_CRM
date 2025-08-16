@@ -16,7 +16,7 @@ import {
   Row,
 } from 'react-bootstrap'
 
-const TransactionHistory = async () => {
+const UpcomingAppointmrnt = async () => {
   const transactionData = await getAllTransaction()
   return (
     <Row>
@@ -24,7 +24,7 @@ const TransactionHistory = async () => {
         <Card>
           <CardHeader className="d-flex justify-content-between align-items-center">
             <div>
-              <CardTitle as={'h4'}>Past Appointments</CardTitle>
+              <CardTitle as={'h4'}>Upcoming Appointments</CardTitle>
             </div>
             <Dropdown>
               <DropdownToggle
@@ -138,4 +138,4 @@ const TransactionHistory = async () => {
   )
 }
 
-export default TransactionHistory
+export default UpcomingAppointmrnt

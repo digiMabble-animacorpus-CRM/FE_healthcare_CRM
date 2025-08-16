@@ -10,26 +10,7 @@ export const MENU_ITEMS: MenuItemType[] = [
     key: "dashboards",
     label: "Dashboards",
     icon: "ri:dashboard-2-line",
-    children: [
-      {
-        key: "analytics",
-        label: "Analytics",
-        url: "/dashboards/analytics",
-        parentKey: "dashboards",
-      },
-      {
-        key: "agent",
-        label: "Agent",
-        url: "/dashboards/agent",
-        parentKey: "dashboards",
-      },
-      {
-        key: "customer",
-        label: "Customer",
-        url: "/dashboards/customer",
-        parentKey: "dashboards",
-      },
-    ],
+    url: "/dashboards/agent",
   },
   // {
   //   key: "property",
@@ -94,23 +75,10 @@ export const MENU_ITEMS: MenuItemType[] = [
   //   ],
   // },
   {
-    key: "customer-enquiries",
-    label: "Customer Enquiries",
-    icon: "ri:contacts-book-3-line",
-    children: [
-      {
-        key: "customer-enquiry-list",
-        label: "Customer Enquiry List",
-        url: "/customer-enquiries/customer-enquiry-list",
-        parentKey: "customer-enquiries",
-      },
-      {
-        key: "add-enquiry",
-        label: "Add Enquiry",
-        url: "/customer-enquiries/add-enquiry",
-        parentKey: "customer-enquiries",
-      },
-    ],
+    key: "appointments",
+    label: "Appointments",
+    icon: "ri:chat-quote-line",
+    url: "/appointments/appointment-list",
   },
   {
     key: "staffs",
@@ -131,6 +99,26 @@ export const MENU_ITEMS: MenuItemType[] = [
       },
     ],
   },
+  {
+    key: "customer-enquiries",
+    label: "Customers",
+    icon: "ri:contacts-book-3-line",
+    children: [
+      {
+        key: "customer-enquiry-list",
+        label: "Customer Enquiry List",
+        url: "/customer-enquiries/customer-enquiry-list",
+        parentKey: "customer-enquiries",
+      },
+      {
+        key: "add-enquiry",
+        label: "Add Enquiry",
+        url: "/customer-enquiries/add-enquiry",
+        parentKey: "customer-enquiries",
+      },
+    ],
+  },
+
   // {
   //   key: "therapists",
   //   label: "Therapist",
@@ -151,6 +139,11 @@ export const MENU_ITEMS: MenuItemType[] = [
   //   ],
   // },
   {
+    key: "settings",
+    label: "Settings",
+    isTitle: true,
+  },
+  {
     key: "languages",
     label: "Languages",
     icon: "ri:home-office-line",
@@ -168,12 +161,7 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: "ri:chat-quote-line",
     url: "/permissions",
   },
-  {
-    key: "appointments",
-    label: "Appointments",
-    icon: "ri:chat-quote-line",
-    url: "/appointments/appointment-form",
-  },
+
   // {
   //   key: "orders",
   //   label: "Orders",
@@ -194,7 +182,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   // },
   // {
   //   key: "messages",
-  //   label: "Pavimmo Chatbot",
+  //   label: "Anima Corpus Chatbot",
   //   icon: "ri:discuss-line",
   //   url: "/messages",
   // },

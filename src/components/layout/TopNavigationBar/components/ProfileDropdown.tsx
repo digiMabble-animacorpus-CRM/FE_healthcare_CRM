@@ -1,4 +1,4 @@
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
+import avatar1 from '@/assets/images/users/main-image.jpeg'
 import IconifyIcon from '@/components/wrappers/IconifyIcon'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -25,20 +25,20 @@ const ProfileDropdown = () => {
         </DropdownHeader>
         <DropdownItem as={Link} href="/profile">
           <IconifyIcon icon="solar:calendar-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">My Schedules</span>
+          <span className="align-middle">My Account</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/pages/pricing">
           <IconifyIcon icon="solar:wallet-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">Pricing</span>
+          <span className="align-middle">Help & Support</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/support/faqs">
           <IconifyIcon icon="solar:help-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">Help</span>
+          <span className="align-middle">Privacy & Conditions</span>
         </DropdownItem>
-        <DropdownItem as={Link} href="/auth/lock-screen">
+        {/* <DropdownItem as={Link} href="/auth/lock-screen">
           <IconifyIcon icon="solar:lock-keyhole-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">Lock screen</span>
-        </DropdownItem>
+        </DropdownItem> */}
         <div className="dropdown-divider my-1" />
         <DropdownItem as={Link} className=" text-danger" href="/auth/sign-in">
           <IconifyIcon icon="solar:logout-3-broken" className="align-middle me-2 fs-18" />
