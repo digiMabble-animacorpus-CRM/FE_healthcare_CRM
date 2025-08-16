@@ -80,25 +80,45 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri:chat-quote-line',
     url: '/appointments/appointment-list',
   },
+
   {
-    key: 'staffs',
-    label: 'Staffs',
+    key: 'therapists',
+    label: 'Therapist',
     icon: 'ri:contacts-book-3-line',
     children: [
       {
-        key: 'staffs-list',
-        label: 'Staffs List',
-        url: '/staffs/staffs-list',
-        parentKey: 'staffs',
+        key: 'therapists-list',
+        label: 'Therapists List',
+        url: '/therapists/therapists-list',
+        parentKey: 'therapists',
       },
       {
-        key: 'staffs-form',
-        label: 'Add Staff',
-        url: '/staffs/staffs-form/create',
-        parentKey: 'staffs',
+        key: 'add-therapist',
+        label: 'Add Therapist',
+        url: '/therapists/add-therapist',
+        parentKey: 'therapists',
       },
     ],
   },
+  // {
+  //   key: 'staffs',
+  //   label: 'Staffs',
+  //   icon: 'ri:contacts-book-3-line',
+  //   children: [
+  //     {
+  //       key: 'staffs-list',
+  //       label: 'Staffs List',
+  //       url: '/staffs/staffs-list',
+  //       parentKey: 'staffs',
+  //     },
+  //     {
+  //       key: 'staffs-form',
+  //       label: 'Add Staff',
+  //       url: '/staffs/staffs-form/create',
+  //       parentKey: 'staffs',
+  //     },
+  //   ],
+  // },
   {
     key: 'patients',
     label: 'Patient',
@@ -119,25 +139,6 @@ export const MENU_ITEMS: MenuItemType[] = [
     ],
   },
 
-  // {
-  //   key: "therapists",
-  //   label: "Therapist",
-  //   icon: "ri:contacts-book-3-line",
-  //   children: [
-  //     {
-  //       key: "therapists-list",
-  //       label: "Therapists List",
-  //       url: "/therapists/therapists-list",
-  //       parentKey: "therapists",
-  //     },
-  //     {
-  //       key: "add-therapist",
-  //       label: "Add Therapist",
-  //       url: "/therapists/add-therapist",
-  //       parentKey: "therapists",
-  //     },
-  //   ],
-  // },
   {
     key: 'settings',
     label: 'Settings',

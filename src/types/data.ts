@@ -61,28 +61,28 @@ export type UserType = {
 };
 
 export type PatientType = {
-  createdAt: string;
-  _id: IdType;
+  createdAt?: string;
+  _id?: IdType;
   birthdate: string;
-  city: string;
-  country: string;
-  emails: string;
+  city?: string;
+  country?: string;
+  emails?: string;
   firstname: string;
   id: string;
-  language: string;
+  language?: string;
   lastname: string;
-  legalgender: string;
-  middlename: string;
-  mutualitynumber: string;
-  mutualityregistrationnumber: string;
-  note: string;
-  number: string;
-  phones: string[];
-  primarypatientrecordid: string;
-  ssin: string;
-  status: string;
-  street: string;
-  zipcode: string;
+  legalgender?: string;
+  middlename?: string;
+  mutualitynumber?: string;
+  mutualityregistrationnumber?: string;
+  note?: string;
+  number?: string;
+  phones?: string[];
+  primarypatientrecordid?: string;
+  ssin?: string;
+  status?: string;
+  street?: string;
+  zipcode?: string;
 };
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';
@@ -266,37 +266,76 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  _id: string;
-  name: string;
-  email: string;
-  number: string;
-  dob: string;
-  description: string;
-  address: string;
-  zip_code: string;
-  gender: string;
-  language: string;
-  city: string;
-  country: string;
-  specialization: string;
-  experience: string;
-  education: string;
-  certificationFiles: {
-    path: string;
-    preview: string | null;
-    formattedSize: string;
-  }[];
-  registrationNumber: string;
-  availability: {
-    day: string; // e.g., "Monday"
-    from: string; // e.g., "09:00"
-    to: string; // e.g., "14:00"
-  }[];
-  tags: string[];
-  status: 'active' | 'inactive';
-  lastUpdated: string;
-  source: string;
-  branch: 'Gembloux - Orneau' | 'Gembloux - Tout Vent' | 'Anima Corpus Namur';
+  _key: number;
+  idPro: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website: string;
+  faq: string;
+  agendaLinks: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any | null;
+  tags?: any;
+};
+
+export type TherapistCreatePayload = {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo?: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations?: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule?: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website?: string;
+  faq?: string;
+  agendaLinks?: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any[];
+  tags?: string[];
+  certificationFiles?: File[];
+  branches?: (string | number)[];
+  selected_branch?: string | number | null;
 };
 
 export type AgentType = {

@@ -5,192 +5,211 @@ import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
-
 import { useRouter } from 'next/navigation';
 
-import { getCustomerEnquiriesById } from '@/helpers/data';
-import type { BranchType, CustomerEnquiriesType, LanguageType } from '@/types/data';
+import type { BranchType, LanguageType, PatientType } from '@/types/data';
 import TextFormInput from '@/components/from/TextFormInput';
 import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
 import { getAllLanguages } from '@/helpers/languages';
 import { getAllBranch } from '@/helpers/branch';
-
-type CustomerFormValues = {
-  name: string;
-  email: string;
-  number: string;
-  dob: string;
-  description: string;
-  address: string;
-  zip_code: string;
-  gender: string;
-  language: string;
-  branch: string;
-  tags: string[];
-  city: string;
-  country: string;
-};
-
-const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
-  name: yup.string().required('Please enter name'),
-  email: yup.string().email('Invalid email').required('Please enter email'),
-  number: yup
-    .string()
-    .matches(/^\d{10}$/, 'Enter valid 10-digit number')
-    .required('Please enter number'),
-  dob: yup.string().required('Please enter Date of birth'),
-  address: yup.string().required('Please enter address'),
-  description: yup.string().required('Please enter description'),
-  zip_code: yup
-    .string()
-    .matches(/^\d{5}$/, 'Enter valid Zip-Code')
-    .required('Please enter Zip-Code'),
-  gender: yup.string().required('Please select gender'),
-  branch: yup.string().required('Please select branch'),
-  language: yup.string().required('Please select language'),
-  tags: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'Please select at least one tag')
-    .required('Please select tags'),
-  city: yup.string().required('Please select city'),
-  country: yup.string().required('Please select country'),
-});
+import { createPatient, getPatientById, updatePatient } from '@/helpers/patient';
 
 interface Props {
-  params: { id?: string };
-  onSubmitHandler?: (data: CustomerEnquiriesType) => void;
+  params?: { id?: string };
+  onSubmitHandler?: (data: PatientType) => void;
 }
 
-const AddCustomer = ({ params, onSubmitHandler }: Props) => {
+const schema: yup.ObjectSchema<Partial<PatientType>> = yup
+  .object({
+    firstname: yup.string().required('Please enter first name'),
+    lastname: yup.string().required('Please enter last name'),
+    middlename: yup.string(),
+    emails: yup.string().email('Invalid email').required('Please enter email'),
+    number: yup
+      .string()
+      .matches(/^\d{10}$/, 'Enter valid 10-digit number')
+      .required('Please enter number'),
+    phones: yup.array().of(yup.string()),
+    birthdate: yup.string().required('Please enter Date of birth'),
+    street: yup.string().required('Please enter address'),
+    note: yup.string().required('Please enter description'),
+    zipcode: yup.string(),
+    legalgender: yup.string().required('Please select gender'),
+    language: yup.string().required('Please select language'),
+    city: yup.string().required('Please select city'),
+    country: yup.string().required('Please select country'),
+    ssin: yup.string(),
+    status: yup.string(),
+    mutualitynumber: yup.string(),
+    mutualityregistrationnumber: yup.string(),
+    branch: yup.string(),
+    tags: yup.array().of(yup.string()).min(1, 'Please select at least one tag'),
+  })
+  .required()
+  .noUnknown(true);
+
+const AddPatient = ({ params, onSubmitHandler }: Props) => {
   const router = useRouter();
-  const isEditMode = !!params.id;
+  const isEditMode = !!params?.id;
 
   const [loading, setLoading] = useState<boolean>(isEditMode);
-  const [defaultValues, setDefaultValues] = useState<CustomerFormValues>({
-    name: '',
-    email: '',
-    number: '',
-    dob: '',
-    description: '',
-    address: '',
-    zip_code: '',
-    gender: '',
-    language: '',
-    branch: '',
-    tags: [],
+  const [defaultValues, setDefaultValues] = useState<Partial<PatientType>>({
+    createdAt: '',
+    _id: '',
+    birthdate: '',
     city: '',
     country: '',
+    emails: '',
+    firstname: '',
+    id: '',
+    language: '',
+    lastname: '',
+    legalgender: '',
+    middlename: '',
+    mutualitynumber: '',
+    mutualityregistrationnumber: '',
+    note: '',
+    number: '',
+    phones: [''],
+    primarypatientrecordid: '',
+    ssin: '',
+    status: '',
+    street: '',
+    zipcode: '',
   });
 
   const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
   const allBranches = useMemo<BranchType[]>(() => getAllBranch(), []);
+  const allTags = useMemo<string[]>(() => ['VIP', 'Regular', 'New', 'Follow-up'], []);
 
   const {
     handleSubmit,
     control,
     reset,
+    setValue,
     formState: { errors },
-  } = useForm<CustomerFormValues>({
+  } = useForm<Partial<PatientType>>({
     resolver: yupResolver(schema),
     defaultValues,
   });
 
+  // Fetch patient for edit mode
   useEffect(() => {
-    if (isEditMode) {
-      const fetchData = async () => {
-        try {
-          const response = await getCustomerEnquiriesById(params.id!);
-          const data = response.data;
-          if (Array.isArray(data) && data.length > 0) {
-            const enquiries: CustomerEnquiriesType = data[0];
-            setDefaultValues(enquiries as CustomerFormValues);
-            reset(enquiries as CustomerFormValues);
-          } else {
-            console.error('Customer not found or invalid data format');
+    if (isEditMode && params?.id) {
+      setLoading(true);
+      getPatientById(params.id)
+        .then((response) => {
+          console.log(response);
+          const patient: PatientType = response; // directly use data as object
+
+          if (patient) {
+            console.log(patient);
+
+            // Map API response properly for form
+            const mappedPatient: Partial<PatientType> = {
+              ...patient,
+              number: patient.number || (patient.phones?.[0] ?? ''),
+              street: patient.street || '',
+              middlename: patient.middlename || '',
+              note: patient.note || '',
+              emails: patient.emails || '',
+            };
+
+            setDefaultValues(mappedPatient);
+            reset(mappedPatient);
           }
-        } catch (error) {
-          console.error('Failed to fetch customer:', error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchData();
+        })
+        .catch((error) => console.error('Failed to fetch patient:', error))
+        .finally(() => setLoading(false));
     }
-  }, [isEditMode, params.id, reset]);
+  }, [isEditMode, params?.id, reset]);
 
-  const onSubmit = async (data: CustomerFormValues) => {
-    if (onSubmitHandler) {
-      onSubmitHandler(data as CustomerEnquiriesType);
-      return;
-    }
-
-    if (isEditMode) {
-      console.log('Edit Submitted Data:', data);
-      // TODO: Update API call here
+  const onSubmit = async (data: Partial<PatientType>) => {
+    if (isEditMode && params?.id) {
+      const success = await updatePatient(params.id, data as any);
+      if (success) {
+        alert('Patient updated successfully');
+        router.back();
+      } else {
+        alert('Failed to update patient');
+      }
     } else {
-      console.log('Create Submitted Data:', data);
-      // TODO: Create API call here
+      const success = await createPatient(data as any);
+      if (success) {
+        alert('Patient created successfully');
+        reset(); // clear the form
+      } else {
+        alert('Failed to create patient');
+      }
     }
   };
 
-  if (loading) {
+  if (loading)
     return (
       <div className="text-center my-5">
         <Spinner animation="border" variant="primary" />
       </div>
     );
-  }
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
-          <CardTitle as="h4">{isEditMode ? 'Edit Customer' : 'Add Customer'}</CardTitle>
+          <CardTitle as="h4">{isEditMode ? 'Edit Patient' : 'Add Patient'}</CardTitle>
         </CardHeader>
         <CardBody>
           <Row>
             <Col lg={6}>
               <TextFormInput
                 control={control}
-                name="name"
-                placeholder="Full Name"
-                label="Customer Name"
+                name="firstname"
+                label="First Name"
+                placeholder="Enter First Name"
               />
             </Col>
             <Col lg={6}>
               <TextFormInput
                 control={control}
-                name="email"
+                name="lastname"
+                label="Last Name"
+                placeholder="Enter Last Name"
+              />
+            </Col>
+            <Col lg={6}>
+              <TextFormInput
+                control={control}
+                name="middlename"
+                label="Middle Name"
+                placeholder="Enter Middle Name"
+              />
+            </Col>
+            <Col lg={6}>
+              <TextFormInput
+                control={control}
+                name="emails"
+                label="Email"
                 placeholder="Enter Email"
-                label="Customer Email"
               />
             </Col>
             <Col lg={6}>
               <TextFormInput
                 control={control}
                 name="number"
+                label="Phone Number"
+                placeholder="Enter Phone Number"
                 type="number"
-                placeholder="Enter Number"
-                label="Customer Number"
               />
             </Col>
             <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="dob"
-                type="date"
-                placeholder=""
-                label="Date of Birth"
-              />
+              <TextFormInput control={control} name="birthdate" label="Date of Birth" type="date" />
             </Col>
 
             <Col lg={6}>
               <label className="form-label">Gender</label>
               <Controller
                 control={control}
-                name="gender"
+                name="legalgender"
                 render={({ field }) => (
                   <ChoicesFormInput className="form-control" {...field}>
                     <option value="" disabled hidden>
@@ -202,18 +221,20 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.gender && <small className="text-danger">{errors.gender.message}</small>}
+              {errors.legalgender && (
+                <small className="text-danger">{errors.legalgender.message}</small>
+              )}
             </Col>
 
             <Col lg={6}>
-              <label className="form-label">Preferred Language</label>
+              <label className="form-label">Language</label>
               <Controller
                 control={control}
                 name="language"
                 render={({ field }) => (
                   <ChoicesFormInput className="form-control" {...field}>
                     <option value="" disabled hidden>
-                      Select Preferred Language
+                      Select Language
                     </option>
                     {allLanguages.map((lang) => (
                       <option key={lang.key} value={lang.key}>
@@ -227,79 +248,34 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
             </Col>
 
             <Col lg={6}>
-              <label className="form-label">Tags</label>
-              <Controller
-                control={control}
-                name="tags"
-                render={({ field }) => (
-                  <ChoicesFormInput
-                    className="form-control"
-                    multiple
-                    options={{ removeItemButton: true }}
-                    {...field}
-                  >
-                    <option value="Blog">Blog</option>
-                    <option value="Business">Business</option>
-                    <option value="Health">Health</option>
-                    <option value="Computer Software">Computer Software</option>
-                    <option value="Lifestyle blogs">Lifestyle blogs</option>
-                    <option value="Fashion">Fashion</option>
-                  </ChoicesFormInput>
-                )}
-              />
-              {errors.tags && <small className="text-danger">{errors.tags.message}</small>}
-            </Col>
-
-            <Col lg={6}>
-              <label className="form-label">Branch</label>
-              <Controller
-                control={control}
-                name="branch"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select Branch
-                    </option>
-                    {allBranches.map((branch) => (
-                      <option key={branch._id} value={branch._id}>
-                        {branch.name}
-                      </option>
-                    ))}
-                  </ChoicesFormInput>
-                )}
-              />
-              {errors.branch && <small className="text-danger">{errors.branch.message}</small>}
-            </Col>
-
-            <Col lg={6}>
               <TextAreaFormInput
                 control={control}
-                name="address"
-                label="Customer Address"
+                name="street"
+                label="Address"
+                placeholder="Enter Address"
                 rows={3}
-                placeholder="Enter address"
               />
             </Col>
-
             <Col lg={6}>
               <TextAreaFormInput
                 control={control}
-                name="description"
+                name="note"
                 label="Description"
+                placeholder="Enter Description"
                 rows={3}
-                placeholder="Any Description"
               />
             </Col>
 
             <Col lg={4}>
               <TextFormInput
                 control={control}
-                name="zip_code"
-                type="number"
-                placeholder="Zip-Code"
+                name="zipcode"
                 label="Zip-Code"
+                placeholder="Enter Zip-Code"
+                type="number"
               />
             </Col>
+
             <Col lg={4}>
               <label className="form-label">City</label>
               <Controller
@@ -308,7 +284,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                 render={({ field }) => (
                   <ChoicesFormInput className="form-control" {...field}>
                     <option value="" disabled hidden>
-                      Choose a city
+                      Select City
                     </option>
                     <option value="London">London</option>
                     <option value="Paris">Paris</option>
@@ -318,6 +294,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
               />
               {errors.city && <small className="text-danger">{errors.city.message}</small>}
             </Col>
+
             <Col lg={4}>
               <label className="form-label">Country</label>
               <Controller
@@ -326,7 +303,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                 render={({ field }) => (
                   <ChoicesFormInput className="form-control" {...field}>
                     <option value="" disabled hidden>
-                      Choose a country
+                      Select Country
                     </option>
                     <option value="UK">United Kingdom</option>
                     <option value="FR">France</option>
@@ -336,14 +313,53 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
               />
               {errors.country && <small className="text-danger">{errors.country.message}</small>}
             </Col>
+
+            <Col lg={6}>
+              <TextFormInput control={control} name="ssin" label="SSIN" placeholder="Enter SSIN" />
+            </Col>
+
+            <Col lg={6}>
+              <label className="form-label">Status</label>
+              <Controller
+                control={control}
+                name="status"
+                render={({ field }) => (
+                  <ChoicesFormInput className="form-control" {...field}>
+                    <option value="" disabled hidden>
+                      Select Status
+                    </option>
+                    <option value="ACTIVE">Active</option>
+                    <option value="INACTIVE">Inactive</option>
+                  </ChoicesFormInput>
+                )}
+              />
+            </Col>
+
+            <Col lg={6}>
+              <TextFormInput
+                control={control}
+                name="mutualitynumber"
+                label="Mutuality Number"
+                placeholder="Enter Mutuality Number"
+              />
+            </Col>
+            <Col lg={6}>
+              <TextFormInput
+                control={control}
+                name="mutualityregistrationnumber"
+                label="Mutuality Registration Number"
+                placeholder="Enter Mutuality Registration Number"
+              />
+            </Col>
           </Row>
         </CardBody>
       </Card>
+
       <div className="mb-3 rounded">
         <Row className="justify-content-end g-2 mt-2">
           <Col lg={2}>
             <Button variant="outline-primary" type="submit" className="w-100">
-              {isEditMode ? 'Update' : 'Create'} Customer
+              {isEditMode ? 'Update' : 'Create'} Patient
             </Button>
           </Col>
           <Col lg={2}>
@@ -357,4 +373,4 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
   );
 };
 
-export default AddCustomer;
+export default AddPatient;

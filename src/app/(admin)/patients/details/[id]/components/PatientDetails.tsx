@@ -8,26 +8,31 @@ import type { PatientType } from '@/types/data';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const PatientDetails = () => {
-  const [patient, setPatient] = useState<PatientType | null>(null);
-  const router = useRouter();
+type Props = {
+  data: PatientType;
+};
 
-  useEffect(() => {
-    const data = sessionStorage.getItem('selectedPatient');
-    if (data) {
-      // Backend wraps data inside "data" field
-      const parsed = JSON.parse(data);
-      setPatient(parsed.data || parsed); // fallback if not wrapped
-    } else {
-      router.push('/patients/patient-list');
-    }
-  }, []);
+const PatientDetails = ({ data }: Props) => {
+  // const [patient, setPatient] = useState<PatientType | null>(null);
+  const router = useRouter();
+  console.log(data);
+
+  // useEffect(() => {
+  //   const data = sessionStorage.getItem('selectedPatient');
+  //   if (data) {
+  //     // Backend wraps data inside "data" field
+  //     const parsed = JSON.parse(data);
+  //     setPatient(parsed.data || parsed); // fallback if not wrapped
+  //   } else {
+  //     router.push('/patients/patient-list');
+  //   }
+  // }, []);
 
   const handleEditClick = (id: string) => {
-    router.push(`/patients/edit-enquiry/${id}`);
+    router.push(`/patients/edit-patient/${id}`);
   };
 
-  if (!patient) return null;
+  if (!data) return null;
 
   return (
     <Card>
@@ -42,10 +47,10 @@ const PatientDetails = () => {
             />
             <div>
               <h3 className="fw-semibold mb-1">
-                {patient.firstname} {patient.lastname}
+                {data.firstname} {data.lastname}
               </h3>
               <p className="link-primary fw-medium fs-14">
-                {patient.birthdate} {patient.legalgender ? `| ${patient.legalgender}` : ''}
+                {data.birthdate} {data.legalgender ? `| ${data.legalgender}` : ''}
               </p>
             </div>
           </div>
@@ -54,7 +59,7 @@ const PatientDetails = () => {
             <Button
               variant="dark"
               className="avatar-sm d-flex align-items-center justify-content-center fs-20"
-              onClick={() => handleEditClick(patient?.id)}
+              onClick={() => handleEditClick(data?.id)}
             >
               <span>
                 {' '}
@@ -67,24 +72,24 @@ const PatientDetails = () => {
         <Row className="my-4">
           <Col lg={4}>
             <p className="text-dark fw-semibold fs-16 mb-1">Email Address :</p>
-            <p className="mb-0">{patient.emails || '-'}</p>
+            <p className="mb-0">{data.emails || '-'}</p>
           </Col>
           <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
             <p className="mb-0">
-              {Array.isArray(patient.phones) ? patient.phones.join(', ') : patient.phones || '-'}
+              {Array.isArray(data.phones) ? data.phones.join(', ') : data.phones || '-'}
             </p>
           </Col>
           <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">City :</p>
-            <p className="mb-0">{patient.city || '-'}</p>
+            <p className="mb-0">{data.city || '-'}</p>
           </Col>
           <Col lg={2}>
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
             <span
-              className={`badge bg-${patient.status === 'ACTIVE' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}
+              className={`badge bg-${data.status === 'ACTIVE' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}
             >
-              {patient.status || '-'}
+              {data.status || '-'}
             </span>
           </Col>
         </Row>
@@ -93,7 +98,7 @@ const PatientDetails = () => {
           <Col lg={9}>
             <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
             <p className="mb-0">
-              {[patient.street, patient.city, patient.country].filter(Boolean).join(' ') || '-'}
+              {[data.street, data.city, data.country].filter(Boolean).join(' ') || '-'}
             </p>
           </Col>
           <Col lg={3}>
@@ -105,7 +110,7 @@ const PatientDetails = () => {
         <Row className="my-4">
           <Col lg={12}>
             <p className="text-dark fw-semibold fs-16 mb-1">Description :</p>
-            <p className="mb-0">{patient.note || '-'}</p>
+            <p className="mb-0">{data.note || '-'}</p>
           </Col>
         </Row>
       </CardBody>
