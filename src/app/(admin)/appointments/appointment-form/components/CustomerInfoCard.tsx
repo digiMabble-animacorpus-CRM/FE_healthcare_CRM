@@ -28,6 +28,9 @@ const emptyCustomer: CustomerEnquiriesType = {
   status: "new",
   lastUpdated: "",
   source: "",
+  appointmentDetails: undefined,
+  familyDetails: undefined,
+  modeOfRegister: ""
 };
 
 const CustomerInfoCard = ({ customerInfo = emptyCustomer, onSave }: Props) => {
