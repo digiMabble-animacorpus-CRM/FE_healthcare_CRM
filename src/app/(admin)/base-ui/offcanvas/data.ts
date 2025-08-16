@@ -1,15 +1,15 @@
 export type BackdropOption = {
-  name: string
-  scroll: boolean
-  backdrop: boolean
-  variant: string
-}
+  name: string;
+  scroll: boolean;
+  backdrop: boolean;
+  variant: string;
+};
 
 export type PlacementOption = {
-  name: string
-  placement?: 'start' | 'end' | 'top' | 'bottom'
-  variant: string
-}
+  name: string;
+  placement?: 'start' | 'end' | 'top' | 'bottom';
+  variant: string;
+};
 
 export const backdropOptions: BackdropOption[] = [
   {
@@ -30,7 +30,7 @@ export const backdropOptions: BackdropOption[] = [
     backdrop: true,
     variant: 'success',
   },
-]
+];
 
 export const placementOptions: PlacementOption[] = [
   {
@@ -53,4 +53,4 @@ export const placementOptions: PlacementOption[] = [
     placement: 'bottom',
     variant: 'info',
   },
-]
+];

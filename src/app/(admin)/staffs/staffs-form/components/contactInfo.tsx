@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo } from "react";
-import { Controller, useFormContext } from "react-hook-form";
-import { Col, Row } from "react-bootstrap";
-import TextFormInput from "@/components/from/TextFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import type { LanguageType, StaffType } from "@/types/data";
-import { getAllLanguages } from "@/helpers/languages";
+import { useEffect, useMemo } from 'react';
+import { Controller, useFormContext } from 'react-hook-form';
+import { Col, Row } from 'react-bootstrap';
+import TextFormInput from '@/components/from/TextFormInput';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import type { LanguageType, StaffType } from '@/types/data';
+import { getAllLanguages } from '@/helpers/languages';
 
 const ContactInfo = () => {
   const {
@@ -87,9 +87,12 @@ const ContactInfo = () => {
               control={control}
               name="address.country"
               render={({ field }) => (
-                <ChoicesFormInput className="form-control" {...field}
+                <ChoicesFormInput
+                  className="form-control"
+                  {...field}
                   value={field.value}
-                  onChange={(val) => field.onChange(val)} >
+                  onChange={(val) => field.onChange(val)}
+                >
                   <option value="" disabled hidden>
                     Select country
                   </option>
@@ -101,7 +104,7 @@ const ContactInfo = () => {
             />
             {errors.address?.country && (
               <small className="text-danger">
-                {(errors.address.country as any)?.message || "Country is required"}
+                {(errors.address.country as any)?.message || 'Country is required'}
               </small>
             )}
           </div>
@@ -136,7 +139,7 @@ const ContactInfo = () => {
             />
             {errors.languages && (
               <small className="text-danger">
-                {(errors.languages as any)?.message || "At least one language is required"}
+                {(errors.languages as any)?.message || 'At least one language is required'}
               </small>
             )}
           </div>

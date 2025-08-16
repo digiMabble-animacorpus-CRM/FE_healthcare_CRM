@@ -1,13 +1,13 @@
-import PageTitle from '@/components/PageTitle'
-import { Row } from 'react-bootstrap'
-import BalanceCard from './components/BalanceCard'
-import SalesChart from './components/SalesChart'
-import SocialSource from './components/SocialSource'
-import Statistics from './components/Statistics'
-import Transaction from './components/Transaction'
-import { Metadata } from 'next'
+import PageTitle from '@/components/PageTitle';
+import { Row } from 'react-bootstrap';
+import BalanceCard from './components/BalanceCard';
+import SalesChart from './components/SalesChart';
+import SocialSource from './components/SocialSource';
+import Statistics from './components/Statistics';
+import Transaction from './components/Transaction';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Analytics' }
+export const metadata: Metadata = { title: 'Analytics' };
 
 const AnalyticsPage = () => {
   return (
@@ -21,7 +21,7 @@ const AnalyticsPage = () => {
       <SocialSource />
       <Transaction />
     </>
-  )
-}
+  );
+};
 
-export default AnalyticsPage
+export default AnalyticsPage;

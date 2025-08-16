@@ -1,7 +1,7 @@
-import type { NextAuthOptions } from 'next-auth'
-import CredentialsProvider from 'next-auth/providers/credentials'
-import { randomBytes } from 'crypto'
-import { UserType } from '@/types/auth'
+import type { NextAuthOptions } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
+import { randomBytes } from 'crypto';
+import { UserType } from '@/types/auth';
 
 export const fakeUsers: UserType[] = [
   {
@@ -15,7 +15,7 @@ export const fakeUsers: UserType[] = [
     token:
       'eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJ0ZWNoemFhIiwiYXVkIjoiaHR0cHM6Ly90ZWNoemFhLmdldGFwcHVpLmNvbS8iLCJzdWIiOiJzdXBwb3J0QGNvZGVydGhlbWVzLmNvbSIsImxhc3ROYW1lIjoiVGVjaHphYSIsIkVtYWlsIjoidGVjaHphYXN0dWRpb0BnbWFpbC5jb20iLCJSb2xlIjoiQWRtaW4iLCJmaXJzdE5hbWUiOiJUZXN0VG9rZW4ifQ.ud4LnFZ-mqhHEYiPf2wCLM7KvLGoAxhXTBSymRIZEFLleFkO119AXd8p3OfPCpdUWSyeZl8-pZyElANc_KHj5w',
   },
-]
+];
 
 export const options: NextAuthOptions = {
   providers: [
@@ -34,12 +34,12 @@ export const options: NextAuthOptions = {
       },
       async authorize(credentials, req) {
         const filteredUser = fakeUsers.find((user) => {
-          return user.email === credentials?.email && user.password === credentials?.password
-        })
+          return user.email === credentials?.email && user.password === credentials?.password;
+        });
         if (filteredUser) {
-          return filteredUser
+          return filteredUser;
         } else {
-          throw new Error('Email or Password is not valid')
+          throw new Error('Email or Password is not valid');
         }
       },
     }),
@@ -50,20 +50,20 @@ export const options: NextAuthOptions = {
   },
   callbacks: {
     async signIn({ user, account, profile, email, credentials }) {
-      return true
+      return true;
     },
     session: ({ session, token }) => {
       session.user = {
         email: 'user@demo.com',
         name: 'Test User',
-      }
-      return Promise.resolve(session)
+      };
+      return Promise.resolve(session);
     },
   },
   session: {
     maxAge: 24 * 60 * 60 * 1000,
     generateSessionToken: () => {
-      return randomBytes(32).toString('hex')
+      return randomBytes(32).toString('hex');
     },
   },
-}
+};

@@ -1,7 +1,7 @@
-import propertiesImg from '@/assets/images/properties/p-12.jpg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
+import propertiesImg from '@/assets/images/properties/p-12.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 
 const AgentsDetailsBanner = () => {
   return (
@@ -13,7 +13,12 @@ const AgentsDetailsBanner = () => {
             <div className="w-25">
               <form className="app-search d-none d-md-block">
                 <div className="position-relative">
-                  <input type="search" className="form-control" placeholder="Search" autoComplete="off" />
+                  <input
+                    type="search"
+                    className="form-control"
+                    placeholder="Search"
+                    autoComplete="off"
+                  />
                   <IconifyIcon icon="solar:magnifer-broken" className="search-widget-icon" />
                 </div>
               </form>
@@ -23,7 +28,11 @@ const AgentsDetailsBanner = () => {
             <Row>
               <Col lg={12}>
                 <div className="position-relative">
-                  <Image src={propertiesImg} alt="properties" className="img-fluid rounded border border-light border-4" />
+                  <Image
+                    src={propertiesImg}
+                    alt="properties"
+                    className="img-fluid rounded border border-light border-4"
+                  />
                 </div>
               </Col>
             </Row>
@@ -31,7 +40,7 @@ const AgentsDetailsBanner = () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default AgentsDetailsBanner
+export default AgentsDetailsBanner;

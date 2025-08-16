@@ -1,12 +1,12 @@
-import Link from 'next/link'
+import Link from 'next/link';
 
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getJoinedGroups } from '@/helpers/data'
-import { useFetchData } from '@/hooks/useFetchData'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { getJoinedGroups } from '@/helpers/data';
+import { useFetchData } from '@/hooks/useFetchData';
 
 const Group = () => {
-  const groupData = useFetchData(getJoinedGroups)
+  const groupData = useFetchData(getJoinedGroups);
 
   return (
     <SimplebarReactClient className="px-2 mb-3 chat-setting-height">
@@ -27,12 +27,17 @@ const Group = () => {
         </Link>
       </div>
       {groupData?.map((group, idx) => (
-        <div className={`d-flex flex-column h-100 ${groupData.length - 1 != idx && 'border-bottom'}`} key={idx}>
+        <div
+          className={`d-flex flex-column h-100 ${groupData.length - 1 != idx && 'border-bottom'}`}
+          key={idx}
+        >
           <Link href="" className="d-block">
             <div className="d-flex align-items-center p-2 mb-1 rounded">
               <div className="position-relative">
                 <div className="avatar flex-shrink-0">
-                  <span className={`avatar-title bg-${group.variant}-subtle text-${group.variant} fw-medium fs-4 rounded-circle`}>
+                  <span
+                    className={`avatar-title bg-${group.variant}-subtle text-${group.variant} fw-medium fs-4 rounded-circle`}
+                  >
                     {group.groupName.slice(0, 1)}
                   </span>
                 </div>
@@ -44,7 +49,9 @@ const Group = () => {
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <h5 className="mb-0">{group.groupName}</h5>
                   <div>
-                    <p className="text-muted fs-13 mb-0">{group.time.toLocaleString('en-us', { hour: '2-digit', minute: 'numeric' })}</p>
+                    <p className="text-muted fs-13 mb-0">
+                      {group.time.toLocaleString('en-us', { hour: '2-digit', minute: 'numeric' })}
+                    </p>
                   </div>
                 </div>
                 <div className="d-flex justify-content-between align-items-center">
@@ -64,7 +71,7 @@ const Group = () => {
         </div>
       ))}
     </SimplebarReactClient>
-  )
-}
+  );
+};
 
-export default Group
+export default Group;

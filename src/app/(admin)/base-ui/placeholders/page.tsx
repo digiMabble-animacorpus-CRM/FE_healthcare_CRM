@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
-import AllPlaceholders from './components/AllPlaceholders'
-import UIExamplesList from '@/components/UIExamplesList'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import type { Metadata } from 'next';
+import AllPlaceholders from './components/AllPlaceholders';
+import UIExamplesList from '@/components/UIExamplesList';
+import { Col, Row } from 'react-bootstrap';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Placeholder' }
+export const metadata: Metadata = { title: 'Placeholder' };
 
 const PLaceholders = () => {
   return (
@@ -26,7 +26,7 @@ const PLaceholders = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default PLaceholders
+export default PLaceholders;

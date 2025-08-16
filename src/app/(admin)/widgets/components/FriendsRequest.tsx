@@ -1,13 +1,22 @@
-import { Card, CardBody, CardHeader, CardTitle, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap'
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+} from 'react-bootstrap';
 
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getAllFriends } from '@/helpers/data'
-import Image from 'next/image'
-import Link from 'next/link'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { getAllFriends } from '@/helpers/data';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const FriendsRequest = async () => {
-  const friends = await getAllFriends()
+  const friends = await getAllFriends();
 
   return (
     <Card>
@@ -18,9 +27,16 @@ const FriendsRequest = async () => {
         <SimplebarReactClient className="p-3" style={{ maxHeight: 400 }}>
           {friends &&
             friends.map((friend, idx) => (
-              <div className={`d-flex align-items-center ${friends.length - 1 === idx ? '' : 'mb-3'}`} key={idx}>
+              <div
+                className={`d-flex align-items-center ${friends.length - 1 === idx ? '' : 'mb-3'}`}
+                key={idx}
+              >
                 <div className="flex-shrink-0">
-                  <Image src={friend.avatar} className="img-fluid avatar-sm rounded me-2" alt="avatar-5" />
+                  <Image
+                    src={friend.avatar}
+                    className="img-fluid avatar-sm rounded me-2"
+                    alt="avatar-5"
+                  />
                 </div>
                 <div className="flex-grow-1">
                   <h5 className="mb-1 fs-14">
@@ -56,7 +72,7 @@ const FriendsRequest = async () => {
         </SimplebarReactClient>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default FriendsRequest
+export default FriendsRequest;

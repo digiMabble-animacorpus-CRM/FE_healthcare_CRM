@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllTreemapCharts from './components/AllTreemapCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllTreemapCharts from './components/AllTreemapCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Treemap Charts' }
+export const metadata: Metadata = { title: 'Treemap Charts' };
 
 const TreemapCharts = () => {
   return (
@@ -26,7 +26,7 @@ const TreemapCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default TreemapCharts
+export default TreemapCharts;

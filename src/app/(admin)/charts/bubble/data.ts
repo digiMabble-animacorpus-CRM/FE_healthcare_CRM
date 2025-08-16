@@ -1,32 +1,32 @@
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 function generateData(baseval: number, count: number, yrange: any): number[] {
-  let i = 0
-  const series: any = []
+  let i = 0;
+  const series: any = [];
   while (i < count) {
-    const x = Math.floor(Math.random() * (750 - 1 + 1)) + 1
-    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
-    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15
+    const x = Math.floor(Math.random() * (750 - 1 + 1)) + 1;
+    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
+    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15;
 
-    series.push([x, y, z])
-    baseval += 86400000
-    i++
+    series.push([x, y, z]);
+    baseval += 86400000;
+    i++;
   }
-  return series
+  return series;
 }
 
 function generateData1(baseval1: number, count: number, yrange: any): number[] {
-  let i = 0
-  const series: any = []
+  let i = 0;
+  const series: any = [];
   while (i < count) {
     //let x =Math.floor(Math.random() * (750 - 1 + 1)) + 1;;
-    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
-    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15
+    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
+    const z = Math.floor(Math.random() * (75 - 15 + 1)) + 15;
 
-    series.push([baseval1, y, z])
-    baseval1 += 86400000
-    i++
+    series.push([baseval1, y, z]);
+    baseval1 += 86400000;
+    i++;
   }
-  return series
+  return series;
 }
 
 export const simpleChartOpts: ApexOptions = {
@@ -86,7 +86,7 @@ export const simpleChartOpts: ApexOptions = {
   legend: {
     offsetY: 7,
   },
-}
+};
 
 export const bubbleChart3DOpts: ApexOptions = {
   chart: {
@@ -153,4 +153,4 @@ export const bubbleChart3DOpts: ApexOptions = {
       bottom: 5,
     },
   },
-}
+};

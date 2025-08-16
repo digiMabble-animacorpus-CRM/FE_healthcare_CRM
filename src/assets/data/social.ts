@@ -1,13 +1,13 @@
-import avatar10 from '@/assets/images/users/avatar-10.jpg'
-import { ChatMessageType, EmailType, GroupType, UserType } from '@/types/data'
-import { addOrSubtractDaysFromDate, addOrSubtractMinutesFromDate } from '@/utils/date'
-import { userData } from './other'
+import avatar10 from '@/assets/images/users/avatar-10.jpg';
+import { ChatMessageType, EmailType, GroupType, UserType } from '@/types/data';
+import { addOrSubtractDaysFromDate, addOrSubtractMinutesFromDate } from '@/utils/date';
+import { userData } from './other';
 
-import small1 from '@/assets/images/small/img-4.jpg'
-import small2 from '@/assets/images/small/img-6.jpg'
-import small3 from '@/assets/images/small/img-7.jpg'
+import small1 from '@/assets/images/small/img-4.jpg';
+import small2 from '@/assets/images/small/img-6.jpg';
+import small3 from '@/assets/images/small/img-7.jpg';
 
-export const messages: ChatMessageType[] = []
+export const messages: ChatMessageType[] = [];
 
 export const socialGroupsData: GroupType[] = [
   {
@@ -93,7 +93,7 @@ export const socialGroupsData: GroupType[] = [
   //   time: addOrSubtractDaysFromDate(50),
   //   change: 1
   // },
-]
+];
 
 const defaultTo: UserType = {
   id: '112',
@@ -107,7 +107,7 @@ const defaultTo: UserType = {
   location: 'Brussels, Belgium',
   languages: ['English', 'Dutch', 'French'],
   activityStatus: 'online',
-}
+};
 
 for (const user of userData) {
   messages.push(
@@ -187,7 +187,7 @@ for (const user of userData) {
       },
       sentOn: addOrSubtractMinutesFromDate(10),
     },
-  )
+  );
 }
 
 export const emailsData: EmailType[] = [
@@ -267,7 +267,12 @@ export const emailsData: EmailType[] = [
     fromId: '107',
     toId: '101',
     label: 'Primary',
-    attachments: [{ name: 'doc1.doc' }, { name: 'doc2.doc' }, { name: 'doc3.doc' }, { name: 'doc4.doc' }],
+    attachments: [
+      { name: 'doc1.doc' },
+      { name: 'doc2.doc' },
+      { name: 'doc3.doc' },
+      { name: 'doc4.doc' },
+    ],
     createdAt: new Date('Feb 27'),
     read: true,
     starred: false,
@@ -331,7 +336,8 @@ export const emailsData: EmailType[] = [
     fromId: '112',
     toId: '101',
     subject: '1 new items in your Stackexchange inbox',
-    content: 'The following items were added to your Stack Exchange global inbox since you last checked it.',
+    content:
+      'The following items were added to your Stack Exchange global inbox since you last checked it.',
     label: 'Primary',
     createdAt: new Date('Feb 21'),
     read: true,
@@ -428,7 +434,12 @@ export const emailsData: EmailType[] = [
     fromId: '107',
     toId: '101',
     label: 'Promotions',
-    attachments: [{ name: 'doc1.doc' }, { name: 'doc2.doc' }, { name: 'doc3.doc' }, { name: 'doc4.doc' }],
+    attachments: [
+      { name: 'doc1.doc' },
+      { name: 'doc2.doc' },
+      { name: 'doc3.doc' },
+      { name: 'doc4.doc' },
+    ],
     createdAt: new Date('Feb 27'),
     read: false,
     starred: false,
@@ -492,7 +503,8 @@ export const emailsData: EmailType[] = [
     fromId: '112',
     toId: '101',
     subject: '1 new items in your Stackexchange inbox',
-    content: 'The following items were added to your Stack Exchange global inbox since you last checked it.',
+    content:
+      'The following items were added to your Stack Exchange global inbox since you last checked it.',
     label: 'Social',
     createdAt: new Date('Feb 21'),
     read: true,
@@ -518,7 +530,8 @@ export const emailsData: EmailType[] = [
     fromId: '103',
     toId: '101',
     subject: 'Hello',
-    content: 'Trip home from Colombo has been arranged, then Jenna will come get me from Stockholm. :)',
+    content:
+      'Trip home from Colombo has been arranged, then Jenna will come get me from Stockholm. :)',
     label: 'Updates',
     createdAt: new Date('Mar 6'),
     read: true,
@@ -636,4 +649,4 @@ export const emailsData: EmailType[] = [
     important: true,
     deleted: true,
   },
-]
+];

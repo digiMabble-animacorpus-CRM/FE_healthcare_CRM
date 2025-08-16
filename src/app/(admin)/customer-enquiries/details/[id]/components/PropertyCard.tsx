@@ -1,11 +1,11 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { PropertyType } from '@/types/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, Col, Row } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { PropertyType } from '@/types/data';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
 const PropertyCard = ({ property }: { property: PropertyType }) => {
-  const { bath, beds, size, image, name, location, save, icon, flor } = property
+  const { bath, beds, size, image, name, location, save, icon, flor } = property;
 
   return (
     <Card className="overflow-hidden">
@@ -15,7 +15,8 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
           {save ? (
             <button
               type="button"
-              className="btn btn-warning avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-light ">
+              className="btn btn-warning avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-light "
+            >
               {' '}
               <span>
                 {' '}
@@ -25,7 +26,8 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
           ) : (
             <button
               type="button"
-              className="btn bg-warning-subtle avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-warning">
+              className="btn bg-warning-subtle avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-warning"
+            >
               <span>
                 <IconifyIcon icon="solar:bookmark-broken" />
               </span>
@@ -81,7 +83,7 @@ const PropertyCard = ({ property }: { property: PropertyType }) => {
         </Row>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default PropertyCard
+export default PropertyCard;

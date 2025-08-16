@@ -1,6 +1,6 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllTransaction } from '@/helpers/data'
-import Link from 'next/link'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getAllTransaction } from '@/helpers/data';
+import Link from 'next/link';
 import {
   Button,
   Card,
@@ -14,10 +14,10 @@ import {
   DropdownMenu,
   DropdownToggle,
   Row,
-} from 'react-bootstrap'
+} from 'react-bootstrap';
 
 const TransactionHistory = async () => {
-  const transactionData = await getAllTransaction()
+  const transactionData = await getAllTransaction();
   return (
     <Row>
       <Col xl={12}>
@@ -31,8 +31,10 @@ const TransactionHistory = async () => {
                 as={'a'}
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
-                aria-expanded="false">
-                This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+                aria-expanded="false"
+              >
+                This Month{' '}
+                <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem>Download</DropdownItem>
@@ -74,7 +76,13 @@ const TransactionHistory = async () => {
                         </div>
                       </td>
                       <td>{item.orderId}</td>
-                      <td>{item.purchaseDate.toLocaleString('en-us', { day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+                      <td>
+                        {item.purchaseDate.toLocaleString('en-us', {
+                          day: '2-digit',
+                          month: '2-digit',
+                          year: 'numeric',
+                        })}
+                      </td>
                       <td>{item.property?.propertyType}</td>
                       <td>{item.property?.location}</td>
                       <td>€{item.amount}</td>
@@ -91,7 +99,10 @@ const TransactionHistory = async () => {
                             <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
                           </Button>
                           <Button variant="soft-danger" size="sm">
-                            <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                            <IconifyIcon
+                              icon="solar:trash-bin-minimalistic-2-broken"
+                              className="align-middle fs-18"
+                            />
                           </Button>
                         </div>
                       </td>
@@ -135,7 +146,7 @@ const TransactionHistory = async () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default TransactionHistory
+export default TransactionHistory;

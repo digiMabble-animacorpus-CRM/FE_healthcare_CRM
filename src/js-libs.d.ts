@@ -1,2 +1,2 @@
-declare module 'gumshoejs'
-declare module 'google-maps-react'
+declare module 'gumshoejs';
+declare module 'google-maps-react';

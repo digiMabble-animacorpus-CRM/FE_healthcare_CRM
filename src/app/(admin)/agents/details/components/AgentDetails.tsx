@@ -1,17 +1,26 @@
-'use client'
-import properties1 from '@/assets/images/properties/p-1.jpg'
-import properties2 from '@/assets/images/properties/p-2.jpg'
-import properties3 from '@/assets/images/properties/p-3.jpg'
-import properties4 from '@/assets/images/properties/p-4.jpg'
-import properties5 from '@/assets/images/properties/p-5.jpg'
-import trophyImg from '@/assets/images/trophy.png'
-import avatar2 from '@/assets/images/users/avatar-2.jpg'
-import { WorldVectorMap } from '@/components/VectorMap'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, CardHeader, CardTitle, Carousel, CarouselItem, Col, Row } from 'react-bootstrap'
-import AgentDetailsCard from './AgentDetailsCard'
+'use client';
+import properties1 from '@/assets/images/properties/p-1.jpg';
+import properties2 from '@/assets/images/properties/p-2.jpg';
+import properties3 from '@/assets/images/properties/p-3.jpg';
+import properties4 from '@/assets/images/properties/p-4.jpg';
+import properties5 from '@/assets/images/properties/p-5.jpg';
+import trophyImg from '@/assets/images/trophy.png';
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import { WorldVectorMap } from '@/components/VectorMap';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Carousel,
+  CarouselItem,
+  Col,
+  Row,
+} from 'react-bootstrap';
+import AgentDetailsCard from './AgentDetailsCard';
 
 const AgentDetails = () => {
   const salesLocationOptions = {
@@ -41,7 +50,7 @@ const AgentDetails = () => {
         fillOpacity: 1,
       },
     },
-  }
+  };
 
   return (
     <Row className="justify-content-center">
@@ -59,13 +68,20 @@ const AgentDetails = () => {
               </div>
               <div className="ms-auto">
                 <div className="avatar bg-primary-subtle rounded flex-centered">
-                  <IconifyIcon width={28} height={28} icon="solar:cup-star-bold" className="fs-28 text-primary" />
+                  <IconifyIcon
+                    width={28}
+                    height={28}
+                    icon="solar:cup-star-bold"
+                    className="fs-28 text-primary"
+                  />
                 </div>
               </div>
             </div>
             <div className="p-3 position-relative overflow-hidden z-1 rounded bg-primary-subtle border border-primary-subtle mt-4 text-center">
               <Image src={trophyImg} alt="trophyImg" className="mx-auto" height={150} width={150} />
-              <span className="position-absolute top-0 end-0 m-1 badge text-light bg-danger px-2 py-1 fs-12"># 1</span>
+              <span className="position-absolute top-0 end-0 m-1 badge text-light bg-danger px-2 py-1 fs-12">
+                # 1
+              </span>
               <div className="position-absolute top-50 start-50 translate-middle z-n1 opacity-50">
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +89,8 @@ const AgentDetails = () => {
                   xmlnsXlink="http://www.w3.org/1999/xlink"
                   viewBox="0 0 800 800"
                   width={400}
-                  height={400}>
+                  height={400}
+                >
                   <defs>
                     <filter id="bbburst-blur-1" x="-100%" y="-100%" width="400%" height="400%">
                       <feGaussianBlur in="SourceGraphic" stdDeviation={1} />
@@ -1020,7 +1037,8 @@ const AgentDetails = () => {
             </div>
             <div className="mt-4">
               <h5 className="text-dark mb-0">
-                <IconifyIcon icon="ri:coins-fill" className="fs-24 text-primary align-middle" /> 19,343 Collected In This Month
+                <IconifyIcon icon="ri:coins-fill" className="fs-24 text-primary align-middle" />{' '}
+                19,343 Collected In This Month
               </h5>
             </div>
           </CardBody>
@@ -1032,11 +1050,21 @@ const AgentDetails = () => {
           <CardBody>
             <Carousel indicators={false}>
               <CarouselItem className="carousel-item active">
-                <Image src={properties1} height={305} className="d-block w-100 rounded" alt="img-6" />
+                <Image
+                  src={properties1}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-6"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
@@ -1048,11 +1076,21 @@ const AgentDetails = () => {
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties2} height={305} className="d-block w-100 rounded" alt="img-7" />
+                <Image
+                  src={properties2}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-7"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
@@ -1064,11 +1102,21 @@ const AgentDetails = () => {
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties3} height={305} className="d-block w-100 rounded" alt="img-5" />
+                <Image
+                  src={properties3}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-5"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
@@ -1080,11 +1128,21 @@ const AgentDetails = () => {
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties4} height={305} className="d-block w-100 rounded" alt="img-5" />
+                <Image
+                  src={properties4}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-5"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:buildings-3-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:buildings-3-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
@@ -1096,11 +1154,21 @@ const AgentDetails = () => {
                 </div>
               </CarouselItem>
               <CarouselItem className="carousel-item">
-                <Image src={properties5} height={305} className="d-block w-100 rounded" alt="img-5" />
+                <Image
+                  src={properties5}
+                  height={305}
+                  className="d-block w-100 rounded"
+                  alt="img-5"
+                />
                 <div className="carousel-caption d-none d-md-block bg-light rounded p-2 text-start">
                   <div className="d-flex align-items-center gap-2">
                     <div className="avatar bg-primary rounded flex-centered">
-                      <IconifyIcon icon="solar:home-bold-duotone" width={24} height={24} className="fs-24 text-white" />
+                      <IconifyIcon
+                        icon="solar:home-bold-duotone"
+                        width={24}
+                        height={24}
+                        className="fs-24 text-white"
+                      />
                     </div>
                     <div>
                       <Link href="" className="text-dark fw-medium fs-16">
@@ -1151,7 +1219,12 @@ const AgentDetails = () => {
               </div>
               <div>
                 <div className="avatar bg-dark rounded flex-centered">
-                  <IconifyIcon icon="solar:point-on-map-perspective-bold" width={30} height={30} className="fs-30 text-light" />
+                  <IconifyIcon
+                    icon="solar:point-on-map-perspective-bold"
+                    width={30}
+                    height={30}
+                    className="fs-30 text-light"
+                  />
                 </div>
               </div>
             </div>
@@ -1159,7 +1232,7 @@ const AgentDetails = () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default AgentDetails
+export default AgentDetails;

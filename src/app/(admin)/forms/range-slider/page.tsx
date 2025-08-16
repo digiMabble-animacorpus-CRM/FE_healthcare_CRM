@@ -1,10 +1,10 @@
-import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import type { Metadata } from 'next'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllSliders from './components/AllSliders'
-import PageTitle from '@/components/PageTitle'
+import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import type { Metadata } from 'next';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllSliders from './components/AllSliders';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Range Slider' }
+export const metadata: Metadata = { title: 'Range Slider' };
 
 const Slider = () => {
   return (
@@ -19,11 +19,14 @@ const Slider = () => {
                 <a
                   className="btn btn-sm btn-outline-success rounded-2 float-end"
                   href="https://github.com/leongersen/noUiSlider#readme"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </a>
               </CardTitle>
-              <p className="text-muted mb-3">noUiSlider is a lightweight JavaScript range slider.</p>
+              <p className="text-muted mb-3">
+                noUiSlider is a lightweight JavaScript range slider.
+              </p>
             </CardBody>
           </Card>
           <AllSliders />
@@ -44,7 +47,7 @@ const Slider = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Slider
+export default Slider;

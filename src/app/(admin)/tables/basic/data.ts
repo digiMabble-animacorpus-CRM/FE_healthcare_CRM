@@ -1,26 +1,26 @@
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
-import avatar2 from '@/assets/images/users/avatar-2.jpg'
-import avatar4 from '@/assets/images/users/avatar-4.jpg'
-import avatar6 from '@/assets/images/users/avatar-6.jpg'
-import avatar7 from '@/assets/images/users/avatar-7.jpg'
-import type { StaticImageData } from 'next/image'
+import avatar1 from '@/assets/images/users/avatar-1.jpg';
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import avatar4 from '@/assets/images/users/avatar-4.jpg';
+import avatar6 from '@/assets/images/users/avatar-6.jpg';
+import avatar7 from '@/assets/images/users/avatar-7.jpg';
+import type { StaticImageData } from 'next/image';
 
 type BasicTableType = {
-  id: string
-  firstName: string
-  lastName: string
-  handle: string
-}
+  id: string;
+  firstName: string;
+  lastName: string;
+  handle: string;
+};
 
 type ExtendedBasicTableType = {
-  id: string
-  name: string
-  avatar?: StaticImageData
-  title: string
-  email: string
-  role: string
-  verified?: boolean
-}
+  id: string;
+  name: string;
+  avatar?: StaticImageData;
+  title: string;
+  email: string;
+  role: string;
+  verified?: boolean;
+};
 
 export const tableData: BasicTableType[] = [
   {
@@ -41,7 +41,7 @@ export const tableData: BasicTableType[] = [
     lastName: 'Simsons',
     handle: '@twitter',
   },
-]
+];
 
 export const extendedTableData: ExtendedBasicTableType[] = [
   {
@@ -85,4 +85,4 @@ export const extendedTableData: ExtendedBasicTableType[] = [
     email: 'kevincreyes@jourrapide.com',
     role: 'Member',
   },
-]
+];

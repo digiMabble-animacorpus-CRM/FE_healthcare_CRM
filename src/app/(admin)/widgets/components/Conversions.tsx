@@ -1,7 +1,7 @@
-'use client'
-import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import type { ApexOptions } from 'apexcharts'
-import ReactApexChart from 'react-apexcharts'
+'use client';
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import type { ApexOptions } from 'apexcharts';
+import ReactApexChart from 'react-apexcharts';
 
 const Conversions = () => {
   const chartOptions: ApexOptions = {
@@ -24,7 +24,7 @@ const Conversions = () => {
             fontSize: '20px',
             color: undefined,
             formatter: function (val) {
-              return val + '%'
+              return val + '%';
             },
           },
         },
@@ -69,7 +69,7 @@ const Conversions = () => {
         left: 0,
       },
     },
-  }
+  };
 
   const chartOptions2: ApexOptions = {
     series: [
@@ -115,7 +115,20 @@ const Conversions = () => {
       },
     },
     xaxis: {
-      categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+      categories: [
+        'Jan',
+        'Feb',
+        'Mar',
+        'Apr',
+        'May',
+        'Jun',
+        'Jul',
+        'Aug',
+        'Sep',
+        'Oct',
+        'Nov',
+        'Dec',
+      ],
       axisTicks: {
         show: false,
       },
@@ -174,22 +187,22 @@ const Conversions = () => {
         {
           formatter: function (y) {
             if (typeof y !== 'undefined') {
-              return y.toFixed(1) + 'k'
+              return y.toFixed(1) + 'k';
             }
-            return y
+            return y;
           },
         },
         {
           formatter: function (y) {
             if (typeof y !== 'undefined') {
-              return y.toFixed(1) + 'k'
+              return y.toFixed(1) + 'k';
             }
-            return y
+            return y;
           },
         },
       ],
     },
-  }
+  };
 
   return (
     <Card>
@@ -198,7 +211,13 @@ const Conversions = () => {
           <Col lg={4}>
             <div className="p-3 d-flex flex-column justify-content-between h-100">
               <CardTitle as={'h5'}>Conversions</CardTitle>
-              <ReactApexChart options={chartOptions} series={chartOptions.series} height={292} type="radialBar" className="apex-charts mb-2 mt-n2" />
+              <ReactApexChart
+                options={chartOptions}
+                series={chartOptions.series}
+                height={292}
+                type="radialBar"
+                className="apex-charts mb-2 mt-n2"
+              />
               <Row className="text-center">
                 <Col xs={6}>
                   <p className="text-muted mb-2">This Week</p>
@@ -236,17 +255,24 @@ const Conversions = () => {
                 </div>
               </div>
               <div className="alert alert-info mt-3 text text-truncate mb-0" role="alert">
-                We regret to inform you that our server is currently experiencing technical difficulties.
+                We regret to inform you that our server is currently experiencing technical
+                difficulties.
               </div>
               <div dir="ltr">
-                <ReactApexChart options={chartOptions2} series={chartOptions2.series} height={313} type="line" className="apex-charts" />
+                <ReactApexChart
+                  options={chartOptions2}
+                  series={chartOptions2.series}
+                  height={313}
+                  type="line"
+                  className="apex-charts"
+                />
               </div>
             </div>
           </Col>
         </Row>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default Conversions
+export default Conversions;

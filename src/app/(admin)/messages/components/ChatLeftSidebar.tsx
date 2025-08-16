@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState } from 'react';
 
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { useChatContext } from '@/context/useChatContext'
-import type { UserType } from '@/types/data'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { useChatContext } from '@/context/useChatContext';
+import type { UserType } from '@/types/data';
 import {
   Accordion,
   AccordionBody,
@@ -15,37 +15,47 @@ import {
   OffcanvasHeader,
   Tab,
   Tabs,
-} from 'react-bootstrap'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import Chat from './Chat'
-import Contact from './Contact'
-import Group from './Group'
+} from 'react-bootstrap';
+import { Swiper, SwiperSlide } from 'swiper/react';
+import Chat from './Chat';
+import Contact from './Contact';
+import Group from './Group';
 
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
+import avatar1 from '@/assets/images/users/avatar-1.jpg';
 
-import Image from 'next/image'
-import Link from 'next/link'
-import 'swiper/css'
+import Image from 'next/image';
+import Link from 'next/link';
+import 'swiper/css';
 
 type ChatUsersProps = {
-  onUserSelect: (value: UserType) => void
-  users: UserType[]
-  selectedUser: UserType
-}
+  onUserSelect: (value: UserType) => void;
+  users: UserType[];
+  selectedUser: UserType;
+};
 
 const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) => {
-  const { chatSetting } = useChatContext()
-  const [user, setUser] = useState<UserType[]>([...users])
+  const { chatSetting } = useChatContext();
+  const [user, setUser] = useState<UserType[]>([...users]);
 
   const search = (text: string) => {
-    setUser(text ? [...users].filter((u) => u.name!.toLowerCase().indexOf(text.toLowerCase()) >= 0) : [...users])
-  }
+    setUser(
+      text
+        ? [...users].filter((u) => u.name!.toLowerCase().indexOf(text.toLowerCase()) >= 0)
+        : [...users],
+    );
+  };
   return (
     <Card className="position-relative overflow-hidden">
       <CardHeader className="border-0 d-flex justify-content-between align-items-center gap-3">
         <form className="chat-search pb-0">
           <div className="chat-search-box">
-            <input className="form-control" type="text" onKeyUp={(e: any) => search(e.target.value)} name="search" placeholder="Search ..." />
+            <input
+              className="form-control"
+              type="text"
+              onKeyUp={(e: any) => search(e.target.value)}
+              name="search"
+              placeholder="Search ..."
+            />
             <button type="button" className="btn btn-sm btn-link search-icon p-0 fs-15">
               <IconifyIcon icon="ri:search-eye-line" />
             </button>
@@ -58,7 +68,8 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
           type="button"
           data-bs-toggle="offcanvas"
           aria-haspopup="true"
-          aria-expanded="true">
+          aria-expanded="true"
+        >
           <IconifyIcon icon="ri:settings-2-line" />
         </a>
       </CardHeader>
@@ -78,12 +89,17 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
           },
         }}
         autoHeight
-        className="mySwiper mx-3">
+        className="mySwiper mx-3"
+      >
         {users.map((user) => (
           <SwiperSlide className="avatar" key={user.id}>
             <div className="chat-user-status-box">
               <span>
-                <Image src={user.avatar} alt="avatar-1" className=" avatar rounded-circle  flex-shrink-0" />
+                <Image
+                  src={user.avatar}
+                  alt="avatar-1"
+                  className=" avatar rounded-circle  flex-shrink-0"
+                />
               </span>
             </div>
           </SwiperSlide>
@@ -92,7 +108,12 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
       <CardTitle as={'h4'} className="m-3">
         Message <span className="badge bg-danger badge-pill">5</span>
       </CardTitle>
-      <Tabs justify mountOnEnter className="nav nav-pills chat-tab-pills nav-justified p-1 rounded mx-1" defaultActiveKey={'chat-tab'}>
+      <Tabs
+        justify
+        mountOnEnter
+        className="nav nav-pills chat-tab-pills nav-justified p-1 rounded mx-1"
+        defaultActiveKey={'chat-tab'}
+      >
         <Tab title="Chat" eventKey={'chat-tab'}>
           <Chat onUserSelect={onUserSelect} users={user} selectedUser={selectedUser} />
         </Tab>
@@ -112,7 +133,8 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
         data-bs-backdrop="false"
         tabIndex={-1}
         id="user-setting"
-        aria-labelledby="user-settingLabel">
+        aria-labelledby="user-settingLabel"
+      >
         <OffcanvasHeader closeButton>
           <h5 className="offcanvas-title text-truncate w-50" id="user-settingLabel">
             Profile
@@ -121,7 +143,13 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
         <div className="offcanvas-body p-0 h-100" data-simplebar>
           <h4 className="page-title p-3 my-0">Setting</h4>
           <div className="d-flex align-items-center px-3 pb-3 border-bottom">
-            <Image src={avatar1} className="me-2 rounded-circle" height={36} width={36} alt="avatar-1" />
+            <Image
+              src={avatar1}
+              className="me-2 rounded-circle"
+              height={36}
+              width={36}
+              alt="avatar-1"
+            />
             <div className="flex-grow-1">
               <div className="float-end">
                 <span role="button">
@@ -142,7 +170,9 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <IconifyIcon icon="bx:key" className="me-3 fs-32" />
                     <span className="flex-grow-1">
                       <span className="fs-14 h5 mt-0 mb-1 d-block">Account</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Privacy, security, change number</span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Privacy, security, change number
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -195,7 +225,9 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <IconifyIcon icon="bx:message-dots" className="me-3 fs-32" />
                     <span className="flex-grow-1">
                       <span className="fs-14 h5 mt-0 mb-1 d-block">Chats</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Theme, wallpapers, chat history</span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Theme, wallpapers, chat history
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -223,11 +255,18 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <li className="mb-2 ms-2">
                       <div className="float-end">
                         <div className="form-check form-switch">
-                          <input className="form-check-input" type="checkbox" id="media" defaultChecked />
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="media"
+                            defaultChecked
+                          />
                         </div>
                       </div>
                       <Link href="">Media Visibility</Link>
-                      <p className="mb-0 text-muted fs-12">Show Newly downloaded media in your phone&apos;s gallery</p>
+                      <p className="mb-0 text-muted fs-12">
+                        Show Newly downloaded media in your phone&apos;s gallery
+                      </p>
                     </li>
                     <li className="mb-2 ms-2">
                       <div className="float-end">
@@ -285,11 +324,18 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <li className="mb-2">
                       <div className="float-end">
                         <div className="form-check form-switch">
-                          <input className="form-check-input" type="checkbox" id="conversation" defaultChecked />
+                          <input
+                            className="form-check-input"
+                            type="checkbox"
+                            id="conversation"
+                            defaultChecked
+                          />
                         </div>
                       </div>
                       <Link href="">Conversation Tones</Link>
-                      <p className="mb-0 text-muted fs-12">Play sound for incoming and outgoing message.</p>
+                      <p className="mb-0 text-muted fs-12">
+                        Play sound for incoming and outgoing message.
+                      </p>
                     </li>
                   </ul>
                   <hr />
@@ -345,7 +391,9 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <IconifyIcon icon="bx:history" className="me-3 fs-32" />
                     <span className="flex-grow-1">
                       <span className="fs-14 h5 mt-0 mb-1 d-block">Storage and data</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Network usage, auto download</span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Network usage, auto download
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -372,7 +420,9 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                   </ul>
                   <hr />
                   <h5 className="mb-0">Media auto-download</h5>
-                  <p className="mb-0 text-muted fs-12">Voice message are always automatically downloaded</p>
+                  <p className="mb-0 text-muted fs-12">
+                    Voice message are always automatically downloaded
+                  </p>
                   <ul className="list-unstyled mb-0 mt-2">
                     <li className="mb-2">
                       <Link href="">When using mobile data</Link>
@@ -389,7 +439,9 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                   </ul>
                   <hr />
                   <h5 className="mb-0">Media upload quality</h5>
-                  <p className="mb-0 text-muted fs-12">Choose the quality of media files to be sent</p>
+                  <p className="mb-0 text-muted fs-12">
+                    Choose the quality of media files to be sent
+                  </p>
                   <ul className="list-unstyled mb-0 mt-2">
                     <li className="ms-2">
                       <Link href="">Photo upload quality</Link>
@@ -405,7 +457,9 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <IconifyIcon icon="bx:info-circle" className="me-3 fs-32" />
                     <span className="flex-grow-1">
                       <span className="fs-14 h5 mt-0 mb-1 d-block">Help</span>
-                      <span className="mt-1 mb-0 text-muted w-75">Help center, contact us, privacy policy</span>
+                      <span className="mt-1 mb-0 text-muted w-75">
+                        Help center, contact us, privacy policy
+                      </span>
                     </span>
                   </span>
                 </AccordionHeader>
@@ -445,7 +499,7 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
         </div>
       </Offcanvas>
     </Card>
-  )
-}
+  );
+};
 
-export default ChatLeftSidebar
+export default ChatLeftSidebar;

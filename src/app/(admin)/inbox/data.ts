@@ -1,18 +1,18 @@
-import { StaticImageData } from 'next/image'
-import small1 from '@/assets/images/small/img-1.jpg'
-import small2 from '@/assets/images/small/img-2.jpg'
-import small3 from '@/assets/images/small/img-3.jpg'
-import small4 from '@/assets/images/small/img-4.jpg'
+import { StaticImageData } from 'next/image';
+import small1 from '@/assets/images/small/img-1.jpg';
+import small2 from '@/assets/images/small/img-2.jpg';
+import small3 from '@/assets/images/small/img-3.jpg';
+import small4 from '@/assets/images/small/img-4.jpg';
 
 export type EmailBodyImage = {
-  image: StaticImageData
-}
+  image: StaticImageData;
+};
 
 export type EmailBodyFile = {
-  icon: string
-  title: string
-  variant: string
-}
+  icon: string;
+  title: string;
+  variant: string;
+};
 
 export const emailBodyImageData: EmailBodyImage[] = [
   {
@@ -27,7 +27,7 @@ export const emailBodyImageData: EmailBodyImage[] = [
   {
     image: small4,
   },
-]
+];
 
 export const emailBodyFileData: EmailBodyFile[] = [
   {
@@ -45,4 +45,4 @@ export const emailBodyFileData: EmailBodyFile[] = [
     title: 'Price List...',
     variant: 'danger',
   },
-]
+];

@@ -1,22 +1,22 @@
-"use client";
-import logoDark from "@/assets/images/logo-light2.png";
-import LogoLight from "@/assets/images/logo-light2.png";
-import TextFormInput from "@/components/from/TextFormInput";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { yupResolver } from "@hookform/resolvers/yup";
-import Image from "next/image";
-import Link from "next/link";
-import { useEffect } from "react";
-import { Button, Card, CardBody, Col, Container, Row } from "react-bootstrap";
-import { useForm } from "react-hook-form";
-import * as yup from "yup";
-import useSignIn from "./useSignIn";
+'use client';
+import logoDark from '@/assets/images/logo-light2.png';
+import LogoLight from '@/assets/images/logo-light2.png';
+import TextFormInput from '@/components/from/TextFormInput';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { yupResolver } from '@hookform/resolvers/yup';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect } from 'react';
+import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import useSignIn from './useSignIn';
 
 const SignIn = () => {
   useEffect(() => {
-    document.body.classList.add("authentication-bg");
+    document.body.classList.add('authentication-bg');
     return () => {
-      document.body.classList.remove("authentication-bg");
+      document.body.classList.remove('authentication-bg');
     };
   }, []);
 
@@ -45,9 +45,7 @@ const SignIn = () => {
                     <Image src={LogoLight} height={28} alt="logo light" />
                   </Link>
                 </div>
-                <h2 className="fw-bold text-uppercase text-center fs-18">
-                  Sign In
-                </h2>
+                <h2 className="fw-bold text-uppercase text-center fs-18">Sign In</h2>
                 <p className="text-muted text-center mt-1 mb-4">
                   Enter your email address and password to access admin panel.
                 </p>

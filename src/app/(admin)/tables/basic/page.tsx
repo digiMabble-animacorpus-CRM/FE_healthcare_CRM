@@ -1,23 +1,23 @@
-import { Button, Col, FormCheck, Row, Table } from 'react-bootstrap'
-import clsx from 'clsx'
-import Link from 'next/link'
+import { Button, Col, FormCheck, Row, Table } from 'react-bootstrap';
+import clsx from 'clsx';
+import Link from 'next/link';
 
-import ComponentContainerCard from '@/components/ComponentContainerCard'
+import ComponentContainerCard from '@/components/ComponentContainerCard';
 
-import UIExamplesList from '@/components/UIExamplesList'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { colorVariants, currency } from '@/context/constants'
-import { toSentenceCase } from '@/utils/change-casing'
-import { extendedTableData, tableData } from './data'
+import UIExamplesList from '@/components/UIExamplesList';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { colorVariants, currency } from '@/context/constants';
+import { toSentenceCase } from '@/utils/change-casing';
+import { extendedTableData, tableData } from './data';
 
-import avatar6 from '@/assets/images/users/avatar-6.jpg'
-import avatar7 from '@/assets/images/users/avatar-7.jpg'
-import avatar8 from '@/assets/images/users/avatar-8.jpg'
-import type { Metadata } from 'next'
-import Image from 'next/image'
-import PageTitle from '@/components/PageTitle'
+import avatar6 from '@/assets/images/users/avatar-6.jpg';
+import avatar7 from '@/assets/images/users/avatar-7.jpg';
+import avatar8 from '@/assets/images/users/avatar-8.jpg';
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Basic Tables' }
+export const metadata: Metadata = { title: 'Basic Tables' };
 
 const BasicExample = () => {
   return (
@@ -26,9 +26,11 @@ const BasicExample = () => {
       title="Basic Example"
       description={
         <>
-          For basic styling—light padding and only horizontal dividers—add the base class <code>.table</code> to any <code>&lt;table&gt;</code>.
+          For basic styling—light padding and only horizontal dividers—add the base class{' '}
+          <code>.table</code> to any <code>&lt;table&gt;</code>.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <table className="table table-centered">
           <thead>
@@ -52,12 +54,16 @@ const BasicExample = () => {
         </table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableVariants = () => {
   return (
-    <ComponentContainerCard id="variant" title="Variants" description={<>Use contextual classes to color tables, table rows or individual cells.</>}>
+    <ComponentContainerCard
+      id="variant"
+      title="Variants"
+      description={<>Use contextual classes to color tables, table rows or individual cells.</>}
+    >
       <div className="table-responsive">
         <table className="table">
           <thead>
@@ -89,8 +95,8 @@ const TableVariants = () => {
         </table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const StripedRowsTable = () => {
   return (
@@ -100,9 +106,11 @@ const StripedRowsTable = () => {
       description={
         <>
           {' '}
-          Use <code>.table-striped</code> to add zebra-striping to any table row within the <code>&lt;tbody&gt;</code>.
+          Use <code>.table-striped</code> to add zebra-striping to any table row within the{' '}
+          <code>&lt;tbody&gt;</code>.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table striped className="table-centered">
           <thead>
@@ -126,8 +134,8 @@ const StripedRowsTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const StripedRowsTableDark = () => {
   return (
@@ -136,9 +144,11 @@ const StripedRowsTableDark = () => {
       title="Striped Rows Table Dark"
       description={
         <>
-          Use <code>.table-dark .table-striped</code> to add zebra-striping to any table row within the <code>&lt;tbody&gt;</code>.
+          Use <code>.table-dark .table-striped</code> to add zebra-striping to any table row within
+          the <code>&lt;tbody&gt;</code>.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table striped variant="dark" align="center">
           <thead>
@@ -162,8 +172,8 @@ const StripedRowsTableDark = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const StripedRowsTableSuccess = () => {
   return (
@@ -172,9 +182,11 @@ const StripedRowsTableSuccess = () => {
       title="Striped Rows Table Success"
       description={
         <>
-          Use <code>.table-success .table-striped</code> to add zebra-striping to any table row within the <code>&lt;tbody&gt;</code>.
+          Use <code>.table-success .table-striped</code> to add zebra-striping to any table row
+          within the <code>&lt;tbody&gt;</code>.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table striped variant="success" align="center">
           <thead>
@@ -198,8 +210,8 @@ const StripedRowsTableSuccess = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const StripedColumnsTable = () => {
   return (
@@ -210,7 +222,8 @@ const StripedColumnsTable = () => {
         <>
           Use <code>.table-striped-columns </code>to add zebra-striping to any table column.
         </>
-      }>
+      }
+    >
       <div className="table-responsive-sm">
         <Table striped="columns" align="center">
           <thead>
@@ -234,8 +247,8 @@ const StripedColumnsTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const StripedColumnsDarkTable = () => {
   return (
@@ -244,9 +257,11 @@ const StripedColumnsDarkTable = () => {
       title="Striped columns Dark"
       description={
         <>
-          Use <code>.table-dark .table-striped-columns </code>to add zebra-striping to any table column.
+          Use <code>.table-dark .table-striped-columns </code>to add zebra-striping to any table
+          column.
         </>
-      }>
+      }
+    >
       <div className="table-responsive-sm">
         <Table variant="dark" striped="columns" align="center">
           <thead>
@@ -270,8 +285,8 @@ const StripedColumnsDarkTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const StripedColumnsSuccessTable = () => {
   return (
@@ -280,9 +295,11 @@ const StripedColumnsSuccessTable = () => {
       title="Striped columns Success"
       description={
         <>
-          Use <code>.table-success .table-striped-columns </code>to add zebra-striping to any table column.
+          Use <code>.table-success .table-striped-columns </code>to add zebra-striping to any table
+          column.
         </>
-      }>
+      }
+    >
       <div className="table-responsive-sm">
         <Table variant="success" striped="columns" align="center">
           <thead>
@@ -306,8 +323,8 @@ const StripedColumnsSuccessTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const HoverableRowsTable = () => {
   return (
@@ -316,9 +333,11 @@ const HoverableRowsTable = () => {
       title="Hoverable rows"
       description={
         <>
-          Add <code>.table-hover</code> to enable a hover state on table rows within a <code>&lt;tbody&gt;</code>.
+          Add <code>.table-hover</code> to enable a hover state on table rows within a{' '}
+          <code>&lt;tbody&gt;</code>.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table hover align="center">
           <thead>
@@ -342,8 +361,8 @@ const HoverableRowsTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const HoverableRowsDarkTable = () => {
   return (
@@ -352,9 +371,11 @@ const HoverableRowsDarkTable = () => {
       title="Hoverable rows Dark"
       description={
         <>
-          Add <code>.table-dark .table-hover</code> to enable a hover state on table rows within a <code>&lt;tbody&gt;</code>.
+          Add <code>.table-dark .table-hover</code> to enable a hover state on table rows within a{' '}
+          <code>&lt;tbody&gt;</code>.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table hover variant="dark" align="center">
           <thead>
@@ -378,8 +399,8 @@ const HoverableRowsDarkTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const ActiveTables = () => {
   return (
@@ -390,7 +411,8 @@ const ActiveTables = () => {
         <>
           Highlight a table row or cell by adding a <code>.table-active</code> class.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table align="center">
           <thead>
@@ -424,8 +446,8 @@ const ActiveTables = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const ActiveTablesDark = () => {
   return (
@@ -436,7 +458,8 @@ const ActiveTablesDark = () => {
         <>
           Highlight a table row or cell by adding a <code>.table-dark .table-active</code> class.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table align="center" variant="dark">
           <thead>
@@ -470,8 +493,8 @@ const ActiveTablesDark = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const BorderedTable = () => {
   return (
@@ -482,7 +505,8 @@ const BorderedTable = () => {
         <>
           Add <code>.table-bordered</code> for borders on all sides of the table and cells.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table bordered>
           <thead>
@@ -506,8 +530,8 @@ const BorderedTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const BorderedColorTable = () => {
   return (
@@ -516,9 +540,11 @@ const BorderedColorTable = () => {
       title="Bordered color Table"
       description={
         <>
-          Add <code>.table-bordered</code> &amp; <code>.border-primary</code> can be added to change colors.
+          Add <code>.table-bordered</code> &amp; <code>.border-primary</code> can be added to change
+          colors.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table bordered className="border-primary" align="center">
           <thead>
@@ -542,8 +568,8 @@ const BorderedColorTable = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableWithoutBorders = () => {
   return (
@@ -554,7 +580,8 @@ const TableWithoutBorders = () => {
         <>
           Add <code>.table-borderless</code> for a table without borders..
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table borderless align="center">
           <thead>
@@ -578,8 +605,8 @@ const TableWithoutBorders = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableWithoutBordersDark = () => {
   return (
@@ -588,9 +615,11 @@ const TableWithoutBordersDark = () => {
       title="Tables without borders Dark"
       description={
         <>
-          Add <code>.table-borderless</code> <code>.table-dark</code> for a table without borders and dark table.
+          Add <code>.table-borderless</code> <code>.table-dark</code> for a table without borders
+          and dark table.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table borderless align="center" variant="dark">
           <thead>
@@ -614,8 +643,8 @@ const TableWithoutBordersDark = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const SmallTables = () => {
   return (
@@ -624,9 +653,11 @@ const SmallTables = () => {
       title="Small tables"
       description={
         <>
-          Add <code>.table-sm </code>to make any .table more compact by cutting all cell padding in half.
+          Add <code>.table-sm </code>to make any .table more compact by cutting all cell padding in
+          half.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table size="sm">
           <thead>
@@ -650,8 +681,8 @@ const SmallTables = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const SmallTableDark = () => {
   return (
@@ -660,9 +691,11 @@ const SmallTableDark = () => {
       title="Small tables Dark"
       description={
         <>
-          Add <code>.table-sm </code> <code>.table-dark </code>to make any .table more compact by cutting all cell padding in half.
+          Add <code>.table-sm </code> <code>.table-dark </code>to make any .table more compact by
+          cutting all cell padding in half.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table size="sm" variant="dark">
           <thead>
@@ -686,8 +719,8 @@ const SmallTableDark = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const VerticalAlignmentTable = () => {
   return (
@@ -696,11 +729,13 @@ const VerticalAlignmentTable = () => {
       title="Vertical alignment"
       description={
         <>
-          Table cells of <code>&lt;thead&gt;</code> are always vertical aligned to the bottom. Table cells in <code>&lt;tbody&gt;</code> inherit their
-          alignment from <code>&lt;table&gt;</code> and are aligned to the top by default. Use the <Link href="">vertical align</Link> classes to
-          re-align where needed.
+          Table cells of <code>&lt;thead&gt;</code> are always vertical aligned to the bottom. Table
+          cells in <code>&lt;tbody&gt;</code> inherit their alignment from{' '}
+          <code>&lt;table&gt;</code> and are aligned to the top by default. Use the{' '}
+          <Link href="">vertical align</Link> classes to re-align where needed.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <table className="table align-middle table-centered">
           <thead>
@@ -731,8 +766,8 @@ const VerticalAlignmentTable = () => {
                 This cell inherits <code>vertical-align: middle;</code> from the table
               </td>
               <td>
-                This here is some placeholder text, intended to take up quite a bit of vertical space, to demonstrate how the vertical alignment works
-                in the preceding cells.
+                This here is some placeholder text, intended to take up quite a bit of vertical
+                space, to demonstrate how the vertical alignment works in the preceding cells.
               </td>
             </tr>
             <tr className="align-bottom">
@@ -746,8 +781,8 @@ const VerticalAlignmentTable = () => {
                 This cell inherits <code>vertical-align: bottom;</code> from the table row
               </td>
               <td>
-                This here is some placeholder text, intended to take up quite a bit of vertical space, to demonstrate how the vertical alignment works
-                in the preceding cells.
+                This here is some placeholder text, intended to take up quite a bit of vertical
+                space, to demonstrate how the vertical alignment works in the preceding cells.
               </td>
             </tr>
             <tr>
@@ -759,23 +794,26 @@ const VerticalAlignmentTable = () => {
               </td>
               <td className="align-top">This cell is aligned to the top.</td>
               <td>
-                This here is some placeholder text, intended to take up quite a bit of vertical space, to demonstrate how the vertical alignment works
-                in the preceding cells.
+                This here is some placeholder text, intended to take up quite a bit of vertical
+                space, to demonstrate how the vertical alignment works in the preceding cells.
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const NestingTable = () => {
   return (
     <ComponentContainerCard
       id="nesting"
       title="Nesting Table"
-      description={<>Border styles, active styles, and table variants are not inherited by nested tables.</>}>
+      description={
+        <>Border styles, active styles, and table variants are not inherited by nested tables.</>
+      }
+    >
       <div className="table-responsive">
         <table className="table table-bordered table-striped table-centered">
           <thead>
@@ -833,8 +871,8 @@ const NestingTable = () => {
         </table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableHead = () => {
   return (
@@ -843,10 +881,11 @@ const TableHead = () => {
       title="Table head"
       description={
         <>
-          Similar to tables and dark tables, use the modifier classes <code>.table-light</code>to make <code>&lt;thead&gt;</code>s appear light or
-          dark gray.
+          Similar to tables and dark tables, use the modifier classes <code>.table-light</code>to
+          make <code>&lt;thead&gt;</code>s appear light or dark gray.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table align="center">
           <thead className="table-light">
@@ -870,8 +909,8 @@ const TableHead = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableHeadDark = () => {
   return (
@@ -880,10 +919,11 @@ const TableHeadDark = () => {
       title="Table head Dark"
       description={
         <>
-          Similar to tables and dark tables, use the modifier classes <code>.table-dark</code> to make <code>&lt;thead&gt;</code>s appear light or
-          dark gray.
+          Similar to tables and dark tables, use the modifier classes <code>.table-dark</code> to
+          make <code>&lt;thead&gt;</code>s appear light or dark gray.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table align="center">
           <thead className="table-dark">
@@ -907,8 +947,8 @@ const TableHeadDark = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableWithFooter = () => {
   return (
@@ -944,8 +984,8 @@ const TableWithFooter = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableWithCaption = () => {
   return (
@@ -954,10 +994,12 @@ const TableWithCaption = () => {
       title="Captions"
       description={
         <>
-          A <code>&lt;caption&gt;</code> functions like a heading for a table. It helps users with screen readers to find a table and understand what
-          it’s about and decide if they want to read it.
+          A <code>&lt;caption&gt;</code> functions like a heading for a table. It helps users with
+          screen readers to find a table and understand what it’s about and decide if they want to
+          read it.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table align="center">
           <caption>List of users</caption>
@@ -982,8 +1024,8 @@ const TableWithCaption = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableWithCaptionTop = () => {
   return (
@@ -992,9 +1034,11 @@ const TableWithCaptionTop = () => {
       title="Captions"
       description={
         <>
-          You can also put the <code>&lt;caption&gt;</code> on the top of the table with <code>.caption-top</code>
+          You can also put the <code>&lt;caption&gt;</code> on the top of the table with{' '}
+          <code>.caption-top</code>
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table align="center" className="caption-top">
           <caption>List of users</caption>
@@ -1019,8 +1063,8 @@ const TableWithCaptionTop = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableGroupDividers = () => {
   return (
@@ -1029,11 +1073,14 @@ const TableGroupDividers = () => {
       title="Table group dividers"
       description={
         <>
-          Add a thicker border, darker between table groups—<code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code>, and <code>&lt;tfoot&gt;</code>
-          —with <code>.table-group-divider</code>. Customize the color by changing the <code>border-top-color</code> (which we don’t currently provide
-          a utility class for at this time).
+          Add a thicker border, darker between table groups—<code>&lt;thead&gt;</code>,{' '}
+          <code>&lt;tbody&gt;</code>, and <code>&lt;tfoot&gt;</code>
+          —with <code>.table-group-divider</code>. Customize the color by changing the{' '}
+          <code>border-top-color</code> (which we don’t currently provide a utility class for at
+          this time).
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <Table>
           <thead>
@@ -1057,8 +1104,8 @@ const TableGroupDividers = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AlwaysResponsiveTable = () => {
   return (
@@ -1067,9 +1114,11 @@ const AlwaysResponsiveTable = () => {
       title="Always responsive"
       description={
         <>
-          Across every breakpoint, use <code>.table-responsive</code> for horizontally scrolling tables.
+          Across every breakpoint, use <code>.table-responsive</code> for horizontally scrolling
+          tables.
         </>
-      }>
+      }
+    >
       <div className="table-responsive">
         <table className="table">
           <thead>
@@ -1127,15 +1176,18 @@ const AlwaysResponsiveTable = () => {
         </table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableWithAvatars = () => {
   return (
     <ComponentContainerCard
       id="avatar"
       title="With avatars"
-      description={<>A list of all the users in your account including their name, title, email and role.</>}>
+      description={
+        <>A list of all the users in your account including their name, title, email and role.</>
+      }
+    >
       <div className="table-responsive">
         <Table hover align="center">
           <thead className="table-light">
@@ -1152,11 +1204,15 @@ const TableWithAvatars = () => {
               <tr className={clsx({ 'table-active': item.verified })} key={item.id}>
                 <td>
                   <div className="d-flex align-items-center gap-1">
-                    {item.avatar && <Image src={item.avatar} alt="avatar" className="avatar-sm rounded-circle" />}
+                    {item.avatar && (
+                      <Image src={item.avatar} alt="avatar" className="avatar-sm rounded-circle" />
+                    )}
                     <div className="d-block">
                       <h5 className="mb-0 d-flex align-items-center gap-1">
                         {item.name}
-                        {item.verified && <IconifyIcon icon="bxs:badge-check" className="text-success" />}{' '}
+                        {item.verified && (
+                          <IconifyIcon icon="bxs:badge-check" className="text-success" />
+                        )}{' '}
                       </h5>
                     </div>
                   </div>
@@ -1175,15 +1231,18 @@ const TableWithAvatars = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TableWithCheckboxes = () => {
   return (
     <ComponentContainerCard
       id="with-checkbox"
       title="With checkboxes"
-      description={<>A list of all the users in your account including their name, title, email and role.</>}>
+      description={
+        <>A list of all the users in your account including their name, title, email and role.</>
+      }
+    >
       <div className="table-responsive">
         <Table striped borderless align="center">
           <thead className="table-light">
@@ -1221,15 +1280,18 @@ const TableWithCheckboxes = () => {
         </Table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const NestingTable2 = () => {
   return (
     <ComponentContainerCard
       id="nesting1"
       title="Nesting Table"
-      description={<>Border styles, active styles, and table variants are not inherited by nested tables.</>}>
+      description={
+        <>Border styles, active styles, and table variants are not inherited by nested tables.</>
+      }
+    >
       <div className="table-responsive">
         <table className="table table-bordered table-striped table-centered">
           <thead>
@@ -1271,7 +1333,9 @@ const NestingTable2 = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="badge bg-success-subtle text-success py-1 px-2">Verified</span>
+                        <span className="badge bg-success-subtle text-success py-1 px-2">
+                          Verified
+                        </span>
                       </td>
                     </tr>
                     <tr>
@@ -1286,7 +1350,9 @@ const NestingTable2 = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="badge bg-warning-subtle text-warning py-1 px-2">Pending</span>
+                        <span className="badge bg-warning-subtle text-warning py-1 px-2">
+                          Pending
+                        </span>
                       </td>
                     </tr>
                     <tr>
@@ -1301,7 +1367,9 @@ const NestingTable2 = () => {
                         </div>
                       </td>
                       <td>
-                        <span className="badge bg-danger-subtle text-danger py-1 px-2">Rejected</span>
+                        <span className="badge bg-danger-subtle text-danger py-1 px-2">
+                          Rejected
+                        </span>
                       </td>
                     </tr>
                   </tbody>
@@ -1318,8 +1386,8 @@ const NestingTable2 = () => {
         </table>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const BasicTables = () => {
   return (
@@ -1380,7 +1448,7 @@ const BasicTables = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default BasicTables
+export default BasicTables;

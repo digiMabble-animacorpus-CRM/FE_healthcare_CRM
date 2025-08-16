@@ -67,4 +67,4 @@ export const faqData = {
         'We strive to respond to all customer inquiries within 24 hours during regular business hours. Response times may vary depending on the volume of inquiries received.',
     },
   ],
-}
+};

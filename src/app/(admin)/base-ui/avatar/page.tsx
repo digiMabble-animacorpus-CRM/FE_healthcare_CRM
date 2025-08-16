@@ -1,20 +1,20 @@
-import { Col, Row } from 'react-bootstrap'
-import Image from 'next/image'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import UIExamplesList from '@/components/UIExamplesList'
+import { Col, Row } from 'react-bootstrap';
+import Image from 'next/image';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import UIExamplesList from '@/components/UIExamplesList';
 
-import small2 from '@/assets/images/small/img-2.jpg'
-import small3 from '@/assets/images/small/img-3.jpg'
-import avatar2 from '@/assets/images/users/avatar-2.jpg'
-import avatar3 from '@/assets/images/users/avatar-3.jpg'
-import avatar4 from '@/assets/images/users/avatar-4.jpg'
-import avatar5 from '@/assets/images/users/avatar-5.jpg'
-import avatar6 from '@/assets/images/users/avatar-6.jpg'
-import avatar7 from '@/assets/images/users/avatar-7.jpg'
-import avatar8 from '@/assets/images/users/avatar-8.jpg'
-import avatar9 from '@/assets/images/users/avatar-9.jpg'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import small2 from '@/assets/images/small/img-2.jpg';
+import small3 from '@/assets/images/small/img-3.jpg';
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import avatar3 from '@/assets/images/users/avatar-3.jpg';
+import avatar4 from '@/assets/images/users/avatar-4.jpg';
+import avatar5 from '@/assets/images/users/avatar-5.jpg';
+import avatar6 from '@/assets/images/users/avatar-6.jpg';
+import avatar7 from '@/assets/images/users/avatar-7.jpg';
+import avatar8 from '@/assets/images/users/avatar-8.jpg';
+import avatar9 from '@/assets/images/users/avatar-9.jpg';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
 const BasicExample = () => {
   return (
@@ -24,10 +24,12 @@ const BasicExample = () => {
       title="Basic Example"
       description={
         <>
-          Create and group avatars of different sizes and shapes with the css classes. Using Bootstrap&apos;s naming convention, you can control size
-          of avatar including standard avatar, or scale it up to different sizes.
+          Create and group avatars of different sizes and shapes with the css classes. Using
+          Bootstrap&apos;s naming convention, you can control size of avatar including standard
+          avatar, or scale it up to different sizes.
         </>
-      }>
+      }
+    >
       <Row>
         <Col md={3}>
           <Image src={avatar2} alt="image" className="img-fluid avatar-xs rounded" />
@@ -59,8 +61,8 @@ const BasicExample = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const RoundedCircleAvatars = () => {
   return (
@@ -71,9 +73,11 @@ const RoundedCircleAvatars = () => {
       description={
         <>
           {' '}
-          Using an additional class <code>.rounded-circle</code> in <code>&lt;img&gt;</code> element creates the rounded avatar.
+          Using an additional class <code>.rounded-circle</code> in <code>&lt;img&gt;</code> element
+          creates the rounded avatar.
         </>
-      }>
+      }
+    >
       <Row>
         <Col md={4}>
           <Image src={avatar7} alt="image" className="img-fluid avatar-md rounded-circle" />
@@ -95,8 +99,8 @@ const RoundedCircleAvatars = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const ImagesShapes = () => {
   return (
@@ -104,7 +108,8 @@ const ImagesShapes = () => {
       descriptionClass="font-14 mb-3"
       id="images-shapes"
       title="Images Shapes"
-      description={<>Avatars with different sizes and shapes.</>}>
+      description={<>Avatars with different sizes and shapes.</>}
+    >
       <div className="d-flex flex-wrap gap-3 align-items-end">
         <div>
           <Image src={small2} alt="image" className="img-fluid rounded" width={200} />
@@ -131,16 +136,21 @@ const ImagesShapes = () => {
           </p>
         </div>
         <div>
-          <Image src={avatar8} alt="image" className="img-fluid rounded-circle img-thumbnail" width={120} />
+          <Image
+            src={avatar8}
+            alt="image"
+            className="img-fluid rounded-circle img-thumbnail"
+            width={120}
+          />
           <p className="mb-0">
             <code>.rounded-circle .img-thumbnail</code>
           </p>
         </div>
       </div>
     </ComponentContainerCard>
-  )
-}
-export const metadata: Metadata = { title: 'Avatars' }
+  );
+};
+export const metadata: Metadata = { title: 'Avatars' };
 
 const page = () => {
   return (
@@ -163,7 +173,7 @@ const page = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default page
+export default page;

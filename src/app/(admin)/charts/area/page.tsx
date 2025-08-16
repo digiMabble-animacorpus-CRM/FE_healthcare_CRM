@@ -1,10 +1,10 @@
-import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllAreaCharts from './components/AllAreaCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllAreaCharts from './components/AllAreaCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Area Charts' }
+export const metadata: Metadata = { title: 'Area Charts' };
 
 const AreaCharts = () => {
   return (
@@ -19,11 +19,15 @@ const AreaCharts = () => {
                 <a
                   className="btn btn-sm btn-outline-success rounded-2 float-end"
                   href="https://apexcharts.com/javascript-chart-demos/"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </a>
               </CardTitle>
-              <p className="text-muted mb-3">ApexCharts is loaded with powerful features to fulfill your data-visualization needs.</p>
+              <p className="text-muted mb-3">
+                ApexCharts is loaded with powerful features to fulfill your data-visualization
+                needs.
+              </p>
             </CardBody>
           </Card>
           <AllAreaCharts />
@@ -44,7 +48,7 @@ const AreaCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default AreaCharts
+export default AreaCharts;

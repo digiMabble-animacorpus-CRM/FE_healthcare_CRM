@@ -1,42 +1,20 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import {
-  useForm,
-  Controller,
-  FormProvider,
-  useFieldArray,
-} from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Row,
-  Spinner,
-} from "react-bootstrap";
-import { useRouter } from "next/navigation";
+import { useEffect, useState } from 'react';
+import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
 
-import { getTherapistById } from "@/helpers/data";
-import type { CustomerEnquiriesType } from "@/types/data";
-import TextFormInput from "@/components/from/TextFormInput";
-import TextAreaFormInput from "@/components/from/TextAreaFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import DropzoneFormInput from "@/components/from/DropzoneFormInput";
+import { getTherapistById } from '@/helpers/data';
+import type { CustomerEnquiriesType } from '@/types/data';
+import TextFormInput from '@/components/from/TextFormInput';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import DropzoneFormInput from '@/components/from/DropzoneFormInput';
 
-const days = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 type AvailabilitySlot = {
   day: string;
@@ -67,49 +45,49 @@ type TherapistFormValues = {
 };
 
 const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
-  name: yup.string().required("Please enter name"),
-  email: yup.string().email("Invalid email").required("Please enter email"),
+  name: yup.string().required('Please enter name'),
+  email: yup.string().email('Invalid email').required('Please enter email'),
   number: yup
     .string()
-    .matches(/^\d{10}$/, "Enter valid 10-digit number")
-    .required("Please enter number"),
-  dob: yup.string().required("Please enter Date of birth"),
-  address: yup.string().required("Please enter address"),
-  description: yup.string().required("Please enter description"),
+    .matches(/^\d{10}$/, 'Enter valid 10-digit number')
+    .required('Please enter number'),
+  dob: yup.string().required('Please enter Date of birth'),
+  address: yup.string().required('Please enter address'),
+  description: yup.string().required('Please enter description'),
   zip_code: yup
     .string()
-    .matches(/^\d{5}$/, "Enter valid Zip-Code")
-    .required("Please enter Zip-Code"),
-  gender: yup.string().required("Please select gender"),
-  branch: yup.string().required("Please select branch"),
-  language: yup.string().required("Please select language"),
+    .matches(/^\d{5}$/, 'Enter valid Zip-Code')
+    .required('Please enter Zip-Code'),
+  gender: yup.string().required('Please select gender'),
+  branch: yup.string().required('Please select branch'),
+  language: yup.string().required('Please select language'),
   tags: yup
     .array()
     .of(yup.string().required())
-    .min(1, "Please select at least one tag")
-    .required("Please select tags"),
-  city: yup.string().required("Please select city"),
-  country: yup.string().required("Please select country"),
-  specialization: yup.string().required("Please select specialization"),
-  experience: yup.string().required("Please enter experience"),
-  education: yup.string().required("Please enter education/degrees"),
+    .min(1, 'Please select at least one tag')
+    .required('Please select tags'),
+  city: yup.string().required('Please select city'),
+  country: yup.string().required('Please select country'),
+  specialization: yup.string().required('Please select specialization'),
+  experience: yup.string().required('Please enter experience'),
+  education: yup.string().required('Please enter education/degrees'),
   certificationFiles: yup
     .array()
-    .of(yup.mixed<File>().required("File is required"))
-    .min(1, "Please upload at least one certification file")
-    .required("Please upload certification files"),
-  registrationNumber: yup.string().required("Please enter registration number"),
+    .of(yup.mixed<File>().required('File is required'))
+    .min(1, 'Please upload at least one certification file')
+    .required('Please upload certification files'),
+  registrationNumber: yup.string().required('Please enter registration number'),
   availability: yup
     .array()
     .of(
       yup.object().shape({
-        day: yup.string().required("Day is required"),
-        from: yup.string().required("Start time is required"),
-        to: yup.string().required("End time is required"),
-      })
+        day: yup.string().required('Day is required'),
+        from: yup.string().required('Start time is required'),
+        to: yup.string().required('End time is required'),
+      }),
     )
-    .required("Please add at least one availability slot")
-    .min(1, "Please add at least one availability slot"),
+    .required('Please add at least one availability slot')
+    .min(1, 'Please add at least one availability slot'),
 });
 
 interface Props {
@@ -125,24 +103,24 @@ const AddTherapist = ({ params }: Props) => {
   const methods = useForm<TherapistFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: "",
-      email: "",
-      number: "",
-      dob: "",
-      description: "",
-      address: "",
-      zip_code: "",
-      gender: "",
-      language: "",
-      branch: "",
+      name: '',
+      email: '',
+      number: '',
+      dob: '',
+      description: '',
+      address: '',
+      zip_code: '',
+      gender: '',
+      language: '',
+      branch: '',
       tags: [],
-      city: "",
-      country: "",
-      specialization: "",
-      experience: "",
-      education: "",
+      city: '',
+      country: '',
+      specialization: '',
+      experience: '',
+      education: '',
       certificationFiles: [],
-      registrationNumber: "",
+      registrationNumber: '',
       availability: [],
     },
   });
@@ -155,7 +133,7 @@ const AddTherapist = ({ params }: Props) => {
   } = methods;
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "availability",
+    name: 'availability',
   });
 
   useEffect(() => {
@@ -168,7 +146,7 @@ const AddTherapist = ({ params }: Props) => {
             reset(data[0] as unknown as TherapistFormValues);
           }
         } catch (error) {
-          console.error("Failed to fetch enquiries:", error);
+          console.error('Failed to fetch enquiries:', error);
         } finally {
           setLoading(false);
         }
@@ -178,7 +156,7 @@ const AddTherapist = ({ params }: Props) => {
   }, [isEditMode, params.id, reset]);
 
   const onSubmit = async (data: TherapistFormValues) => {
-    console.log(isEditMode ? "Edit Submitted Data:" : "Create Submitted Data:", data);
+    console.log(isEditMode ? 'Edit Submitted Data:' : 'Create Submitted Data:', data);
   };
 
   if (loading) {
@@ -194,9 +172,7 @@ const AddTherapist = ({ params }: Props) => {
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card>
           <CardHeader>
-            <CardTitle as="h4">
-              {isEditMode ? "Edit Therapist" : "Add Therapist"}
-            </CardTitle>
+            <CardTitle as="h4">{isEditMode ? 'Edit Therapist' : 'Add Therapist'}</CardTitle>
           </CardHeader>
           <CardBody>
             <Row>
@@ -259,11 +235,7 @@ const AddTherapist = ({ params }: Props) => {
                       </ChoicesFormInput>
                     )}
                   />
-                  {errors.gender && (
-                    <small className="text-danger">
-                      {errors.gender.message}
-                    </small>
-                  )}
+                  {errors.gender && <small className="text-danger">{errors.gender.message}</small>}
                 </div>
               </Col>
               <Col lg={6}>
@@ -284,9 +256,7 @@ const AddTherapist = ({ params }: Props) => {
                     )}
                   />
                   {errors.language && (
-                    <small className="text-danger">
-                      {errors.language.message}
-                    </small>
+                    <small className="text-danger">{errors.language.message}</small>
                   )}
                 </div>
               </Col>
@@ -306,17 +276,13 @@ const AddTherapist = ({ params }: Props) => {
                         <option value="Blog">Blog</option>
                         <option value="Business">Business</option>
                         <option value="Health">Health</option>
-                        <option value="Computer Software">
-                          Computer Software
-                        </option>
+                        <option value="Computer Software">Computer Software</option>
                         <option value="Lifestyle blogs">Lifestyle blogs</option>
                         <option value="Fashion">Fashion</option>
                       </ChoicesFormInput>
                     )}
                   />
-                  {errors.tags && (
-                    <small className="text-danger">{errors.tags.message}</small>
-                  )}
+                  {errors.tags && <small className="text-danger">{errors.tags.message}</small>}
                 </div>
               </Col>
               <Col lg={6}>
@@ -330,23 +296,13 @@ const AddTherapist = ({ params }: Props) => {
                         <option value="" disabled hidden>
                           Select Branch
                         </option>
-                        <option value="Gembloux - Orneau">
-                          Gembloux - Orneau
-                        </option>
-                        <option value="Gembloux - Tout Vent">
-                          Gembloux - Tout Vent
-                        </option>
-                        <option value="Anima Corpus Namur">
-                          Anima Corpus Namur
-                        </option>
+                        <option value="Gembloux - Orneau">Gembloux - Orneau</option>
+                        <option value="Gembloux - Tout Vent">Gembloux - Tout Vent</option>
+                        <option value="Anima Corpus Namur">Anima Corpus Namur</option>
                       </ChoicesFormInput>
                     )}
                   />
-                  {errors.branch && (
-                    <small className="text-danger">
-                      {errors.branch.message}
-                    </small>
-                  )}
+                  {errors.branch && <small className="text-danger">{errors.branch.message}</small>}
                 </div>
               </Col>
 
@@ -403,9 +359,7 @@ const AddTherapist = ({ params }: Props) => {
                       </ChoicesFormInput>
                     )}
                   />
-                  {errors.city && (
-                    <small className="text-danger">{errors.city.message}</small>
-                  )}
+                  {errors.city && <small className="text-danger">{errors.city.message}</small>}
                 </div>
               </Col>
               <Col lg={4}>
@@ -426,9 +380,7 @@ const AddTherapist = ({ params }: Props) => {
                     )}
                   />
                   {errors.country && (
-                    <small className="text-danger">
-                      {errors.country.message}
-                    </small>
+                    <small className="text-danger">{errors.country.message}</small>
                   )}
                 </div>
               </Col>
@@ -453,9 +405,7 @@ const AddTherapist = ({ params }: Props) => {
                           Select Specialization
                         </option>
                         <option value="physiotherapy">Physiotherapy</option>
-                        <option value="occupational-therapy">
-                          Occupational Therapy
-                        </option>
+                        <option value="occupational-therapy">Occupational Therapy</option>
                         <option value="speech-therapy">Speech Therapy</option>
                         <option value="cognitive-behavioral-therapy">
                           Cognitive Behavioral Therapy
@@ -465,9 +415,7 @@ const AddTherapist = ({ params }: Props) => {
                     )}
                   />
                   {errors.specialization && (
-                    <small className="text-danger">
-                      {errors.specialization.message}
-                    </small>
+                    <small className="text-danger">{errors.specialization.message}</small>
                   )}
                 </div>
               </Col>
@@ -548,17 +496,14 @@ const AddTherapist = ({ params }: Props) => {
                 </Col>
               </Row>
             ))}
-            <Button
-              variant="outline-primary"
-              onClick={() => append({ day: "", from: "", to: "" })}
-            >
+            <Button variant="outline-primary" onClick={() => append({ day: '', from: '', to: '' })}>
               Add Availability
             </Button>
           </CardBody>
         </Card>
         <Card>
           <CardHeader>
-            <CardTitle as={"h4"}>Upload Certifications / Licenses</CardTitle>
+            <CardTitle as={'h4'}>Upload Certifications / Licenses</CardTitle>
           </CardHeader>
           <CardBody>
             <Controller
@@ -568,16 +513,15 @@ const AddTherapist = ({ params }: Props) => {
                 <DropzoneFormInput
                   className="py-5"
                   iconProps={{
-                    icon: "bx:cloud-upload",
+                    icon: 'bx:cloud-upload',
                     height: 48,
                     width: 48,
-                    className: "mb-4 text-primary",
+                    className: 'mb-4 text-primary',
                   }}
                   text="Drop your Certifications / Licenses here, or click to browse"
                   helpText={
                     <span className="text-muted fs-13">
-                      (1600 x 1200 (4:3) recommended. PNG, JPG and GIF files are
-                      allowed )
+                      (1600 x 1200 (4:3) recommended. PNG, JPG and GIF files are allowed )
                     </span>
                   }
                   showPreview
@@ -586,9 +530,7 @@ const AddTherapist = ({ params }: Props) => {
               )}
             />
             {errors.certificationFiles && (
-              <small className="text-danger">
-                {errors.certificationFiles.message}
-              </small>
+              <small className="text-danger">{errors.certificationFiles.message}</small>
             )}
           </CardBody>
         </Card>
@@ -597,15 +539,11 @@ const AddTherapist = ({ params }: Props) => {
           <Row className="justify-content-end g-2 mt-2">
             <Col lg={2}>
               <Button variant="outline-primary" type="submit" className="w-100">
-                {isEditMode ? "Update" : "Create"} Therapist
+                {isEditMode ? 'Update' : 'Create'} Therapist
               </Button>
             </Col>
             <Col lg={2}>
-              <Button
-                variant="danger"
-                className="w-100"
-                onClick={() => router.back()}
-              >
+              <Button variant="danger" className="w-100" onClick={() => router.back()}>
                 Cancel
               </Button>
             </Col>

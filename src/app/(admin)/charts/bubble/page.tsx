@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllBubbleCharts from './components/AllBubbleCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllBubbleCharts from './components/AllBubbleCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Bubble Charts' }
+export const metadata: Metadata = { title: 'Bubble Charts' };
 
 const BubbleCharts = () => {
   return (
@@ -24,7 +24,7 @@ const BubbleCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default BubbleCharts
+export default BubbleCharts;

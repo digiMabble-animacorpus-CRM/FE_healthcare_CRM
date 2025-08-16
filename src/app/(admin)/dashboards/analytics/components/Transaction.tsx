@@ -1,11 +1,23 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllTransaction } from '@/helpers/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getAllTransaction } from '@/helpers/data';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from 'react-bootstrap';
 
 const Transaction = async () => {
-  const transaction = await getAllTransaction()
+  const transaction = await getAllTransaction();
 
   return (
     <Row>
@@ -20,8 +32,10 @@ const Transaction = async () => {
                 as={'a'}
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
-                aria-expanded="false">
-                This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+                aria-expanded="false"
+              >
+                This Month{' '}
+                <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem>Week</DropdownItem>
@@ -68,17 +82,31 @@ const Transaction = async () => {
                         </Link>{' '}
                       </td>
                       <td>
-                        {item.user?.avatar && <Image src={item.user.avatar} className="avatar-sm rounded-circle me-2" alt="..." />}
+                        {item.user?.avatar && (
+                          <Image
+                            src={item.user.avatar}
+                            className="avatar-sm rounded-circle me-2"
+                            alt="..."
+                          />
+                        )}
                         {item.user?.name}
                       </td>
                       <td>IN-4563</td>
-                      <td> {item.purchaseDate.toLocaleString('en-us', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                      <td>
+                        {' '}
+                        {item.purchaseDate.toLocaleString('en-us', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </td>
                       <td> €{item.amount}</td>
                       <td> {item.paymentType}</td>
                       <td>
                         {' '}
                         <span
-                          className={`badge bg-${item.paymentStatus == 'Cancel' ? 'danger' : item.paymentStatus == 'Pending' ? 'warning' : 'success'}-subtle text-${item.paymentStatus == 'Cancel' ? 'danger' : item.paymentStatus == 'Pending' ? 'warning' : 'success'} py-1 px-2 fs-12`}>
+                          className={`badge bg-${item.paymentStatus == 'Cancel' ? 'danger' : item.paymentStatus == 'Pending' ? 'warning' : 'success'}-subtle text-${item.paymentStatus == 'Cancel' ? 'danger' : item.paymentStatus == 'Pending' ? 'warning' : 'success'} py-1 px-2 fs-12`}
+                        >
                           {item.paymentStatus}
                         </span>{' '}
                       </td>
@@ -91,7 +119,10 @@ const Transaction = async () => {
                             <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
                           </Button>
                           <Button variant="soft-danger" size="sm">
-                            <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                            <IconifyIcon
+                              icon="solar:trash-bin-minimalistic-2-broken"
+                              className="align-middle fs-18"
+                            />
                           </Button>
                         </div>
                       </td>
@@ -104,7 +135,7 @@ const Transaction = async () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default Transaction
+export default Transaction;

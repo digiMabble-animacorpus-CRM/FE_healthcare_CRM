@@ -1,10 +1,10 @@
-import UIExamplesList from '@/components/UIExamplesList'
-import AllCollapse from './components/AllCollapse'
-import type { Metadata } from 'next'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import UIExamplesList from '@/components/UIExamplesList';
+import AllCollapse from './components/AllCollapse';
+import type { Metadata } from 'next';
+import { Col, Row } from 'react-bootstrap';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Collapse' }
+export const metadata: Metadata = { title: 'Collapse' };
 
 const Collapse = () => {
   return (
@@ -25,7 +25,7 @@ const Collapse = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Collapse
+export default Collapse;

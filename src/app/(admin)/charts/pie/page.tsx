@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Col, Row } from 'react-bootstrap'
-import AllPieCharts from './components/AllPieCharts'
+import PageTitle from '@/components/PageTitle';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import { Col, Row } from 'react-bootstrap';
+import AllPieCharts from './components/AllPieCharts';
 
-export const metadata: Metadata = { title: 'Pie Charts' }
+export const metadata: Metadata = { title: 'Pie Charts' };
 
 const PieCharts = () => {
   return (
@@ -29,7 +29,7 @@ const PieCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default PieCharts
+export default PieCharts;

@@ -1,14 +1,11 @@
-
-import LeftSideBarToggle from './components/LeftSideBarToggle'
-import ProfileDropdown from './components/ProfileDropdown'
-import ThemeCustomizerToggle from './components/ThemeCustomizerToggle'
-import Notifications from './components/Notifications'
-import ThemeModeToggle from './components/ThemeModeToggle'
-import MaximizeScreen from './components/MaximizeScreen'
-import { Container } from 'react-bootstrap'
-import Dropdownselector from './components/dropdownselector'
-
-
+import LeftSideBarToggle from './components/LeftSideBarToggle';
+import ProfileDropdown from './components/ProfileDropdown';
+import ThemeCustomizerToggle from './components/ThemeCustomizerToggle';
+import Notifications from './components/Notifications';
+import ThemeModeToggle from './components/ThemeModeToggle';
+import MaximizeScreen from './components/MaximizeScreen';
+import { Container } from 'react-bootstrap';
+import Dropdownselector from './components/dropdownselector';
 
 const page = () => {
   return (
@@ -41,7 +38,7 @@ const page = () => {
         </Container>
       </div>
     </header>
-  )
-}
+  );
+};
 
-export default page
+export default page;

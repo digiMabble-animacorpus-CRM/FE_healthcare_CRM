@@ -1,13 +1,13 @@
-import PageTitle from "@/components/PageTitle";
-import { getAllProperty, getTherapistById } from "@/helpers/data";
-import TherapistDetails from "./components/TherapistDetails";
-import WeeklyInquiry from "./components/WeeklyInquiry";
-import TransactionHistory from "./components/TransactionHistory";
-import type { TherapistType } from "@/types/data";
-import { Col, Row } from "react-bootstrap";
-import { Metadata } from "next";
+import PageTitle from '@/components/PageTitle';
+import { getAllProperty, getTherapistById } from '@/helpers/data';
+import TherapistDetails from './components/TherapistDetails';
+import WeeklyInquiry from './components/WeeklyInquiry';
+import TransactionHistory from './components/TransactionHistory';
+import type { TherapistType } from '@/types/data';
+import { Col, Row } from 'react-bootstrap';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: "Customer Overview" };
+export const metadata: Metadata = { title: 'Customer Overview' };
 
 interface Props {
   params: { id: string };

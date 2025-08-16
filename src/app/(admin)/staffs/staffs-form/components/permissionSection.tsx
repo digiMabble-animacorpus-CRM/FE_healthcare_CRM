@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { Row, Col, FormCheck } from "react-bootstrap";
-import type { StaffType, PermissionType, StaffRoleType } from "@/types/data";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import { staffRoleData } from "@/assets/data/staffRoleData";
+import { useEffect, useMemo, useState } from 'react';
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { Row, Col, FormCheck } from 'react-bootstrap';
+import type { StaffType, PermissionType, StaffRoleType } from '@/types/data';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import { staffRoleData } from '@/assets/data/staffRoleData';
 
 const PermissionsSection = () => {
   const {
@@ -14,8 +14,8 @@ const PermissionsSection = () => {
     formState: { errors },
   } = useFormContext<StaffType>();
 
-  const roleId = useWatch({ name: "roleId" });
-  const selectedPermissions = useWatch({ name: "permissions" }) || [];
+  const roleId = useWatch({ name: 'roleId' });
+  const selectedPermissions = useWatch({ name: 'permissions' }) || [];
 
   const [defaultKeys, setDefaultKeys] = useState<string[]>([]);
   const [allRoles, setAllRoles] = useState<StaffRoleType[]>([]);
@@ -23,18 +23,16 @@ const PermissionsSection = () => {
 
   // Fetch roles and permissions once
   useEffect(() => {
-    const roles = staffRoleData.filter((r) => r.tag === "Role");
+    const roles = staffRoleData.filter((r) => r.tag === 'Role');
     setAllRoles(roles);
 
-    const permissionSet = new Set(
-      roles.flatMap((r) => r.defaultPermissions || [])
-    );
+    const permissionSet = new Set(roles.flatMap((r) => r.defaultPermissions || []));
 
     // Generate fake permission objects based on roles
     const permissions = Array.from(permissionSet).map((key) => ({
       _id: key,
       key,
-      label: key.replace(/[-_]/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      label: key.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
     }));
 
     setAllPermissions(permissions);
@@ -55,24 +53,21 @@ const PermissionsSection = () => {
 
   // Selected permission keys
   const selectedKeys = useMemo(
-    () =>
-      selectedPermissions
-        .filter((p: any) => p.enabled)
-        .map((p: any) => p._id),
-    [selectedPermissions]
+    () => selectedPermissions.filter((p: any) => p.enabled).map((p: any) => p._id),
+    [selectedPermissions],
   );
 
   // Handlers
   const handleToggle = (key: string) => {
     const updated = selectedPermissions.map((p: any) =>
-      p._id === key ? { ...p, enabled: !p.enabled } : p
+      p._id === key ? { ...p, enabled: !p.enabled } : p,
     );
-    setValue("permissions", updated);
+    setValue('permissions', updated);
   };
 
   const handleSelectChange = (val: string[]) => {
     const updated = val.map((key) => ({ _id: key, enabled: true }));
-    setValue("permissions", updated);
+    setValue('permissions', updated);
   };
 
   /* render ----------------------------------------------------------- */
@@ -111,19 +106,14 @@ const PermissionsSection = () => {
               type="checkbox"
               id={key}
               label={permissionLabels[key]}
-              checked={
-                selectedPermissions.find((p: any) => p._id === key)?.enabled ??
-                false
-              }
+              checked={selectedPermissions.find((p: any) => p._id === key)?.enabled ?? false}
               onChange={() => handleToggle(key)}
             />
           </Col>
         ))}
       </Row>
 
-      {errors.permissions && (
-        <small className="text-danger2">{errors.permissions.message}</small>
-      )}
+      {errors.permissions && <small className="text-danger2">{errors.permissions.message}</small>}
     </div>
   );
 };

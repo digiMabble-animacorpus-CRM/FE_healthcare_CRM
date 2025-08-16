@@ -1,11 +1,11 @@
-'use client'
-import ChoicesFormInput from '@/components/from/ChoicesFormInput'
-import TextAreaFormInput from '@/components/from/TextAreaFormInput'
-import TextFormInput from '@/components/from/TextFormInput'
-import { yupResolver } from '@hookform/resolvers/yup'
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
+'use client';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import TextFormInput from '@/components/from/TextFormInput';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 const CreatePost = () => {
   const messageSchema = yup.object({
@@ -14,11 +14,11 @@ const CreatePost = () => {
     userName: yup.string().required('Please enter user name'),
     date: yup.string().email().required('Please enter date'),
     userDetails: yup.string().required('Please enter description'),
-  })
+  });
 
   const { handleSubmit, control } = useForm({
     resolver: yupResolver(messageSchema),
-  })
+  });
   return (
     <form onSubmit={handleSubmit(() => {})}>
       <Card>
@@ -29,7 +29,12 @@ const CreatePost = () => {
           <Row>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="name" placeholder="Name" label="Blog Title" />
+                <TextFormInput
+                  control={control}
+                  name="name"
+                  placeholder="Name"
+                  label="Blog Title"
+                />
               </div>
             </Col>
             <Col lg={6}>
@@ -42,7 +47,8 @@ const CreatePost = () => {
                 id="choices-multiple-remove-button"
                 data-choices
                 data-choices-removeitem
-                multiple>
+                multiple
+              >
                 <option value="Blog">Blog</option>
                 <option value="Business">Business</option>
                 <option value="Health">Health</option>
@@ -76,7 +82,12 @@ const CreatePost = () => {
           <Row>
             <Col lg={6}>
               <div className="mb-3">
-                <TextFormInput control={control} name="userName" placeholder="Name" label="User Name" />
+                <TextFormInput
+                  control={control}
+                  name="userName"
+                  placeholder="Name"
+                  label="User Name"
+                />
               </div>
             </Col>
             <Col lg={6}>
@@ -84,7 +95,12 @@ const CreatePost = () => {
                 <label htmlFor="create-date" className="form-label">
                   Date
                 </label>
-                <input type="text" id="create-date" className="form-control flatpickr-input" placeholder="dd-mm-yyyy" />
+                <input
+                  type="text"
+                  id="create-date"
+                  className="form-control flatpickr-input"
+                  placeholder="dd-mm-yyyy"
+                />
               </div>
             </Col>
             <Col lg={12}>
@@ -119,7 +135,7 @@ const CreatePost = () => {
         </Row>
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default CreatePost
+export default CreatePost;

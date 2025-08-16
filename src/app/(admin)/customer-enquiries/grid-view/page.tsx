@@ -1,13 +1,13 @@
-import PageTitle from '@/components/PageTitle'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllCustomer } from '@/helpers/data'
-import { CustomerType } from '@/types/data'
-import { Metadata } from 'next'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardFooter, Col, Row } from 'react-bootstrap'
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getAllCustomer } from '@/helpers/data';
+import { CustomerType } from '@/types/data';
+import { Metadata } from 'next';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button, Card, CardBody, CardFooter, Col, Row } from 'react-bootstrap';
 
-export const metadata: Metadata = { title: 'Customer Grid' }
+export const metadata: Metadata = { title: 'Customer Grid' };
 
 const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: CustomerType) => {
   return (
@@ -22,7 +22,10 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
             />
           )}
           <span className="position-absolute top-0 end-0 p-1">
-            <button type="button" className="btn btn-dark avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-light">
+            <button
+              type="button"
+              className="btn btn-dark avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded text-light"
+            >
               {' '}
               <span>
                 <IconifyIcon icon="solar:pen-new-square-broken" />
@@ -36,7 +39,11 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
               {user?.name}
             </Link>
             <div>
-              <span className={`badge bg-${status == 'Available' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}>{status}</span>
+              <span
+                className={`badge bg-${status == 'Available' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}
+              >
+                {status}
+              </span>
             </div>
           </div>
           <p className="text-muted fw-medium fs-14 mb-1">
@@ -65,7 +72,10 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
           <h4 className="mt-3 fs-17">Social Information :</h4>
           <ul className="list-inline d-flex gap-1 mb-0 align-items-center mt-3">
             <li className="list-inline-item">
-              <Button variant="soft-primary" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+              <Button
+                variant="soft-primary"
+                className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+              >
                 <span>
                   {' '}
                   <IconifyIcon icon="ri:facebook-fill" />
@@ -73,7 +83,10 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
               </Button>
             </li>
             <li className="list-inline-item">
-              <Button variant="soft-danger" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+              <Button
+                variant="soft-danger"
+                className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+              >
                 <span>
                   {' '}
                   <IconifyIcon icon="ri:instagram-fill" />
@@ -81,7 +94,10 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
               </Button>
             </li>
             <li className="list-inline-item">
-              <Button variant="soft-info" className="avatar-sm d-flex align-items-center justify-content-center  fs-20">
+              <Button
+                variant="soft-info"
+                className="avatar-sm d-flex align-items-center justify-content-center  fs-20"
+              >
                 <span>
                   {' '}
                   <IconifyIcon icon="ri:twitter-fill" />
@@ -89,7 +105,10 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
               </Button>
             </li>
             <li className="list-inline-item">
-              <Button variant="soft-success" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+              <Button
+                variant="soft-success"
+                className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+              >
                 <span>
                   {' '}
                   <IconifyIcon icon="ri:whatsapp-fill" />
@@ -97,7 +116,10 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
               </Button>
             </li>
             <li className="list-inline-item">
-              <Button variant="soft-warning" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+              <Button
+                variant="soft-warning"
+                className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+              >
                 <span>
                   {' '}
                   <IconifyIcon icon="ri:mail-fill" />
@@ -116,11 +138,11 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
         </Button>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
 const CustomerGridPage = async () => {
-  const customerGridData = await getAllCustomer()
+  const customerGridData = await getAllCustomer();
   return (
     <>
       <PageTitle subName="Customers" title="Customer Grid" />
@@ -132,7 +154,7 @@ const CustomerGridPage = async () => {
         ))}
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default CustomerGridPage
+export default CustomerGridPage;

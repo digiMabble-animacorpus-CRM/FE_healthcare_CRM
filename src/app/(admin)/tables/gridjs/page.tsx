@@ -1,15 +1,15 @@
-import UIExamplesList from '@/components/UIExamplesList'
+import UIExamplesList from '@/components/UIExamplesList';
 // import { getAllDataTableRecords } from '@/helpers/data'
-import type { Metadata } from 'next'
-import { Col, Row } from 'react-bootstrap'
-import AllDataTables from './components/AllDataTables'
-import { getAllDataTableRecords } from '@/helpers/data'
-import PageTitle from '@/components/PageTitle'
+import type { Metadata } from 'next';
+import { Col, Row } from 'react-bootstrap';
+import AllDataTables from './components/AllDataTables';
+import { getAllDataTableRecords } from '@/helpers/data';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'GridJs Tables' }
+export const metadata: Metadata = { title: 'GridJs Tables' };
 
 const GridJS = async () => {
-  const dataTableRecords = await getAllDataTableRecords()
+  const dataTableRecords = await getAllDataTableRecords();
   return (
     <>
       <PageTitle title="Grid JS" subName="Table" />
@@ -36,7 +36,7 @@ const GridJS = async () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default GridJS
+export default GridJS;

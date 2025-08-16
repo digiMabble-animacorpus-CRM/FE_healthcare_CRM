@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { StaffRoleType } from "@/types/data";
-import StaffRoleForm from "../../staffRoleForm";
-import { getStaffRoleById } from "@/helpers/staff";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { StaffRoleType } from '@/types/data';
+import StaffRoleForm from '../../staffRoleForm';
+import { getStaffRoleById } from '@/helpers/staff';
 
 interface Props {
   params: { id?: string };
@@ -37,24 +37,20 @@ const EditStaffRolePage = ({ params }: Props) => {
     fetchData();
   }, [params.id]);
 
-  const onSubmitHandler = async (data: Omit<StaffRoleType, "_id">) => {
+  const onSubmitHandler = async (data: Omit<StaffRoleType, '_id'>) => {
     try {
-      console.log("StaffRole updated", data);
+      console.log('StaffRole updated', data);
       // await updateStaffRole(params.id as string, data)
       // router.push("/StaffRoles");
     } catch {
-      console.error("Error updating StaffRole");
+      console.error('Error updating StaffRole');
     }
   };
 
   if (loading) return <div>Loading StaffRole details...</div>;
 
   return (
-    <StaffRoleForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
+    <StaffRoleForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
   );
 };
 

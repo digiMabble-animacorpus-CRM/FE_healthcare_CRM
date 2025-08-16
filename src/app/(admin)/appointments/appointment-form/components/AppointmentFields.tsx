@@ -1,30 +1,41 @@
-"use client";
+'use client';
 
-import { Controller, useFormContext } from "react-hook-form";
-import { Row, Col, Button, Form } from "react-bootstrap";
-import TextAreaFormInput from "@/components/from/TextAreaFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import TextFormInput from "@/components/from/TextFormInput";
+import { Controller, useFormContext } from 'react-hook-form';
+import { Row, Col, Button, Form } from 'react-bootstrap';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import TextFormInput from '@/components/from/TextFormInput';
 
 const services = [
-  { key: "consultation", label: "Consultation" },
-  { key: "demo", label: "Demo" },
-  { key: "meeting", label: "Meeting" },
+  { key: 'consultation', label: 'Consultation' },
+  { key: 'demo', label: 'Demo' },
+  { key: 'meeting', label: 'Meeting' },
 ];
 
 export const departments = [
-  { key: "physiotherapy", label: "Physiotherapy" },
-  { key: "fitness", label: "Fitness" },
-  { key: "nutrition", label: "Nutrition" },
-  { key: "counseling", label: "Counseling" },
-  { key: "sports-medicine", label: "Sports Medicine" },
+  { key: 'physiotherapy', label: 'Physiotherapy' },
+  { key: 'fitness', label: 'Fitness' },
+  { key: 'nutrition', label: 'Nutrition' },
+  { key: 'counseling', label: 'Counseling' },
+  { key: 'sports-medicine', label: 'Sports Medicine' },
 ];
 
 const timeSlots = [
-  "09:00", "09:30", "10:00", "10:30",
-  "11:00", "11:30", "12:00", "12:30",
-  "14:00", "14:30", "15:00", "15:30",
-  "16:00", "16:30", "17:00"
+  '09:00',
+  '09:30',
+  '10:00',
+  '10:30',
+  '11:00',
+  '11:30',
+  '12:00',
+  '12:30',
+  '14:00',
+  '14:30',
+  '15:00',
+  '15:30',
+  '16:00',
+  '16:30',
+  '17:00',
 ];
 
 const AppointmentFields = () => {
@@ -36,7 +47,7 @@ const AppointmentFields = () => {
     formState: { errors },
   } = useFormContext();
 
-  const selectedTime = watch("time");
+  const selectedTime = watch('time');
 
   return (
     <>
@@ -52,7 +63,7 @@ const AppointmentFields = () => {
                   <Form.Control
                     type="date"
                     {...field}
-                    min={new Date().toISOString().split("T")[0]}
+                    min={new Date().toISOString().split('T')[0]}
                     isInvalid={!!errors.date}
                   />
                   <Form.Control.Feedback type="invalid">
@@ -71,20 +82,18 @@ const AppointmentFields = () => {
               {timeSlots.map((slot) => (
                 <Button
                   key={slot}
-                  variant={selectedTime === slot ? "primary" : "outline-primary"}
+                  variant={selectedTime === slot ? 'primary' : 'outline-primary'}
                   size="sm"
                   onClick={() => {
-                    setValue("time", slot);
-                    trigger("time"); // ✅ remove validation error if time selected
+                    setValue('time', slot);
+                    trigger('time'); // ✅ remove validation error if time selected
                   }}
                 >
                   {slot}
                 </Button>
               ))}
             </div>
-            {errors.time && (
-              <small className="text-danger">{String(errors.time.message)}</small>
-            )}
+            {errors.time && <small className="text-danger">{String(errors.time.message)}</small>}
           </div>
         </Col>
 
@@ -96,7 +105,9 @@ const AppointmentFields = () => {
               name="service"
               render={({ field }) => (
                 <ChoicesFormInput className="form-control" {...field}>
-                  <option value="" disabled hidden>Select Service</option>
+                  <option value="" disabled hidden>
+                    Select Service
+                  </option>
                   {services.map((s) => (
                     <option key={s.key} value={s.key}>
                       {s.label}
@@ -119,7 +130,9 @@ const AppointmentFields = () => {
               name="department"
               render={({ field }) => (
                 <ChoicesFormInput className="form-control" {...field}>
-                  <option value="" disabled hidden>Select Department</option>
+                  <option value="" disabled hidden>
+                    Select Department
+                  </option>
                   {departments.map((d) => (
                     <option key={d.key} value={d.key}>
                       {d.label}

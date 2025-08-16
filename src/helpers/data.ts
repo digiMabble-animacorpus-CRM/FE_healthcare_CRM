@@ -11,12 +11,12 @@ import {
   timelineData,
   transactionData,
   userData,
-} from "@/assets/data/other";
-import { sellersData } from "@/assets/data/product";
-import { emailsData, socialGroupsData } from "@/assets/data/social";
-import { staffData } from "@/assets/data/staffData";
-import { todoData } from "@/assets/data/task";
-import { notificationsData } from "@/assets/data/topbar";
+} from '@/assets/data/other';
+import { sellersData } from '@/assets/data/product';
+import { emailsData, socialGroupsData } from '@/assets/data/social';
+import { staffData } from '@/assets/data/staffData';
+import { todoData } from '@/assets/data/task';
+import { notificationsData } from '@/assets/data/topbar';
 import {
   AgentType,
   CustomerReviewsType,
@@ -35,11 +35,11 @@ import {
   UserType,
   TherapistType,
   StaffType,
-} from "@/types/data";
-import { db } from "@/utils/firebase";
-import { sleep } from "@/utils/promise";
-import { collection, doc, getDoc, getDocs } from "firebase/firestore";
-import * as yup from "yup";
+} from '@/types/data';
+import { db } from '@/utils/firebase';
+import { sleep } from '@/utils/promise';
+import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
+import * as yup from 'yup';
 
 export const getNotifications = async (): Promise<NotificationType[]> => {
   return notificationsData;
@@ -56,9 +56,7 @@ export const getAllProperty = async (): Promise<PropertyType[]> => {
 export const getAllTransaction = async (): Promise<TransactionType[]> => {
   const data = transactionData.map((item) => {
     const user = userData.find((user) => user.id === item.userId);
-    const property = propertyData.find(
-      (property) => property.id == item.propertyId
-    );
+    const property = propertyData.find((property) => property.id == item.propertyId);
     return {
       ...item,
       user,
@@ -145,7 +143,7 @@ export const getAllCustomerEnquiries = async (
   branch?: string,
   from?: string,
   to?: string,
-  search?: string
+  search?: string,
 ): Promise<{ data: CustomerEnquiriesType[]; totalCount: number }> => {
   await sleep();
 
@@ -173,7 +171,7 @@ export const getAllCustomerEnquiries = async (
       (item) =>
         item.name.toLowerCase().includes(lowerSearch) ||
         item.email.toLowerCase().includes(lowerSearch) ||
-        item.number.toLowerCase().includes(lowerSearch)
+        item.number.toLowerCase().includes(lowerSearch),
     );
   }
 
@@ -194,7 +192,7 @@ export const getAllTherapists = async (
   branch?: string,
   from?: string,
   to?: string,
-  search?: string
+  search?: string,
 ): Promise<{ data: TherapistType[]; totalCount: number }> => {
   await sleep();
 
@@ -222,7 +220,7 @@ export const getAllTherapists = async (
       (item) =>
         item.name.toLowerCase().includes(lowerSearch) ||
         item.email.toLowerCase().includes(lowerSearch) ||
-        item.number.toLowerCase().includes(lowerSearch)
+        item.number.toLowerCase().includes(lowerSearch),
     );
   }
 
@@ -237,9 +235,7 @@ export const getAllTherapists = async (
   };
 };
 
-export const getStaffById = async (
-  id?: string
-): Promise<{ data: StaffType[] }> => {
+export const getStaffById = async (id?: string): Promise<{ data: StaffType[] }> => {
   await sleep();
 
   if (!id) {
@@ -252,7 +248,7 @@ export const getStaffById = async (
 };
 
 export const getCustomerEnquiriesById = async (
-  id?: string
+  id?: string,
 ): Promise<{ data: CustomerEnquiriesType[] }> => {
   await sleep();
 
@@ -265,9 +261,7 @@ export const getCustomerEnquiriesById = async (
   return { data: result };
 };
 
-export const getTherapistById = async (
-  id?: string
-): Promise<{ data: TherapistType[] }> => {
+export const getTherapistById = async (id?: string): Promise<{ data: TherapistType[] }> => {
   await sleep();
 
   if (!id) {
@@ -282,9 +276,7 @@ export const getTherapistById = async (
 export const getAllReview = async (): Promise<CustomerReviewsType[]> => {
   const data = customerReviewsData.map((item) => {
     const user = userData.find((user) => user.id === item.userId);
-    const property = propertyData.find(
-      (property) => property.id == item.propertyId
-    );
+    const property = propertyData.find((property) => property.id == item.propertyId);
     return {
       ...item,
       user,
@@ -295,9 +287,7 @@ export const getAllReview = async (): Promise<CustomerReviewsType[]> => {
   return data;
 };
 
-export const getUserById = async (
-  id: UserType["id"]
-): Promise<UserType | void> => {
+export const getUserById = async (id: UserType['id']): Promise<UserType | void> => {
   const user = userData.find((user) => user.id === id);
   if (user) {
     await sleep();
@@ -318,10 +308,10 @@ export const getEmailsCategoryCount = async (): Promise<EmailCountType> => {
     deleted: 0,
     important: 0,
   };
-  mailsCount.inbox = emailsData.filter((email) => email.toId === "101").length;
+  mailsCount.inbox = emailsData.filter((email) => email.toId === '101').length;
   mailsCount.starred = emailsData.filter((email) => email.starred).length;
   mailsCount.draft = emailsData.filter((email) => email.draft).length;
-  mailsCount.sent = emailsData.filter((email) => email.fromId === "101").length;
+  mailsCount.sent = emailsData.filter((email) => email.fromId === '101').length;
   mailsCount.important = emailsData.filter((email) => email.important).length;
   await sleep();
   return mailsCount;
@@ -334,9 +324,7 @@ export const getAllProjects = async (): Promise<ProjectType[]> => {
 
 export const getAllTasks = async (): Promise<TodoType[]> => {
   const data = todoData.map((task) => {
-    const employee = sellersData.find(
-      (seller) => seller.id === task.employeeId
-    );
+    const employee = sellersData.find((seller) => seller.id === task.employeeId);
     return {
       ...task,
       employee,
@@ -352,36 +340,34 @@ export const getAllFriends = async (): Promise<UserType[]> => {
   return data;
 };
 
-export const serverSideFormValidate = async (
-  data: unknown
-): Promise<unknown> => {
+export const serverSideFormValidate = async (data: unknown): Promise<unknown> => {
   const formSchema = yup.object({
     fName: yup
       .string()
-      .min(3, "First name should have at least 3 characters")
-      .max(50, "First name should not be more than 50 characters")
-      .required("First name is required"),
+      .min(3, 'First name should have at least 3 characters')
+      .max(50, 'First name should not be more than 50 characters')
+      .required('First name is required'),
     lName: yup
       .string()
-      .min(3, "Last name should have at least 3 characters")
-      .max(50, "Last name should not be more than 50 characters")
-      .required("Last name is required"),
+      .min(3, 'Last name should have at least 3 characters')
+      .max(50, 'Last name should not be more than 50 characters')
+      .required('Last name is required'),
     username: yup
       .string()
-      .min(3, "Username should have at least 3 characters")
-      .max(20, "Username should not be more than 20 characters")
-      .required("Username is required"),
+      .min(3, 'Username should have at least 3 characters')
+      .max(20, 'Username should not be more than 20 characters')
+      .required('Username is required'),
     city: yup
       .string()
-      .min(3, "City should have at least 3 characters")
-      .max(20, "City should not be more than 20 characters")
-      .required("City is required"),
+      .min(3, 'City should have at least 3 characters')
+      .max(20, 'City should not be more than 20 characters')
+      .required('City is required'),
     state: yup
       .string()
-      .min(3, "State should have at least 3 characters")
-      .max(20, "State should not be more than 20 characters")
-      .required("State is required"),
-    zip: yup.number().required("ZIP is required"),
+      .min(3, 'State should have at least 3 characters')
+      .max(20, 'State should not be more than 20 characters')
+      .required('State is required'),
+    zip: yup.number().required('ZIP is required'),
   });
 
   try {

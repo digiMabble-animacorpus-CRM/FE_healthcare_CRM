@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import avatar2 from "@/assets/images/users/avatar-2.jpg";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import Image from "next/image";
-import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
-import type { TherapistType } from "@/types/data";
-import { useRouter } from "next/navigation";
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import type { TherapistType } from '@/types/data';
+import { useRouter } from 'next/navigation';
 
 const TherapistDetails = ({ data }: { data: TherapistType }) => {
   const router = useRouter();
@@ -39,7 +39,7 @@ const TherapistDetails = ({ data }: { data: TherapistType }) => {
               onClick={() => handleEditClick(data._id)}
             >
               <span>
-                {" "}
+                {' '}
                 <IconifyIcon icon="ri:edit-fill" />
               </span>
             </Button>
@@ -71,7 +71,7 @@ const TherapistDetails = ({ data }: { data: TherapistType }) => {
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
             <span
               className={`badge bg-${
-                data.status === "active" ? "success" : "danger"
+                data.status === 'active' ? 'success' : 'danger'
               } text-white fs-12 px-2 py-1`}
             >
               {data.status}
@@ -101,10 +101,7 @@ const TherapistDetails = ({ data }: { data: TherapistType }) => {
               {Array.isArray(data?.tags) &&
                 data.tags.map((tag: string, i: number) => (
                   <p className="mb-0 d-flex align-items-center" key={i}>
-                    <IconifyIcon
-                      icon="ri:circle-fill"
-                      className="fs-10 me-2 text-success"
-                    />
+                    <IconifyIcon icon="ri:circle-fill" className="fs-10 me-2 text-success" />
                     {tag}
                   </p>
                 ))}

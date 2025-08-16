@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Col, Row } from 'react-bootstrap'
-import AllColumnCharts from './components/AllColumnCharts'
+import PageTitle from '@/components/PageTitle';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import { Col, Row } from 'react-bootstrap';
+import AllColumnCharts from './components/AllColumnCharts';
 
-export const metadata: Metadata = { title: 'Column Charts' }
+export const metadata: Metadata = { title: 'Column Charts' };
 
 const ColumnCharts = () => {
   return (
@@ -33,7 +33,7 @@ const ColumnCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default ColumnCharts
+export default ColumnCharts;

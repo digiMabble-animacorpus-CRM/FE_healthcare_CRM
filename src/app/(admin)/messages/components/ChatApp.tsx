@@ -1,39 +1,39 @@
-'use client'
-import { useEffect, useState } from 'react'
-import { Col, Offcanvas } from 'react-bootstrap'
+'use client';
+import { useEffect, useState } from 'react';
+import { Col, Offcanvas } from 'react-bootstrap';
 
-import { getAllUsers, getUserById } from '@/helpers/data'
-import type { UserType } from '@/types/data'
-import ChatArea from './ChatArea'
-import ChatLeftSidebar from './ChatLeftSidebar'
-import { useChatContext } from '@/context/useChatContext'
+import { getAllUsers, getUserById } from '@/helpers/data';
+import type { UserType } from '@/types/data';
+import ChatArea from './ChatArea';
+import ChatLeftSidebar from './ChatLeftSidebar';
+import { useChatContext } from '@/context/useChatContext';
 
 const fetchSingleUser = async (id: UserType['id']) => {
-  const data = await getUserById(id)
-  if (data) return data
-}
+  const data = await getUserById(id);
+  if (data) return data;
+};
 
 const fetchUsers = async () => {
-  const data = await getAllUsers()
-  if (data) return data
-}
+  const data = await getAllUsers();
+  if (data) return data;
+};
 
 const ChatApp = () => {
-  const [selectedUser, setSelectedUser] = useState<UserType>()
-  const [users, setUsers] = useState<UserType[]>()
-  const { chatList } = useChatContext()
+  const [selectedUser, setSelectedUser] = useState<UserType>();
+  const [users, setUsers] = useState<UserType[]>();
+  const { chatList } = useChatContext();
 
   useEffect(() => {
     const fetchInitial = async () => {
-      setSelectedUser(await fetchSingleUser('1'))
-      setUsers(await fetchUsers())
-    }
-    fetchInitial()
-  }, [])
+      setSelectedUser(await fetchSingleUser('1'));
+      setUsers(await fetchUsers());
+    };
+    fetchInitial();
+  }, []);
 
   const onUserChange = async (user: UserType) => {
-    setSelectedUser(await fetchSingleUser(user.id))
-  }
+    setSelectedUser(await fetchSingleUser(user.id));
+  };
 
   return (
     <>
@@ -58,7 +58,7 @@ const ChatApp = () => {
 
       <Col xxl={12}>{selectedUser && <ChatArea selectedUser={selectedUser} />}</Col>
     </>
-  )
-}
+  );
+};
 
-export default ChatApp
+export default ChatApp;

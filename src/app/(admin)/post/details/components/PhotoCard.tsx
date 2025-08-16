@@ -1,19 +1,32 @@
-import small1 from '@/assets/images/small/img-1.jpg'
-import small10 from '@/assets/images/small/img-10.jpg'
-import small2 from '@/assets/images/small/img-2.jpg'
-import small3 from '@/assets/images/small/img-3.jpg'
-import small4 from '@/assets/images/small/img-4.jpg'
-import small5 from '@/assets/images/small/img-5.jpg'
-import small6 from '@/assets/images/small/img-6.jpg'
-import small7 from '@/assets/images/small/img-7.jpg'
-import small8 from '@/assets/images/small/img-8.jpg'
-import small9 from '@/assets/images/small/img-9.jpg'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
+import small1 from '@/assets/images/small/img-1.jpg';
+import small10 from '@/assets/images/small/img-10.jpg';
+import small2 from '@/assets/images/small/img-2.jpg';
+import small3 from '@/assets/images/small/img-3.jpg';
+import small4 from '@/assets/images/small/img-4.jpg';
+import small5 from '@/assets/images/small/img-5.jpg';
+import small6 from '@/assets/images/small/img-6.jpg';
+import small7 from '@/assets/images/small/img-7.jpg';
+import small8 from '@/assets/images/small/img-8.jpg';
+import small9 from '@/assets/images/small/img-9.jpg';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 
 const PhotoCard = () => {
-  const images = [small1, small2, small3, small4, small5, small6, small7, small8, small9, small10, small4, small5]
+  const images = [
+    small1,
+    small2,
+    small3,
+    small4,
+    small5,
+    small6,
+    small7,
+    small8,
+    small9,
+    small10,
+    small4,
+    small5,
+  ];
   return (
     <Card className="mt-4">
       <CardHeader className="d-flex border-bottom border-dashed">
@@ -36,7 +49,7 @@ const PhotoCard = () => {
         </Row>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default PhotoCard
+export default PhotoCard;

@@ -1,11 +1,23 @@
-'use client'
-import homeImg from '@/assets/images/home-2.png'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { ApexOptions } from 'apexcharts'
-import Image from 'next/image'
-import Link from 'next/link'
-import ReactApexChart from 'react-apexcharts'
-import { Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
+'use client';
+import homeImg from '@/assets/images/home-2.png';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { ApexOptions } from 'apexcharts';
+import Image from 'next/image';
+import Link from 'next/link';
+import ReactApexChart from 'react-apexcharts';
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from 'react-bootstrap';
 
 const PropertiesChart = () => {
   const GridOptions: ApexOptions = {
@@ -49,7 +61,7 @@ const PropertiesChart = () => {
         },
       },
     ],
-  }
+  };
   return (
     <Col xl={6} lg={12}>
       <Card>
@@ -63,7 +75,13 @@ const PropertiesChart = () => {
                   <Row className="align-items-center">
                     <Col lg={6}>
                       <div id="grid-chart" className="apex-charts" />
-                      <ReactApexChart options={GridOptions} series={GridOptions.series} height={123} type="donut" className="apex-charts mb-4" />
+                      <ReactApexChart
+                        options={GridOptions}
+                        series={GridOptions.series}
+                        height={123}
+                        type="donut"
+                        className="apex-charts mb-4"
+                      />
                     </Col>
                     <Col lg={6}>
                       <h5>Properties</h5>
@@ -99,8 +117,8 @@ const PropertiesChart = () => {
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
 const DevelopmentTask = () => {
   return (
@@ -112,7 +130,12 @@ const DevelopmentTask = () => {
           </CardTitle>
           <div className="ms-auto">
             <Dropdown>
-              <DropdownToggle as={'a'} className="drop-arrow-none card-drop p-0 " data-bs-toggle="dropdown" aria-expanded="false">
+              <DropdownToggle
+                as={'a'}
+                className="drop-arrow-none card-drop p-0 "
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
                 <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
@@ -137,10 +160,25 @@ const DevelopmentTask = () => {
               <p className="text-muted mb-0">Day Left</p>
             </Col>
           </Row>
-          <div className="progress progress-lg bg-light-subtle rounded-0 gap-1 overflow-visible mt-2" style={{ height: 10 }}>
-            <div className="progress-bar bg-primary rounded-pill" role="progressbar" style={{ width: '40%' }}></div>
-            <div className="progress-bar bg-warning rounded-pill" role="progressbar" style={{ width: '30%' }}></div>
-            <div className="progress-bar bg-info rounded-pill" role="progressbar" style={{ width: '30%' }}></div>
+          <div
+            className="progress progress-lg bg-light-subtle rounded-0 gap-1 overflow-visible mt-2"
+            style={{ height: 10 }}
+          >
+            <div
+              className="progress-bar bg-primary rounded-pill"
+              role="progressbar"
+              style={{ width: '40%' }}
+            ></div>
+            <div
+              className="progress-bar bg-warning rounded-pill"
+              role="progressbar"
+              style={{ width: '30%' }}
+            ></div>
+            <div
+              className="progress-bar bg-info rounded-pill"
+              role="progressbar"
+              style={{ width: '30%' }}
+            ></div>
           </div>
           <p className="mb-0 mt-3">
             <span className="text-success fw-medium mb-0">
@@ -160,8 +198,8 @@ const DevelopmentTask = () => {
         </CardFooter>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
 const SealProperties = () => {
   const SealPropertiesOptions: ApexOptions = {
@@ -195,7 +233,7 @@ const SealProperties = () => {
       y: {
         title: {
           formatter: function (seriesName) {
-            return ''
+            return '';
           },
         },
       },
@@ -203,7 +241,7 @@ const SealProperties = () => {
         show: false,
       },
     },
-  }
+  };
   return (
     <Col xl={3} lg={6}>
       <Card className="bg-primary bg-gradient">
@@ -217,17 +255,28 @@ const SealProperties = () => {
             </div>
             <div>
               <div className="avatar-md bg-light rounded flex-centered">
-                <IconifyIcon icon="solar:home-bold-duotone" width={32} height={32} className="fs-32 text-primary" />
+                <IconifyIcon
+                  icon="solar:home-bold-duotone"
+                  width={32}
+                  height={32}
+                  className="fs-32 text-primary"
+                />
               </div>
             </div>
           </div>
           <div id="seal_properties" data-colors="#ffffff" className="apex-charts" />
-          <ReactApexChart options={SealPropertiesOptions} series={SealPropertiesOptions.series} height={115} type="line" className="apex-charts" />
+          <ReactApexChart
+            options={SealPropertiesOptions}
+            series={SealPropertiesOptions.series}
+            height={115}
+            type="line"
+            className="apex-charts"
+          />
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
 const AgentGridCard = () => {
   return (
@@ -236,7 +285,7 @@ const AgentGridCard = () => {
       <DevelopmentTask />
       <SealProperties />
     </Row>
-  )
-}
+  );
+};
 
-export default AgentGridCard
+export default AgentGridCard;

@@ -1,9 +1,16 @@
-import Image from 'next/image'
-import { customersCountryData, CustomersCountryType } from '../data'
-import { Card, CardBody, Col, ProgressBar, Row } from 'react-bootstrap'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
+import Image from 'next/image';
+import { customersCountryData, CustomersCountryType } from '../data';
+import { Card, CardBody, Col, ProgressBar, Row } from 'react-bootstrap';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
-const CountryCard = ({ amount, change, country, image, progress, totalCustomers }: CustomersCountryType) => {
+const CountryCard = ({
+  amount,
+  change,
+  country,
+  image,
+  progress,
+  totalCustomers,
+}: CustomersCountryType) => {
   return (
     <Card>
       <CardBody>
@@ -44,8 +51,8 @@ const CountryCard = ({ amount, change, country, image, progress, totalCustomers 
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const CustomerCountry = () => {
   return (
@@ -56,7 +63,7 @@ const CustomerCountry = () => {
         </Col>
       ))}
     </Row>
-  )
-}
+  );
+};
 
-export default CustomerCountry
+export default CustomerCountry;

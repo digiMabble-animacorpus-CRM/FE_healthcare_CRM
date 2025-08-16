@@ -1,4 +1,4 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
 export const basicPolarAreaOpts: ApexOptions = {
   series: [14, 23, 21, 17, 15, 10],
@@ -30,7 +30,7 @@ export const basicPolarAreaOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const monochromePolarAreaOpts: ApexOptions = {
   series: [42, 47, 52, 58, 65],
@@ -69,4 +69,4 @@ export const monochromePolarAreaOpts: ApexOptions = {
       shadeIntensity: 0.6,
     },
   },
-}
+};

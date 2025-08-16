@@ -1,15 +1,14 @@
-"use client";
+'use client';
 
-import avatar2 from "@/assets/images/users/avatar-2.jpg";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import Image from "next/image";
-import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
-import type { StaffType } from "@/types/data";
-import { useRouter } from "next/navigation";
-import { encryptAES, decryptAES } from "@/utils/encryption";
-import { useParams } from "next/navigation";
-import { string } from "yup";
-
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import type { StaffType } from '@/types/data';
+import { useRouter } from 'next/navigation';
+import { encryptAES, decryptAES } from '@/utils/encryption';
+import { useParams } from 'next/navigation';
+import { string } from 'yup';
 
 // const StaffDetails = ({ data }: { data: StaffType }) => {
 const StaffDetails = ({ data }: { data: StaffType }) => {
@@ -17,36 +16,32 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
   // const params = useParams();
   // const encryptedId = params?.id as string;
 
-  console.log(" Staff Details Data:", data);
-  console.log(" Raw Staff ID:", data?.id);
+  console.log(' Staff Details Data:', data);
+  console.log(' Raw Staff ID:', data?.id);
 
+  const handleEditClick = (id: string) => {
+    console.log('🧪 handleEditClick triggered with id:', id);
 
+    if (!id) {
+      console.error(' Staff ID is missing or undefined in handleEditClick');
+      return;
+    }
 
-const handleEditClick = (id: string) => {
-  console.log("🧪 handleEditClick triggered with id:", id);
+    try {
+      const encryptedId = encryptAES(id);
+      const encodedId = encodeURIComponent(encryptedId);
 
-  if (!id) {
-    console.error(" Staff ID is missing or undefined in handleEditClick");
-    return;
-  }
+      //  Save the data to sessionStorage
+      sessionStorage.setItem('selectedStaff', JSON.stringify(data));
 
-  try {
-    const encryptedId = encryptAES(id);
-    const encodedId = encodeURIComponent(encryptedId);
+      console.log(' Navigating to:', `/staffs/staffs-form/${encodedId}/edit`);
+      router.push(`/staffs/staffs-form/${encodedId}/edit`);
+    } catch (error) {
+      console.error(' Error during ID encryption or navigation:', error);
+    }
+  };
 
-    //  Save the data to sessionStorage
-    sessionStorage.setItem("selectedStaff", JSON.stringify(data));
-
-    console.log(" Navigating to:", `/staffs/staffs-form/${encodedId}/edit`);
-    router.push(`/staffs/staffs-form/${encodedId}/edit`);
-  } catch (error) {
-    console.error(" Error during ID encryption or navigation:", error);
-  }
-};
-
-
-  
- const handleEditPermissionClick = (id: string) => {
+  const handleEditPermissionClick = (id: string) => {
     const encryptedId = encodeURIComponent(encryptAES(id));
     router.push(`/staffs/staffs-form/${encryptedId}/permission`);
   };
@@ -75,12 +70,11 @@ const handleEditClick = (id: string) => {
             <Button
               variant="dark"
               className="avatar-sm d-flex align-items-center justify-content-center fs-20"
-          // onClick={() =>  handleEditClick(data.id)}
+              // onClick={() =>  handleEditClick(data.id)}
               onClick={() => handleEditClick(String(data.id))}
-               
             >
               <span>
-                {" "}
+                {' '}
                 <IconifyIcon icon="ri:edit-fill" />
               </span>
             </Button>
@@ -112,7 +106,7 @@ const handleEditClick = (id: string) => {
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
             <span
               className={`badge bg-${
-                data?.status === "active" ? "success" : "danger"
+                data?.status === 'active' ? 'success' : 'danger'
               } text-white fs-12 px-2 py-1`}
             >
               {data?.status}
@@ -122,12 +116,13 @@ const handleEditClick = (id: string) => {
         <Row className="my-4">
           <Col lg={8}>
             <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
-            <p className="mb-0">{data.address?.street} {data.address?.line2}, {data.address?.city}, {data.address?.country} - {data.address?.zip_code}</p>
+            <p className="mb-0">
+              {data.address?.street} {data.address?.line2}, {data.address?.city},{' '}
+              {data.address?.country} - {data.address?.zip_code}
+            </p>
           </Col>
           <Col lg={4}>
-            <p className="text-dark fw-semibold fs-16 mb-1">
-              Mode of Register :
-            </p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Mode of Register :</p>
             <p className="mb-0">Online</p>
           </Col>
         </Row>
@@ -144,10 +139,7 @@ const handleEditClick = (id: string) => {
               {Array.isArray(data?.tags) &&
                 data.tags.map((tag: string, i: number) => (
                   <p className="mb-0 d-flex align-items-center" key={i}>
-                    <IconifyIcon
-                      icon="ri:circle-fill"
-                      className="fs-10 me-2 text-success"
-                    />
+                    <IconifyIcon icon="ri:circle-fill" className="fs-10 me-2 text-success" />
                     {tag}
                   </p>
                 ))}

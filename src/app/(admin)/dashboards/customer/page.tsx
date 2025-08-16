@@ -1,15 +1,15 @@
-import PageTitle from '@/components/PageTitle'
-import CustomerByCountry from './components/CustomerByCountry'
-import CustomerCountry from './components/CustomerCountry'
-import CustomersInvest from './components/CustomersInvest'
-import PropertyInvestor from './components/PropertyInvestor'
-import TopCustomer from './components/TopCustomer'
-import CustomerVisit from './components/CustomerVisit'
-import PurchaseProperty from './components/PurchaseProperty'
-import { Col, Row } from 'react-bootstrap'
-import { Metadata } from 'next'
+import PageTitle from '@/components/PageTitle';
+import CustomerByCountry from './components/CustomerByCountry';
+import CustomerCountry from './components/CustomerCountry';
+import CustomersInvest from './components/CustomersInvest';
+import PropertyInvestor from './components/PropertyInvestor';
+import TopCustomer from './components/TopCustomer';
+import CustomerVisit from './components/CustomerVisit';
+import PurchaseProperty from './components/PurchaseProperty';
+import { Col, Row } from 'react-bootstrap';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Customers' }
+export const metadata: Metadata = { title: 'Customers' };
 
 const CustomerPage = () => {
   return (
@@ -34,7 +34,7 @@ const CustomerPage = () => {
         <PurchaseProperty />
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default CustomerPage
+export default CustomerPage;

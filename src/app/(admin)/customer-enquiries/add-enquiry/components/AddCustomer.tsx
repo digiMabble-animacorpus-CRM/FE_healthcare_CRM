@@ -1,33 +1,20 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { useForm, Controller } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Row,
-  Spinner,
-} from "react-bootstrap";
+import { useEffect, useMemo, useState } from 'react';
+import { useForm, Controller } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
 
-import { useRouter } from "next/navigation";
+import { useRouter } from 'next/navigation';
 
-import { getCustomerEnquiriesById } from "@/helpers/data";
-import type {
-  BranchType,
-  CustomerEnquiriesType,
-  LanguageType,
-} from "@/types/data";
-import TextFormInput from "@/components/from/TextFormInput";
-import TextAreaFormInput from "@/components/from/TextAreaFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import { getAllLanguages } from "@/helpers/languages";
-import { getAllBranch } from "@/helpers/branch";
+import { getCustomerEnquiriesById } from '@/helpers/data';
+import type { BranchType, CustomerEnquiriesType, LanguageType } from '@/types/data';
+import TextFormInput from '@/components/from/TextFormInput';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import { getAllLanguages } from '@/helpers/languages';
+import { getAllBranch } from '@/helpers/branch';
 
 type CustomerFormValues = {
   name: string;
@@ -46,29 +33,29 @@ type CustomerFormValues = {
 };
 
 const schema: yup.ObjectSchema<CustomerFormValues> = yup.object({
-  name: yup.string().required("Please enter name"),
-  email: yup.string().email("Invalid email").required("Please enter email"),
+  name: yup.string().required('Please enter name'),
+  email: yup.string().email('Invalid email').required('Please enter email'),
   number: yup
     .string()
-    .matches(/^\d{10}$/, "Enter valid 10-digit number")
-    .required("Please enter number"),
-  dob: yup.string().required("Please enter Date of birth"),
-  address: yup.string().required("Please enter address"),
-  description: yup.string().required("Please enter description"),
+    .matches(/^\d{10}$/, 'Enter valid 10-digit number')
+    .required('Please enter number'),
+  dob: yup.string().required('Please enter Date of birth'),
+  address: yup.string().required('Please enter address'),
+  description: yup.string().required('Please enter description'),
   zip_code: yup
     .string()
-    .matches(/^\d{5}$/, "Enter valid Zip-Code")
-    .required("Please enter Zip-Code"),
-  gender: yup.string().required("Please select gender"),
-  branch: yup.string().required("Please select branch"),
-  language: yup.string().required("Please select language"),
+    .matches(/^\d{5}$/, 'Enter valid Zip-Code')
+    .required('Please enter Zip-Code'),
+  gender: yup.string().required('Please select gender'),
+  branch: yup.string().required('Please select branch'),
+  language: yup.string().required('Please select language'),
   tags: yup
     .array()
     .of(yup.string().required())
-    .min(1, "Please select at least one tag")
-    .required("Please select tags"),
-  city: yup.string().required("Please select city"),
-  country: yup.string().required("Please select country"),
+    .min(1, 'Please select at least one tag')
+    .required('Please select tags'),
+  city: yup.string().required('Please select city'),
+  country: yup.string().required('Please select country'),
 });
 
 interface Props {
@@ -82,19 +69,19 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
 
   const [loading, setLoading] = useState<boolean>(isEditMode);
   const [defaultValues, setDefaultValues] = useState<CustomerFormValues>({
-    name: "",
-    email: "",
-    number: "",
-    dob: "",
-    description: "",
-    address: "",
-    zip_code: "",
-    gender: "",
-    language: "",
-    branch: "",
+    name: '',
+    email: '',
+    number: '',
+    dob: '',
+    description: '',
+    address: '',
+    zip_code: '',
+    gender: '',
+    language: '',
+    branch: '',
     tags: [],
-    city: "",
-    country: "",
+    city: '',
+    country: '',
   });
 
   const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
@@ -121,10 +108,10 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
             setDefaultValues(enquiries as CustomerFormValues);
             reset(enquiries as CustomerFormValues);
           } else {
-            console.error("Customer not found or invalid data format");
+            console.error('Customer not found or invalid data format');
           }
         } catch (error) {
-          console.error("Failed to fetch customer:", error);
+          console.error('Failed to fetch customer:', error);
         } finally {
           setLoading(false);
         }
@@ -140,10 +127,10 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
     }
 
     if (isEditMode) {
-      console.log("Edit Submitted Data:", data);
+      console.log('Edit Submitted Data:', data);
       // TODO: Update API call here
     } else {
-      console.log("Create Submitted Data:", data);
+      console.log('Create Submitted Data:', data);
       // TODO: Create API call here
     }
   };
@@ -160,9 +147,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
-          <CardTitle as="h4">
-            {isEditMode ? "Edit Customer" : "Add Customer"}
-          </CardTitle>
+          <CardTitle as="h4">{isEditMode ? 'Edit Customer' : 'Add Customer'}</CardTitle>
         </CardHeader>
         <CardBody>
           <Row>
@@ -217,9 +202,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.gender && (
-                <small className="text-danger">{errors.gender.message}</small>
-              )}
+              {errors.gender && <small className="text-danger">{errors.gender.message}</small>}
             </Col>
 
             <Col lg={6}>
@@ -240,9 +223,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.language && (
-                <small className="text-danger">{errors.language.message}</small>
-              )}
+              {errors.language && <small className="text-danger">{errors.language.message}</small>}
             </Col>
 
             <Col lg={6}>
@@ -266,9 +247,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.tags && (
-                <small className="text-danger">{errors.tags.message}</small>
-              )}
+              {errors.tags && <small className="text-danger">{errors.tags.message}</small>}
             </Col>
 
             <Col lg={6}>
@@ -289,9 +268,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.branch && (
-                <small className="text-danger">{errors.branch.message}</small>
-              )}
+              {errors.branch && <small className="text-danger">{errors.branch.message}</small>}
             </Col>
 
             <Col lg={6}>
@@ -339,9 +316,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.city && (
-                <small className="text-danger">{errors.city.message}</small>
-              )}
+              {errors.city && <small className="text-danger">{errors.city.message}</small>}
             </Col>
             <Col lg={4}>
               <label className="form-label">Country</label>
@@ -359,9 +334,7 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.country && (
-                <small className="text-danger">{errors.country.message}</small>
-              )}
+              {errors.country && <small className="text-danger">{errors.country.message}</small>}
             </Col>
           </Row>
         </CardBody>
@@ -370,15 +343,11 @@ const AddCustomer = ({ params, onSubmitHandler }: Props) => {
         <Row className="justify-content-end g-2 mt-2">
           <Col lg={2}>
             <Button variant="outline-primary" type="submit" className="w-100">
-              {isEditMode ? "Update" : "Create"} Customer
+              {isEditMode ? 'Update' : 'Create'} Customer
             </Button>
           </Col>
           <Col lg={2}>
-            <Button
-              variant="danger"
-              className="w-100"
-              onClick={() => router.back()}
-            >
+            <Button variant="danger" className="w-100" onClick={() => router.back()}>
               Cancel
             </Button>
           </Col>

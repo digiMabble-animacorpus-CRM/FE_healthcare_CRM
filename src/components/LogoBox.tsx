@@ -1,8 +1,8 @@
-import logoDark from '@/assets/images/logo-light2.png'
-import logoLight from '@/assets/images/logo-light2.png'
-import logoSm from '@/assets/images/logo-light23.png'
-import Image from 'next/image'
-import Link from 'next/link'
+import logoDark from '@/assets/images/logo-light2.png';
+import logoLight from '@/assets/images/logo-light2.png';
+import logoSm from '@/assets/images/logo-light23.png';
+import Image from 'next/image';
+import Link from 'next/link';
 
 const LogoBox = () => {
   return (
@@ -16,7 +16,7 @@ const LogoBox = () => {
         <Image width={120} height={150} src={logoLight} className="logo-lg" alt="logo light" />
       </Link>
     </div>
-  )
-}
+  );
+};
 
-export default LogoBox
+export default LogoBox;
