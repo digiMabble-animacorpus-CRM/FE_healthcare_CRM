@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
-import ResetPassword from './components/ResetPassword'
+import { Metadata } from 'next';
+import ResetPassword from './components/ResetPassword';
 
-export const metadata: Metadata = { title: 'Reset Password' }
+export const metadata: Metadata = { title: 'Reset Password' };
 
 const ResetPasswordPage = () => {
-  return <ResetPassword />
-}
+  return <ResetPassword />;
+};
 
-export default ResetPasswordPage
+export default ResetPasswordPage;

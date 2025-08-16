@@ -1,8 +1,8 @@
-import { Metadata } from 'next'
-import Link from 'next/link'
-import { Card, CardBody, Col, Row } from 'react-bootstrap'
+import { Metadata } from 'next';
+import Link from 'next/link';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
-export const metadata: Metadata = { title: '404' }
+export const metadata: Metadata = { title: '404' };
 
 const Error404AltPage = () => {
   return (
@@ -15,7 +15,8 @@ const Error404AltPage = () => {
                 <h1 className="mb-3 fw-bold fs-60">404</h1>
                 <h2 className="fs-22 lh-base">Page Not Found !</h2>
                 <p className="text-muted mt-1 mb-4">
-                  The page you&apos;re trying to reach seems to have gone <br /> missing in the digital wilderness.
+                  The page you&apos;re trying to reach seems to have gone <br /> missing in the
+                  digital wilderness.
                 </p>
                 <div className="text-center">
                   <Link href="/dashboards/analytics" className="btn btn-success">
@@ -28,7 +29,7 @@ const Error404AltPage = () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default Error404AltPage
+export default Error404AltPage;

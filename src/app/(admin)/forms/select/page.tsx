@@ -1,11 +1,11 @@
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import ChoicesFormInput from '@/components/from/ChoicesFormInput'
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import PageTitle from '@/components/PageTitle';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Form Select' }
+export const metadata: Metadata = { title: 'Form Select' };
 
 const BasicExample = () => {
   return (
@@ -21,8 +21,8 @@ const BasicExample = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const OptionGroups = () => {
   return (
@@ -67,12 +67,16 @@ const OptionGroups = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const OptionWithNoSearch = () => {
   return (
-    <ComponentContainerCard id="options-add-no-search" title="Options added via config with no search" titleClass="mb-3">
+    <ComponentContainerCard
+      id="options-add-no-search"
+      title="Options added via config with no search"
+      titleClass="mb-3"
+    >
       <Row>
         <Col lg={6}>
           <ChoicesFormInput options={{ removeItemButton: true, searchEnabled: false }}>
@@ -87,12 +91,16 @@ const OptionWithNoSearch = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const OptionWithNoSorting = () => {
   return (
-    <ComponentContainerCard id="options-add-no-sorting" title=" Options added via config with no sorting" titleClass="mb-3">
+    <ComponentContainerCard
+      id="options-add-no-sorting"
+      title=" Options added via config with no sorting"
+      titleClass="mb-3"
+    >
       <Row>
         <Col lg={6}>
           <ChoicesFormInput options={{ shouldSort: false }}>
@@ -120,8 +128,8 @@ const OptionWithNoSorting = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const MultipleSelect = () => {
   return (
@@ -141,12 +149,16 @@ const MultipleSelect = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const MultipleSelectWithRemoveButton = () => {
   return (
-    <ComponentContainerCard id="multiple-select-remove" title="Multiple select With remove button input" titleClass="mb-3">
+    <ComponentContainerCard
+      id="multiple-select-remove"
+      title="Multiple select With remove button input"
+      titleClass="mb-3"
+    >
       <Row>
         <Col lg={6}>
           <ChoicesFormInput options={{ removeItemButton: true }} multiple>
@@ -158,12 +170,16 @@ const MultipleSelectWithRemoveButton = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const MultipleSelectOptionGroups = () => {
   return (
-    <ComponentContainerCard id="multiple-groups" title="Multiple select With Option groups" titleClass="mb-3">
+    <ComponentContainerCard
+      id="multiple-groups"
+      title="Multiple select With Option groups"
+      titleClass="mb-3"
+    >
       <Row>
         <Col lg={6}>
           <ChoicesFormInput options={{ placeholderValue: 'choose a city' }} multiple>
@@ -204,8 +220,8 @@ const MultipleSelectOptionGroups = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TextInputs = () => {
   return (
@@ -214,9 +230,14 @@ const TextInputs = () => {
       title="Text Inputs"
       description={
         <>
-          Set <code>data-choices data-choices-limit=&quot;Required Limit&quot; data-choices-removeItem</code> attribute.
+          Set{' '}
+          <code>
+            data-choices data-choices-limit=&quot;Required Limit&quot; data-choices-removeItem
+          </code>{' '}
+          attribute.
         </>
-      }>
+      }
+    >
       <Row>
         <Col lg={6}>
           <label htmlFor="choices-text-remove-button" className="form-label text-muted">
@@ -234,8 +255,8 @@ const TextInputs = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TextInputsWithUniqueValue = () => {
   return (
@@ -246,7 +267,8 @@ const TextInputsWithUniqueValue = () => {
         <>
           Set <code>data-choices data-choices-text-unique-true</code> attribute.
         </>
-      }>
+      }
+    >
       <Row>
         <Col lg={6}>
           <label htmlFor="choices-text-unique-values" className="form-label text-muted">
@@ -264,8 +286,8 @@ const TextInputsWithUniqueValue = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const DisabledInput = () => {
   return (
@@ -276,7 +298,8 @@ const DisabledInput = () => {
         <>
           Set <code>data-choices data-choices-text-disabled-true</code> attribute.
         </>
-      }>
+      }
+    >
       <div className="w-50 mb-3">
         <label htmlFor="choices-text-disabled" className="form-label text-muted">
           Disabled
@@ -292,8 +315,8 @@ const DisabledInput = () => {
         />
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const Select = () => {
   return (
@@ -310,13 +333,14 @@ const Select = () => {
                   size="sm"
                   className="rounded-2 float-end"
                   href="https://github.com/Choices-js/Choices"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </Button>
               </CardTitle>
               <p className="text-muted mb-3">
-                Choices.js is a A vanilla, lightweight, configurable select box/text input plugin. Similar to Select2 and Selectize but without the
-                jQuery dependency.
+                Choices.js is a A vanilla, lightweight, configurable select box/text input plugin.
+                Similar to Select2 and Selectize but without the jQuery dependency.
               </p>
             </CardBody>
           </Card>
@@ -337,9 +361,15 @@ const Select = () => {
               { link: '#basic', label: 'Basic Example' },
               { link: '#options-group', label: 'Option Groups Example' },
               { link: '#options-add-no-search', label: 'Options added via config with no search' },
-              { link: '#options-add-no-sorting', label: 'Options added via config with no sorting' },
+              {
+                link: '#options-add-no-sorting',
+                label: 'Options added via config with no sorting',
+              },
               { link: '#multiple-select', label: 'Multiple select input' },
-              { link: '#multiple-select-remove', label: 'Multiple select With remove button input' },
+              {
+                link: '#multiple-select-remove',
+                label: 'Multiple select With remove button input',
+              },
               { link: '#multiple-groups', label: 'Multiple select With Option groups' },
               { link: '#text-input', label: 'Text inputs' },
               { link: '#unique-values', label: 'Text inputs in Unique values only,no pasting' },
@@ -348,7 +378,7 @@ const Select = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Select
+export default Select;

@@ -1,9 +1,9 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { currency } from '@/context/constants'
-import { ApexOptions } from 'apexcharts'
-import ReactApexChart from 'react-apexcharts'
-import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
+'use client';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { currency } from '@/context/constants';
+import { ApexOptions } from 'apexcharts';
+import ReactApexChart from 'react-apexcharts';
+import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
 
 const OwnProperty = () => {
   const OwnPropertyOptions: ApexOptions = {
@@ -73,7 +73,7 @@ const OwnProperty = () => {
       lineCap: 'round',
     },
     labels: ['Own'],
-  }
+  };
 
   return (
     <Card>
@@ -81,7 +81,13 @@ const OwnProperty = () => {
         <CardTitle as={'h4'}>Own Property</CardTitle>
       </CardHeader>
       <CardBody>
-        <ReactApexChart options={OwnPropertyOptions} series={OwnPropertyOptions.series} height={343} type="radialBar" className="apex-charts" />
+        <ReactApexChart
+          options={OwnPropertyOptions}
+          series={OwnPropertyOptions.series}
+          height={343}
+          type="radialBar"
+          className="apex-charts"
+        />
         <div className="d-flex justify-content-between align-content-center">
           <div className="d-flex align-items-center gap-3">
             <div className="avatar flex-shrink-0">
@@ -108,7 +114,7 @@ const OwnProperty = () => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default OwnProperty
+export default OwnProperty;

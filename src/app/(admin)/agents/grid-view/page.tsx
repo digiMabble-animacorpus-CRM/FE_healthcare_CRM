@@ -1,12 +1,12 @@
-import PageTitle from '@/components/PageTitle'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Link from 'next/link'
-import { Card, CardHeader, Col, Row } from 'react-bootstrap'
-import AgentData from './Components/AgentData'
-import AgentGridCard from './Components/AgentGridCard'
-import { Metadata } from 'next'
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Link from 'next/link';
+import { Card, CardHeader, Col, Row } from 'react-bootstrap';
+import AgentData from './Components/AgentData';
+import AgentGridCard from './Components/AgentGridCard';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Agent Grid' }
+export const metadata: Metadata = { title: 'Agent Grid' };
 
 const GridViewPage = () => {
   return (
@@ -75,7 +75,7 @@ const GridViewPage = () => {
         </nav>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default GridViewPage
+export default GridViewPage;

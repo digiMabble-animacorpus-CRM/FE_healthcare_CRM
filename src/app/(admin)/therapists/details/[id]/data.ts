@@ -1,13 +1,13 @@
-import { currency } from '@/context/constants'
+import { currency } from '@/context/constants';
 
 export type CustomerType = {
-  title: string
-  Property: number
-  icon: string
-  count: string
-  progress: number
-  variant: string
-}
+  title: string;
+  Property: number;
+  icon: string;
+  count: string;
+  progress: number;
+  variant: string;
+};
 
 export const customerData: CustomerType[] = [
   {
@@ -34,4 +34,4 @@ export const customerData: CustomerType[] = [
     progress: 80,
     variant: 'primary',
   },
-]
+];

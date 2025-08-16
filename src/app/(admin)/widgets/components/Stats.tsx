@@ -1,10 +1,10 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { Card, CardBody, Col, Row } from 'react-bootstrap'
-import { stateData } from '../data'
-import { StatType } from '../type'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
+import { stateData } from '../data';
+import { StatType } from '../type';
 
 const StatsCard = ({ stat }: { stat: StatType }) => {
-  const { amount, change, changeColor, badgeIcon, icon, iconColor, title } = stat
+  const { amount, change, changeColor, badgeIcon, icon, iconColor, title } = stat;
   return (
     <Card>
       <CardBody className="overflow-hidden position-relative">
@@ -18,8 +18,8 @@ const StatsCard = ({ stat }: { stat: StatType }) => {
         <IconifyIcon icon={badgeIcon} className="widget-icon" />
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const Stats = () => {
   return (
@@ -32,7 +32,7 @@ const Stats = () => {
         ))}
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Stats
+export default Stats;

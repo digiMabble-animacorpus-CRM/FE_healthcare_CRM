@@ -1,13 +1,13 @@
-import PageTitle from "@/components/PageTitle";
-import { getAllProperty, getCustomerEnquiriesById } from "@/helpers/data";
-import CustomersDetails from "./components/CustomersDetails";
-import WeeklyInquiry from "./components/WeeklyInquiry";
-import TransactionHistory from "./components/TransactionHistory";
-import type { CustomerEnquiriesType } from "@/types/data";
-import { Col, Row } from "react-bootstrap";
-import { Metadata } from "next";
+import PageTitle from '@/components/PageTitle';
+import { getAllProperty, getCustomerEnquiriesById } from '@/helpers/data';
+import CustomersDetails from './components/CustomersDetails';
+import WeeklyInquiry from './components/WeeklyInquiry';
+import TransactionHistory from './components/TransactionHistory';
+import type { CustomerEnquiriesType } from '@/types/data';
+import { Col, Row } from 'react-bootstrap';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: "Customer Overview" };
+export const metadata: Metadata = { title: 'Customer Overview' };
 
 interface Props {
   params: { id: string };

@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllRadarCharts from './components/AllRadarCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllRadarCharts from './components/AllRadarCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Radar Chart' }
+export const metadata: Metadata = { title: 'Radar Chart' };
 
 const RadarCharts = () => {
   return (
@@ -25,7 +25,7 @@ const RadarCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default RadarCharts
+export default RadarCharts;

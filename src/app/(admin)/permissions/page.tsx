@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import PageTitle from "@/components/PageTitle";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { useEffect, useState } from "react";
-import type { PermissionType } from "@/types/data";
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { useEffect, useState } from 'react';
+import type { PermissionType } from '@/types/data';
 import {
   Button,
   Card,
@@ -15,9 +15,9 @@ import {
   Modal,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import { getPermissions } from "@/helpers/permission";
+} from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import { getPermissions } from '@/helpers/permission';
 
 const PAGE_LIMIT = 10;
 
@@ -25,7 +25,7 @@ const PermissionsListPage = () => {
   const [permissions, setPermissions] = useState<PermissionType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPermissionId, setSelectedPermissionId] = useState<string | null>(null);
@@ -39,7 +39,7 @@ const PermissionsListPage = () => {
       setPermissions(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error("Failed to fetch permissions:", error);
+      console.error('Failed to fetch permissions:', error);
     } finally {
       setLoading(false);
     }
@@ -69,12 +69,12 @@ const PermissionsListPage = () => {
 
     try {
       await fetch(`/api/permissions/${selectedPermissionId}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
       fetchPermissionsList(currentPage);
     } catch (error) {
-      console.error("Failed to delete permission:", error);
+      console.error('Failed to delete permission:', error);
     } finally {
       setShowDeleteModal(false);
       setSelectedPermissionId(null);
@@ -93,7 +93,7 @@ const PermissionsListPage = () => {
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
-                <div style={{ minWidth: "200px" }}>
+                <div style={{ minWidth: '200px' }}>
                   <input
                     type="text"
                     className="form-control form-control-sm"
@@ -105,7 +105,10 @@ const PermissionsListPage = () => {
                     }}
                   />
                 </div>
-                <Button variant="primary" onClick={() => router.push("/permissions/permission-form/create")}>
+                <Button
+                  variant="primary"
+                  onClick={() => router.push('/permissions/permission-form/create')}
+                >
                   Create New Permission
                 </Button>
               </div>
@@ -140,14 +143,20 @@ const PermissionsListPage = () => {
                                 size="sm"
                                 onClick={() => handleEditPermission(permission._id)}
                               >
-                                <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
+                                <IconifyIcon
+                                  icon="solar:pen-2-broken"
+                                  className="align-middle fs-18"
+                                />
                               </Button>
                               <Button
                                 variant="soft-danger"
                                 size="sm"
                                 onClick={() => handleDeletePermission(permission._id)}
                               >
-                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                                <IconifyIcon
+                                  icon="solar:trash-bin-minimalistic-2-broken"
+                                  className="align-middle fs-18"
+                                />
                               </Button>
                             </div>
                           </td>
@@ -162,7 +171,7 @@ const PermissionsListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -173,7 +182,7 @@ const PermissionsListPage = () => {
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
                     <li
-                      className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
+                      className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
                       key={index}
                     >
                       <Button
@@ -185,7 +194,7 @@ const PermissionsListPage = () => {
                       </Button>
                     </li>
                   ))}
-                  <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -201,11 +210,7 @@ const PermissionsListPage = () => {
         </Col>
       </Row>
 
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>

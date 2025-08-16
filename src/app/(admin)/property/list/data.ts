@@ -1,12 +1,12 @@
-import { currency } from '@/context/constants'
+import { currency } from '@/context/constants';
 
 export type PropertyStatType = {
-  title: string
-  amount: string
-  icon: string
-  change: number
-  variant: string
-}
+  title: string;
+  amount: string;
+  icon: string;
+  change: number;
+  variant: string;
+};
 
 export const propertyStatData: PropertyStatType[] = [
   {
@@ -37,4 +37,4 @@ export const propertyStatData: PropertyStatType[] = [
     change: 12,
     variant: 'danger',
   },
-]
+];

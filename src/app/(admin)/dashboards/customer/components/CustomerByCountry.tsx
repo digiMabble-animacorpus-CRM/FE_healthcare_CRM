@@ -1,6 +1,6 @@
-'use client'
-import WorldVectorMap from '@/components/VectorMap/WorldMap'
-import { Card, CardBody, CardHeader, CardTitle, Col } from 'react-bootstrap'
+'use client';
+import WorldVectorMap from '@/components/VectorMap/WorldMap';
+import { Card, CardBody, CardHeader, CardTitle, Col } from 'react-bootstrap';
 
 const CustomerByCountry = () => {
   const worldMapOptions = {
@@ -34,7 +34,7 @@ const CustomerByCountry = () => {
         fillOpacity: 1,
       },
     },
-  }
+  };
 
   return (
     <Col lg={6}>
@@ -47,7 +47,7 @@ const CustomerByCountry = () => {
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default CustomerByCountry
+export default CustomerByCountry;

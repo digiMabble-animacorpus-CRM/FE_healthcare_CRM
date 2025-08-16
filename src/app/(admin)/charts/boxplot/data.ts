@@ -1,4 +1,4 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
 export const basicBoxplotOpts: ApexOptions = {
   series: [
@@ -54,7 +54,7 @@ export const basicBoxplotOpts: ApexOptions = {
   stroke: {
     colors: ['#a1a9b1'],
   },
-}
+};
 
 export const scatterBoxplotOpts: ApexOptions = {
   series: [
@@ -133,7 +133,7 @@ export const scatterBoxplotOpts: ApexOptions = {
     type: 'datetime',
     tooltip: {
       formatter: function (val: string) {
-        return new Date(val).getFullYear().toString()
+        return new Date(val).getFullYear().toString();
       },
     },
   },
@@ -154,4 +154,4 @@ export const scatterBoxplotOpts: ApexOptions = {
       },
     },
   },
-}
+};

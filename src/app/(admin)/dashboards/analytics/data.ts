@@ -1,21 +1,21 @@
-import { currency } from '@/context/constants'
-import { ApexOptions } from 'apexcharts'
+import { currency } from '@/context/constants';
+import { ApexOptions } from 'apexcharts';
 
 export type StatisticType = {
-  icon: string
-  title: string
-  amount: string
-  change: number
-  variant?: string
-}
+  icon: string;
+  title: string;
+  amount: string;
+  change: number;
+  variant?: string;
+};
 
 export type PropertyType = {
-  title: string
-  icon: string
-  amount: string
-  progress: number
-  variant: string
-}
+  title: string;
+  icon: string;
+  amount: string;
+  progress: number;
+  variant: string;
+};
 
 export const statisticData: StatisticType[] = [
   {
@@ -43,7 +43,7 @@ export const statisticData: StatisticType[] = [
     amount: `${currency}78.3M`,
     change: 8.76,
   },
-]
+];
 
 export const propertyData: PropertyType[] = [
   {
@@ -60,7 +60,7 @@ export const propertyData: PropertyType[] = [
     progress: 80,
     variant: 'success',
   },
-]
+];
 
 export const chartOptions: ApexOptions = {
   chart: {
@@ -128,7 +128,7 @@ export const chartOptions: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const salesChart: ApexOptions = {
   chart: {
@@ -190,7 +190,7 @@ export const salesChart: ApexOptions = {
   yaxis: {
     labels: {
       formatter: function (value, index) {
-        return value / 1000 + 'K'
+        return value / 1000 + 'K';
       },
       offsetX: -15,
       offsetY: 0,
@@ -245,7 +245,7 @@ export const salesChart: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const socialOptions: ApexOptions = {
   chart: {
@@ -319,7 +319,7 @@ export const socialOptions: ApexOptions = {
     lineCap: 'round',
   },
   labels: ['Total Buyer'],
-}
+};
 
 export const salesOptions: ApexOptions = {
   chart: {
@@ -389,4 +389,4 @@ export const salesOptions: ApexOptions = {
       },
     },
   ],
-}
+};

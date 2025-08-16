@@ -1,25 +1,12 @@
-"use client";
+'use client';
 
-import {
-  useFormContext,
-  Controller,
-  useFieldArray,
-  useWatch,
-} from "react-hook-form";
-import { Button, Col, Row } from "react-bootstrap";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import TextFormInput from "@/components/from/TextFormInput";
-import type { StaffType } from "@/types/data";
+import { useFormContext, Controller, useFieldArray, useWatch } from 'react-hook-form';
+import { Button, Col, Row } from 'react-bootstrap';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import TextFormInput from '@/components/from/TextFormInput';
+import type { StaffType } from '@/types/data';
 
-const weekDays = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
+const weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 const AvailabilitySection = () => {
   const {
@@ -28,15 +15,13 @@ const AvailabilitySection = () => {
   } = useFormContext<StaffType>();
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "availability",
+    name: 'availability',
   });
 
-  const currentAvailability = useWatch({ control, name: "availability" }) || [];
+  const currentAvailability = useWatch({ control, name: 'availability' }) || [];
 
   // Get selected days to avoid duplication
-  const selectedDays = currentAvailability
-    .map((slot: any) => slot?.day)
-    .filter(Boolean);
+  const selectedDays = currentAvailability.map((slot: any) => slot?.day).filter(Boolean);
 
   return (
     <div className="mb-4">
@@ -60,8 +45,7 @@ const AvailabilitySection = () => {
                         key={day}
                         value={day}
                         disabled={
-                          selectedDays.includes(day) &&
-                          day !== currentAvailability[index]?.day
+                          selectedDays.includes(day) && day !== currentAvailability[index]?.day
                         }
                       >
                         {day}
@@ -94,11 +78,7 @@ const AvailabilitySection = () => {
           </Col>
 
           <Col md={2}>
-            <Button
-              variant="outline-danger"
-              className="w-100"
-              onClick={() => remove(index)}
-            >
+            <Button variant="outline-danger" className="w-100" onClick={() => remove(index)}>
               Remove
             </Button>
           </Col>
@@ -107,10 +87,7 @@ const AvailabilitySection = () => {
 
       <div className="mt-3">
         {selectedDays.length < weekDays.length && (
-          <Button
-            variant="outline-primary"
-            onClick={() => append({ day: "", from: "", to: "" })}
-          >
+          <Button variant="outline-primary" onClick={() => append({ day: '', from: '', to: '' })}>
             + Add Another
           </Button>
         )}

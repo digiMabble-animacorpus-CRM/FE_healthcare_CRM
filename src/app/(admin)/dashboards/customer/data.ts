@@ -1,15 +1,15 @@
-import flagBeImg from '@/assets/images/flag/be.png'
-import { ApexOptions } from 'apexcharts'
-import { StaticImageData } from 'next/image'
+import flagBeImg from '@/assets/images/flag/be.png';
+import { ApexOptions } from 'apexcharts';
+import { StaticImageData } from 'next/image';
 
 export type CustomersCountryType = {
-  country: string
-  amount: string
-  change: string
-  progress: number
-  image: StaticImageData
-  totalCustomers: number
-}
+  country: string;
+  amount: string;
+  change: string;
+  progress: number;
+  image: StaticImageData;
+  totalCustomers: number;
+};
 
 export const customersCountryData: CustomersCountryType[] = [
   {
@@ -36,7 +36,7 @@ export const customersCountryData: CustomersCountryType[] = [
     image: flagBeImg,
     totalCustomers: 8901,
   },
-]
+];
 
 export const propertyOptions: ApexOptions = {
   chart: {
@@ -78,7 +78,20 @@ export const propertyOptions: ApexOptions = {
     show: !1,
   },
   xaxis: {
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'July', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    categories: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'July',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ],
     axisBorder: {
       show: !1,
     },
@@ -96,9 +109,9 @@ export const propertyOptions: ApexOptions = {
       {
         formatter: function (y) {
           if (typeof y !== 'undefined') {
-            return '€' + y.toFixed(2) + 'k'
+            return '€' + y.toFixed(2) + 'k';
           }
-          return y
+          return y;
         },
       },
     ],
@@ -113,7 +126,7 @@ export const propertyOptions: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const customersInvestOptions: ApexOptions = {
   chart: {
@@ -135,7 +148,7 @@ export const customersInvestOptions: ApexOptions = {
   dataLabels: {
     enabled: true,
     formatter: function (val) {
-      return val + '%'
+      return val + '%';
     },
     offsetY: -25,
     style: {
@@ -185,7 +198,7 @@ export const customersInvestOptions: ApexOptions = {
     labels: {
       show: true,
       formatter: function (val) {
-        return val + '%'
+        return val + '%';
       },
     },
   },
@@ -196,7 +209,7 @@ export const customersInvestOptions: ApexOptions = {
     },
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const customerVisit: ApexOptions = {
   chart: {
@@ -240,7 +253,7 @@ export const customerVisit: ApexOptions = {
     y: {
       title: {
         formatter: function (seriesName) {
-          return ''
+          return '';
         },
       },
     },
@@ -248,4 +261,4 @@ export const customerVisit: ApexOptions = {
       show: false,
     },
   },
-}
+};

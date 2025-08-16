@@ -1,4 +1,4 @@
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
 export const basicChartOpts: ApexOptions = {
   chart: {
@@ -63,11 +63,11 @@ export const basicChartOpts: ApexOptions = {
   tooltip: {
     y: {
       formatter: function (val: any) {
-        return '€ ' + val + ' thousands'
+        return '€ ' + val + ' thousands';
       },
     },
   },
-}
+};
 
 export const dataLabelsChartOpts: ApexOptions = {
   chart: {
@@ -88,7 +88,7 @@ export const dataLabelsChartOpts: ApexOptions = {
   dataLabels: {
     enabled: true,
     formatter: function (val) {
-      return val + '%'
+      return val + '%';
     },
     offsetY: -25,
     style: {
@@ -110,7 +110,20 @@ export const dataLabelsChartOpts: ApexOptions = {
     },
   ],
   xaxis: {
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    categories: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ],
     position: 'top',
     labels: {
       offsetY: 0,
@@ -160,7 +173,7 @@ export const dataLabelsChartOpts: ApexOptions = {
     labels: {
       show: false,
       formatter: function (val) {
-        return val + '%'
+        return val + '%';
       },
     },
   },
@@ -180,7 +193,7 @@ export const dataLabelsChartOpts: ApexOptions = {
     },
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const stackedChartOpts: ApexOptions = {
   chart: {
@@ -212,7 +225,16 @@ export const stackedChartOpts: ApexOptions = {
     },
   ],
   xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2', '2012 Q3', '2012 Q4'],
+    categories: [
+      '2011 Q1',
+      '2011 Q2',
+      '2011 Q3',
+      '2011 Q4',
+      '2012 Q1',
+      '2012 Q2',
+      '2012 Q3',
+      '2012 Q4',
+    ],
   },
   colors: ['#4697ce', '#f8ac59', '#7dcc93'],
   fill: {
@@ -231,7 +253,7 @@ export const stackedChartOpts: ApexOptions = {
       bottom: 5,
     },
   },
-}
+};
 
 export const fullStackedChartOpts: ApexOptions = {
   chart: {
@@ -263,7 +285,16 @@ export const fullStackedChartOpts: ApexOptions = {
     },
   ],
   xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2', '2012 Q3', '2012 Q4'],
+    categories: [
+      '2011 Q1',
+      '2011 Q2',
+      '2011 Q3',
+      '2011 Q4',
+      '2012 Q1',
+      '2012 Q2',
+      '2012 Q3',
+      '2012 Q4',
+    ],
   },
   fill: {
     opacity: 1,
@@ -282,7 +313,7 @@ export const fullStackedChartOpts: ApexOptions = {
       bottom: 5,
     },
   },
-}
+};
 
 export const markersChartOpts: ApexOptions = {
   series: [
@@ -412,7 +443,7 @@ export const markersChartOpts: ApexOptions = {
       fillColors: ['#e06d94', '#57606c'],
     },
   },
-}
+};
 
 export const groupLabelChartOpts: ApexOptions = {
   series: [
@@ -499,7 +530,7 @@ export const groupLabelChartOpts: ApexOptions = {
       // }
     },
   },
-}
+};
 
 export const columnWithRotatedLabelsOpts: ApexOptions = {
   annotations: {
@@ -592,7 +623,7 @@ export const columnWithRotatedLabelsOpts: ApexOptions = {
       stops: [50, 0, 100],
     },
   },
-}
+};
 
 export const columnWithNegativeValueOpts: ApexOptions = {
   chart: {
@@ -629,8 +660,9 @@ export const columnWithNegativeValueOpts: ApexOptions = {
     {
       name: 'Cash Flow',
       data: [
-        1.45, 5.42, 5.9, -0.42, -12.6, -18.1, -18.2, -14.16, -11.1, -6.09, 0.34, 3.88, 13.07, 5.8, 2, 7.37, 8.1, 13.57, 15.75, 17.1, 19.8, -27.03,
-        -54.4, -47.2, -43.3, -18.6, -48.6, -41.1, -39.6, -37.6, -29.4, -21.4, -2.4,
+        1.45, 5.42, 5.9, -0.42, -12.6, -18.1, -18.2, -14.16, -11.1, -6.09, 0.34, 3.88, 13.07, 5.8,
+        2, 7.37, 8.1, 13.57, 15.75, 17.1, 19.8, -27.03, -54.4, -47.2, -43.3, -18.6, -48.6, -41.1,
+        -39.6, -37.6, -29.4, -21.4, -2.4,
       ],
     },
   ],
@@ -640,7 +672,7 @@ export const columnWithNegativeValueOpts: ApexOptions = {
     },
     labels: {
       formatter: function (y) {
-        return y.toFixed(0) + '%'
+        return y.toFixed(0) + '%';
       },
     },
   },
@@ -692,7 +724,7 @@ export const columnWithNegativeValueOpts: ApexOptions = {
     },
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const distributedColumnOpts: ApexOptions = {
   chart: {
@@ -703,7 +735,7 @@ export const distributedColumnOpts: ApexOptions = {
     },
     events: {
       click: function (chart, w, e) {
-        console.info(chart, w, e)
+        console.info(chart, w, e);
       },
     },
   },
@@ -726,7 +758,16 @@ export const distributedColumnOpts: ApexOptions = {
     categories: ['John', 'Joe', 'Jake', 'Amber', 'Peter', 'Mary', 'David', 'Lily'],
     labels: {
       style: {
-        colors: ['#4697ce', '#53389f', '#7f56da', '#ff86c8', '#e06d94', '#63b7e6', '#f8ac59', '#7dcc93'],
+        colors: [
+          '#4697ce',
+          '#53389f',
+          '#7f56da',
+          '#ff86c8',
+          '#e06d94',
+          '#63b7e6',
+          '#f8ac59',
+          '#7dcc93',
+        ],
         fontSize: '14px',
       },
     },
@@ -741,7 +782,7 @@ export const distributedColumnOpts: ApexOptions = {
     },
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const rangeColumnOpts: ApexOptions = {
   chart: {
@@ -807,4 +848,4 @@ export const rangeColumnOpts: ApexOptions = {
       ],
     },
   ],
-}
+};

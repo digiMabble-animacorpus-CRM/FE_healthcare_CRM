@@ -1,15 +1,15 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { useEmailContext } from '@/context/useEmailContext'
-import { getAllUsers, getEmailsCategoryCount } from '@/helpers/data'
-import { useFetchData } from '@/hooks/useFetchData'
-import useToggle from '@/hooks/useToggle'
-import useViewPort from '@/hooks/useViewPort'
-import { EmailCountType } from '@/types/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+'use client';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { useEmailContext } from '@/context/useEmailContext';
+import { getAllUsers, getEmailsCategoryCount } from '@/helpers/data';
+import { useFetchData } from '@/hooks/useFetchData';
+import useToggle from '@/hooks/useToggle';
+import useViewPort from '@/hooks/useViewPort';
+import { EmailCountType } from '@/types/data';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 import {
   Button,
   CardBody,
@@ -22,25 +22,32 @@ import {
   ModalBody,
   ModalHeader,
   Offcanvas,
-} from 'react-bootstrap'
+} from 'react-bootstrap';
 
 const NavBar = () => {
-  const inboxUser = useFetchData(getAllUsers)
-  const { activeLabel, changeActiveLabel } = useEmailContext()
+  const inboxUser = useFetchData(getAllUsers);
+  const { activeLabel, changeActiveLabel } = useEmailContext();
 
-  const [emailsCount, setEmailsCount] = useState<EmailCountType>({ inbox: 0, starred: 0, draft: 0, sent: 0, deleted: 0, important: 0 })
+  const [emailsCount, setEmailsCount] = useState<EmailCountType>({
+    inbox: 0,
+    starred: 0,
+    draft: 0,
+    sent: 0,
+    deleted: 0,
+    important: 0,
+  });
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = await getEmailsCategoryCount()
-      if (data) setEmailsCount(data)
-    }
-    fetchData()
-  }, [])
+      const data = await getEmailsCategoryCount();
+      if (data) setEmailsCount(data);
+    };
+    fetchData();
+  }, []);
 
-  const { isTrue, toggle: toggleCollapse } = useToggle()
-  const { isTrue: compaseTrue, toggle: toggleCompase } = useToggle()
-  const { isTrue: isOpenContact, toggle: toggleContact } = useToggle()
+  const { isTrue, toggle: toggleCollapse } = useToggle();
+  const { isTrue: compaseTrue, toggle: toggleCompase } = useToggle();
+  const { isTrue: isOpenContact, toggle: toggleContact } = useToggle();
   return (
     <>
       <div>
@@ -50,7 +57,8 @@ const NavBar = () => {
             onClick={toggleCompase}
             className="btn btn-danger w-100 d-flex align-items-center  justify-content-center"
             data-bs-toggle="modal"
-            data-bs-target="#compose-modal">
+            data-bs-target="#compose-modal"
+          >
             <span className="fw-semibold">
               <IconifyIcon icon="solar:pen-new-square-broken" className="align-middle me-1 fs-16" />
               Compose
@@ -61,7 +69,8 @@ const NavBar = () => {
             className="btn btn-icon btn-soft-danger d-xl-none"
             data-bs-dismiss="offcanvas"
             data-bs-target="#offcanvasExample"
-            aria-label="Close">
+            aria-label="Close"
+          >
             <IconifyIcon icon="ri:close-line" className="fs-22" />
           </button>
         </div>
@@ -71,7 +80,13 @@ const NavBar = () => {
           <h5 className="modal-title text-white" id="compose-modalLabel">
             New Message
           </h5>
-          <button type="button" className="btn-close btn-close-white" onClick={toggleCompase} data-bs-dismiss="modal" aria-label="Close" />
+          <button
+            type="button"
+            className="btn-close btn-close-white"
+            onClick={toggleCompase}
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          />
         </ModalHeader>
         <ModalBody className="p-4">
           <div className="overflow-hidden">
@@ -86,7 +101,11 @@ const NavBar = () => {
             </div>
             <div className="d-flex float-end">
               <Dropdown className="me-1">
-                <DropdownToggle className="arrow-none btn btn-light" data-bs-toggle="dropdown" aria-expanded="false">
+                <DropdownToggle
+                  className="arrow-none btn btn-light"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
                   <IconifyIcon icon="ri:more-2-fill" className="fs-18" />
                 </DropdownToggle>
                 <DropdownMenu className="dropdown-menu-up">
@@ -157,18 +176,25 @@ const NavBar = () => {
             data-bs-toggle="collapse"
             data-bs-target="#labels"
             aria-expanded="false"
-            aria-controls="labels">
+            aria-controls="labels"
+          >
             Labels <IconifyIcon icon="ri:arrow-down-s-line" className="ms-auto" />
           </span>
           <Collapse in={isTrue}>
             <div>
               <div className="email-menu-list d-flex flex-column gap-2 mt-2">
                 <Link href="">
-                  <IconifyIcon icon="solar:camera-square-bold" className="me-2 fs-18 text-success" />
+                  <IconifyIcon
+                    icon="solar:camera-square-bold"
+                    className="me-2 fs-18 text-success"
+                  />
                   <span>Collaboration</span>
                 </Link>
                 <Link href="">
-                  <IconifyIcon icon="solar:camera-square-bold" className="me-2 fs-18 text-warning" />
+                  <IconifyIcon
+                    icon="solar:camera-square-bold"
+                    className="me-2 fs-18 text-warning"
+                  />
                   <span>New Client</span>
                 </Link>
                 <Link href="">
@@ -187,7 +213,8 @@ const NavBar = () => {
             data-bs-toggle="collapse"
             data-bs-target="#contacts"
             aria-expanded="false"
-            aria-controls="contacts">
+            aria-controls="contacts"
+          >
             Contacts <IconifyIcon icon="ri:arrow-down-s-line" className="ms-auto" />
           </Link>
           <Collapse in={isOpenContact}>
@@ -207,22 +234,27 @@ const NavBar = () => {
         </CardBody>
       </SimplebarReactClient>
     </>
-  )
-}
+  );
+};
 
 const EmailNavigationMenu = () => {
-  const { composeEmail } = useEmailContext()
-  const { width } = useViewPort()
+  const { composeEmail } = useEmailContext();
+  const { width } = useViewPort();
   const {
     navigationBar: { open, toggle },
-  } = useEmailContext()
+  } = useEmailContext();
   return width > 1400 ? (
     <NavBar />
   ) : (
-    <Offcanvas show={composeEmail.open} onHide={composeEmail.toggle} placement="start" className="offcanvas-xl">
+    <Offcanvas
+      show={composeEmail.open}
+      onHide={composeEmail.toggle}
+      placement="start"
+      className="offcanvas-xl"
+    >
       <NavBar />
     </Offcanvas>
-  )
-}
+  );
+};
 
-export default EmailNavigationMenu
+export default EmailNavigationMenu;

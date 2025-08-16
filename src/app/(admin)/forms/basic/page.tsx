@@ -1,11 +1,11 @@
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Col, FormControl, FormLabel, FormSelect, Row } from 'react-bootstrap'
-import BasicExamples from './components/BasicExamples'
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import PageTitle from '@/components/PageTitle';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import { Col, FormControl, FormLabel, FormSelect, Row } from 'react-bootstrap';
+import BasicExamples from './components/BasicExamples';
 
-export const metadata: Metadata = { title: 'Form Basics' }
+export const metadata: Metadata = { title: 'Form Basics' };
 
 const InputSizing = () => {
   return (
@@ -14,21 +14,37 @@ const InputSizing = () => {
       title="Input Sizing"
       description={
         <>
-          Set heights using classes like <code>.form-control-lg</code> and <code>.form-control-sm</code>.
+          Set heights using classes like <code>.form-control-lg</code> and{' '}
+          <code>.form-control-sm</code>.
         </>
-      }>
+      }
+    >
       <Row>
         <Col lg={6}>
           <div className="d-flex flex-column gap-2">
-            <FormControl size="lg" type="text" placeholder=".form-control-lg" aria-label=".form-control-lg example" />
-            <FormControl type="text" placeholder="Default input" aria-label="default input example" />
-            <FormControl size="sm" type="text" placeholder=".form-control-sm" aria-label=".form-control-sm example" />
+            <FormControl
+              size="lg"
+              type="text"
+              placeholder=".form-control-lg"
+              aria-label=".form-control-lg example"
+            />
+            <FormControl
+              type="text"
+              placeholder="Default input"
+              aria-label="default input example"
+            />
+            <FormControl
+              size="sm"
+              type="text"
+              placeholder=".form-control-sm"
+              aria-label=".form-control-sm example"
+            />
           </div>
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const DisabledInput = () => {
   return (
@@ -37,20 +53,33 @@ const DisabledInput = () => {
       title="Disabled Input"
       description={
         <>
-          Add the <code>disabled</code> boolean attribute on an input to give it a grayed out appearance, remove pointer events, and prevent focusing.
+          Add the <code>disabled</code> boolean attribute on an input to give it a grayed out
+          appearance, remove pointer events, and prevent focusing.
         </>
-      }>
+      }
+    >
       <Row>
         <Col lg={6}>
           <div className="d-flex flex-column gap-2">
-            <FormControl type="text" placeholder="Disabled input" aria-label="Disabled input example" disabled />
-            <FormControl type="text" defaultValue="Disabled readonly input" aria-label="Disabled input example" disabled readOnly />
+            <FormControl
+              type="text"
+              placeholder="Disabled input"
+              aria-label="Disabled input example"
+              disabled
+            />
+            <FormControl
+              type="text"
+              defaultValue="Disabled readonly input"
+              aria-label="Disabled input example"
+              disabled
+              readOnly
+            />
           </div>
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const ReadonlyInput = () => {
   return (
@@ -59,26 +88,40 @@ const ReadonlyInput = () => {
       title="Readonly Input"
       description={
         <>
-          Add the <code>readonly</code> boolean attribute on an input to prevent modification of the input’s value. <code>readonly</code> inputs can
-          still be focused and selected, while <code>disabled</code> inputs cannot.
+          Add the <code>readonly</code> boolean attribute on an input to prevent modification of the
+          input’s value. <code>readonly</code> inputs can still be focused and selected, while{' '}
+          <code>disabled</code> inputs cannot.
           <br />
           <br />
-          If you want to have <code>&lt;input readonly&gt;</code> elements in your form styled as plain text, replace <code>.form-control</code> with{' '}
-          <code>.form-control-plaintext</code> to remove the default form field styling and preserve the correct <code>margin</code> and{' '}
+          If you want to have <code>&lt;input readonly&gt;</code> elements in your form styled as
+          plain text, replace <code>.form-control</code> with <code>.form-control-plaintext</code>{' '}
+          to remove the default form field styling and preserve the correct <code>margin</code> and{' '}
           <code>padding</code>.
         </>
-      }>
+      }
+    >
       <Row>
         <Col lg={6}>
           <div className="d-flex flex-column gap-2">
-            <FormControl type="text" defaultValue="Readonly input here..." aria-label="readonly input example" readOnly />
-            <input type="text" readOnly className="form-control-plaintext" id="staticEmail" defaultValue="email@example.com" />
+            <FormControl
+              type="text"
+              defaultValue="Readonly input here..."
+              aria-label="readonly input example"
+              readOnly
+            />
+            <input
+              type="text"
+              readOnly
+              className="form-control-plaintext"
+              id="staticEmail"
+              defaultValue="email@example.com"
+            />
           </div>
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const DataListsInput = () => {
   return (
@@ -87,18 +130,25 @@ const DataListsInput = () => {
       title="Datalists input"
       description={
         <>
-          If you want to have <code>&lt;input readonly&gt;</code> elements in your form styled as plain text, replace <code>.form-control</code> with{' '}
-          <code>.form-control-plaintext</code> to remove the default form field styling and preserve the correct <code>margin</code> and{' '}
+          If you want to have <code>&lt;input readonly&gt;</code> elements in your form styled as
+          plain text, replace <code>.form-control</code> with <code>.form-control-plaintext</code>{' '}
+          to remove the default form field styling and preserve the correct <code>margin</code> and{' '}
           <code>padding</code>.
         </>
-      }>
+      }
+    >
       <Row>
         <Col lg={6}>
           <div>
             <label htmlFor="exampleDataList" className="form-label">
               Datalist example
             </label>
-            <input className="form-control" list="datalistOptions" id="exampleDataList" placeholder="Type to search..." />
+            <input
+              className="form-control"
+              list="datalistOptions"
+              id="exampleDataList"
+              placeholder="Type to search..."
+            />
             <datalist id="datalistOptions">
               <option value="San Francisco"></option>
               <option value="New York"></option>
@@ -110,8 +160,8 @@ const DataListsInput = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const SelectInputs = () => {
   return (
@@ -120,11 +170,13 @@ const SelectInputs = () => {
       title="Select"
       description={
         <>
-          Custom <code>&lt;select&gt;</code> menus need only a custom class, <code>.form-select</code> to trigger the custom styles. Custom styles are
-          limited to the <code>&lt;select&gt;</code>’s initial appearance and cannot modify the <code>&lt;option&gt;</code>s due to browser
-          limitations.
+          Custom <code>&lt;select&gt;</code> menus need only a custom class,{' '}
+          <code>.form-select</code> to trigger the custom styles. Custom styles are limited to the{' '}
+          <code>&lt;select&gt;</code>’s initial appearance and cannot modify the{' '}
+          <code>&lt;option&gt;</code>s due to browser limitations.
         </>
-      }>
+      }
+    >
       <Row>
         <Col lg={6}>
           <div className="mb-3">
@@ -156,7 +208,12 @@ const SelectInputs = () => {
           <label htmlFor="example-multiselectsize" className="form-label">
             Multiple Select Size
           </label>
-          <select id="example-multiselectsize" className="form-select" size={3} aria-label="size 3 select example">
+          <select
+            id="example-multiselectsize"
+            className="form-select"
+            size={3}
+            aria-label="size 3 select example"
+          >
             <option defaultValue="selected">Open this select menu</option>
             <option value={1}>One</option>
             <option value={2}>Two</option>
@@ -165,8 +222,8 @@ const SelectInputs = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const BasicElements = () => {
   return (
@@ -195,7 +252,7 @@ const BasicElements = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default BasicElements
+export default BasicElements;

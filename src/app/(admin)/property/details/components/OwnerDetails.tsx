@@ -1,14 +1,23 @@
-'use client'
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
-import TextAreaFormInput from '@/components/from/TextAreaFormInput'
-import TextFormInput from '@/components/from/TextFormInput'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { yupResolver } from '@hookform/resolvers/yup'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
+'use client';
+import avatar1 from '@/assets/images/users/avatar-1.jpg';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import TextFormInput from '@/components/from/TextFormInput';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { yupResolver } from '@hookform/resolvers/yup';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+} from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 const OwnerDetails = () => {
   const messageSchema = yup.object({
@@ -18,11 +27,11 @@ const OwnerDetails = () => {
     number: yup.string().required('Please enter your number'),
     email: yup.string().email().required('Please enter email'),
     description: yup.string().required('Please enter description'),
-  })
+  });
 
   const { handleSubmit, control } = useForm({
     resolver: yupResolver(messageSchema),
-  })
+  });
   return (
     <Col xl={3} lg={4}>
       <Card>
@@ -31,7 +40,11 @@ const OwnerDetails = () => {
         </CardHeader>
         <CardBody>
           <div className="text-center">
-            <Image src={avatar1} alt="avatar" className="avatar-xl rounded-circle border border-2 border-light mx-auto" />
+            <Image
+              src={avatar1}
+              alt="avatar"
+              className="avatar-xl rounded-circle border border-2 border-light mx-auto"
+            />
             <div className="mt-2">
               <Link href="" className="fw-medium text-dark fs-16">
                 Gaston Lapierre
@@ -41,7 +54,10 @@ const OwnerDetails = () => {
             <div className="mt-3">
               <ul className="list-inline justify-content-center d-flex gap-1 mb-0 align-items-center">
                 <li className="list-inline-item">
-                  <Button variant="light" className="d-flex avatar-sm align-items-center justify-content-center text-primary fs-20">
+                  <Button
+                    variant="light"
+                    className="d-flex avatar-sm align-items-center justify-content-center text-primary fs-20"
+                  >
                     <span>
                       {' '}
                       <IconifyIcon width={20} height={20} icon="ri:facebook-fill" />
@@ -49,7 +65,10 @@ const OwnerDetails = () => {
                   </Button>
                 </li>
                 <li className="list-inline-item">
-                  <Button variant="light" className="avatar-sm d-flex align-items-center justify-content-center text-danger fs-20  ">
+                  <Button
+                    variant="light"
+                    className="avatar-sm d-flex align-items-center justify-content-center text-danger fs-20  "
+                  >
                     <span>
                       {' '}
                       <IconifyIcon width={20} height={20} icon="ri:instagram-fill" />
@@ -57,7 +76,10 @@ const OwnerDetails = () => {
                   </Button>
                 </li>
                 <li className="list-inline-item">
-                  <Button variant="light" className="avatar-sm d-flex align-items-center justify-content-center text-info   fs-20">
+                  <Button
+                    variant="light"
+                    className="avatar-sm d-flex align-items-center justify-content-center text-info   fs-20"
+                  >
                     <span>
                       {' '}
                       <IconifyIcon width={20} height={20} icon="ri:twitter-fill" />
@@ -65,7 +87,10 @@ const OwnerDetails = () => {
                   </Button>
                 </li>
                 <li className="list-inline-item">
-                  <Button variant="light" className="avatar-sm d-flex align-items-center justify-content-center text-success fs-20  ">
+                  <Button
+                    variant="light"
+                    className="avatar-sm d-flex align-items-center justify-content-center text-success fs-20  "
+                  >
                     <span>
                       {' '}
                       <IconifyIcon width={20} height={20} icon="ri:whatsapp-fill" />
@@ -80,12 +105,20 @@ const OwnerDetails = () => {
           <Row className="g-2">
             <Col lg={6}>
               <Button variant="primary" className="w-100">
-                <IconifyIcon icon="solar:phone-calling-bold-duotone" className="align-middle fs-18" /> Call Us
+                <IconifyIcon
+                  icon="solar:phone-calling-bold-duotone"
+                  className="align-middle fs-18"
+                />{' '}
+                Call Us
               </Button>
             </Col>
             <Col lg={6}>
               <Button variant="success" className="w-100">
-                <IconifyIcon icon="solar:chat-round-dots-bold-duotone" className="align-middle fs-16" /> Message
+                <IconifyIcon
+                  icon="solar:chat-round-dots-bold-duotone"
+                  className="align-middle fs-16"
+                />{' '}
+                Message
               </Button>
             </Col>
           </Row>
@@ -98,19 +131,19 @@ const OwnerDetails = () => {
         <form onSubmit={handleSubmit(() => {})}>
           <CardBody>
             <div className="mb-3">
-              <TextFormInput control={control}  name="date" placeholder="dd-mm-yyyy" />
+              <TextFormInput control={control} name="date" placeholder="dd-mm-yyyy" />
             </div>
             <div className="mb-3">
-              <TextFormInput control={control}  name="time" placeholder="12:00 PM" />
+              <TextFormInput control={control} name="time" placeholder="12:00 PM" />
             </div>
             <div className="mb-3">
-              <TextFormInput control={control}  name="name" placeholder="Your Full Name" />
+              <TextFormInput control={control} name="name" placeholder="Your Full Name" />
             </div>
             <div className="mb-3">
-              <TextFormInput control={control}  name="email" placeholder="Email" />
+              <TextFormInput control={control} name="email" placeholder="Email" />
             </div>
             <div className="mb-3">
-              <TextFormInput control={control}  name="number" placeholder="Number" />
+              <TextFormInput control={control} name="number" placeholder="Number" />
             </div>
             <div>
               <TextAreaFormInput
@@ -124,14 +157,14 @@ const OwnerDetails = () => {
             </div>
           </CardBody>
           <CardFooter className="bg-light-subtle">
-            <Button variant="primary" type='submit' className="w-100">
+            <Button variant="primary" type="submit" className="w-100">
               Send Information
             </Button>
           </CardFooter>
         </form>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default OwnerDetails
+export default OwnerDetails;

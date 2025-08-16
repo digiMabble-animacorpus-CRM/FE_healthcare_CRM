@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllBoxPlotCharts from './components/AllBoxPlotCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllBoxPlotCharts from './components/AllBoxPlotCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-const metadata: Metadata = { title: 'Boxplot Alert' }
+const metadata: Metadata = { title: 'Boxplot Alert' };
 
 const BoxPlotCharts = () => {
   return (
@@ -24,7 +24,7 @@ const BoxPlotCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default BoxPlotCharts
+export default BoxPlotCharts;

@@ -1,27 +1,27 @@
-import FullCalendar from '@fullcalendar/react'
-import dayGridPlugin from '@fullcalendar/daygrid'
-import interactionPlugin, { type DateClickArg, type DropArg } from '@fullcalendar/interaction'
-import timeGridPlugin from '@fullcalendar/timegrid'
-import listPlugin from '@fullcalendar/list'
-import bootstrapPlugin from '@fullcalendar/bootstrap'
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import interactionPlugin, { type DateClickArg, type DropArg } from '@fullcalendar/interaction';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import listPlugin from '@fullcalendar/list';
+import bootstrapPlugin from '@fullcalendar/bootstrap';
 
-import type { CalendarProps } from '@/types/component-props'
-import type { EventClickArg, EventDropArg } from '@fullcalendar/core/index.js'
+import type { CalendarProps } from '@/types/component-props';
+import type { EventClickArg, EventDropArg } from '@fullcalendar/core/index.js';
 
 const Calendar = ({ events, onDateClick, onDrop, onEventClick, onEventDrop }: CalendarProps) => {
   // You can modify these events as per your needs
   const handleDateClick = (arg: DateClickArg) => {
-    onDateClick(arg)
-  }
+    onDateClick(arg);
+  };
   const handleEventClick = (arg: EventClickArg) => {
-    onEventClick(arg)
-  }
+    onEventClick(arg);
+  };
   const handleDrop = (arg: DropArg) => {
-    onDrop(arg)
-  }
+    onDrop(arg);
+  };
   const handleEventDrop = (arg: EventDropArg) => {
-    onEventDrop(arg)
-  }
+    onEventDrop(arg);
+  };
 
   return (
     <div className="mt-4 mt-lg-0">
@@ -62,7 +62,7 @@ const Calendar = ({ events, onDateClick, onDrop, onEventClick, onEventDrop }: Ca
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Calendar
+export default Calendar;

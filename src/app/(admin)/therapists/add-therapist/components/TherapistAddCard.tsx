@@ -1,8 +1,8 @@
-import avatar2 from '@/assets/images/users/avatar-2.jpg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { currency } from '@/context/constants'
-import Image from 'next/image'
-import { Button, Card, CardBody, Col, Row } from 'react-bootstrap'
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { currency } from '@/context/constants';
+import Image from 'next/image';
+import { Button, Card, CardBody, Col, Row } from 'react-bootstrap';
 
 const TherapistAddCard = () => {
   return (
@@ -49,7 +49,11 @@ const TherapistAddCard = () => {
             <h4 className="mt-3 fs-17">Social Information :</h4>
             <ul className="list-inline d-flex gap-1 mb-0 align-items-center mt-3">
               <li className="list-inline-item">
-                <Button variant="soft-primary" href="" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+                <Button
+                  variant="soft-primary"
+                  href=""
+                  className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+                >
                   <span>
                     {' '}
                     <IconifyIcon icon="ri:facebook-fill" />{' '}
@@ -57,7 +61,11 @@ const TherapistAddCard = () => {
                 </Button>
               </li>
               <li className="list-inline-item">
-                <Button variant="soft-danger" href="" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+                <Button
+                  variant="soft-danger"
+                  href=""
+                  className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+                >
                   <span>
                     {' '}
                     <IconifyIcon icon="ri:instagram-fill" />{' '}
@@ -65,7 +73,11 @@ const TherapistAddCard = () => {
                 </Button>
               </li>
               <li className="list-inline-item">
-                <Button variant="soft-info" href="" className="avatar-sm d-flex align-items-center justify-content-center  fs-20">
+                <Button
+                  variant="soft-info"
+                  href=""
+                  className="avatar-sm d-flex align-items-center justify-content-center  fs-20"
+                >
                   <span>
                     {' '}
                     <IconifyIcon icon="ri:twitter-fill" />{' '}
@@ -73,7 +85,11 @@ const TherapistAddCard = () => {
                 </Button>
               </li>
               <li className="list-inline-item">
-                <Button variant="soft-success" href="" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+                <Button
+                  variant="soft-success"
+                  href=""
+                  className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+                >
                   <span>
                     {' '}
                     <IconifyIcon icon="ri:whatsapp-fill" />{' '}
@@ -81,7 +97,11 @@ const TherapistAddCard = () => {
                 </Button>
               </li>
               <li className="list-inline-item">
-                <Button variant="soft-warning" href="" className="avatar-sm d-flex align-items-center justify-content-center fs-20">
+                <Button
+                  variant="soft-warning"
+                  href=""
+                  className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+                >
                   <span>
                     {' '}
                     <IconifyIcon icon="ri:mail-fill" />{' '}
@@ -93,7 +113,7 @@ const TherapistAddCard = () => {
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default TherapistAddCard
+export default TherapistAddCard;

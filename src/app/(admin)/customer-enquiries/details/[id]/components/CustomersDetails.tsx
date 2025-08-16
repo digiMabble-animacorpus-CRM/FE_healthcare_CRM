@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import avatar2 from "@/assets/images/users/avatar-2.jpg";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import Image from "next/image";
-import { Button, Card, CardBody, CardTitle, Col, Row } from "react-bootstrap";
-import type { CustomerEnquiriesType } from "@/types/data";
-import { useRouter } from "next/navigation";
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import type { CustomerEnquiriesType } from '@/types/data';
+import { useRouter } from 'next/navigation';
 
 const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
   const router = useRouter();
@@ -39,7 +39,7 @@ const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
               onClick={() => handleEditClick(data._id)}
             >
               <span>
-                {" "}
+                {' '}
                 <IconifyIcon icon="ri:edit-fill" />
               </span>
             </Button>
@@ -71,7 +71,7 @@ const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
             <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
             <span
               className={`badge bg-${
-                data.status === "new" ? "success" : "danger"
+                data.status === 'new' ? 'success' : 'danger'
               } text-white fs-12 px-2 py-1`}
             >
               {data.status}
@@ -101,10 +101,7 @@ const CustomersDetails = ({ data }: { data: CustomerEnquiriesType }) => {
               {Array.isArray(data?.tags) &&
                 data.tags.map((tag: string, i: number) => (
                   <p className="mb-0 d-flex align-items-center" key={i}>
-                    <IconifyIcon
-                      icon="ri:circle-fill"
-                      className="fs-10 me-2 text-success"
-                    />
+                    <IconifyIcon icon="ri:circle-fill" className="fs-10 me-2 text-success" />
                     {tag}
                   </p>
                 ))}

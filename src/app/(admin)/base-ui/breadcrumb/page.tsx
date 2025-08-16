@@ -1,12 +1,12 @@
-import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
+import { Breadcrumb, BreadcrumbItem, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
 
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import PageTitle from '@/components/PageTitle'
-import Link from 'next/link'
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import PageTitle from '@/components/PageTitle';
+import Link from 'next/link';
 
-export const metadata: Metadata = { title: 'Breadcrumbs' }
+export const metadata: Metadata = { title: 'Breadcrumbs' };
 
 const page = () => {
   return (
@@ -23,8 +23,8 @@ const page = () => {
                 </Link>
               </CardTitle>
               <p className="text-muted">
-                Use an ordered or unordered list with linked list items to create a minimally styled breadcrumb. Use our utilities to add additional
-                styles as desired.
+                Use an ordered or unordered list with linked list items to create a minimally styled
+                breadcrumb. Use our utilities to add additional styles as desired.
               </p>
               <nav aria-label="breadcrumb">
                 <Breadcrumb className="py-0">
@@ -69,7 +69,9 @@ const page = () => {
                   #
                 </Link>
               </CardTitle>
-              <p className="text-muted">Optionally you can also specify the icon with your breadcrumb item.</p>
+              <p className="text-muted">
+                Optionally you can also specify the icon with your breadcrumb item.
+              </p>
               <nav aria-label="breadcrumb">
                 <Breadcrumb className="py-0">
                   <BreadcrumbItem active aria-current="page">
@@ -116,7 +118,7 @@ const page = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default page
+export default page;

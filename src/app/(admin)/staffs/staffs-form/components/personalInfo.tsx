@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Controller, useFormContext } from "react-hook-form";
-import { Col, Row } from "react-bootstrap";
-import TextFormInput from "@/components/from/TextFormInput";
-import TextAreaFormInput from "@/components/from/TextAreaFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import type { StaffType } from "@/types/data";
+import { Controller, useFormContext } from 'react-hook-form';
+import { Col, Row } from 'react-bootstrap';
+import TextFormInput from '@/components/from/TextFormInput';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import type { StaffType } from '@/types/data';
 
 const PersonalInfo = () => {
   const {
@@ -76,9 +76,12 @@ const PersonalInfo = () => {
               control={control}
               name="gender"
               render={({ field }) => (
-                <ChoicesFormInput className="form-control" {...field}
-                value={field.value}
-                onChange={(val) => field.onChange(val)}>
+                <ChoicesFormInput
+                  className="form-control"
+                  {...field}
+                  value={field.value}
+                  onChange={(val) => field.onChange(val)}
+                >
                   <option value="" disabled hidden>
                     Select Gender
                   </option>
@@ -88,9 +91,7 @@ const PersonalInfo = () => {
                 </ChoicesFormInput>
               )}
             />
-            {errors.gender && (
-              <small className="text-danger2">{errors.gender.message}</small>
-            )}
+            {errors.gender && <small className="text-danger2">{errors.gender.message}</small>}
           </div>
         </Col>
 

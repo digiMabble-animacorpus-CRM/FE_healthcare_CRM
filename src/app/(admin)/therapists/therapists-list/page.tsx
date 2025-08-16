@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import PageTitle from "@/components/PageTitle";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { getAllTherapists } from "@/helpers/data";
-import { useEffect, useState } from "react";
-import type { TherapistType } from "@/types/data";
-import dayjs from "dayjs";
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getAllTherapists } from '@/helpers/data';
+import { useEffect, useState } from 'react';
+import type { TherapistType } from '@/types/data';
+import dayjs from 'dayjs';
 import {
   Button,
   Card,
@@ -21,57 +21,51 @@ import {
   Modal,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { useRouter } from "next/navigation";
+} from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
 
 const PAGE_LIMIT = 10;
-const BRANCHES = [
-  "Gembloux - Orneau",
-  "Gembloux - Tout Vent",
-  "Anima Corpus Namur",
-];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
 const TherapistsListPage = () => {
   const [therapists, setTherapists] = useState<TherapistType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
-  );
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const router = useRouter();
 
   const getDateRange = () => {
     const now = dayjs();
     switch (dateFilter) {
-      case "today":
+      case 'today':
         return {
-          from: now.startOf("day").toISOString(),
-          to: now.endOf("day").toISOString(),
+          from: now.startOf('day').toISOString(),
+          to: now.endOf('day').toISOString(),
         };
-      case "this_week":
+      case 'this_week':
         return {
-          from: now.startOf("week").toISOString(),
-          to: now.endOf("week").toISOString(),
+          from: now.startOf('week').toISOString(),
+          to: now.endOf('week').toISOString(),
         };
-      case "15_days":
+      case '15_days':
         return {
-          from: now.subtract(15, "day").startOf("day").toISOString(),
-          to: now.endOf("day").toISOString(),
+          from: now.subtract(15, 'day').startOf('day').toISOString(),
+          to: now.endOf('day').toISOString(),
         };
-      case "this_month":
+      case 'this_month':
         return {
-          from: now.startOf("month").toISOString(),
-          to: now.endOf("month").toISOString(),
+          from: now.startOf('month').toISOString(),
+          to: now.endOf('month').toISOString(),
         };
-      case "this_year":
+      case 'this_year':
         return {
-          from: now.startOf("year").toISOString(),
-          to: now.endOf("year").toISOString(),
+          from: now.startOf('year').toISOString(),
+          to: now.endOf('year').toISOString(),
         };
       default:
         return {};
@@ -88,12 +82,12 @@ const TherapistsListPage = () => {
         selectedBranch || undefined,
         from,
         to,
-        searchTerm
+        searchTerm,
       );
       setTherapists(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error("Failed to fetch enquiries data:", error);
+      console.error('Failed to fetch enquiries data:', error);
     } finally {
       setLoading(false);
     }
@@ -127,12 +121,12 @@ const TherapistsListPage = () => {
 
     try {
       await fetch(`/api/therapists/${selectedPatientId}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
       fetchTherapists(currentPage); // refresh list
     } catch (error) {
-      console.error("Failed to delete enquiries:", error);
+      console.error('Failed to delete enquiries:', error);
     } finally {
       setShowDeleteModal(false);
       setSelectedPatientId(null);
@@ -145,15 +139,14 @@ const TherapistsListPage = () => {
     let age = today.getFullYear() - birthDate.getFullYear();
     const hasBirthdayPassed =
       today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
+      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
 
     if (!hasBirthdayPassed) age--;
     return age;
   };
 
   const formatGender = (gender: string): string => {
-    if (!gender) return "";
+    if (!gender) return '';
     return gender.charAt(0).toUpperCase();
   };
 
@@ -169,7 +162,7 @@ const TherapistsListPage = () => {
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
-                <div style={{ minWidth: "200px" }}>
+                <div style={{ minWidth: '200px' }}>
                   <input
                     type="text"
                     className="form-control form-control-sm"
@@ -192,7 +185,7 @@ const TherapistsListPage = () => {
                       width={18}
                       className="me-1"
                     />
-                    {selectedBranch || "Filter by Branch"}
+                    {selectedBranch || 'Filter by Branch'}
                   </DropdownToggle>
                   <DropdownMenu>
                     {BRANCHES.map((branch) => (
@@ -226,22 +219,18 @@ const TherapistsListPage = () => {
                     className="btn btn-sm btn-outline-secondary d-flex align-items-center"
                     id="dateFilter"
                   >
-                    <IconifyIcon
-                      icon="mdi:calendar-clock"
-                      width={18}
-                      className="me-1"
-                    />
-                    {dateFilter === "all"
-                      ? "Filter by Date"
-                      : dateFilter.replace("_", " ").toUpperCase()}
+                    <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
+                    {dateFilter === 'all'
+                      ? 'Filter by Date'
+                      : dateFilter.replace('_', ' ').toUpperCase()}
                   </DropdownToggle>
                   <DropdownMenu>
                     {[
-                      { label: "Today", value: "today" },
-                      { label: "This Week", value: "this_week" },
-                      { label: "Last 15 Days", value: "15_days" },
-                      { label: "This Month", value: "this_month" },
-                      { label: "This Year", value: "this_year" },
+                      { label: 'Today', value: 'today' },
+                      { label: 'This Week', value: 'this_week' },
+                      { label: 'Last 15 Days', value: '15_days' },
+                      { label: 'This Month', value: 'this_month' },
+                      { label: 'This Year', value: 'this_year' },
                     ].map((f) => (
                       <DropdownItem
                         key={f.value}
@@ -254,11 +243,11 @@ const TherapistsListPage = () => {
                         {f.label}
                       </DropdownItem>
                     ))}
-                    {dateFilter !== "all" && (
+                    {dateFilter !== 'all' && (
                       <DropdownItem
                         className="text-danger"
                         onClick={() => {
-                          setDateFilter("all");
+                          setDateFilter('all');
                           setCurrentPage(1);
                         }}
                       >
@@ -282,15 +271,8 @@ const TherapistsListPage = () => {
                       <tr>
                         <th style={{ width: 20 }}>
                           <div className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id="customCheck1"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="customCheck1"
-                            />
+                            <input type="checkbox" className="form-check-input" id="customCheck1" />
+                            <label className="form-check-label" htmlFor="customCheck1" />
                           </div>
                         </th>
                         <th>Therapists name</th>
@@ -320,15 +302,14 @@ const TherapistsListPage = () => {
                           <td>{item.email}</td>
                           <td>{item.number}</td>
                           <td>
-                            {calculateAge(item.dob)} yrs |{" "}
-                            {formatGender(item.gender)}
+                            {calculateAge(item.dob)} yrs | {formatGender(item.gender)}
                           </td>
                           <td>{item.branch}</td>
                           <td>{item.source}</td>
                           <td>
                             <span
                               className={`badge bg-${
-                                item.status === "active" ? "success" : "danger"
+                                item.status === 'active' ? 'success' : 'danger'
                               } text-white fs-12 px-2 py-1`}
                             >
                               {item.status}
@@ -380,7 +361,7 @@ const TherapistsListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -391,9 +372,7 @@ const TherapistsListPage = () => {
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
                     <li
-                      className={`page-item ${
-                        currentPage === index + 1 ? "active" : ""
-                      }`}
+                      className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
                       key={index}
                     >
                       <Button
@@ -405,11 +384,7 @@ const TherapistsListPage = () => {
                       </Button>
                     </li>
                   ))}
-                  <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -426,17 +401,12 @@ const TherapistsListPage = () => {
       </Row>
 
       {/* Delete Confirmation Modal */}
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this customer? This action cannot be
-          undone.
+          Are you sure you want to delete this customer? This action cannot be undone.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>

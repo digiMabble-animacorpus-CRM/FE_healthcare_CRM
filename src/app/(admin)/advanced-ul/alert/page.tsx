@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import AllSweetAlerts from './Components/AllSweetAlerts'
+import PageTitle from '@/components/PageTitle';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import AllSweetAlerts from './Components/AllSweetAlerts';
 
-export const metadata: Metadata = { title: 'Sweet Alert' }
+export const metadata: Metadata = { title: 'Sweet Alert' };
 
 const SweetAlerts = () => {
   return (
@@ -16,12 +16,19 @@ const SweetAlerts = () => {
             <CardBody>
               <CardTitle as={'h5'} className="mb-1 anchor" id="overview">
                 Overview
-                <Button variant="outline-success" size="sm" className="rounded-2 float-end" href="https://sweetalert2.github.io/" target="_blank">
+                <Button
+                  variant="outline-success"
+                  size="sm"
+                  className="rounded-2 float-end"
+                  href="https://sweetalert2.github.io/"
+                  target="_blank"
+                >
                   Official Website
                 </Button>
               </CardTitle>
               <p className="text-muted mb-3">
-                A beautiful, responsive, customizable, accessible (WAI-ARIA) replacement for JavaScript&apos;s popup boxes
+                A beautiful, responsive, customizable, accessible (WAI-ARIA) replacement for
+                JavaScript&apos;s popup boxes
               </p>
             </CardBody>
           </Card>
@@ -41,7 +48,7 @@ const SweetAlerts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default SweetAlerts
+export default SweetAlerts;

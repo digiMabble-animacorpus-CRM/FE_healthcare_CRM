@@ -1,9 +1,9 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { Icon } from '@iconify/react/dist/iconify.js'
-import { Card, CardBody, Col } from 'react-bootstrap'
-import { postData, PostType } from '../data'
-import Link from 'next/link'
+'use client';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { Icon } from '@iconify/react/dist/iconify.js';
+import { Card, CardBody, Col } from 'react-bootstrap';
+import { postData, PostType } from '../data';
+import Link from 'next/link';
 
 const PostCard = ({ date, description, link, name, tags, title }: PostType) => {
   return (
@@ -20,7 +20,8 @@ const PostCard = ({ date, description, link, name, tags, title }: PostType) => {
           {tags.map((item, idx) => (
             <span
               className={`badge px-2 py-1 bg-${item == 'Tutorials' ? 'success' : item == 'News' ? 'warning' : item == 'Homes' ? 'primary' : 'danger'}-subtle text-${item == 'Tutorials' ? 'success' : item == 'News' ? 'warning' : item == 'Homes' ? 'primary' : 'danger'} ms-1 `}
-              key={idx}>
+              key={idx}
+            >
               {item}
             </span>
           ))}
@@ -42,7 +43,8 @@ const PostCard = ({ date, description, link, name, tags, title }: PostType) => {
             <span>
               <button
                 type="button"
-                className="btn btn-soft-danger avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded-circle">
+                className="btn btn-soft-danger avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded-circle"
+              >
                 <span>
                   {' '}
                   <IconifyIcon icon="solar:heart-broken" />
@@ -53,8 +55,8 @@ const PostCard = ({ date, description, link, name, tags, title }: PostType) => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const Posts = () => {
   return (
@@ -65,7 +67,7 @@ const Posts = () => {
         </Col>
       ))}
     </>
-  )
-}
+  );
+};
 
-export default Posts
+export default Posts;

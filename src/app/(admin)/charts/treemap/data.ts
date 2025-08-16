@@ -1,4 +1,4 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
 export const basicTreemapOpts: ApexOptions = {
   series: [
@@ -71,7 +71,7 @@ export const basicTreemapOpts: ApexOptions = {
     text: 'Basic Treemap',
     align: 'center',
   },
-}
+};
 
 export const multipleSeriesTreemapOpts: ApexOptions = {
   series: [
@@ -134,7 +134,7 @@ export const multipleSeriesTreemapOpts: ApexOptions = {
     text: 'Multi-dimensional Treemap',
     align: 'center',
   },
-}
+};
 
 export const distributedTreemapOpts: ApexOptions = {
   series: [
@@ -227,8 +227,8 @@ export const distributedTreemapOpts: ApexOptions = {
       enableShades: false,
     },
   },
-}
-const colors = ['#4697ce', '#1bb394']
+};
+const colors = ['#4697ce', '#1bb394'];
 
 export const colorRangeTreemapOpts: ApexOptions = {
   series: [
@@ -303,7 +303,7 @@ export const colorRangeTreemapOpts: ApexOptions = {
   dataLabels: {
     enabled: true,
     formatter: function (text, opts) {
-      return text + '  ' + opts.value
+      return text + '  ' + opts.value;
     },
     style: {
       fontSize: '12px',
@@ -331,4 +331,4 @@ export const colorRangeTreemapOpts: ApexOptions = {
       },
     },
   },
-}
+};

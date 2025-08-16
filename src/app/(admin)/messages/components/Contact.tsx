@@ -1,22 +1,22 @@
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import Link from 'next/link';
+import { useEffect, useState } from 'react';
 
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getAllUsers } from '@/helpers/data'
-import type { UserType } from '@/types/data'
-import Image from 'next/image'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { getAllUsers } from '@/helpers/data';
+import type { UserType } from '@/types/data';
+import Image from 'next/image';
 
 const Contact = () => {
-  const [allContacts, setAllContacts] = useState<UserType[]>()
+  const [allContacts, setAllContacts] = useState<UserType[]>();
 
   useEffect(() => {
     const fetchData = async () => {
-      const fetchedContacts = await getAllUsers()
-      setAllContacts(fetchedContacts)
-    }
-    fetchData()
-  }, [])
+      const fetchedContacts = await getAllUsers();
+      setAllContacts(fetchedContacts);
+    };
+    fetchData();
+  }, []);
 
   return (
     <SimplebarReactClient className="px-2 mb-3 chat-setting-height">
@@ -39,18 +39,27 @@ const Contact = () => {
       </div>
 
       {allContacts?.map((contact, idx) => (
-        <div className={`d-flex flex-column h-100 ${allContacts.length - 1 != idx && 'border-bottom'} `} key={idx}>
+        <div
+          className={`d-flex flex-column h-100 ${allContacts.length - 1 != idx && 'border-bottom'} `}
+          key={idx}
+        >
           <Link href="" className="d-block">
             <div className="d-flex align-items-center p-2 mb-1 rounded">
               <div className="position-relative">
-                <Image src={contact.avatar} alt="avatar" className="avatar rounded-circle flex-shrink-0" />
+                <Image
+                  src={contact.avatar}
+                  alt="avatar"
+                  className="avatar rounded-circle flex-shrink-0"
+                />
               </div>
               <div className="d-block ms-3 flex-grow-1">
                 <div className="d-flex justify-content-between align-items-center mb-1">
                   <h5 className="mb-0">{contact.name}</h5>
                 </div>
                 <div className="d-flex justify-content-between align-items-center">
-                  <p className="mb-0 text-muted d-flex align-items-center gap-1">Are we going to have th...</p>
+                  <p className="mb-0 text-muted d-flex align-items-center gap-1">
+                    Are we going to have th...
+                  </p>
                 </div>
               </div>
             </div>
@@ -58,7 +67,7 @@ const Contact = () => {
         </div>
       ))}
     </SimplebarReactClient>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

@@ -1,10 +1,10 @@
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import AllModals from './components/AllModals'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import AllModals from './components/AllModals';
+import { Col, Row } from 'react-bootstrap';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Modals' }
+export const metadata: Metadata = { title: 'Modals' };
 
 const Modals = () => {
   return (
@@ -30,7 +30,7 @@ const Modals = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Modals
+export default Modals;

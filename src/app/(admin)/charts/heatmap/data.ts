@@ -1,19 +1,19 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
 function generateData(count: number, yrange: any) {
-  let i = 0
-  const series = []
+  let i = 0;
+  const series = [];
   while (i < count) {
-    const x = (i + 1).toString()
-    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
+    const x = (i + 1).toString();
+    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
 
     series.push({
       x: x,
       y: y,
-    })
-    i++
+    });
+    i++;
   }
-  return series
+  return series;
 }
 
 export const basicHeatmapOpts: ApexOptions = {
@@ -96,7 +96,7 @@ export const basicHeatmapOpts: ApexOptions = {
   xaxis: {
     type: 'category',
   },
-}
+};
 
 export const multipleHeatmapOpts: ApexOptions = {
   chart: {
@@ -109,7 +109,17 @@ export const multipleHeatmapOpts: ApexOptions = {
   dataLabels: {
     enabled: false,
   },
-  colors: ['#4697ce', '#53389f', '#7f56da', '#ff86c8', '#e06d94', '#e06d94', '#f8ac59', '#7dcc93', '#7dcc93'],
+  colors: [
+    '#4697ce',
+    '#53389f',
+    '#7f56da',
+    '#ff86c8',
+    '#e06d94',
+    '#e06d94',
+    '#f8ac59',
+    '#7dcc93',
+    '#7dcc93',
+  ],
   series: [
     {
       name: 'Metric 1',
@@ -178,7 +188,7 @@ export const multipleHeatmapOpts: ApexOptions = {
   xaxis: {
     type: 'category',
   },
-}
+};
 
 export const colorRangeHeatmapOpts: ApexOptions = {
   chart: {
@@ -290,7 +300,7 @@ export const colorRangeHeatmapOpts: ApexOptions = {
       }),
     },
   ],
-}
+};
 
 export const rangeWithoutShadeOpts: ApexOptions = {
   chart: {
@@ -402,4 +412,4 @@ export const rangeWithoutShadeOpts: ApexOptions = {
   grid: {
     borderColor: '#f1f3fa',
   },
-}
+};

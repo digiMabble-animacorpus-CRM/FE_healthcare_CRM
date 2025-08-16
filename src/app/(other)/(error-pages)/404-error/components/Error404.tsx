@@ -1,19 +1,19 @@
-'use client'
-import error404Img from '@/assets/images/404.svg'
-import logoDark from '@/assets/images/logo-dark.png'
-import logoLight from '@/assets/images/logo-light.png'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { Card, CardBody, Col, Container, Row } from 'react-bootstrap'
+'use client';
+import error404Img from '@/assets/images/404.svg';
+import logoDark from '@/assets/images/logo-dark.png';
+import logoLight from '@/assets/images/logo-light.png';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect } from 'react';
+import { Card, CardBody, Col, Container, Row } from 'react-bootstrap';
 
 const Error404 = () => {
   useEffect(() => {
-    document.body.classList.add('authentication-bg')
+    document.body.classList.add('authentication-bg');
     return () => {
-      document.body.classList.remove('authentication-bg')
-    }
-  }, [])
+      document.body.classList.remove('authentication-bg');
+    };
+  }, []);
   return (
     <div className="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
       <Container>
@@ -36,7 +36,8 @@ const Error404 = () => {
                         <Image src={error404Img} alt="auth" height={250} className="mt-5 mb-3" />
                         <h2 className="fs-22 lh-base">Page Not Found !</h2>
                         <p className="text-muted mt-1 mb-4">
-                          The page you&apos;re trying to reach seems to have gone <br /> missing in the digital wilderness.
+                          The page you&apos;re trying to reach seems to have gone <br /> missing in
+                          the digital wilderness.
                         </p>
                         <div className="text-center">
                           <Link href="/dashboards/analytics" className="btn btn-danger">
@@ -53,7 +54,7 @@ const Error404 = () => {
         </Row>
       </Container>
     </div>
-  )
-}
+  );
+};
 
-export default Error404
+export default Error404;

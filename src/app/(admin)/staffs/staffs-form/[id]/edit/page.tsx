@@ -1,28 +1,27 @@
 'use client';
 
-import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import StaffForm from "../../staffForm";
-import { decryptAES } from "@/utils/encryption";
-import type { StaffType } from "@/types/data";
-import { updateStaff  } from "@/helpers/staff";
-
+import { useEffect, useMemo, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import StaffForm from '../../staffForm';
+import { decryptAES } from '@/utils/encryption';
+import type { StaffType } from '@/types/data';
+import { updateStaff } from '@/helpers/staff';
 
 interface Props {
   params: { id?: string };
 }
 const transformToBackendDto = (formData: StaffType) => {
-  let accessLevel: "staff" | "branch-admin" | "super-admin" | undefined;
+  let accessLevel: 'staff' | 'branch-admin' | 'super-admin' | undefined;
 
   switch (formData.accessLevelId) {
-    case "al-001":
-      accessLevel = "staff";
+    case 'al-001':
+      accessLevel = 'staff';
       break;
-    case "al-002":
-      accessLevel = "branch-admin";
+    case 'al-002':
+      accessLevel = 'branch-admin';
       break;
-    case "al-003":
-      accessLevel = "super-admin";
+    case 'al-003':
+      accessLevel = 'super-admin';
       break;
   }
 
@@ -30,14 +29,12 @@ const transformToBackendDto = (formData: StaffType) => {
     ...formData,
     roleId: Number(formData.roleId),
     accessLevel: accessLevel,
-    branches: formData.branches
-      .map((b) => Number(b.id))
-      .filter((id) => !isNaN(id)),
+    branches: formData.branches.map((b) => Number(b.id)).filter((id) => !isNaN(id)),
     selectedBranch: Number(formData.selectedBranch),
     permissions: formData.permissions
       .filter((p) => p.enabled)
       .map((p) => {
-        const [action, resource] = p._id.split("-");
+        const [action, resource] = p._id.split('-');
         return {
           action,
           resource,
@@ -46,14 +43,12 @@ const transformToBackendDto = (formData: StaffType) => {
       }),
     updatedBy: [
       {
-        staffId: String(localStorage.getItem("staff_id") || ""),
+        staffId: String(localStorage.getItem('staff_id') || ''),
         updatedAt: new Date().toISOString(),
       },
     ],
   };
 };
-
-
 
 const EditStaffPage = ({ params }: Props) => {
   const router = useRouter();
@@ -62,15 +57,15 @@ const EditStaffPage = ({ params }: Props) => {
 
   //  Decrypt ID from URL param
   const decryptedId = useMemo(() => {
-      if (!params?.id) return null;
+    if (!params?.id) return null;
     try {
       if (!params?.id) return null;
       const decoded = decodeURIComponent(params.id);
       const result = decryptAES(decoded);
-      console.log(" Decrypted ID:", result);
+      console.log(' Decrypted ID:', result);
       return result;
     } catch (e) {
-      console.error(" Error decrypting ID:", e);
+      console.error(' Error decrypting ID:', e);
       return null;
     }
   }, [params.id]);
@@ -79,7 +74,7 @@ const EditStaffPage = ({ params }: Props) => {
   useEffect(() => {
     if (!decryptedId) return;
 
-    const storedStaff = sessionStorage.getItem("selectedStaff");
+    const storedStaff = sessionStorage.getItem('selectedStaff');
     if (storedStaff) {
       try {
         const parsed = JSON.parse(storedStaff) as StaffType;
@@ -87,39 +82,38 @@ const EditStaffPage = ({ params }: Props) => {
         if (String(parsed.id) === String(decryptedId)) {
           setDefaultValues(parsed);
         } else {
-          console.warn(" Staff ID mismatch in sessionStorage.");
+          console.warn(' Staff ID mismatch in sessionStorage.');
         }
       } catch (err) {
-        console.error(" Error parsing staff from sessionStorage:", err);
+        console.error(' Error parsing staff from sessionStorage:', err);
       }
     } else {
-      console.warn(" No staff data found in sessionStorage.");
+      console.warn(' No staff data found in sessionStorage.');
     }
 
     setLoading(false);
   }, [decryptedId]);
 
-  
   //  Submit updated form
   const onSubmitHandler = async (formData: StaffType) => {
     try {
-      if (!decryptedId) throw new Error("Missing decrypted staff ID");
+      if (!decryptedId) throw new Error('Missing decrypted staff ID');
 
       const dto = transformToBackendDto(formData);
-      console.log(" Final DTO to send:", dto);
+      console.log(' Final DTO to send:', dto);
 
       const success = await updateStaff(decryptedId, dto);
 
       if (success) {
-        console.log(" Staff updated!");
-        router.push("/staffs/staffs-list");
+        console.log(' Staff updated!');
+        router.push('/staffs/staffs-list');
       } else {
-        console.error(" Update failed.");
-        alert("Failed to update staff. Please try again.");
+        console.error(' Update failed.');
+        alert('Failed to update staff. Please try again.');
       }
     } catch (err) {
-      console.error(" Error during update:", err);
-      alert("Something went wrong during update.");
+      console.error(' Error during update:', err);
+      alert('Something went wrong during update.');
     }
   };
 

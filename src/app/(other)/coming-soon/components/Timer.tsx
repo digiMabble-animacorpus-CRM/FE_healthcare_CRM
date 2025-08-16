@@ -1,9 +1,9 @@
-'use client'
-import useCountdown from '@/hooks/useCountdown'
-import { Col, Row } from 'react-bootstrap'
+'use client';
+import useCountdown from '@/hooks/useCountdown';
+import { Col, Row } from 'react-bootstrap';
 
 const Timer = () => {
-  const { days, hours, minutes, seconds } = useCountdown()
+  const { days, hours, minutes, seconds } = useCountdown();
   return (
     <Row className="my-5">
       <Col>
@@ -31,7 +31,7 @@ const Timer = () => {
         <p className="text-uppercase fw-semibold">Seconds</p>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default Timer
+export default Timer;

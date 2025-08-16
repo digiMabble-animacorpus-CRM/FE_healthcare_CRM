@@ -1,31 +1,31 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import React, { useEffect, useRef } from 'react'
-import { usePathname } from 'next/navigation'
-import { useLayoutContext } from '@/context/useLayoutContext'
+'use client';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import React, { useEffect, useRef } from 'react';
+import { usePathname } from 'next/navigation';
+import { useLayoutContext } from '@/context/useLayoutContext';
 
 const LeftSideBarToggle = () => {
   const {
     menu: { size },
     changeMenu: { size: changeMenuSize },
     toggleBackdrop,
-  } = useLayoutContext()
-  const pathname = usePathname()
-  const isFirstRender = useRef(true)
+  } = useLayoutContext();
+  const pathname = usePathname();
+  const isFirstRender = useRef(true);
 
   const handleMenuSize = () => {
-    if (size === 'hidden') toggleBackdrop()
-    if (size === 'condensed') changeMenuSize('default')
-    else if (size === 'default') changeMenuSize('condensed')
-  }
+    if (size === 'hidden') toggleBackdrop();
+    if (size === 'condensed') changeMenuSize('default');
+    else if (size === 'default') changeMenuSize('condensed');
+  };
 
   useEffect(() => {
     if (isFirstRender.current) {
-      isFirstRender.current = false
+      isFirstRender.current = false;
     } else if (size === 'hidden') {
-      toggleBackdrop()
+      toggleBackdrop();
     }
-  }, [pathname])
+  }, [pathname]);
 
   return (
     <div className="topbar-item">
@@ -33,7 +33,7 @@ const LeftSideBarToggle = () => {
         <IconifyIcon icon="ri:menu-2-line" width={24} height={24} className="fs-24" />
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default LeftSideBarToggle
+export default LeftSideBarToggle;

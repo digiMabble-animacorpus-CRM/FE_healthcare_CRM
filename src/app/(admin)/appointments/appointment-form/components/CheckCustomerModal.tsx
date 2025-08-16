@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 interface Props {
   onCheck: (email: string) => void;
@@ -11,14 +11,9 @@ interface Props {
   isCustomerNotFound: boolean;
 }
 
-const CheckCustomerModal = ({
-  show,
-  onClose,
-  onCheck,
-  isCustomerNotFound,
-}: Props) => {
+const CheckCustomerModal = ({ show, onClose, onCheck, isCustomerNotFound }: Props) => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
 
   return (
     <Modal show={show} onHide={onClose}>
@@ -58,7 +53,7 @@ const CheckCustomerModal = ({
             </Button>
             <Button
               variant="success"
-              onClick={() => router.push("/customer-enquiries/add-enquiry")}
+              onClick={() => router.push('/customer-enquiries/add-enquiry')}
             >
               Create New Customer
             </Button>

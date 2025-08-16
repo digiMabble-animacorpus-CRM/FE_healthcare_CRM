@@ -1,6 +1,12 @@
-'use client'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import { CanadaVectorMap, IraqVectorMap, RussiaVectorMap, SpainVectorMap, WorldVectorMap } from '@/components/VectorMap'
+'use client';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import {
+  CanadaVectorMap,
+  IraqVectorMap,
+  RussiaVectorMap,
+  SpainVectorMap,
+  WorldVectorMap,
+} from '@/components/VectorMap';
 
 const WorldVectorMaps = () => {
   const worldMapOptions = {
@@ -25,23 +31,25 @@ const WorldVectorMaps = () => {
         fillOpacity: 1,
       },
     },
-  }
+  };
   return (
     <ComponentContainerCard
       id="world_vector_map"
       title="World Vector Map"
       description={
         <>
-          Give textual form controls like <code>&lt;input&gt;</code>s and <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus
-          states, and more.
+          Give textual form controls like <code>&lt;input&gt;</code>s and{' '}
+          <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus states, and
+          more.
         </>
-      }>
+      }
+    >
       <div id="world-map-markers2">
         <WorldVectorMap height="360px" width="100%" options={worldMapOptions} />
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const CanadaMap = () => {
   return (
@@ -50,10 +58,12 @@ const CanadaMap = () => {
       title="Canada Vector Map"
       description={
         <>
-          Give textual form controls like <code>&lt;input&gt;</code>s and <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus
-          states, and more.{' '}
+          Give textual form controls like <code>&lt;input&gt;</code>s and{' '}
+          <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus states, and
+          more.{' '}
         </>
-      }>
+      }
+    >
       <CanadaVectorMap
         height="360px"
         width="100%"
@@ -68,8 +78,8 @@ const CanadaMap = () => {
         }}
       />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const RussiaMap = () => {
   return (
@@ -78,10 +88,12 @@ const RussiaMap = () => {
       title="Russia Vector Map"
       description={
         <>
-          Give textual form controls like <code>&lt;input&gt;</code>s and <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus
-          states, and more.
+          Give textual form controls like <code>&lt;input&gt;</code>s and{' '}
+          <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus states, and
+          more.
         </>
-      }>
+      }
+    >
       <RussiaVectorMap
         height="360px"
         width="100%"
@@ -96,8 +108,8 @@ const RussiaMap = () => {
         }}
       />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const IraqMap = () => {
   return (
@@ -106,10 +118,12 @@ const IraqMap = () => {
       title="Iraq Vector Map"
       description={
         <>
-          Give textual form controls like <code>&lt;input&gt;</code>s and <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus
-          states, and more.{' '}
+          Give textual form controls like <code>&lt;input&gt;</code>s and{' '}
+          <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus states, and
+          more.{' '}
         </>
-      }>
+      }
+    >
       <IraqVectorMap
         height="360px"
         width="100%"
@@ -124,8 +138,8 @@ const IraqMap = () => {
         }}
       />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const SpainMap = () => {
   return (
@@ -134,10 +148,12 @@ const SpainMap = () => {
       title="Spain Vector Map"
       description={
         <>
-          Give textual form controls like <code>&lt;input&gt;</code>s and <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus
-          states, and more.{' '}
+          Give textual form controls like <code>&lt;input&gt;</code>s and{' '}
+          <code>&lt;textarea&gt;</code>s an upgrade with custom styles, sizing, focus states, and
+          more.{' '}
         </>
-      }>
+      }
+    >
       <SpainVectorMap
         height="360px"
         width="100%"
@@ -152,8 +168,8 @@ const SpainMap = () => {
         }}
       />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 const AllVectorMaps = () => {
   return (
     <>
@@ -163,6 +179,6 @@ const AllVectorMaps = () => {
       <IraqMap />
       <SpainMap />
     </>
-  )
-}
-export default AllVectorMaps
+  );
+};
+export default AllVectorMaps;

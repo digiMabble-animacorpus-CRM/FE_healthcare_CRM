@@ -1,9 +1,9 @@
-import AllTimelineCharts from './components/AllTimelineCharts'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Col, Row } from 'react-bootstrap'
+import AllTimelineCharts from './components/AllTimelineCharts';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import { Col, Row } from 'react-bootstrap';
 
-export const metadata: Metadata = { title: 'Timeline Charts' }
+export const metadata: Metadata = { title: 'Timeline Charts' };
 
 const TimelineCharts = () => {
   return (
@@ -23,7 +23,7 @@ const TimelineCharts = () => {
         />
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default TimelineCharts
+export default TimelineCharts;

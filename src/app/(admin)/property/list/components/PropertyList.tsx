@@ -1,11 +1,23 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllProperty } from '@/helpers/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardFooter, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getAllProperty } from '@/helpers/data';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Button,
+  Card,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from 'react-bootstrap';
 
 const PropertyList = async () => {
-  const propertyListData = await getAllProperty()
+  const propertyListData = await getAllProperty();
   return (
     <Row>
       <Col xl={12}>
@@ -21,8 +33,10 @@ const PropertyList = async () => {
                 as={'a'}
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
-                aria-expanded="false">
-                This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+                aria-expanded="false"
+              >
+                This Month{' '}
+                <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem>Download</DropdownItem>
@@ -65,7 +79,11 @@ const PropertyList = async () => {
                     <td>
                       <div className="d-flex align-items-center gap-2">
                         <div>
-                          <Image src={item.image} alt="properties" className="avatar-md rounded border border-light border-3" />
+                          <Image
+                            src={item.image}
+                            alt="properties"
+                            className="avatar-md rounded border border-light border-3"
+                          />
                         </div>
                         <div>
                           <Link href="" className="text-dark fw-medium fs-15">
@@ -79,13 +97,15 @@ const PropertyList = async () => {
                     <td>
                       {' '}
                       <span
-                        className={`badge bg-${item.type == 'Rent' ? 'success' : item.type == 'Sold' ? 'danger' : 'warning'}-subtle text-${item.type == 'Rent' ? 'success' : item.type == 'Sold' ? 'danger' : 'warning'} py-1 px-2 fs-13`}>
+                        className={`badge bg-${item.type == 'Rent' ? 'success' : item.type == 'Sold' ? 'danger' : 'warning'}-subtle text-${item.type == 'Rent' ? 'success' : item.type == 'Sold' ? 'danger' : 'warning'} py-1 px-2 fs-13`}
+                      >
                         {item.type}
                       </span>
                     </td>
                     <td>
                       <p className="mb-0">
-                        <IconifyIcon icon="solar:bed-broken" className="align-middle fs-16" /> {item.beds}
+                        <IconifyIcon icon="solar:bed-broken" className="align-middle fs-16" />{' '}
+                        {item.beds}
                       </p>
                     </td>
                     <td>{item.country}</td>
@@ -99,7 +119,10 @@ const PropertyList = async () => {
                           <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
                         </Button>
                         <Button variant="soft-danger" size="sm">
-                          <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                          <IconifyIcon
+                            icon="solar:trash-bin-minimalistic-2-broken"
+                            className="align-middle fs-18"
+                          />
                         </Button>
                       </div>
                     </td>
@@ -142,7 +165,7 @@ const PropertyList = async () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default PropertyList
+export default PropertyList;

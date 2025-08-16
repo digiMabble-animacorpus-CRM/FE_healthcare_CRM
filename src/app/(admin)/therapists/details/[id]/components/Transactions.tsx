@@ -1,11 +1,11 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import contactlessImg from '@/assets/images/contactless-payment.png'
-import chipImg from '@/assets/images/chip.png'
-import mastercardImg from '@/assets/images/card/mastercard.svg'
-import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
-import { currency } from '@/context/constants'
-import Link from 'next/link'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import contactlessImg from '@/assets/images/contactless-payment.png';
+import chipImg from '@/assets/images/chip.png';
+import mastercardImg from '@/assets/images/card/mastercard.svg';
+import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
+import { currency } from '@/context/constants';
+import Link from 'next/link';
 
 const Transactions = () => {
   return (
@@ -23,7 +23,9 @@ const Transactions = () => {
           </div>
           <div className="mt-5">
             <h4 className="text-white d-flex gap-2">
-              <span className="text-white-50">XXXX</span> <span className="text-white-50">XXXX</span> <span className="text-white-50">XXXX</span> 3467
+              <span className="text-white-50">XXXX</span>{' '}
+              <span className="text-white-50">XXXX</span>{' '}
+              <span className="text-white-50">XXXX</span> 3467
             </h4>
           </div>
           <div className="d-flex align-items-center justify-content-between mt-4">
@@ -41,7 +43,12 @@ const Transactions = () => {
         <div className="mt-4">
           <div className="d-flex align-items-center gap-3 border-bottom pb-3">
             <div className="avatar bg-primary bg-opacity-10 rounded flex-centered">
-              <IconifyIcon icon="solar:square-transfer-horizontal-bold" width={28} height={28} className="fs-28 text-primary" />
+              <IconifyIcon
+                icon="solar:square-transfer-horizontal-bold"
+                width={28}
+                height={28}
+                className="fs-28 text-primary"
+              />
             </div>
             <div>
               <p className="mb-1 text-dark fw-medium fs-15">Michael A. Miner</p>
@@ -59,7 +66,12 @@ const Transactions = () => {
           </div>
           <div className="d-flex align-items-center gap-3 pt-3 rounded">
             <div className="avatar bg-primary bg-opacity-10 rounded flex-centered">
-              <IconifyIcon icon="solar:square-transfer-horizontal-bold" width={28} height={28} className="fs-28 text-primary" />
+              <IconifyIcon
+                icon="solar:square-transfer-horizontal-bold"
+                width={28}
+                height={28}
+                className="fs-28 text-primary"
+              />
             </div>
             <div>
               <p className="mb-1 text-dark fw-medium fs-15">Theresa T. Brose</p>
@@ -83,7 +95,7 @@ const Transactions = () => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default Transactions
+export default Transactions;

@@ -1,11 +1,11 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getNotifications } from '@/helpers/data'
-import { NotificationType } from '@/types/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import React from 'react'
-import { Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { getNotifications } from '@/helpers/data';
+import { NotificationType } from '@/types/data';
+import Image from 'next/image';
+import Link from 'next/link';
+import React from 'react';
+import { Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap';
 
 const NotificationItem = ({ from, content, icon }: NotificationType) => {
   return (
@@ -16,7 +16,9 @@ const NotificationItem = ({ from, content, icon }: NotificationType) => {
             <Image src={icon} className="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-1" />
           ) : (
             <div className="avatar-sm me-2">
-              <span className="avatar-title bg-soft-info text-info fs-20 rounded-circle">{from.charAt(0).toUpperCase()}</span>
+              <span className="avatar-title bg-soft-info text-info fs-20 rounded-circle">
+                {from.charAt(0).toUpperCase()}
+              </span>
             </div>
           )}
         </div>
@@ -26,11 +28,11 @@ const NotificationItem = ({ from, content, icon }: NotificationType) => {
         </div>
       </div>
     </DropdownItem>
-  )
-}
+  );
+};
 
 const Notifications = async () => {
-  const notificationList = await getNotifications()
+  const notificationList = await getNotifications();
   return (
     <Dropdown className="topbar-item ">
       <DropdownToggle
@@ -40,13 +42,17 @@ const Notifications = async () => {
         id="page-header-notifications-dropdown"
         data-bs-toggle="dropdown"
         aria-haspopup="true"
-        aria-expanded="false">
+        aria-expanded="false"
+      >
         <IconifyIcon icon="ri:notification-3-line" className="fs-24 align-middle " />
         <span className="position-absolute topbar-badge fs-10 translate-middle badge bg-danger rounded-pill">
           3<span className="visually-hidden">unread messages</span>
         </span>
       </DropdownToggle>
-      <DropdownMenu className="py-0 dropdown-lg dropdown-menu-end" aria-labelledby="page-header-notifications-dropdown">
+      <DropdownMenu
+        className="py-0 dropdown-lg dropdown-menu-end"
+        aria-labelledby="page-header-notifications-dropdown"
+      >
         <div className="p-3 border-top-0 border-start-0 border-end-0 border-dashed border">
           <Row className="align-items-center">
             <Col>
@@ -71,7 +77,7 @@ const Notifications = async () => {
         </div>
       </DropdownMenu>
     </Dropdown>
-  )
-}
+  );
+};
 
-export default Notifications
+export default Notifications;

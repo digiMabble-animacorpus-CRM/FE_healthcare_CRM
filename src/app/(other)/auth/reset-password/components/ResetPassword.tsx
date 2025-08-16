@@ -1,64 +1,67 @@
-'use client'
-import logoDark from '@/assets/images/logo-light2.png'
-import LogoLight from '@/assets/images/logo-light2.png'
-import TextFormInput from '@/components/from/TextFormInput'
-import { yupResolver } from '@hookform/resolvers/yup'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { Card, CardBody, Col, Container, Row } from 'react-bootstrap'
-import { useForm } from 'react-hook-form'
-import * as yup from 'yup'
-import useResetPassword from './useResetPassword'
-import { useSearchParams } from 'next/navigation'
+'use client';
+import logoDark from '@/assets/images/logo-light2.png';
+import LogoLight from '@/assets/images/logo-light2.png';
+import TextFormInput from '@/components/from/TextFormInput';
+import { yupResolver } from '@hookform/resolvers/yup';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect } from 'react';
+import { Card, CardBody, Col, Container, Row } from 'react-bootstrap';
+import { useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import useResetPassword from './useResetPassword';
+import { useSearchParams } from 'next/navigation';
 
 const ResetPassword = () => {
   useEffect(() => {
-    document.body.classList.add('authentication-bg')
+    document.body.classList.add('authentication-bg');
     return () => {
-      document.body.classList.remove('authentication-bg')
-    }
-  }, [])
+      document.body.classList.remove('authentication-bg');
+    };
+  }, []);
 
   type ForgotPasswordFormData = {
-    email: string
-  }
+    email: string;
+  };
 
   type ResetPasswordFormData = {
-    password: string
-    confirmPassword: string
-  }
+    password: string;
+    confirmPassword: string;
+  };
 
-  const searchParams = useSearchParams()
-  const token = searchParams.get('token') ?? ''
+  const searchParams = useSearchParams();
+  const token = searchParams.get('token') ?? '';
 
   const forgotPasswordSchema = yup.object({
     email: yup.string().email().required('Please enter your email'),
-  })
+  });
 
   const resetPasswordSchema = yup.object({
-    password: yup.string().min(8, 'Password must be at least 8 characters').required('Please enter new password'),
+    password: yup
+      .string()
+      .min(8, 'Password must be at least 8 characters')
+      .required('Please enter new password'),
     confirmPassword: yup
       .string()
       .oneOf([yup.ref('password')], 'Passwords must match')
       .required('Please confirm your password'),
-  })
+  });
 
-  const schema = token ? resetPasswordSchema : forgotPasswordSchema
+  const schema = token ? resetPasswordSchema : forgotPasswordSchema;
 
   const { handleSubmit, control } = useForm<ForgotPasswordFormData | ResetPasswordFormData>({
     resolver: yupResolver(schema as any),
-  })
+  });
 
-  const { resetPassword, requestResetLink, loading } = useResetPassword()
+  const { resetPassword, requestResetLink, loading } = useResetPassword();
 
   const onSubmit = (data: any) => {
     if (token) {
-      resetPassword(token, data.password, data.confirmPassword)
+      resetPassword(token, data.password, data.confirmPassword);
     } else {
-      requestResetLink(data.email)
+      requestResetLink(data.email);
     }
-  }
+  };
 
   return (
     <div className="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
@@ -115,7 +118,11 @@ const ResetPassword = () => {
                       )}
                     </div>
                     <div className="mb-1 text-center d-grid">
-                      <button disabled={loading} className="btn btn-danger py-2 fw-medium" type="submit">
+                      <button
+                        disabled={loading}
+                        className="btn btn-danger py-2 fw-medium"
+                        type="submit"
+                      >
                         {token ? 'Set New Password' : 'Reset Password'}
                       </button>
                     </div>
@@ -133,7 +140,7 @@ const ResetPassword = () => {
         </Row>
       </Container>
     </div>
-  )
-}
+  );
+};
 
-export default ResetPassword
+export default ResetPassword;

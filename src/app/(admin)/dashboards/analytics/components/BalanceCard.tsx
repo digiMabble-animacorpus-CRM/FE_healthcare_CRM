@@ -1,10 +1,19 @@
-import moneyImg from '@/assets/images/money.png'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { currency } from '@/context/constants'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardFooter, CardTitle, Col, ProgressBar, Row } from 'react-bootstrap'
-import { propertyData } from '../data'
+import moneyImg from '@/assets/images/money.png';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { currency } from '@/context/constants';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardTitle,
+  Col,
+  ProgressBar,
+  Row,
+} from 'react-bootstrap';
+import { propertyData } from '../data';
 
 const BalanceCard = () => {
   return (
@@ -72,7 +81,12 @@ const BalanceCard = () => {
                     {item.title}
                   </CardTitle>
                   <div className="avatar-md bg-light bg-opacity-50 rounded mx-auto my-3 flex-centered">
-                    <IconifyIcon icon={item.icon} width={32} height={32} className={`fs-32 text-${item.variant}`} />
+                    <IconifyIcon
+                      icon={item.icon}
+                      width={32}
+                      height={32}
+                      className={`fs-32 text-${item.variant}`}
+                    />
                   </div>
                   <h4 className="text-dark fw-medium">{item.amount}</h4>
                   <p className="text-muted">{item.progress}% Target</p>
@@ -97,7 +111,7 @@ const BalanceCard = () => {
         </CardFooter>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default BalanceCard
+export default BalanceCard;

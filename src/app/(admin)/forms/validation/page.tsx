@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllFormValidation from './components/AllFormValidation'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllFormValidation from './components/AllFormValidation';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Validation' }
+export const metadata: Metadata = { title: 'Validation' };
 
 const Validation = () => {
   return (
@@ -27,7 +27,7 @@ const Validation = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Validation
+export default Validation;

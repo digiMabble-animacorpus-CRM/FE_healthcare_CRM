@@ -1,9 +1,9 @@
-import blogImg from '@/assets/images/blog/blog.jpg'
-import avatar6 from '@/assets/images/users/avatar-6.jpg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardFooter, Col, Row } from 'react-bootstrap'
+import blogImg from '@/assets/images/blog/blog.jpg';
+import avatar6 from '@/assets/images/users/avatar-6.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Button, Card, CardBody, CardFooter, Col, Row } from 'react-bootstrap';
 
 const CreatePostCard = () => {
   return (
@@ -16,9 +16,12 @@ const CreatePostCard = () => {
           </span>
         </div>
         <div className="mt-3">
-          <h4 className="lh-base">Essential Home Staging Tips: How to Showcase Your Property for Maximum Buyer Appeal</h4>
+          <h4 className="lh-base">
+            Essential Home Staging Tips: How to Showcase Your Property for Maximum Buyer Appeal
+          </h4>
           <p className="mb-0">
-            Home staging is a crucial step in the selling process that involves preparing your home to appeal to a wide range of potential buyers.
+            Home staging is a crucial step in the selling process that involves preparing your home
+            to appeal to a wide range of potential buyers.
           </p>
         </div>
         <div className="d-flex align-items-center gap-1 mt-3">
@@ -39,7 +42,8 @@ const CreatePostCard = () => {
             <span>
               <button
                 type="button"
-                className="btn btn-soft-danger avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded-circle">
+                className="btn btn-soft-danger avatar-sm d-inline-flex align-items-center justify-content-center fs-20 rounded-circle"
+              >
                 {' '}
                 <span>
                   {' '}
@@ -65,7 +69,7 @@ const CreatePostCard = () => {
         </Row>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
-export default CreatePostCard
+export default CreatePostCard;

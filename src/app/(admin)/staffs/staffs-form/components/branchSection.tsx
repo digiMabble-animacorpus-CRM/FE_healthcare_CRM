@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useEffect, useMemo } from "react";
-import { useFormContext, Controller, useWatch } from "react-hook-form";
-import { Col, Row, FormCheck } from "react-bootstrap";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import type { StaffType, BranchType } from "@/types/data";
-import { getAllBranch } from "@/helpers/branch";
+import { useEffect, useMemo } from 'react';
+import { useFormContext, Controller, useWatch } from 'react-hook-form';
+import { Col, Row, FormCheck } from 'react-bootstrap';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import type { StaffType, BranchType } from '@/types/data';
+import { getAllBranch } from '@/helpers/branch';
 
 const BranchSection = () => {
   const {
@@ -14,8 +14,8 @@ const BranchSection = () => {
     formState: { errors },
   } = useFormContext<StaffType>();
 
-  const assignedBranches = useWatch({ control, name: "branches" }) || [];
-  const selectedBranch = useWatch({ control, name: "selectedBranch" });
+  const assignedBranches = useWatch({ control, name: 'branches' }) || [];
+  const selectedBranch = useWatch({ control, name: 'selectedBranch' });
 
   //  Get all branches as full objects
   const allBranches = useMemo<BranchType[]>(() => {
@@ -30,34 +30,31 @@ const BranchSection = () => {
   }));
 
   //  Auto-select or clear primary branch based on selection count
-useEffect(() => {
-  if (assignedBranches.length === 1) {
-    const branchId = typeof assignedBranches[0] === "string"
-      ? assignedBranches[0]
-      : assignedBranches[0].id;
+  useEffect(() => {
+    if (assignedBranches.length === 1) {
+      const branchId =
+        typeof assignedBranches[0] === 'string' ? assignedBranches[0] : assignedBranches[0].id;
 
-    if (selectedBranch !== branchId) {
-      setValue("selectedBranch", branchId, { shouldValidate: true });
-    }
-  } else if (assignedBranches.length > 1) {
-    const isCurrentSelectedValid = assignedBranches.some(
-      (b) => (typeof b === "string" ? b : b.id) === selectedBranch
-    );
-
-    if (!selectedBranch || !isCurrentSelectedValid) {
-      const firstBranch = typeof assignedBranches[0] === "string"
-        ? assignedBranches[0]
-        : assignedBranches[0].id;
-
-      if (selectedBranch !== firstBranch) {
-        setValue("selectedBranch", firstBranch, { shouldValidate: true });
+      if (selectedBranch !== branchId) {
+        setValue('selectedBranch', branchId, { shouldValidate: true });
       }
-    }
-  } else if (selectedBranch !== "") {
-    setValue("selectedBranch", "", { shouldValidate: true });
-  }
-}, [assignedBranches, selectedBranch, setValue]);
+    } else if (assignedBranches.length > 1) {
+      const isCurrentSelectedValid = assignedBranches.some(
+        (b) => (typeof b === 'string' ? b : b.id) === selectedBranch,
+      );
 
+      if (!selectedBranch || !isCurrentSelectedValid) {
+        const firstBranch =
+          typeof assignedBranches[0] === 'string' ? assignedBranches[0] : assignedBranches[0].id;
+
+        if (selectedBranch !== firstBranch) {
+          setValue('selectedBranch', firstBranch, { shouldValidate: true });
+        }
+      }
+    } else if (selectedBranch !== '') {
+      setValue('selectedBranch', '', { shouldValidate: true });
+    }
+  }, [assignedBranches, selectedBranch, setValue]);
 
   return (
     <div className="mb-4">
@@ -78,7 +75,7 @@ useEffect(() => {
                     className="form-control"
                     multiple
                     options={{ removeItemButton: true }}
-                    value={value.map((v) => (typeof v === "string" ? v : v.id))}
+                    value={value.map((v) => (typeof v === 'string' ? v : v.id))}
                     onChange={(val) => {
                       const converted = Array.isArray(val)
                         ? val.map((v) => ({
@@ -99,9 +96,7 @@ useEffect(() => {
                 );
               }}
             />
-            {errors.branches && (
-              <small className="text-danger2">{errors.branches.message}</small>
-            )}
+            {errors.branches && <small className="text-danger2">{errors.branches.message}</small>}
           </div>
         </Col>
 
@@ -113,11 +108,8 @@ useEffect(() => {
               </label>
               <Row>
                 {assignedBranches.map((branch) => {
-                  const branchId =
-                    typeof branch === "string" ? branch : branch.id;
-                  const branchName =
-                    allBranches.find((b) => b._id === branchId)?.name ||
-                    branchId;
+                  const branchId = typeof branch === 'string' ? branch : branch.id;
+                  const branchName = allBranches.find((b) => b._id === branchId)?.name || branchId;
 
                   return (
                     <Col lg={4} key={branchId}>
@@ -143,9 +135,7 @@ useEffect(() => {
                 })}
               </Row>
               {errors.selectedBranch && (
-                <small className="text-danger2">
-                  {errors.selectedBranch.message}
-                </small>
+                <small className="text-danger2">{errors.selectedBranch.message}</small>
               )}
             </div>
           </Col>

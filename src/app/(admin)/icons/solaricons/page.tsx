@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { Card, CardBody } from 'react-bootstrap'
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { Card, CardBody } from 'react-bootstrap';
 
-export const metadata: Metadata = { title: 'Solar Icons' }
+export const metadata: Metadata = { title: 'Solar Icons' };
 
 const IconMoon = () => {
   return (
@@ -194,12 +194,16 @@ const IconMoon = () => {
       </div>
 
       <div className="my-4 text-center">
-        <Link href="https://icon-sets.iconify.design/iconamoon/" target="_blank" className="btn btn-primary">
+        <Link
+          href="https://icon-sets.iconify.design/iconamoon/"
+          target="_blank"
+          className="btn btn-primary"
+        >
           View All Icons
         </Link>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default IconMoon
+export default IconMoon;

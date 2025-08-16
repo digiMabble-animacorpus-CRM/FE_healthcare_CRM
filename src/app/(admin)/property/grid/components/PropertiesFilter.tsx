@@ -1,20 +1,29 @@
-'use client'
-import ChoicesFormInput from '@/components/from/ChoicesFormInput'
-import Nouislider from 'nouislider-react'
-import { useState } from 'react'
-import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
+'use client';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import Nouislider from 'nouislider-react';
+import { useState } from 'react';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+} from 'react-bootstrap';
 
 const PropertiesFilter = () => {
-  const [selectedValue, setSelectedValue] = useState([6000, 100000])
+  const [selectedValue, setSelectedValue] = useState([6000, 100000]);
   const handleSliderChange = (values: any) => {
-    setSelectedValue(values)
-  }
+    setSelectedValue(values);
+  };
 
   const handleInputChange = (event: any) => {
     if (selectedValue[0] <= Math.round(event.target.value)) {
-      setSelectedValue([selectedValue[0], Math.round(event.target.value)])
+      setSelectedValue([selectedValue[0], Math.round(event.target.value)]);
     }
-  }
+  };
   return (
     <Col xl={3} lg={12}>
       <Card>
@@ -29,7 +38,11 @@ const PropertiesFilter = () => {
             <label htmlFor="choices-single-groups" className="form-label">
               Properties Location
             </label>
-            <ChoicesFormInput className="form-control" id="choices-single-groups" data-placeholder="Select City">
+            <ChoicesFormInput
+              className="form-control"
+              id="choices-single-groups"
+              data-placeholder="Select City"
+            >
               <option>Choose a city</option>
               <optgroup label="UK">
                 <option value="London">London</option>
@@ -121,7 +134,12 @@ const PropertiesFilter = () => {
           <Row className="g-1">
             <Col lg={6}>
               <div className="mb-2">
-                <input className="form-check-input" type="checkbox" id="defaultCheck" defaultChecked />
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="defaultCheck"
+                  defaultChecked
+                />
                 &nbsp;
                 <label className="form-check-label ms-1" htmlFor="defaultCheck">
                   All Properties
@@ -249,7 +267,7 @@ const PropertiesFilter = () => {
         </CardFooter>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default PropertiesFilter
+export default PropertiesFilter;

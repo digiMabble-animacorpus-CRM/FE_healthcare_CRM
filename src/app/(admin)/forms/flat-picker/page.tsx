@@ -1,11 +1,11 @@
-import { Card, CardBody, CardTitle, Col, Container, Row } from 'react-bootstrap'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import CustomFlatpickr from '@/components/CustomFlatpickr'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Card, CardBody, CardTitle, Col, Container, Row } from 'react-bootstrap';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import CustomFlatpickr from '@/components/CustomFlatpickr';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Flatpicker' }
+export const metadata: Metadata = { title: 'Flatpicker' };
 
 const FlatPicker = () => {
   return (
@@ -20,17 +20,24 @@ const FlatPicker = () => {
                 <a
                   className="btn btn-sm btn-outline-success rounded-2 float-end"
                   href="https://www.npmjs.com/package/react-flatpickr"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </a>
               </CardTitle>
-              <p className="text-muted mb-3">flatpickr is a lightweight and powerful datetime picker.</p>
+              <p className="text-muted mb-3">
+                flatpickr is a lightweight and powerful datetime picker.
+              </p>
             </CardBody>
           </Card>
           <ComponentContainerCard id="basic" title="Basic" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr className="form-control" placeholder="Basic datepicker" options={{ enableTime: false }} />
+                <CustomFlatpickr
+                  className="form-control"
+                  placeholder="Basic datepicker"
+                  options={{ enableTime: false }}
+                />
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -50,7 +57,11 @@ const FlatPicker = () => {
             </Row>
           </ComponentContainerCard>
 
-          <ComponentContainerCard id="human-friendly-dates" title="Human-friendly Dates" titleClass="mb-3">
+          <ComponentContainerCard
+            id="human-friendly-dates"
+            title="Human-friendly Dates"
+            titleClass="mb-3"
+          >
             <Row>
               <Col lg={6}>
                 <CustomFlatpickr
@@ -115,7 +126,11 @@ const FlatPicker = () => {
             </Row>
           </ComponentContainerCard>
 
-          <ComponentContainerCard id="conjunction" title="Selecting multiple dates - Conjunction" titleClass="mb-3">
+          <ComponentContainerCard
+            id="conjunction"
+            title="Selecting multiple dates - Conjunction"
+            titleClass="mb-3"
+          >
             <Row>
               <Col lg={6}>
                 <CustomFlatpickr
@@ -193,7 +208,11 @@ const FlatPicker = () => {
             </Row>
           </ComponentContainerCard>
 
-          <ComponentContainerCard id="timepicker-minmax" title="Time Picker w/ Limits" titleClass="mb-3">
+          <ComponentContainerCard
+            id="timepicker-minmax"
+            title="Time Picker w/ Limits"
+            titleClass="mb-3"
+          >
             <Row>
               <Col lg={6}>
                 <CustomFlatpickr
@@ -249,7 +268,7 @@ const FlatPicker = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default FlatPicker
+export default FlatPicker;

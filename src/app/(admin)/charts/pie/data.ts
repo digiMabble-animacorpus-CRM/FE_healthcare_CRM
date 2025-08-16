@@ -1,10 +1,10 @@
-import { type ApexOptions } from 'apexcharts'
-import small1 from '@/assets/images/small/img-1.jpg'
-import small2 from '@/assets/images/small/img-2.jpg'
-import small3 from '@/assets/images/small/img-3.jpg'
-import small5 from '@/assets/images/small/img-5.jpg'
+import { type ApexOptions } from 'apexcharts';
+import small1 from '@/assets/images/small/img-1.jpg';
+import small2 from '@/assets/images/small/img-2.jpg';
+import small3 from '@/assets/images/small/img-3.jpg';
+import small5 from '@/assets/images/small/img-5.jpg';
 
-const colors1 = ['#4697ce', '#7f56da', '#e06d94', '#f8ac59', '#7dcc93']
+const colors1 = ['#4697ce', '#7f56da', '#e06d94', '#f8ac59', '#7dcc93'];
 
 export const simplePieOpts: ApexOptions = {
   chart: {
@@ -37,7 +37,7 @@ export const simplePieOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const simpleDonutOpts: ApexOptions = {
   chart: {
@@ -70,7 +70,7 @@ export const simpleDonutOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const monochromePieOpts: ApexOptions = {
   chart: {
@@ -107,7 +107,7 @@ export const monochromePieOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const gradientDonutOpts: ApexOptions = {
   chart: {
@@ -143,7 +143,7 @@ export const gradientDonutOpts: ApexOptions = {
   fill: {
     type: 'gradient',
   },
-}
+};
 
 export const patternedDonutOpts: ApexOptions = {
   chart: {
@@ -203,7 +203,7 @@ export const patternedDonutOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const imageFillOpts: ApexOptions = {
   chart: {
@@ -251,7 +251,7 @@ export const imageFillOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const donutUpdateOpts: ApexOptions = {
   chart: {
@@ -262,7 +262,18 @@ export const donutUpdateOpts: ApexOptions = {
     enabled: false,
   },
   series: [44, 55, 13, 33],
-  colors: ['#4697ce', '#53389f', '#7f56da', '#ff86c8', '#e06d94', '#e06d94', '#f8ac59', '#7dcc93', '#040505', '#7dcc93'],
+  colors: [
+    '#4697ce',
+    '#53389f',
+    '#7f56da',
+    '#ff86c8',
+    '#e06d94',
+    '#e06d94',
+    '#f8ac59',
+    '#7dcc93',
+    '#040505',
+    '#7dcc93',
+  ],
   legend: {
     show: true,
     position: 'bottom',
@@ -286,4 +297,4 @@ export const donutUpdateOpts: ApexOptions = {
       },
     },
   ],
-}
+};

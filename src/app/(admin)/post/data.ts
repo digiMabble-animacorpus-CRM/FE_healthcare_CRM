@@ -1,29 +1,30 @@
-import { addOrSubtractDaysFromDate } from '@/utils/date'
-import { StaticImageData } from 'next/image'
-import avatar3 from '@/assets/images/users/avatar-1.jpg'
-import avatar4 from '@/assets/images/users/avatar-1.jpg'
+import { addOrSubtractDaysFromDate } from '@/utils/date';
+import { StaticImageData } from 'next/image';
+import avatar3 from '@/assets/images/users/avatar-1.jpg';
+import avatar4 from '@/assets/images/users/avatar-1.jpg';
 
 export type ArticleType = {
-  title: string
-  description: string
-  name: string
-  date: Date
-  tags: string[]
-  image: StaticImageData
-}
+  title: string;
+  description: string;
+  name: string;
+  date: Date;
+  tags: string[];
+  image: StaticImageData;
+};
 
 export type PostType = {
-  link: string
-  title: string
-  description: string
-  name: string
-  date: Date
-  tags: string[]
-}
+  link: string;
+  title: string;
+  description: string;
+  name: string;
+  date: Date;
+  tags: string[];
+};
 
 export const articleData: ArticleType[] = [
   {
-    title: 'A Comprehensive Guide to Buying Your First Home: Everything You Need to Know from Start to Finish',
+    title:
+      'A Comprehensive Guide to Buying Your First Home: Everything You Need to Know from Start to Finish',
     date: addOrSubtractDaysFromDate(50),
     description:
       'First, ensure that you have a development environment ready. This typically involves installing the necessary tools and dependencies. We recommend using a reliable framework or platform that supports rapid development.',
@@ -32,7 +33,8 @@ export const articleData: ArticleType[] = [
     image: avatar3,
   },
   {
-    title: 'Understanding the Ins and Outs of the Real Estate Market: Key Trends and Predictions for 2023',
+    title:
+      'Understanding the Ins and Outs of the Real Estate Market: Key Trends and Predictions for 2023',
     date: addOrSubtractDaysFromDate(250),
     description:
       "In recent years, interest rates have been a pivotal factor in the real estate market. In 2023, the Federal Reserve's policies will continue to impact mortgage rates. A rise in interest rates can increase borrowing costs, potentially.",
@@ -40,7 +42,7 @@ export const articleData: ArticleType[] = [
     tags: ['Tutorials', 'Blog'],
     image: avatar4,
   },
-]
+];
 
 export const postData: PostType[] = [
   {
@@ -64,7 +66,8 @@ export const postData: PostType[] = [
   {
     link: 'https://www.youtube.com/embed/qBpY4MJt6lc?si=LXHNQxR1XHEt_5VT',
     title: 'Buying a fixer-upper: pros and cons ',
-    description: 'Fixer-uppers are often priced lower than move-in ready homes, allowing for potential savings and equity-building opportunities.',
+    description:
+      'Fixer-uppers are often priced lower than move-in ready homes, allowing for potential savings and equity-building opportunities.',
     name: 'Manuel B. Barry',
     date: addOrSubtractDaysFromDate(185),
     tags: ['Blog', 'Homes'],
@@ -72,9 +75,10 @@ export const postData: PostType[] = [
   {
     link: 'https://www.youtube.com/embed/wEw4A7CcSWU?si=BWA7J4IpWkiYvypk',
     title: 'Navigating the mortgage process ',
-    description: "Get pre-approved for a mortgage to establish your budget and demonstrate to sellers that you're a serious buyer.",
+    description:
+      "Get pre-approved for a mortgage to establish your budget and demonstrate to sellers that you're a serious buyer.",
     name: 'Obdulia J. Gatlin',
     date: addOrSubtractDaysFromDate(385),
     tags: ['Homes', 'News'],
   },
-]
+];

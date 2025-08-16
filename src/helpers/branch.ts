@@ -1,8 +1,6 @@
-import { branches } from "@/assets/data/branchData";
+import { branches } from '@/assets/data/branchData';
 
-import {
-  BranchType,
-} from "@/types/data";
+import { BranchType } from '@/types/data';
 
 const sleep = (ms = 500) => new Promise((res) => setTimeout(res, ms));
 
@@ -13,7 +11,7 @@ export const getAllBranch = (): BranchType[] => {
 export const getBranches = async (
   page: number = 1,
   limit: number = 10,
-  search?: string
+  search?: string,
 ): Promise<{
   data: BranchType[];
   totalCount: number;
@@ -24,9 +22,7 @@ export const getBranches = async (
 
   if (search) {
     const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter(
-      (item) => item.name.toLowerCase().includes(lowerSearch)
-    );
+    filteredData = filteredData.filter((item) => item.name.toLowerCase().includes(lowerSearch));
   }
 
   const start = (page - 1) * limit;

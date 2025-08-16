@@ -1,25 +1,35 @@
-'use client'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import { useState } from 'react'
-import ReactApexChart from 'react-apexcharts'
-import { Button } from 'react-bootstrap'
-import { basicRadarOpts, multipleSeriesOpts, polygonFillOpts } from '../data'
+'use client';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import { useState } from 'react';
+import ReactApexChart from 'react-apexcharts';
+import { Button } from 'react-bootstrap';
+import { basicRadarOpts, multipleSeriesOpts, polygonFillOpts } from '../data';
 
 const BasicChart = () => {
   return (
     <ComponentContainerCard id="basic" title="Basic Radar Chart">
-      <ReactApexChart height={350} options={basicRadarOpts} series={basicRadarOpts.series} type="radar" />
+      <ReactApexChart
+        height={350}
+        options={basicRadarOpts}
+        series={basicRadarOpts.series}
+        type="radar"
+      />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const PolygonFillChart = () => {
   return (
     <ComponentContainerCard id="polygon" title="Radar with Polygon-fill">
-      <ReactApexChart height={350} options={polygonFillOpts} series={polygonFillOpts.series} type="radar" />
+      <ReactApexChart
+        height={350}
+        options={polygonFillOpts}
+        series={polygonFillOpts.series}
+        type="radar"
+      />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const MultipleSeriesChart = () => {
   const [data, setData] = useState([
@@ -35,15 +45,15 @@ const MultipleSeriesChart = () => {
       name: 'Series 3',
       data: [44, 76, 78, 13, 43, 10],
     },
-  ])
+  ]);
 
   function update() {
     function randomSeries() {
-      const arr = []
+      const arr = [];
       for (let i = 0; i < 6; i++) {
-        arr.push(Math.floor(Math.random() * 100))
+        arr.push(Math.floor(Math.random() * 100));
       }
-      return arr
+      return arr;
     }
 
     setData([
@@ -59,7 +69,7 @@ const MultipleSeriesChart = () => {
         name: 'Series 3',
         data: randomSeries(),
       },
-    ])
+    ]);
   }
   return (
     <ComponentContainerCard id="multiple-series" title="Radar – Multiple Series">
@@ -70,8 +80,8 @@ const MultipleSeriesChart = () => {
         </Button>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AllRadarCharts = () => {
   return (
@@ -80,7 +90,7 @@ const AllRadarCharts = () => {
       <PolygonFillChart />
       <MultipleSeriesChart />
     </>
-  )
-}
+  );
+};
 
-export default AllRadarCharts
+export default AllRadarCharts;

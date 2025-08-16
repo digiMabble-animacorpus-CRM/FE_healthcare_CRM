@@ -1,10 +1,10 @@
-import FileUpload from "@/components/FileUpload";
-import PageTitle from "@/components/PageTitle";
-import { Col, Row } from "react-bootstrap";
-import { Metadata } from "next";
-import AddTherapist from "../../add-therapist/components/AddTherapist";
+import FileUpload from '@/components/FileUpload';
+import PageTitle from '@/components/PageTitle';
+import { Col, Row } from 'react-bootstrap';
+import { Metadata } from 'next';
+import AddTherapist from '../../add-therapist/components/AddTherapist';
 
-export const metadata: Metadata = { title: "Customers Add" };
+export const metadata: Metadata = { title: 'Customers Add' };
 
 const TherapistEditPage = ({ params }: { params: { id: string } }) => {
   return (

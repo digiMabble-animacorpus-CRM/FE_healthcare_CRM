@@ -30,7 +30,7 @@ export const getAllStaff = async (
   branch?: string,
   from?: string,
   to?: string,
-  search?: string
+  search?: string,
 ): Promise<{ data: StaffType[]; totalCount: number }> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -72,8 +72,8 @@ export const getAllStaff = async (
     const staffData: StaffType[] = Array.isArray(jsonData?.data)
       ? jsonData.data
       : jsonData?.data
-      ? [jsonData.data]
-      : [];
+        ? [jsonData.data]
+        : [];
 
     return {
       data: staffData,
@@ -85,32 +85,31 @@ export const getAllStaff = async (
   }
 };
 
-
 export const getStaffById = async (staffId: string): Promise<StaffType | null> => {
-  const token = localStorage.getItem("access_token");
+  const token = localStorage.getItem('access_token');
   if (!token) {
-    console.warn("No access token found.");
+    console.warn('No access token found.');
     return null;
   }
 
   const url = `${API_BASE_PATH}/staff/${staffId}`;
-  console.log("Requesting staff by ID:", url);
+  console.log('Requesting staff by ID:', url);
 
   try {
     const response = await fetch(url, {
-      method: "GET",
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
-    console.log("Response status:", response.status);
+    console.log('Response status:', response.status);
     const result = await response.json();
-    console.log("Full API response:", result);
+    console.log('Full API response:', result);
 
     if (!response.ok) {
-      console.error("Failed to fetch staff:", result?.message || "Unknown error");
+      console.error('Failed to fetch staff:', result?.message || 'Unknown error');
       return null;
     }
 
@@ -119,19 +118,17 @@ export const getStaffById = async (staffId: string): Promise<StaffType | null> =
       return result.data as StaffType;
     }
 
-    console.warn("No data found in response.");
+    console.warn('No data found in response.');
     return null;
   } catch (error) {
-    console.error("Exception during staff fetch:", error);
+    console.error('Exception during staff fetch:', error);
     return null;
   }
 };
 
-
-
 export const updateStaff = async (
   id: string | number,
-  payload: StaffUpdatePayload
+  payload: StaffUpdatePayload,
 ): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -140,25 +137,20 @@ export const updateStaff = async (
     const safePayload = {
       ...payload,
       branches: (payload.branches || []).map((b: string | number) => Number(b)),
-      selected_branch: payload.selected_branch
-        ? Number(payload.selected_branch)
-        : null,
+      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
     const encryptedId = encryptAES(String(id));
     const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(
-      `${API_BASE_PATH}/staff/${encodeURIComponent(encryptedId)}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data: encryptedPayload }),
-      }
-    );
+    const response = await fetch(`${API_BASE_PATH}/staff/${encodeURIComponent(encryptedId)}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ data: encryptedPayload }),
+    });
 
     const result = await response.json();
 
@@ -173,7 +165,6 @@ export const updateStaff = async (
     return false;
   }
 };
-
 
 export const transformToBackendDto = (formData: StaffType): StaffUpdatePayload => {
   return {
@@ -197,8 +188,6 @@ export const transformToBackendDto = (formData: StaffType): StaffUpdatePayload =
     ],
   };
 };
-
-
 
 export const getAllRoles = async (): Promise<StaffRoleType[]> => {
   try {

@@ -1,25 +1,38 @@
-'use client'
-import clsx from 'clsx'
-import { useState, type ChangeEvent, type FormEvent } from 'react'
-import { Button, Col, Form, FormCheck, FormControl, FormGroup, FormLabel, FormSelect, InputGroup } from 'react-bootstrap'
-import Feedback from 'react-bootstrap/esm/Feedback'
-import InputGroupText from 'react-bootstrap/esm/InputGroupText'
-import { ValidationError } from 'yup'
+'use client';
+import clsx from 'clsx';
+import { useState, type ChangeEvent, type FormEvent } from 'react';
+import {
+  Button,
+  Col,
+  Form,
+  FormCheck,
+  FormControl,
+  FormGroup,
+  FormLabel,
+  FormSelect,
+  InputGroup,
+} from 'react-bootstrap';
+import Feedback from 'react-bootstrap/esm/Feedback';
+import InputGroupText from 'react-bootstrap/esm/InputGroupText';
+import { ValidationError } from 'yup';
 
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import { serverSideFormValidate } from '@/helpers/data'
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import { serverSideFormValidate } from '@/helpers/data';
 
 type ValidationErrorType = {
-  name?: string
-  message: string
-}
+  name?: string;
+  message: string;
+};
 
 const BrowserDefault = () => {
   return (
     <ComponentContainerCard
       id="browser-defaults"
       title="Browser Default"
-      description={<>Depending on your browser and OS, you’ll see a slightly different style of feedback.</>}>
+      description={
+        <>Depending on your browser and OS, you’ll see a slightly different style of feedback.</>
+      }
+    >
       <form className="row g-3">
         <Col md={4}>
           <FormLabel htmlFor="validationDefault01">First name</FormLabel>
@@ -35,7 +48,12 @@ const BrowserDefault = () => {
             <span className="input-group-text" id="inputGroupPrepend2">
               @
             </span>
-            <FormControl type="text" id="validationDefaultUsername" aria-describedby="inputGroupPrepend2" required />
+            <FormControl
+              type="text"
+              id="validationDefaultUsername"
+              aria-describedby="inputGroupPrepend2"
+              required
+            />
           </div>
         </Col>
         <Col md={6}>
@@ -63,20 +81,20 @@ const BrowserDefault = () => {
         </Col>
       </form>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const CustomStyles = () => {
-  const [validated, setValidated] = useState(false)
+  const [validated, setValidated] = useState(false);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    const form = event.currentTarget
+    const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault()
-      event.stopPropagation()
+      event.preventDefault();
+      event.stopPropagation();
     }
-    setValidated(true)
-  }
+    setValidated(true);
+  };
 
   return (
     <ComponentContainerCard
@@ -84,27 +102,52 @@ const CustomStyles = () => {
       title="Custom styles"
       description={
         <>
-          For custom Bootstrap form validation messages, you’ll need to add the <code>novalidate</code> boolean attribute to your{' '}
-          <code>&lt;form&gt;</code>. This disables the browser default feedback tooltips, but still provides access to the form validation APIs in
-          JavaScript. When attempting to submit, you’ll see the <code>:invalid</code> and <code>:valid</code> styles applied to your form controls.
+          For custom Bootstrap form validation messages, you’ll need to add the{' '}
+          <code>novalidate</code> boolean attribute to your <code>&lt;form&gt;</code>. This disables
+          the browser default feedback tooltips, but still provides access to the form validation
+          APIs in JavaScript. When attempting to submit, you’ll see the <code>:invalid</code> and{' '}
+          <code>:valid</code> styles applied to your form controls.
         </>
-      }>
-      <Form className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleSubmit}>
+      }
+    >
+      <Form
+        className="row g-3 needs-validation"
+        noValidate
+        validated={validated}
+        onSubmit={handleSubmit}
+      >
         <FormGroup className="col-md-4">
           <FormLabel>First name</FormLabel>
-          <FormControl type="text" id="validationCustom01" placeholder="First name" defaultValue="Mark" required />
+          <FormControl
+            type="text"
+            id="validationCustom01"
+            placeholder="First name"
+            defaultValue="Mark"
+            required
+          />
           <Feedback>Looks good!</Feedback>
         </FormGroup>
         <FormGroup className="col-md-4">
           <FormLabel>Last name</FormLabel>
-          <FormControl type="text" id="validationCustom02" placeholder="Last name" defaultValue="Otto" required />
+          <FormControl
+            type="text"
+            id="validationCustom02"
+            placeholder="Last name"
+            defaultValue="Otto"
+            required
+          />
           <Feedback>Looks good!</Feedback>
         </FormGroup>
         <FormGroup className="col-md-4">
           <FormLabel>Username</FormLabel>
           <InputGroup>
             <InputGroupText id="inputGroupPrepend">@</InputGroupText>
-            <FormControl type="text" id="validationCustomUsername" placeholder="Username" required />
+            <FormControl
+              type="text"
+              id="validationCustomUsername"
+              placeholder="Username"
+              required
+            />
             <Feedback type="invalid">Please choose a username.</Feedback>
           </InputGroup>
         </FormGroup>
@@ -139,12 +182,12 @@ const CustomStyles = () => {
         </Col>
       </Form>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const ServerSideValidation = () => {
-  const [validated, setValidated] = useState(false)
-  const [formErrors, setFormErrors] = useState<ValidationErrorType[]>([])
+  const [validated, setValidated] = useState(false);
+  const [formErrors, setFormErrors] = useState<ValidationErrorType[]>([]);
 
   const [formValue, setFormValue] = useState({
     fName: 'Mark',
@@ -153,30 +196,30 @@ const ServerSideValidation = () => {
     city: '',
     state: '',
     zip: '',
-  })
+  });
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setFormValue({ ...formValue, [e.target.name]: e.target.value })
-  }
+    setFormValue({ ...formValue, [e.target.name]: e.target.value });
+  };
 
   const isValidInput = (name: string) => {
-    return !formErrors.find((key) => key.name === name)
-  }
+    return !formErrors.find((key) => key.name === name);
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    event.stopPropagation()
-    setValidated(true)
-    const validationReply = (await serverSideFormValidate(formValue)) as ValidationError
-    const allErrors: ValidationErrorType[] = []
+    event.preventDefault();
+    event.stopPropagation();
+    setValidated(true);
+    const validationReply = (await serverSideFormValidate(formValue)) as ValidationError;
+    const allErrors: ValidationErrorType[] = [];
     validationReply?.inner?.forEach((e) => {
       allErrors.push({
         name: e.path,
         message: e.message,
-      })
-    })
-    setFormErrors(allErrors)
-  }
+      });
+    });
+    setFormErrors(allErrors);
+  };
 
   return (
     <ComponentContainerCard
@@ -184,10 +227,13 @@ const ServerSideValidation = () => {
       title="Server side"
       description={
         <>
-          We recommend using client-side validation, but in case you require server-side validation, you can indicate invalid and valid form fields
-          with <code>.is-invalid</code> and <code>.is-valid</code>. Note that <code>.invalid-feedback</code> is also supported with these classes.
+          We recommend using client-side validation, but in case you require server-side validation,
+          you can indicate invalid and valid form fields with <code>.is-invalid</code> and{' '}
+          <code>.is-valid</code>. Note that <code>.invalid-feedback</code> is also supported with
+          these classes.
         </>
-      }>
+      }
+    >
       <Form className="row g-3" onSubmit={handleSubmit} noValidate>
         <FormGroup className="col-md-4" controlId="firstNameInput">
           <FormLabel>First name</FormLabel>
@@ -202,7 +248,9 @@ const ServerSideValidation = () => {
               onChange={handleChange}
             />
             <Feedback type={isValidInput('fName') ? 'valid' : 'invalid'}>
-              {isValidInput('fName') ? 'Looks good!' : formErrors.find((err) => err.name === 'fName')?.message}
+              {isValidInput('fName')
+                ? 'Looks good!'
+                : formErrors.find((err) => err.name === 'fName')?.message}
             </Feedback>
           </InputGroup>
         </FormGroup>
@@ -219,7 +267,9 @@ const ServerSideValidation = () => {
               isInvalid={!isValidInput('lName')}
             />
             <Feedback type={isValidInput('lName') ? 'valid' : 'invalid'}>
-              {isValidInput('lName') ? 'Looks good!' : formErrors.find((err) => err.name === 'lName')?.message}
+              {isValidInput('lName')
+                ? 'Looks good!'
+                : formErrors.find((err) => err.name === 'lName')?.message}
             </Feedback>
           </InputGroup>
         </FormGroup>
@@ -238,7 +288,9 @@ const ServerSideValidation = () => {
                 isInvalid={!isValidInput('username')}
               />
               <Feedback type={isValidInput('username') ? 'valid' : 'invalid'}>
-                {isValidInput('username') ? 'Looks good!' : formErrors.find((err) => err.name === 'username')?.message}
+                {isValidInput('username')
+                  ? 'Looks good!'
+                  : formErrors.find((err) => err.name === 'username')?.message}
               </Feedback>
             </InputGroup>
           </InputGroup>
@@ -256,7 +308,9 @@ const ServerSideValidation = () => {
               isInvalid={!isValidInput('city')}
             />
             <Feedback type={isValidInput('city') ? 'valid' : 'invalid'}>
-              {isValidInput('city') ? 'Looks good!' : formErrors.find((err) => err.name === 'city')?.message}
+              {isValidInput('city')
+                ? 'Looks good!'
+                : formErrors.find((err) => err.name === 'city')?.message}
             </Feedback>
           </InputGroup>
         </FormGroup>
@@ -273,7 +327,9 @@ const ServerSideValidation = () => {
               isInvalid={!isValidInput('state')}
             />
             <Feedback type={isValidInput('state') ? 'valid' : 'invalid'}>
-              {isValidInput('state') ? 'Looks good!' : formErrors.find((err) => err.name === 'state')?.message}
+              {isValidInput('state')
+                ? 'Looks good!'
+                : formErrors.find((err) => err.name === 'state')?.message}
             </Feedback>
           </InputGroup>
         </FormGroup>
@@ -289,7 +345,9 @@ const ServerSideValidation = () => {
             isInvalid={!isValidInput('zip')}
           />
           <Feedback type={isValidInput('zip') ? 'valid' : 'invalid'}>
-            {isValidInput('zip') ? 'Looks good!' : formErrors.find((err) => err.name === 'zip')?.message}
+            {isValidInput('zip')
+              ? 'Looks good!'
+              : formErrors.find((err) => err.name === 'zip')?.message}
           </Feedback>
         </FormGroup>
         <FormGroup className="col-12">
@@ -302,20 +360,20 @@ const ServerSideValidation = () => {
         </Col>
       </Form>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const Tooltips = () => {
-  const [validated, setValidated] = useState(false)
+  const [validated, setValidated] = useState(false);
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-    const form = event.currentTarget
+    const form = event.currentTarget;
     if (!form.checkValidity()) {
-      event.preventDefault()
-      event.stopPropagation()
+      event.preventDefault();
+      event.stopPropagation();
     }
-    setValidated(true)
-  }
+    setValidated(true);
+  };
 
   return (
     <ComponentContainerCard
@@ -331,11 +389,18 @@ const Tooltips = () => {
           <code>
             .{'{'}valid|invalid{'}'}-tooltip
           </code>{' '}
-          classes to display validation feedbackin a styled tooltip. Be sure to have a parent with <code>position: relative</code> on it for tooltip
-          positioning. In the example below, our column classes have this already, but your project may require an alternative setup.{' '}
+          classes to display validation feedbackin a styled tooltip. Be sure to have a parent with{' '}
+          <code>position: relative</code> on it for tooltip positioning. In the example below, our
+          column classes have this already, but your project may require an alternative setup.{' '}
         </>
-      }>
-      <Form className="row g-3 needs-validation" noValidate validated={validated} onSubmit={handleSubmit}>
+      }
+    >
+      <Form
+        className="row g-3 needs-validation"
+        noValidate
+        validated={validated}
+        onSubmit={handleSubmit}
+      >
         <FormGroup className="position-relative col-md-4">
           <FormLabel>First name</FormLabel>
           <FormControl type="text" placeholder="First name" defaultValue="Mark" required />
@@ -390,15 +455,18 @@ const Tooltips = () => {
         </Col>
       </Form>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const SupportedElements = () => {
   return (
     <ComponentContainerCard
       id="supported-elements"
       title="Supported elements"
-      description={<>Validation styles are available for the following form controls and components:</>}>
+      description={
+        <>Validation styles are available for the following form controls and components:</>
+      }
+    >
       <ul>
         <li>
           <code>&lt;input&gt;</code>s and&nbsp;
@@ -418,7 +486,13 @@ const SupportedElements = () => {
       <form className="was-validated">
         <div className="mb-3">
           <FormLabel htmlFor="validationTextarea">Textarea</FormLabel>
-          <textarea className="form-control" id="validationTextarea" placeholder="Required example textarea" required defaultValue={''} />
+          <textarea
+            className="form-control"
+            id="validationTextarea"
+            placeholder="Required example textarea"
+            required
+            defaultValue={''}
+          />
           <Feedback type="invalid">Please enter a message in the textarea.</Feedback>
         </div>
         <div className="form-check mb-3">
@@ -429,13 +503,25 @@ const SupportedElements = () => {
           <Feedback type="invalid">Example invalid feedback text</Feedback>
         </div>
         <div className="form-check">
-          <input type="radio" className="form-check-input" id="validationFormCheck2" name="radio-stacked" required />
+          <input
+            type="radio"
+            className="form-check-input"
+            id="validationFormCheck2"
+            name="radio-stacked"
+            required
+          />
           <label className="form-check-label" htmlFor="validationFormCheck2">
             Toggle this radio
           </label>
         </div>
         <div className="form-check mb-3">
-          <input type="radio" className="form-check-input" id="validationFormCheck3" name="radio-stacked" required />
+          <input
+            type="radio"
+            className="form-check-input"
+            id="validationFormCheck3"
+            name="radio-stacked"
+            required
+          />
           <label className="form-check-label" htmlFor="validationFormCheck3">
             Or toggle this other radio
           </label>
@@ -461,8 +547,8 @@ const SupportedElements = () => {
         </div>
       </form>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AllFormValidation = () => {
   return (
@@ -477,7 +563,7 @@ const AllFormValidation = () => {
 
       <Tooltips />
     </>
-  )
-}
+  );
+};
 
-export default AllFormValidation
+export default AllFormValidation;

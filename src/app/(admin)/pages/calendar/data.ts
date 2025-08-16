@@ -1,4 +1,4 @@
-import { EventInput } from '@fullcalendar/core'
+import { EventInput } from '@fullcalendar/core';
 
 export const defaultEvents: EventInput[] = [
   {
@@ -28,4 +28,4 @@ export const defaultEvents: EventInput[] = [
     end: new Date(Date.now() + 338000000 * 1.2),
     className: 'bg-primary',
   },
-]
+];

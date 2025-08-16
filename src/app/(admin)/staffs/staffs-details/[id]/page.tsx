@@ -1,15 +1,15 @@
 'use client';
 
-import PageTitle from "@/components/PageTitle";
-import { getStaffById } from "@/helpers/staff";
-import { useEffect, useState } from "react";
-import { Col, Row, Spinner, Alert } from "react-bootstrap";
-import WeeklyInquiry from "./components/WeeklyInquiry";
-import TransactionHistory from "./components/TransactionHistory";
-import UpcomingAppointmrnt from "./components/upcomingAppointmrnt";
-import type { StaffType, TherapistType } from "@/types/data";
-import { Metadata } from "next";
-import StaffDetails from "./components/StaffDetails";
+import PageTitle from '@/components/PageTitle';
+import { getStaffById } from '@/helpers/staff';
+import { useEffect, useState } from 'react';
+import { Col, Row, Spinner, Alert } from 'react-bootstrap';
+import WeeklyInquiry from './components/WeeklyInquiry';
+import TransactionHistory from './components/TransactionHistory';
+import UpcomingAppointmrnt from './components/upcomingAppointmrnt';
+import type { StaffType, TherapistType } from '@/types/data';
+import { Metadata } from 'next';
+import StaffDetails from './components/StaffDetails';
 
 interface Props {
   params: { id: string };
@@ -20,25 +20,24 @@ const StaffDetailPage = ({ params }: Props) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-
   useEffect(() => {
     const fetchStaff = async () => {
       try {
         const encryptedId = decodeURIComponent(params.id);
-        console.log(" Fetching staff with Encrypted ID:", encryptedId);
+        console.log(' Fetching staff with Encrypted ID:', encryptedId);
 
         const response = await getStaffById(encryptedId);
-        console.log(" API Response:", response);
+        console.log(' API Response:', response);
 
         //  If response is the staff data directly:
         if (!response || typeof response !== 'object' || !('id' in response)) {
-          throw new Error("Invalid staff data received from server");
+          throw new Error('Invalid staff data received from server');
         }
 
         setStaff(response);
       } catch (err: any) {
-        console.error(" Error fetching staff:", err.message || err);
-        setError("Failed to load staff data. Please try again later.");
+        console.error(' Error fetching staff:', err.message || err);
+        setError('Failed to load staff data. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -64,13 +63,13 @@ const StaffDetailPage = ({ params }: Props) => {
   //     </div>
   //   );
   // }
-if (!staff) {
-  return (
-    <div className="text-center mt-5">
-      <Alert variant="danger">{error || "Staff not found or failed to load."}</Alert>
-    </div>
-  );
-}
+  if (!staff) {
+    return (
+      <div className="text-center mt-5">
+        <Alert variant="danger">{error || 'Staff not found or failed to load.'}</Alert>
+      </div>
+    );
+  }
   return (
     <>
       <PageTitle subName="Staffs" title="Staff Overview" />

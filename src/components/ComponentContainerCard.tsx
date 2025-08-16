@@ -1,18 +1,25 @@
-import clsx from 'clsx'
-import Link from 'next/link'
-import { type ReactNode } from 'react'
-import { Card, CardBody, CardTitle } from 'react-bootstrap'
+import clsx from 'clsx';
+import Link from 'next/link';
+import { type ReactNode } from 'react';
+import { Card, CardBody, CardTitle } from 'react-bootstrap';
 
 type ContainerCardProps = {
-  title: string
-  id: string
-  titleClass?: string
-  descriptionClass?: string
-  description?: ReactNode
-  children: ReactNode
-}
+  title: string;
+  id: string;
+  titleClass?: string;
+  descriptionClass?: string;
+  description?: ReactNode;
+  children: ReactNode;
+};
 
-const ComponentContainerCard = ({ title, id, description, children, titleClass, descriptionClass }: ContainerCardProps) => {
+const ComponentContainerCard = ({
+  title,
+  id,
+  description,
+  children,
+  titleClass,
+  descriptionClass,
+}: ContainerCardProps) => {
   return (
     <Card>
       <CardBody>
@@ -26,7 +33,7 @@ const ComponentContainerCard = ({ title, id, description, children, titleClass, 
         <>{children}</>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default ComponentContainerCard
+export default ComponentContainerCard;

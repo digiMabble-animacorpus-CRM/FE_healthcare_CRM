@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import PageTitle from "@/components/PageTitle";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { useEffect, useState } from "react";
-import type { LanguageType, StaffType } from "@/types/data";
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { useEffect, useState } from 'react';
+import type { LanguageType, StaffType } from '@/types/data';
 import {
   Button,
   Card,
@@ -15,9 +15,9 @@ import {
   Modal,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import { getLanguages } from "@/helpers/languages";
+} from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import { getLanguages } from '@/helpers/languages';
 
 const PAGE_LIMIT = 10;
 
@@ -25,12 +25,10 @@ const LanguageListPage = () => {
   const [languages, setLanguages] = useState<LanguageType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(
-    null
-  );
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const router = useRouter();
 
   const fetchLanguages = async (page: number) => {
@@ -40,7 +38,7 @@ const LanguageListPage = () => {
       setLanguages(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error("Failed to fetch enquiries data:", error);
+      console.error('Failed to fetch enquiries data:', error);
     } finally {
       setLoading(false);
     }
@@ -70,12 +68,12 @@ const LanguageListPage = () => {
 
     try {
       await fetch(`/api/languages/${selectedPatientId}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
 
       fetchLanguages(currentPage); // refresh list
     } catch (error) {
-      console.error("Failed to delete enquiries:", error);
+      console.error('Failed to delete enquiries:', error);
     } finally {
       setShowDeleteModal(false);
       setSelectedPatientId(null);
@@ -94,7 +92,7 @@ const LanguageListPage = () => {
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
-                <div style={{ minWidth: "200px" }}>
+                <div style={{ minWidth: '200px' }}>
                   <input
                     type="text"
                     className="form-control form-control-sm"
@@ -106,7 +104,10 @@ const LanguageListPage = () => {
                     }}
                   />
                 </div>
-                <Button variant="primary" onClick={() => router.push("/languages/language-form/create")}>
+                <Button
+                  variant="primary"
+                  onClick={() => router.push('/languages/language-form/create')}
+                >
                   Add Language
                 </Button>
               </div>
@@ -124,15 +125,8 @@ const LanguageListPage = () => {
                       <tr>
                         <th style={{ width: 20 }}>
                           <div className="form-check">
-                            <input
-                              type="checkbox"
-                              className="form-check-input"
-                              id="customCheck1"
-                            />
-                            <label
-                              className="form-check-label"
-                              htmlFor="customCheck1"
-                            />
+                            <input type="checkbox" className="form-check-input" id="customCheck1" />
+                            <label className="form-check-label" htmlFor="customCheck1" />
                           </div>
                         </th>
                         {/* <th>Id</th> */}
@@ -191,9 +185,7 @@ const LanguageListPage = () => {
             <CardFooter>
               <nav aria-label="Page navigation example">
                 <ul className="pagination justify-content-end mb-0">
-                  <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                  >
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -204,9 +196,7 @@ const LanguageListPage = () => {
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
                     <li
-                      className={`page-item ${
-                        currentPage === index + 1 ? "active" : ""
-                      }`}
+                      className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
                       key={index}
                     >
                       <Button
@@ -218,11 +208,7 @@ const LanguageListPage = () => {
                       </Button>
                     </li>
                   ))}
-                  <li
-                    className={`page-item ${
-                      currentPage === totalPages ? "disabled" : ""
-                    }`}
-                  >
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -239,17 +225,12 @@ const LanguageListPage = () => {
       </Row>
 
       {/* Delete Confirmation Modal */}
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this customer? This action cannot be
-          undone.
+          Are you sure you want to delete this customer? This action cannot be undone.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>

@@ -1,8 +1,14 @@
-import avatar1 from '@/assets/images/users/main-image.jpeg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Dropdown, DropdownHeader, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap'
+import avatar1 from '@/assets/images/users/main-image.jpeg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+} from 'react-bootstrap';
 
 const ProfileDropdown = () => {
   return (
@@ -14,7 +20,8 @@ const ProfileDropdown = () => {
         id="page-header-user-dropdown "
         data-bs-toggle="dropdown"
         aria-haspopup="true"
-        aria-expanded="false">
+        aria-expanded="false"
+      >
         <span className="d-flex align-items-center">
           <Image className="rounded-circle" width={32} src={avatar1} alt="avatar-3" />
         </span>
@@ -46,7 +53,7 @@ const ProfileDropdown = () => {
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
-}
+  );
+};
 
-export default ProfileDropdown
+export default ProfileDropdown;
