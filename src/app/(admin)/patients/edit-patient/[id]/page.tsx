@@ -1,8 +1,8 @@
 import FileUpload from '@/components/FileUpload';
 import PageTitle from '@/components/PageTitle';
-import AddPatient from '../../add-patient/components/AddPaitent';
 import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
+import AddPatient from '../../add-patient/components/AddPatient';
 
 export const metadata: Metadata = { title: 'Customers Add' };
 
