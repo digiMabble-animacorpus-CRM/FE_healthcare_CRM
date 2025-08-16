@@ -2,59 +2,49 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Button, Form } from "react-bootstrap";
 
 interface Props {
   onCheck: (email: string) => void;
-  show: boolean;
-  onClose: () => void;
   isCustomerNotFound: boolean;
 }
 
-const CheckCustomerModal = ({
-  show,
-  onClose,
-  onCheck,
-  isCustomerNotFound,
-}: Props) => {
+const CheckCustomerSection = ({ onCheck, isCustomerNotFound }: Props) => {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
   return (
-    <Modal show={show} onHide={onClose}>
-      <Modal.Header closeButton>
-        <Modal.Title>Check Customer Email</Modal.Title>
-      </Modal.Header>
-      <Modal.Body>
-        <Form.Group>
-          <Form.Label>Email</Form.Label>
-          <Form.Control
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Enter customer's email"
-          />
-        </Form.Group>
+    <div className="p-3 border rounded bg-light">
+      <Form.Group className="mb-2">
+        <Form.Label className="fw-bold">Search by Email</Form.Label>
+        <Form.Control
+          type="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="Enter customer's email"
+        />
+      </Form.Group>
 
-        {isCustomerNotFound && (
-          <p className="text-danger mt-2">
-            Customer not found. You can create a new customer or check a different email.
-          </p>
-        )}
-      </Modal.Body>
+      {isCustomerNotFound && (
+        <p className="text-danger mt-1 mb-2">
+          Customer not found. You can create a new customer or search with a different email.
+        </p>
+      )}
 
-      <Modal.Footer>
-        <Button variant="secondary" onClick={onClose}>
-          Close
-        </Button>
+      <div className="mt-2">
         {!isCustomerNotFound ? (
-          <Button variant="primary" onClick={() => onCheck(email)}>
-            Check
+          <Button variant="primary" onClick={() => onCheck(email)} disabled={!email.trim()}>
+            Search
           </Button>
         ) : (
           <>
-            <Button variant="primary" onClick={() => onCheck(email)}>
-              Check Again
+            <Button
+              variant="primary"
+              onClick={() => onCheck(email)}
+              disabled={!email.trim()}
+              className="me-2"
+            >
+              Search Again
             </Button>
             <Button
               variant="success"
@@ -64,9 +54,9 @@ const CheckCustomerModal = ({
             </Button>
           </>
         )}
-      </Modal.Footer>
-    </Modal>
+      </div>
+    </div>
   );
 };
 
-export default CheckCustomerModal;
+export default CheckCustomerSection;

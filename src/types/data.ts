@@ -66,6 +66,9 @@ export type UserType = {
 };
 
 export type CustomerEnquiriesType = {
+  appointmentDetails: any;
+  familyDetails: any;
+  modeOfRegister: string;
   _id: IdType;
   name: string;
   email: string;
