@@ -192,7 +192,7 @@ export type Language = 'french' | 'dutch' | 'english';
 
 export type Address = {
   line1?: string; // street
-  street: string;
+  street?: string;
   line2?: string;
   city: string;
   zip_code: string;
