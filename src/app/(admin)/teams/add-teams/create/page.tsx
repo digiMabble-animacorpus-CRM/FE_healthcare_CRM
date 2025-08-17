@@ -1,7 +1,7 @@
 'use client';
 
 import { TeamType } from '@/assets/data/TeamType';
-import React, { useState } from 'react';
+import React, { useState } from 'react';  
 
 type TeamFormProps = {
   onSubmitHandler: (formData: TeamType) => void;
