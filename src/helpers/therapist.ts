@@ -2,13 +2,14 @@
 
 import { API_BASE_PATH } from '@/context/constants';
 import { encryptAES, decryptAES } from '@/utils/encryption';
+import type { TherapistCreatePayload, TherapistType } from '@/types/data';
 
-export interface PatientUpdatePayload {
+export interface TherapistUpdatePayload {
   name?: string;
   email?: string;
   phoneNumber?: string;
   roleId?: number;
-  accessLevel?: 'patient' | 'branch-admin' | 'super-admin';
+  accessLevel?: 'staff' | 'branch-admin' | 'super-admin';
   branches?: number[];
   selectedBranch?: number | null;
   permissions?: {
@@ -17,13 +18,13 @@ export interface PatientUpdatePayload {
     enabled: boolean;
   }[];
   updatedBy?: {
-    patientId: string;
+    staffId: string;
     updatedAt: string;
   }[];
   [key: string]: any;
 }
 
-export const getAllPatient = async (
+export const getAllTherapists = async (
   page: number = 1,
   limit: number = 10,
   branch?: string,
@@ -51,7 +52,7 @@ export const getAllPatient = async (
 
     const queryParams = new URLSearchParams(filters).toString();
 
-    const response = await fetch(`${API_BASE_PATH}/customers?${queryParams}`, {
+    const response = await fetch(`${API_BASE_PATH}/staff?${queryParams}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -68,14 +69,10 @@ export const getAllPatient = async (
     const jsonData = await response.json();
     console.log('Response from server:', jsonData);
 
-    const patientData: any[] = Array.isArray(jsonData?.data)
-      ? jsonData.data
-      : jsonData?.data
-        ? [jsonData.data]
-        : [];
+    const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
     return {
-      data: patientData,
+      data: therapistData,
       totalCount: jsonData?.totalCount || 0,
     };
   } catch (error) {
@@ -84,16 +81,15 @@ export const getAllPatient = async (
   }
 };
 
-export const getPatientById = async (patientId: any): Promise<any | null> => {
-  console.log(patientId);
+export const getTherapistById = async (therapistId: any): Promise<TherapistType | null> => {
   const token = localStorage.getItem('access_token');
   if (!token) {
     console.warn('No access token found.');
     return null;
   }
 
-  const url = `${API_BASE_PATH}/customers/${patientId}`;
-  console.log('Requesting patient by ID:', url);
+  const url = `${API_BASE_PATH}/staff/${therapistId}`;
+  console.log('Requesting therapist by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -105,88 +101,67 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
     });
 
     console.log('Response status:', response.status);
+
     const result = await response.json();
     console.log('Full API response:', result);
 
     if (!response.ok) {
-      console.error('Failed to fetch patient:', result?.message || 'Unknown error');
+      console.error('Failed to fetch therapist:', result?.message || 'Unknown error');
       return null;
     }
 
-    // Directly return the patient data
-    if (result?.data) {
-      return result.data as any;
+    // Return the therapist data directly
+    if (result) {
+      return result as TherapistType;
     }
 
     console.warn('No data found in response.');
     return null;
   } catch (error) {
-    console.error('Exception during patient fetch:', error);
+    console.error('Exception during therapist fetch:', error);
     return null;
   }
 };
 
-export const createPatient = async (payload: any): Promise<boolean> => {
+export const createTherapist = async (payload: TherapistCreatePayload): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return false;
 
-    //   const safePayload = {
-    //     ...payload,
-    //     branches: (payload.branches || []).map((b: string | number) => Number(b)),
-    //     selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
-    //   };
-
     const safePayload = {
-      firstname: 'John',
-      middlename: 'Middle',
-      lastname: 'Doe',
-      ssin: '94060768059',
-      legalgender: 'M',
-      language: 'en',
-      primarypatientrecordid: 'primary_record_123',
-      note: 'Some note about the patient',
-      status: 'ACTIVE',
-      mutualitynumber: '12345',
-      mutualityregistrationnumber: '67890',
-      emails: 'john.doe@example.com',
-      country: 'BE',
-      city: 'Brussels',
-      street: 'Rue du Comté',
-      number: '10',
-      zipcode: '5140',
-      birthdate: '1994-06-07',
-      phones: ['+32491079736'],
+      ...payload,
+      branches: (payload.branches || []).map((b) => Number(b)),
+      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
     const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(`${API_BASE_PATH}/customers`, {
+    const response = await fetch(`${API_BASE_PATH}/staff`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: safePayload }),
+      body: JSON.stringify({ data: encryptedPayload }),
     });
 
     const result = await response.json();
 
     if (!response.ok || !result.status) {
-      console.error('Create patient failed:', result.message || 'Unknown error');
+      console.error('Create failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error creating patient:', error);
+    console.error('Error creating staff:', error);
     return false;
   }
 };
 
-export const updatePatient = async (
+export const updateTherapist = async (
   id: string | number,
-  payload: PatientUpdatePayload,
+  payload: TherapistUpdatePayload,
 ): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -201,13 +176,13 @@ export const updatePatient = async (
     const encryptedId = encryptAES(String(id));
     const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(`${API_BASE_PATH}/customers/${encodeURIComponent(encryptedId)}`, {
+    const response = await fetch(`${API_BASE_PATH}/staff/${encodeURIComponent(encryptedId)}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: safePayload }),
+      body: JSON.stringify({ data: encryptedPayload }),
     });
 
     const result = await response.json();
@@ -219,28 +194,46 @@ export const updatePatient = async (
 
     return true;
   } catch (error) {
-    console.error(' Error updating patient:', error);
+    console.error(' Error updating staff:', error);
     return false;
   }
 };
 
-export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
+export const transformToBackendDto = (formData: TherapistType): TherapistUpdatePayload => {
   return {
-    name: formData.name,
-    email: formData.email,
-    phone_number: formData.phoneNumber,
-    role_id: formData.roleId ? Number(formData.roleId) : undefined,
-    access_level: formData.accessLevelId as 'patient' | 'branch-admin' | 'super-admin',
-    branches: formData.branches.map((b: { id: any }) => Number(b.id)).filter(Boolean),
-    selected_branch: formData.selectedBranch ? Number(formData.selectedBranch) : null,
-    permissions: formData.permissions.map((p: { _id: string; enabled: any }) => ({
-      action: p._id.split('-')[0],
-      resource: p._id.split('-')[1],
-      enabled: !!p.enabled,
-    })),
+    id: String(formData.idPro),
+    full_name: formData.fullName,
+    first_name: formData.firstName,
+    last_name: formData.lastName,
+    job_title: formData.jobTitle,
+    about_me: formData.aboutMe,
+    specializations: formData.specializations
+      ? formData.specializations.split('\n').map((s) => s.trim())
+      : [],
+    contact: {
+      email: formData.contactEmail,
+      phone: formData.contactPhone,
+    },
+    center: {
+      address: formData.centerAddress,
+      email: formData.centerEmail,
+      phone: formData.centerPhoneNumber,
+    },
+    schedule: formData.schedule,
+    website: formData.website,
+    availability: formData.availability || null,
+    languages: formData.spokenLanguages
+      ? formData.spokenLanguages.split(',').map((lang) => lang.trim())
+      : [],
+    payment_methods: formData.paymentMethods
+      ? formData.paymentMethods.split(/\r?\n|,/).map((p) => p.trim())
+      : [],
+    agenda_links: formData.agendaLinks || null,
+    rosa_link: formData.rosaLink || null,
+    google_agenda_link: formData.googleAgendaLink || null,
     updatedBy: [
       {
-        patientId: String(localStorage.getItem('patient_id') || ''),
+        staffId: String(localStorage.getItem('staff_id') || ''),
         updatedAt: new Date().toISOString(),
       },
     ],
@@ -252,7 +245,7 @@ export const getAllRoles = async (): Promise<any[]> => {
     const token = localStorage.getItem('access_token');
     if (!token) return [];
 
-    const response = await fetch(`${API_BASE_PATH}/patient-role?tag=Role`, {
+    const response = await fetch(`${API_BASE_PATH}/staff-role?tag=Role`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -275,7 +268,7 @@ export const getAllAccessLevels = async (): Promise<any[]> => {
     const token = localStorage.getItem('access_token');
     if (!token) return [];
 
-    const response = await fetch(`${API_BASE_PATH}/patient-role?tag=AccessLevel`, {
+    const response = await fetch(`${API_BASE_PATH}/staff-role?tag=AccessLevel`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

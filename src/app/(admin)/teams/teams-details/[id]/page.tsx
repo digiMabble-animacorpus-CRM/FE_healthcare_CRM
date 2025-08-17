@@ -11,7 +11,6 @@ import WeeklyInquiry from '@/app/(admin)/patients/details/[id]/components/Weekly
 import StaffDetails from '@/app/(admin)/staffs/staffs-details/[id]/components/StaffDetails';
 import UpcomingAppointmrnt from '@/app/(admin)/staffs/staffs-details/[id]/components/upcomingAppointmrnt';
 
-
 interface Props {
   params: { id: string };
 }

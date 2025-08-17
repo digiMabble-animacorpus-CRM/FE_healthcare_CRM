@@ -90,8 +90,8 @@ const PatientsListPage = () => {
       const term = searchTerm.toLowerCase();
       data = data.filter(
         (p) =>
-          p.firstname.toLowerCase().includes(term) ||
-          p.lastname.toLowerCase().includes(term) ||
+          p?.firstname.toLowerCase().includes(term) ||
+          p?.lastname.toLowerCase().includes(term) ||
           (p.emails && p.emails.toLowerCase().includes(term)) ||
           (p.phones && p.phones.join(' ').toLowerCase().includes(term)),
       );
@@ -132,19 +132,11 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = async (id: string) => {
-    try {
-      const data = await getPatientById(id);
-      if (!data) throw new Error('Failed to fetch patient');
-      sessionStorage.setItem('selectedPatient', JSON.stringify(data));
-      router.push(`/patients/details/${id}`);
-    } catch (error) {
-      console.error(error);
-      alert('Failed to load patient details');
-    }
+  const handleView = (id: string) => {
+    router.push(`/patients/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => router.push(`/patients/edit-enquiry/${id}`);
+  const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
   const handleDeleteClick = (id: string) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
@@ -167,6 +159,7 @@ const PatientsListPage = () => {
     setCurrentPage(page);
   };
 
+  console.log(currentData);
   return (
     <>
       <PageTitle subName="Patient" title="Patient List" />

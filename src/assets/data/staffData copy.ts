@@ -12,7 +12,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: '12 Rue de la Santé',
       city: 'Namur',
-      zipCode: '5000',
+      zip_code: '5000',
       country: 'France',
     },
     dob: '1982-05-17',
@@ -68,7 +68,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: '45 Avenue de Bruxelles',
       city: 'Gembloux',
-      zipCode: '5030',
+      zip_code: '5030',
       country: 'Belgium',
     },
 
@@ -121,7 +121,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: "88 Rue de l'Administration",
       city: 'Gembloux',
-      zipCode: '5030',
+      zip_code: '5030',
       country: 'Belgium',
     },
 
@@ -162,7 +162,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: '5 Technologiepark',
       city: 'Namur',
-      zipCode: '5000',
+      zip_code: '5000',
       country: 'Belgium',
     },
 
@@ -208,7 +208,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: '3 Boulevard Central',
       city: 'Gembloux',
-      zipCode: '5030',
+      zip_code: '5030',
       country: 'Belgium',
     },
 
@@ -253,7 +253,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: '1 Rue Centrale',
       city: 'Namur',
-      zipCode: '5000',
+      zip_code: '5000',
       country: 'Belgium',
     },
 
@@ -296,7 +296,7 @@ export const staffData: StaffType[] = [
     address: {
       line1: '78 Rue Médicale',
       city: 'Namur',
-      zipCode: '5000',
+      zip_code: '5000',
       country: 'Belgium',
     },
 
