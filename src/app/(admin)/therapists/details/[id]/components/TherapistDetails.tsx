@@ -1,236 +1,466 @@
 'use client';
 
 import Image from 'next/image';
-import { useState } from 'react';
-import { Card, CardBody, Col, Row, Button, Badge, Collapse, Accordion } from 'react-bootstrap';
-import type { TherapistType } from '@/types/data';
+import React, { useState } from 'react';
+import { Card, CardBody, Col, Row, Button, Badge, Collapse, Table } from 'react-bootstrap';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { ApexOptions } from 'apexcharts';
+import ReactApexChart from 'react-apexcharts';
+import { FaClock, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa';
 
-type Props = {
-  data: TherapistType;
+type WeeklySessionType = { week: string; sessions: number };
+type StatType = { title: string; count: number; progress: number; icon: string; variant: string };
+type TransactionType = { date: string; type: string; amount: number; status: string };
+type FeedbackType = {
+  name: string;
+  userName: string;
+  country: string;
+  day: number;
+  description: string;
+  rating: number;
+  image?: string;
+};
+type FileType = { name: string; size: number; icon: string; variant: string };
+type CabinetType = {
+  address: string;
+  email?: string;
+  phone?: string;
+  hours?: Record<string, string>;
+  isPrimary?: boolean;
 };
 
-const TherapistDetails = ({ data }: Props) => {
+type TherapistDetailsCardProps = {
+  name: string;
+  jobTitle?: string;
+  email?: string;
+  phone?: string;
+  cabinets?: CabinetType[];
+  about?: string;
+  languages?: string[];
+  paymentMethods?: string[];
+  website?: string;
+  education?: string[];
+  specializations?: string[];
+  weeklySessions?: WeeklySessionType[];
+  stats?: StatType[];
+  transactions?: TransactionType[];
+  feedbacks?: FeedbackType[];
+  files?: FileType[];
+  photo?: string;
+  agendaLink?: string | null;
+};
+
+const TherapistDetails = ({
+  name,
+  jobTitle,
+  email,
+  phone,
+  cabinets = [],
+  about,
+  languages = [],
+  paymentMethods = [],
+  website,
+  education = [],
+  specializations = [],
+  weeklySessions = [],
+  stats = [],
+  transactions = [],
+  feedbacks = [],
+  files = [],
+  photo,
+  agendaLink = null,
+}: TherapistDetailsCardProps) => {
   const [aboutOpen, setAboutOpen] = useState(true);
-  const [scheduleOpen, setScheduleOpen] = useState(true);
+  const [cabinetsOpen, setCabinetsOpen] = useState(true);
 
-  // Ensure valid URL for next/image
-  const photoUrl = data.photo?.match(/^https?:\/\//) ? data.photo : '/placeholder-avatar.jpg';
+  const photoUrl = photo?.match(/^https?:\/\//) ? photo : '/placeholder-avatar.jpg';
 
-  const specializations = data.specializations
-    ? data.specializations.split('\n').map((s) => s.trim())
-    : [];
-
-  const branches = data.centerAddress ? data.centerAddress.split(',').map((b) => b.trim()) : [];
-
-  const faqs = data.faq
-    ? data.faq.split('\n').map((item) => {
-        const [question, answer] = item.split(':');
-        return { question: question?.trim() || '-', answer: answer?.trim() || '-' };
-      })
-    : [];
-
-  {
-    /* Languages */
-  }
-  const languages = data.spokenLanguages
-    ? data.spokenLanguages.split(',').map((l) => l.trim())
-    : [];
+  const options: ApexOptions = {
+    chart: { type: 'radialBar', height: 90, sparkline: { enabled: true } },
+    plotOptions: { radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } } },
+    colors: ['#0d6efd'],
+  };
 
   return (
-    <Card className="my-4">
-      <CardBody>
-        {/* Header */}
-        <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mt-3">
-          <div className="d-flex align-items-center gap-3">
-            <Image
-              src={photoUrl}
-              alt="avatar"
-              width={100}
-              height={100}
-              className="rounded-circle avatar-xl img-thumbnail"
-            />
-            <div>
-              <h3 className="fw-semibold mb-1">{data.fullName}</h3>
-              <p className="link-primary fw-medium fs-14">{data.jobTitle}</p>
-            </div>
-          </div>
-          <div className="d-flex gap-2">
-            {data.agendaLinks && (
-              <Button variant="primary" onClick={() => window.open(data.agendaLinks!, '_blank')}>
-                Book Appointment
-              </Button>
-            )}
-          </div>
-        </div>
-        {/* Contact Info */}
-        <Row className="my-4">
-          <Col lg={4}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Email:</p>
-            <p className="mb-0">{data.contactEmail || '-'}</p>
-          </Col>
-          <Col lg={3}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Phone:</p>
-            <p className="mb-0">{data.contactPhone || '-'}</p>
-          </Col>
-          <Col lg={5}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Website:</p>
-            <p className="mb-0">
-              {data.website ? (
-                <a href={data.website} target="_blank" rel="noopener noreferrer">
-                  {data.website}
-                </a>
-              ) : (
-                '-'
-              )}
-            </p>
-          </Col>
-        </Row>
-        {/* About Me */}
-        <Row className="my-3">
-          <Col lg={12}>
-            <p className="text-dark fw-semibold fs-16 mb-1">
-              About Me:
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => setAboutOpen(!aboutOpen)}
-                className="ms-2 p-0"
-              >
-                {aboutOpen ? 'Hide' : 'Show'}
-              </Button>
-            </p>
-            <Collapse in={aboutOpen}>
-              <div>
-                <p className="mb-0">{data.aboutMe || '-'}</p>
-              </div>
-            </Collapse>
-          </Col>
-        </Row>
-        {/* Schedule */}
-        <Row className="my-3">
-          <Col lg={12}>
-            <p className="text-dark fw-semibold fs-16 mb-1">
-              Schedule:
-              <Button
-                variant="link"
-                size="sm"
-                onClick={() => setScheduleOpen(!scheduleOpen)}
-                className="ms-2 p-0"
-              >
-                {scheduleOpen ? 'Hide' : 'Show'}
-              </Button>
-            </p>
-            <Collapse in={scheduleOpen}>
-              <div>
-                <p className="mb-0">{data.schedule || '-'}</p>
-              </div>
-            </Collapse>
-          </Col>
-        </Row>
-        {/* Branches */}
-        <Row className="my-4">
-          {branches.map((branch, idx) => (
-            <Col lg={4} key={idx}>
-              <Card className="mb-3 shadow-sm">
-                <CardBody>
-                  <p className="text-dark fw-semibold fs-14 mb-1">Branch {idx + 1}</p>
-                  <p className="mb-1">{branch}</p>
-                  <p className="mb-0">
-                    Email:{' '}
-                    {data.centerEmail ? data.centerEmail.split(',')[idx]?.trim() || '-' : '-'}
-                  </p>
-                  <p className="mb-0">
-                    Phone:{' '}
-                    {data.centerPhoneNumber
-                      ? data.centerPhoneNumber.split(',')[idx]?.trim() || '-'
-                      : '-'}
-                  </p>
-                </CardBody>
-              </Card>
-            </Col>
-          ))}
-        </Row>
-        {/* Specializations */}
-        {specializations.length > 0 && (
-          <Row className="my-4">
-            <Col lg={12}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Specializations:</p>
-              <div className="d-flex flex-wrap gap-2">
-                {specializations.map((spec, i) => {
-                  let variant = 'secondary';
-                  const lower = spec.toLowerCase();
-                  if (lower.includes('clinicienne') || lower.includes('psychologue'))
-                    variant = 'primary';
-                  else if (lower.includes('familiale') || lower.includes('systémique'))
-                    variant = 'success';
-                  else if (lower.includes('thérapie') || lower.includes('burnout'))
-                    variant = 'warning';
-                  return (
-                    <Badge key={i} bg={variant} className="fs-12">
-                      {spec}
-                    </Badge>
-                  );
-                })}
-              </div>
-            </Col>
-          </Row>
+    <div>
+      {/* Top Buttons */}
+      <div className="d-flex justify-content-between mb-3">
+        <Button variant="secondary" onClick={() => window.history.back()}>
+          <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back
+        </Button>
+        {agendaLink && (
+          <Button variant="primary" onClick={() => window.open(agendaLink, '_blank')}>
+            Book Appointment
+          </Button>
         )}
-        {/* Degrees & Training */}
-        <Row className="my-4">
-          <Col lg={12}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Degrees & Training:</p>
-            <p className="mb-0">{data.degreesAndTraining || '-'}</p>
-          </Col>
-        </Row>
-        {/* Consultations */}
-        <Row className="my-4">
-          <Col lg={12}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Consultations / Role:</p>
-            <p className="mb-0">{data.consultations || '-'}</p>
-          </Col>
-        </Row>
-        {/* Languages */}
-        {languages.length > 0 && (
-          <Row className="my-4">
-            <Col lg={12}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Languages:</p>
-              <div className="d-flex flex-wrap gap-2">
-                {languages.map((lang, i) => {
-                  let variant = 'secondary';
-                  const lower = lang.toLowerCase();
-                  // Optional: different color based on language
-                  if (lower === 'english') variant = 'primary';
-                  else if (lower === 'french') variant = 'success';
-                  else if (lower === 'german') variant = 'warning';
+      </div>
 
-                  return (
-                    <Badge key={i} bg={variant} className="fs-12">
-                      {lang}
-                    </Badge>
-                  );
-                })}
+      {/* Profile / Avatar */}
+      <Card className="mb-4 shadow-sm" style={{ backgroundColor: '#f8f9fa' }}>
+        <CardBody>
+          <Row className="align-items-center">
+            <Col lg={2} className="d-flex justify-content-center">
+              <div
+                className="rounded-circle d-flex align-items-center justify-content-center"
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  backgroundColor: '#0d6efd',
+                  color: '#fff',
+                  fontSize: '36px',
+                  fontWeight: 'bold',
+                }}
+              >
+                {name ? name[0].toUpperCase() : 'T'}
+              </div>
+            </Col>
+            <Col lg={8}>
+              <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
+                {name}
+              </h2>
+              <p className="text-muted mb-2">{jobTitle || '-'}</p>
+              <div className="d-flex flex-column gap-2">
+                {email && (
+                  <div className="d-flex align-items-center gap-2">
+                    <FaEnvelope className="text-primary" /> <span>{email}</span>
+                  </div>
+                )}
+                {phone && (
+                  <div className="d-flex align-items-center gap-2">
+                    <FaPhone className="text-success" /> <span>{phone}</span>
+                  </div>
+                )}
+                {website && (
+                  <div className="d-flex align-items-center gap-2">
+                    <FaMapMarkerAlt className="text-warning" />{' '}
+                    <a
+                      href={website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-decoration-none"
+                    >
+                      {website}
+                    </a>
+                  </div>
+                )}
               </div>
             </Col>
           </Row>
-        )}
-        {/* FAQ */}
-        {faqs.length > 0 && (
-          <Row className="my-4">
-            <Col lg={12}>
-              <p className="text-dark fw-semibold fs-16 mb-2">FAQ:</p>
-              <Accordion>
-                {faqs.map((faq, index) => (
-                  <Accordion.Item eventKey={index.toString()} key={index}>
-                    <Accordion.Header>{faq.question}</Accordion.Header>
-                    <Accordion.Body>{faq.answer}</Accordion.Body>
-                  </Accordion.Item>
+        </CardBody>
+      </Card>
+
+      {/* Branches / Localisation */}
+      {cabinets.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
+            <div className="d-flex justify-content-between mb-2">
+              <h4>Localisation & Branches</h4>
+              <Button variant="link" size="sm" onClick={() => setCabinetsOpen(!cabinetsOpen)}>
+                {cabinetsOpen ? 'Hide' : 'Show'}
+              </Button>
+            </div>
+            <Collapse in={cabinetsOpen}>
+              <div className="d-flex gap-3 overflow-auto py-2">
+                {cabinets.map((cab, idx) => (
+                  <Card
+                    key={idx}
+                    className="p-3 flex-shrink-0 shadow-sm"
+                    style={{
+                      minWidth: '260px',
+                      border: cab.isPrimary ? '2px solid #0d6efd' : '1px solid #dee2e6',
+                    }}
+                  >
+                    <div className="d-flex align-items-center gap-2 mb-2">
+                      {cab.isPrimary && <Badge bg="primary">Primary</Badge>}
+                      <FaMapMarkerAlt className="text-danger" />
+                      <strong>{cab.address}</strong>
+                    </div>
+                    {cab.email && (
+                      <div className="d-flex align-items-center gap-2 mb-1">
+                        <FaEnvelope className="text-secondary" /> {cab.email}
+                      </div>
+                    )}
+                    {cab.phone && (
+                      <div className="d-flex align-items-center gap-2 mb-2">
+                        <FaPhone className="text-secondary" /> {cab.phone}
+                      </div>
+                    )}
+
+                    <p className="fw-semibold mb-1">Weekly Hours:</p>
+                    <div className="d-flex flex-column gap-1">
+                      {cab.hours
+                        ? Object.entries(cab.hours).map(([day, h]) => (
+                            <div
+                              key={day}
+                              className={`d-flex align-items-center gap-2 p-1 rounded ${
+                                h.toLowerCase() === 'closed'
+                                  ? 'bg-light text-muted'
+                                  : 'bg-primary bg-opacity-10'
+                              }`}
+                            >
+                              <FaClock
+                                className={
+                                  h.toLowerCase() === 'closed' ? 'text-muted' : 'text-primary'
+                                }
+                              />
+                              <strong style={{ width: '80px' }}>{day}:</strong>
+                              <span>{h}</span>
+                            </div>
+                          ))
+                        : 'No hours provided'}
+                    </div>
+                  </Card>
                 ))}
-              </Accordion>
-            </Col>
+              </div>
+            </Collapse>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* About */}
+      <Card className="mb-4">
+        <CardBody>
+          <div className="d-flex justify-content-between mb-2">
+            <h4>About</h4>
+            <Button variant="link" size="sm" onClick={() => setAboutOpen(!aboutOpen)}>
+              {aboutOpen ? 'Hide' : 'Show'}
+            </Button>
+          </div>
+          <Collapse in={aboutOpen}>
+            <div>
+              <p>{about || '-'}</p>
+            </div>
+          </Collapse>
+        </CardBody>
+      </Card>
+
+      {/* Weekly Sessions & Stats */}
+      <Card className="mb-4">
+        <CardBody>
+          <h4>Weekly Sessions & Stats</h4>
+          <Row className="g-3">
+            {weeklySessions.map((w, idx) => (
+              <Col lg={4} key={idx}>
+                <Card className="border p-3">
+                  <p className="fw-medium fs-15 mb-1">{w.week}</p>
+                  <p className="fw-semibold fs-20 mb-0">{w.sessions} sessions</p>
+                </Card>
+              </Col>
+            ))}
+            {stats.map((t, idx) => {
+              const options = {
+                series: [t.progress],
+                chart: { type: 'radialBar', height: 90, sparkline: { enabled: true } },
+                plotOptions: {
+                  radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } },
+                },
+                colors: [t.variant],
+              };
+              return (
+                <Col lg={4} key={idx}>
+                  <Card className="border p-3">
+                    <div className="d-flex align-items-center gap-3">
+                      <div className={`avatar bg-${t.variant} bg-opacity-10 rounded flex-centered`}>
+                        <IconifyIcon
+                          icon={t.icon}
+                          width={28}
+                          height={28}
+                          className={`fs-28 text-${t.variant}`}
+                        />
+                      </div>
+                      <div>
+                        <p className="fw-medium fs-15 mb-1">{t.title}</p>
+                        <p className="fw-semibold fs-20 mb-0">{t.count}</p>
+                      </div>
+                    </div>
+                  </Card>
+                </Col>
+              );
+            })}
           </Row>
-        )}
-      </CardBody>
-    </Card>
+        </CardBody>
+      </Card>
+
+      {/* Education & Training */}
+      {education.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
+            <h4>Education & Training</h4>
+            <div className="d-flex flex-wrap gap-2">
+              {education.map((edu, i) => (
+                <Badge
+                  key={i}
+                  bg="info"
+                  className="fs-13 text-dark d-flex align-items-center px-2 py-1"
+                  style={{ cursor: 'pointer' }}
+                  title={edu}
+                >
+                  <IconifyIcon icon="ri:book-line" className="me-1" /> {edu}
+                </Badge>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Specializations */}
+      {specializations.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
+            <h4>Specializations</h4>
+            <div className="d-flex flex-wrap gap-2">
+              {specializations.map((spec, i) => (
+                <Badge key={i} bg="primary" className="fs-12">
+                  {spec}
+                </Badge>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Transactions Section */}
+      {transactions.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
+            <h4>Transactions</h4>
+            <Table responsive striped hover>
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((tr, idx) => (
+                  <tr key={idx}>
+                    <td>{tr.date}</td>
+                    <td>{tr.type}</td>
+                    <td>${tr.amount.toFixed(2)}</td>
+                    <td>
+                      <Badge bg={tr.status === 'Completed' ? 'success' : 'warning'}>
+                        {tr.status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Files / Documents */}
+      {files.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
+            <h4>Files / Documents</h4>
+            <Row className="g-2">
+              {files.map((file, idx) => (
+                <Col lg={3} key={idx}>
+                  <Card className="p-2 d-flex align-items-center gap-2">
+                    <IconifyIcon icon={file.icon} className={`text-${file.variant} fs-24`} />
+                    <div>
+                      <p className="mb-1">{file.name}</p>
+                      <p className="mb-0 fs-12">{file.size} MB</p>
+                    </div>
+                    <IconifyIcon icon="ri:download-cloud-line" className="fs-20 text-muted" />
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Feedback / Reviews */}
+      {feedbacks.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
+            <h4>Reviews / Feedback</h4>
+            <Row>
+              {feedbacks.map((f, idx) => (
+                <Col lg={6} key={idx}>
+                  <Card className="bg-light-subtle mb-3">
+                    <CardBody>
+                      {f.image && (
+                        <Image
+                          src={f.image}
+                          alt="avatar"
+                          className="rounded-circle avatar-md mb-2"
+                          width={40}
+                          height={40}
+                        />
+                      )}
+                      <h5>{f.name}</h5>
+                      <p>
+                        @{f.userName} ({f.country})
+                      </p>
+                      <p>{f.description}</p>
+                      <p className="text-warning">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                          <IconifyIcon
+                            key={i}
+                            icon={i < f.rating ? 'ri:star-fill' : 'ri:star-line'}
+                          />
+                        ))}
+                      </p>
+                      <p className="text-muted">{f.day} days ago</p>
+                    </CardBody>
+                  </Card>
+                </Col>
+              ))}
+            </Row>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Transaction / Appointment History */}
+      {transactions.length > 0 && (
+        <Card className="mb-4 shadow-sm">
+          <CardBody>
+            <h4 className="mb-3" style={{ color: '#0d6efd' }}>
+              Transactions / Appointments
+            </h4>
+            <Table responsive striped hover className="mb-0">
+              <thead className="table-primary">
+                <tr>
+                  <th>Date</th>
+                  <th>Type</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((tr, idx) => (
+                  <tr key={idx}>
+                    <td>{tr.date}</td>
+                    <td>{tr.type}</td>
+                    <td>${tr.amount.toFixed(2)}</td>
+                    <td>
+                      <Badge
+                        bg={
+                          tr.status === 'Completed'
+                            ? 'success'
+                            : tr.status === 'Pending'
+                              ? 'warning'
+                              : 'secondary'
+                        }
+                        className="py-1 px-2"
+                      >
+                        {tr.status}
+                      </Badge>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </CardBody>
+        </Card>
+      )}
+    </div>
   );
 };
 
