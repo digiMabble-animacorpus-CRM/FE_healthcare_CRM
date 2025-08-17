@@ -26,6 +26,7 @@ export type ReviewType = {
   count: number;
   stars: number;
 };
+
 export type Employee = {
   id: IdType;
   name: string;
@@ -262,6 +263,7 @@ export type StaffType = {
     updatedAt: string;
   }[];
 };
+
 export type BranchDetails = {
   id: number;
   name: string;
@@ -434,22 +436,6 @@ export type CustomerReviewsType = {
   date: Date;
 };
 
-// export type SocialUserType = {
-//   id: IdType
-//   avatar: StaticImageData
-//   name: string
-//   activityStatus: 'typing' | 'online' | 'offline'
-//   email: string
-//   phone: string
-//   languages: string[]
-//   location: string
-//   mutualCount: number
-//   hasRequested?: boolean
-//   message?: string
-//   time: Date
-//   status?: string
-// }
-
 export type FileType = Partial<File> & {
   preview?: string;
 };
@@ -552,4 +538,77 @@ export type SellerType = {
   walletBalance: number;
   createdAt: Date;
   revenue: number;
+};
+
+export type ProfileType = {
+  _key: number;
+  idPro: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website: string;
+  faq: string;
+  agendaLinks: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any | null;
+  tags?: any;
+};
+
+export type ProfileCreatePayload = {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo?: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations?: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule?: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website?: string;
+  faq?: string;
+  agendaLinks?: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any[];
+  tags?: string[];
+  certificationFiles?: File[];
+  branches?: (string | number)[];
+  selected_branch?: string | number | null;
 };
