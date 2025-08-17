@@ -2,10 +2,10 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import StaffForm from '../../staffForm';
 import { decryptAES } from '@/utils/encryption';
 import type { StaffType } from '@/types/data';
 import { updateStaff } from '@/helpers/staff';
+import StaffForm from '../../teamsForm';
 
 interface Props {
   params: { id?: string };
