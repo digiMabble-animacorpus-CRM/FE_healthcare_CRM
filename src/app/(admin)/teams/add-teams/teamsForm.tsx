@@ -1,136 +1,306 @@
-'use client';
+"use client";
 
-import { FormProvider, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { TeamType } from "@/assets/data/TeamType";
+import React, { useState } from "react";
 
-import type { StaffType, StaffRoleType } from '@/types/data';
-import PersonalInfo from './components/personalInfo';
-import ProfessionalInfo from './components/professionalInfo';
-import BranchSection from './components/branchSection';
-import ContactInfo from './components/contactInfo';
-import AvailabilitySection from './components/availabilitySection';
-import PermissionsSection from './components/permissionSection';
-import { getAllRoles } from '@/helpers/staff';
+type TeamFormProps = {
+  onSubmitHandler: (formData: TeamType) => void;
+};
 
-const schema: yup.ObjectSchema<any> = yup.object().shape({
-  name: yup.string().required('Name is required'),
-  email: yup.string().email().required('Email is required'),
-  phoneNumber: yup.string().required('Phone number is required'),
-  gender: yup.string().required('Gender is required'),
-  dob: yup.string().required('Date of birth is required'),
-  description: yup.string(),
-  roleId: yup.string().required('Role is required'),
-  accessLevelId: yup.string().required('Access Level is required'),
-  branches: yup
-    .array()
-    .of(
-      yup.object().shape({
-        id: yup.string().required('Branch ID is required'),
-        isPrimary: yup.boolean().optional(),
-      }),
-    )
-    .min(1, 'Select at least one branch')
-    .required(),
-  selectedBranch: yup.string().required('Select primary branch'),
-  address: yup.object().shape({
-    street: yup.string().required('Address Line 1 is required'),
-    city: yup.string().required('City is required'),
-    zip_code: yup.string().required('Zip Code is required'),
-    country: yup.string().required('Country is required'),
-  }),
-  languages: yup.array().min(1, 'At least one language is required').required(),
-  availability: yup.array().of(
-    yup.object().shape({
-      day: yup.string().required('Day is required'),
-      from: yup.string().required('Start time is required'),
-      to: yup.string().required('End time is required'),
-    }),
-  ),
-  permissions: yup.array().of(
-    yup.object().shape({
-      _id: yup.string().required('Permission ID is required'),
-      enabled: yup.boolean().required(),
-    }),
-  ),
-});
+const initialFormData: TeamType = {
+  // No ID_Pro
+  LastName: "",
+  FirstName: "",
+  NomComplet: "",
+  Function: "",
+  PublicSpecific: "",
+  Specialisation: "",
+  Function2: "",
+  Function3: "",
+  Function4: "",
+  WhoAmI: "",
+  Consultations: "",
+  Address: {
+    street: "",
+    city: "",
+    zip_code: "",
+    country: "",
+  },
+  ContactMail: "",
+  PhoneNumber: "",
+  Hourly: "",
+  About: "",
+  LanguesParlees: "",
+  PaymentMethod: "",
+  DiplomasTrainings: "",
+  Specialisations: "",
+  Website: "",
+  FAQ: "",
+  LiensAgenda: "",
+  Photo: "",
+  ID_Pro: ""
+};
 
-interface Props {
-  defaultValues?: Partial<StaffType>;
-  isEditMode?: boolean;
-  onSubmitHandler: (data: StaffType) => Promise<void>;
-}
+export const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
+  const [formData, setFormData] = useState<TeamType>(initialFormData);
 
-const StaffForm = ({ defaultValues, isEditMode, onSubmitHandler }: Props) => {
-  const methods = useForm<StaffType>({
-    resolver: yupResolver(schema),
-    mode: 'onTouched',
-    defaultValues: defaultValues || {},
-  });
-
-  const { watch, getValues, reset, handleSubmit } = methods;
-  const router = useRouter();
-
-  useEffect(() => {
-    if (defaultValues && Object.keys(defaultValues).length > 0) {
-      reset({ ...defaultValues });
-      console.log(' Form reset with defaultValues', defaultValues);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    if (name.startsWith("Address.")) {
+      const key = name.split(".")[1];
+      setFormData((prev) => ({
+        ...prev,
+        Address: {
+          ...prev.Address,
+          [key]: value,
+        },
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
     }
-  }, [defaultValues, reset]);
+  };
 
-  //  Load role and determine if availability is required
-  const roleId = watch('roleId') || '';
-  const [selectedRole, setSelectedRole] = useState<StaffRoleType | null>(null);
-
-  useEffect(() => {
-    const fetchRole = async () => {
-      const roles = await getAllRoles();
-      const matchedRole = roles.find((r) => r._id === roleId);
-      setSelectedRole(matchedRole || null);
-    };
-
-    if (roleId) {
-      fetchRole();
-    }
-  }, [roleId]);
-
-  //  Debug submit errors
-  const onSubmitError = (formErrors: any) => {
-    console.error(' Form validation errors:', formErrors);
-    console.debug('🧾 Form values at time of error:', getValues());
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    onSubmitHandler(formData);
   };
 
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmitHandler, onSubmitError)}>
-        <Card>
-          <CardHeader>
-            <CardTitle as="h5">{isEditMode ? 'Edit Staff Details' : 'Create New Staff'}</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <PersonalInfo />
-            <ProfessionalInfo />
-            <BranchSection />
-            <ContactInfo />
-            {selectedRole?.requiresAvailability && <AvailabilitySection />}
-            <PermissionsSection />
+    <form
+      onSubmit={handleSubmit}
+      style={{
+        display: "grid",
+        gap: "10px",
+        gridTemplateColumns: "repeat(6, 1fr)",
+        padding: "2rem",
+        background: "white",
+        borderRadius: "10px",
+        maxWidth: "1200px",
+        margin: "24px auto",
+      }}
+    >
+      {/* Top Row */}
+      <input
+        name="LastName"
+        value={formData.LastName}
+        onChange={handleChange}
+        placeholder="Last Name"
+      />
+      <input
+        name="FirstName"
+        value={formData.FirstName}
+        onChange={handleChange}
+        placeholder="First Name"
+      />
+      <input
+        name="NomComplet"
+        value={formData.NomComplet}
+        onChange={handleChange}
+        placeholder="Nom complet"
+      />
+      <input
+        name="Function"
+        value={formData.Function}
+        onChange={handleChange}
+        placeholder="Function"
+      />
+      <input
+        name="PublicSpecific"
+        value={formData.PublicSpecific}
+        onChange={handleChange}
+        placeholder="Public specific"
+      />
+      <input
+        name="Specialisation"
+        value={formData.Specialisation}
+        onChange={handleChange}
+        placeholder="Specialisation"
+      />
 
-            <div className="mt-4 d-flex gap-3 justify-content-end">
-              <Button type="submit" variant="primary">
-                {isEditMode ? 'Update' : 'Create'} Staff
-              </Button>
-              <Button variant="secondary" onClick={() => router.back()}>
-                Cancel
-              </Button>
-            </div>
-          </CardBody>
-        </Card>
-      </form>
-    </FormProvider>
+      {/* Second Row */}
+      <input
+        name="Function2"
+        value={formData.Function2}
+        onChange={handleChange}
+        placeholder="Function 2"
+      />
+      <input
+        name="Function3"
+        value={formData.Function3}
+        onChange={handleChange}
+        placeholder="Function 3"
+      />
+      <input
+        name="Function4"
+        value={formData.Function4}
+        onChange={handleChange}
+        placeholder="Function 4"
+      />
+      <textarea
+        name="WhoAmI"
+        value={formData.WhoAmI}
+        onChange={handleChange}
+        placeholder="Who Am I"
+        style={{ gridColumn: "span 1" }}
+        rows={2}
+      />
+      <textarea
+        name="Consultations"
+        value={formData.Consultations}
+        onChange={handleChange}
+        placeholder="Consultations"
+        style={{ gridColumn: "span 2" }}
+        rows={2}
+      />
+
+      {/* Address Row - 6 columns */}
+      <label
+        style={{
+          gridColumn: "1 / 7",
+          fontWeight: "bold",
+          marginTop: "1rem",
+        }}
+      >
+        Address:
+      </label>
+      <input
+        name="Address.street"
+        value={formData.Address.street}
+        onChange={handleChange}
+        placeholder="Street"
+        style={{ gridColumn: "1 / 2" }}
+      />
+      <input
+        name="Address.city"
+        value={formData.Address.city}
+        onChange={handleChange}
+        placeholder="City"
+        style={{ gridColumn: "2 / 3" }}
+      />
+      <input
+        name="Address.zip_code"
+        value={formData.Address.zip_code}
+        onChange={handleChange}
+        placeholder="Zip Code"
+        style={{ gridColumn: "3 / 4" }}
+      />
+      <input
+        name="Address.country"
+        value={formData.Address.country}
+        onChange={handleChange}
+        placeholder="Country"
+        style={{ gridColumn: "4 / 5" }}
+      />
+      <input
+        name="ContactMail"
+        value={formData.ContactMail}
+        onChange={handleChange}
+        placeholder="Contact Email"
+        type="email"
+        style={{ gridColumn: "5 / 6" }}
+      />
+      <input
+        name="PhoneNumber"
+        value={formData.PhoneNumber}
+        onChange={handleChange}
+        placeholder="Phone Number"
+        type="tel"
+        style={{ gridColumn: "6 / 7" }}
+      />
+
+      {/* Next row */}
+      <input
+        name="Hourly"
+        value={formData.Hourly}
+        onChange={handleChange}
+        placeholder="Hourly Rate"
+        style={{ gridColumn: "1 / 2" }}
+      />
+      <textarea
+        name="About"
+        value={formData.About}
+        onChange={handleChange}
+        placeholder="About"
+        rows={2}
+        style={{ gridColumn: "2 / 4" }}
+      />
+      <input
+        name="LanguesParlees"
+        value={formData.LanguesParlees}
+        onChange={handleChange}
+        placeholder="Langues parlées"
+        style={{ gridColumn: "4 / 5" }}
+      />
+      <input
+        name="PaymentMethod"
+        value={formData.PaymentMethod}
+        onChange={handleChange}
+        placeholder="Payment Method"
+        style={{ gridColumn: "5 / 6" }}
+      />
+
+      {/* Diplomas/Trainings/Specialisations/etc row */}
+      <textarea
+        name="DiplomasTrainings"
+        value={formData.DiplomasTrainings}
+        onChange={handleChange}
+        placeholder="Diplomas and Trainings"
+        rows={2}
+        style={{ gridColumn: "1 / 3" }}
+      />
+      <textarea
+        name="Specialisations"
+        value={formData.Specialisations}
+        onChange={handleChange}
+        placeholder="Specialisations"
+        rows={2}
+        style={{ gridColumn: "3 / 4" }}
+      />
+      <input
+        name="Website"
+        value={formData.Website}
+        onChange={handleChange}
+        placeholder="Website"
+        style={{ gridColumn: "4 / 5" }}
+      />
+      <textarea
+        name="FAQ"
+        value={formData.FAQ}
+        onChange={handleChange}
+        placeholder="FAQ"
+        rows={2}
+        style={{ gridColumn: "5 / 6" }}
+      />
+      <input
+        name="LiensAgenda"
+        value={formData.LiensAgenda}
+        onChange={handleChange}
+        placeholder="Liens Agenda"
+        style={{ gridColumn: "6 / 7" }}
+      />
+      <input
+        name="Photo"
+        value={formData.Photo}
+        onChange={handleChange}
+        placeholder="Photo URL"
+        style={{ gridColumn: "1 / 3" }}
+      />
+
+      {/* Button */}
+      <button
+        type="submit"
+        className="bg-blue-500 text-white px-4 py-2 rounded"
+        style={{ gridColumn: "1 / 3", marginTop: "12px" }}
+      >
+        Create Team Member
+      </button>
+    </form>
   );
 };
 
-export default StaffForm;
+export default TeamForm;
