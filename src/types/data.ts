@@ -61,6 +61,9 @@ export type UserType = {
 };
 
 export type PatientType = {
+  visits: number;
+  prescriptions: number;
+  bills: number;
   createdAt?: string;
   _id?: IdType;
   birthdate: string;

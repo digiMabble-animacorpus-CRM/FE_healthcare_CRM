@@ -2,7 +2,7 @@ import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { ProgressBar } from 'react-bootstrap';
 import { CustomerType } from '../data';
 
-const CustomerCard = ({ customer }: { customer: CustomerType }) => {
+const PatientCard = ({ customer }: { customer: CustomerType }) => {
   const { Property, count, icon, progress, title, variant } = customer;
   return (
     <div className="border p-2 rounded">
@@ -37,4 +37,4 @@ const CustomerCard = ({ customer }: { customer: CustomerType }) => {
   );
 };
 
-export default CustomerCard;
+export default PatientCard;
