@@ -2,13 +2,9 @@
 
 import { API_BASE_PATH } from '@/context/constants';
 import { encryptAES, decryptAES } from '@/utils/encryption';
-import type { StaffType, StaffRoleType, PermissionType } from '@/types/data';
-import { staffRoleData } from '@/assets/data/staffRoleData';
-import { permissionData } from '@/assets/data/permissionData';
+import type { ProfileCreatePayload, ProfileType } from '@/types/data';
 
-const sleep = (ms = 500) => new Promise((res) => setTimeout(res, ms));
-
-export interface StaffUpdatePayload {
+export interface ProfileUpdatePayload {
   name?: string;
   email?: string;
   phoneNumber?: string;
@@ -28,14 +24,14 @@ export interface StaffUpdatePayload {
   [key: string]: any;
 }
 
-export const getAllStaff = async (
+export const getAllProfiles = async (
   page: number = 1,
   limit: number = 10,
   branch?: string,
   from?: string,
   to?: string,
   search?: string,
-): Promise<{ data: StaffType[]; totalCount: number }> => {
+): Promise<{ data: any[]; totalCount: number }> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) {
@@ -73,31 +69,27 @@ export const getAllStaff = async (
     const jsonData = await response.json();
     console.log('Response from server:', jsonData);
 
-    const staffData: StaffType[] = Array.isArray(jsonData?.data)
-      ? jsonData.data
-      : jsonData?.data
-        ? [jsonData.data]
-        : [];
+    const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
     return {
-      data: staffData,
+      data: therapistData,
       totalCount: jsonData?.totalCount || 0,
     };
   } catch (error) {
-    console.error('Error fetching staff:', error);
+    console.error('Error fetching patient:', error);
     return { data: [], totalCount: 0 };
   }
 };
 
-export const getStaffById = async (staffId: string): Promise<StaffType | null> => {
+export const getProfileById = async (therapistId: any): Promise<ProfileType | null> => {
   const token = localStorage.getItem('access_token');
   if (!token) {
     console.warn('No access token found.');
     return null;
   }
 
-  const url = `${API_BASE_PATH}/staff/${staffId}`;
-  console.log('Requesting staff by ID:', url);
+  const url = `${API_BASE_PATH}/staff/${therapistId}`;
+  console.log('Requesting therapist by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -109,30 +101,67 @@ export const getStaffById = async (staffId: string): Promise<StaffType | null> =
     });
 
     console.log('Response status:', response.status);
+
     const result = await response.json();
     console.log('Full API response:', result);
 
     if (!response.ok) {
-      console.error('Failed to fetch staff:', result?.message || 'Unknown error');
+      console.error('Failed to fetch therapist:', result?.message || 'Unknown error');
       return null;
     }
 
-    // Directly return the staff data
-    if (result?.data) {
-      return result.data as StaffType;
+    // Return the therapist data directly
+    if (result) {
+      return result as ProfileType;
     }
 
     console.warn('No data found in response.');
     return null;
   } catch (error) {
-    console.error('Exception during staff fetch:', error);
+    console.error('Exception during therapist fetch:', error);
     return null;
   }
 };
 
-export const updateStaff = async (
+export const createProfile = async (payload: ProfileCreatePayload): Promise<boolean> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) return false;
+
+    const safePayload = {
+      ...payload,
+      branches: (payload.branches || []).map((b) => Number(b)),
+      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
+    };
+
+    const encryptedPayload = encryptAES(safePayload);
+
+    const response = await fetch(`${API_BASE_PATH}/staff`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ data: encryptedPayload }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.status) {
+      console.error('Create failed:', result.message || 'Unknown error');
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error creating staff:', error);
+    return false;
+  }
+};
+
+export const updateProfile = async (
   id: string | number,
-  payload: StaffUpdatePayload,
+  payload: ProfileUpdatePayload,
 ): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -170,20 +199,38 @@ export const updateStaff = async (
   }
 };
 
-export const transformToBackendDto = (formData: StaffType): StaffUpdatePayload => {
+export const transformToBackendDto = (formData: ProfileType): ProfileUpdatePayload => {
   return {
-    name: formData.name,
-    email: formData.email,
-    phone_number: formData.phoneNumber,
-    role_id: formData.roleId ? Number(formData.roleId) : undefined,
-    access_level: formData.accessLevelId as 'staff' | 'branch-admin' | 'super-admin',
-    branches: formData.branches.map((b) => Number(b.id)).filter(Boolean),
-    selected_branch: formData.selectedBranch ? Number(formData.selectedBranch) : null,
-    permissions: formData.permissions.map((p) => ({
-      action: p._id.split('-')[0],
-      resource: p._id.split('-')[1],
-      enabled: !!p.enabled,
-    })),
+    id: String(formData.idPro),
+    full_name: formData.fullName,
+    first_name: formData.firstName,
+    last_name: formData.lastName,
+    job_title: formData.jobTitle,
+    about_me: formData.aboutMe,
+    specializations: formData.specializations
+      ? formData.specializations.split('\n').map((s) => s.trim())
+      : [],
+    contact: {
+      email: formData.contactEmail,
+      phone: formData.contactPhone,
+    },
+    center: {
+      address: formData.centerAddress,
+      email: formData.centerEmail,
+      phone: formData.centerPhoneNumber,
+    },
+    schedule: formData.schedule,
+    website: formData.website,
+    availability: formData.availability || null,
+    languages: formData.spokenLanguages
+      ? formData.spokenLanguages.split(',').map((lang) => lang.trim())
+      : [],
+    payment_methods: formData.paymentMethods
+      ? formData.paymentMethods.split(/\r?\n|,/).map((p) => p.trim())
+      : [],
+    agenda_links: formData.agendaLinks || null,
+    rosa_link: formData.rosaLink || null,
+    google_agenda_link: formData.googleAgendaLink || null,
     updatedBy: [
       {
         staffId: String(localStorage.getItem('staff_id') || ''),
@@ -193,7 +240,7 @@ export const transformToBackendDto = (formData: StaffType): StaffUpdatePayload =
   };
 };
 
-export const getAllRoles = async (): Promise<StaffRoleType[]> => {
+export const getAllRoles = async (): Promise<any[]> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return [];
@@ -216,7 +263,7 @@ export const getAllRoles = async (): Promise<StaffRoleType[]> => {
   }
 };
 
-export const getAllAccessLevels = async (): Promise<StaffRoleType[]> => {
+export const getAllAccessLevels = async (): Promise<any[]> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return [];
@@ -237,94 +284,4 @@ export const getAllAccessLevels = async (): Promise<StaffRoleType[]> => {
     console.error(' Error fetching access levels:', error);
     return [];
   }
-};
-
-export const getAllStaffRoll = async (
-  page: number = 1,
-  limit: number = 10,
-  tag?: string,
-  search?: string,
-): Promise<{
-  data: (StaffRoleType & { permissionsDetailed: PermissionType[] })[];
-  totalCount: number;
-}> => {
-  await sleep();
-
-  let filteredData = staffRoleData;
-
-  // ✅ Filter by Tag
-  if (tag) {
-    filteredData = filteredData.filter((item) => item.tag === tag);
-  }
-
-  // ✅ Search Filter
-  if (search) {
-    const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter(
-      (item) =>
-        item.key?.toLowerCase().includes(lowerSearch) ||
-        item.label?.toLowerCase().includes(lowerSearch),
-    );
-  }
-
-  // ✅ Pagination
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedData = filteredData.slice(start, end);
-
-  // ✅ Enrich Roles with Permission Details
-  const enrichedData = paginatedData.map((role) => {
-    const permissionsDetailed = (role.defaultPermissions || []).map((permKey) => {
-      return (
-        permissionData.find((p) => p.key === permKey) || {
-          _id: permKey,
-          key: permKey,
-          label: permKey,
-          description: '',
-        }
-      );
-    });
-
-    return {
-      ...role,
-      permissionsDetailed,
-    };
-  });
-
-  return {
-    data: enrichedData,
-    totalCount: filteredData.length,
-  };
-};
-
-export const getStaffRoleById = async (id?: string): Promise<{ data: StaffRoleType[] }> => {
-  await sleep();
-
-  if (!id) {
-    return { data: [] };
-  }
-
-  const filtered = staffRoleData.filter((p) => p._id === id);
-
-  const enriched = filtered.map((staff) => {
-    const defaultPermissionsDetailed = (staff.defaultPermissions || []).map((perm) => {
-      const permDetails = permissionData.find((p) => p.key === perm);
-      return {
-        ...(permDetails || {
-          _id: perm,
-          key: perm,
-          label: '',
-          description: '',
-        }),
-      };
-    });
-    return {
-      ...staff,
-      defaultPermissionsDetailed,
-    };
-  });
-
-  return {
-    data: enriched,
-  };
 };

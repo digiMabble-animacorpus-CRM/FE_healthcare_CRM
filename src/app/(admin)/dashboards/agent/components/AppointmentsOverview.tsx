@@ -29,8 +29,8 @@ import avatar1 from '@/assets/images/users/avatar-1.jpg';
 import avatar2 from '@/assets/images/users/avatar-2.jpg';
 import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
-
-const Calendar = dynamic(() => import('@toast-ui/react-calendar'), { ssr: false });
+import Calendar from './Calendar';
+import useCalendar from '@/app/(admin)/pages/calendar/useCalendar';
 
 export type Appointment = {
   id: string;
@@ -122,14 +122,21 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
     borderColor: c.color,
   }));
 
-  const calendarEvents = filteredAppointments.map((a) => ({
-    id: a.id,
-    title: `${a.patient} (${a.doctor})`,
-    start: `${a.date}T${a.time}`,
-    bgColor:
-      a.status === 'COMPLETED' ? '#28a745' : a.status === 'CANCELLED' ? '#dc3545' : '#0d6efd',
-    borderColor: 'transparent',
-  }));
+  const {
+    createNewEvent,
+    eventData,
+    events,
+    isEditable,
+    onAddEvent,
+    onCloseModal,
+    onDateClick,
+    onDrop,
+    onEventClick,
+    onEventDrop,
+    onRemoveEvent,
+    onUpdateEvent,
+    show,
+  } = useCalendar();
 
   return (
     <Col lg={12}>
@@ -241,62 +248,43 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
             </Col>
 
             <Col lg={6} style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              {/* Calendar Header */}
-              {/* <div className="d-flex justify-content-between align-items-center mb-3 p-2 border rounded bg-light">
-                <Dropdown as={ButtonGroup}>
-                  <Button variant="outline-primary" size="sm">{view.charAt(0).toUpperCase() + view.slice(1)}</Button>
-                  <Dropdown.Toggle split variant="outline-primary" size="sm" />
-                  <Dropdown.Menu>
-                    <Dropdown.Item onClick={() => setView('day')}>Day</Dropdown.Item>
-                    <Dropdown.Item onClick={() => setView('week')}>Week</Dropdown.Item>
-                    <Dropdown.Item onClick={() => setView('month')}>Month</Dropdown.Item>
-                  </Dropdown.Menu>
-                </Dropdown>
-
-                <h5 className="mb-0">{dayjs().format('MMMM D, YYYY')}</h5>
-
-                <ButtonGroup size="sm">
-                  <Button variant={calendarViewMode === 'calendar' ? 'primary' : 'outline-primary'} onClick={() => setCalendarViewMode('calendar')}>
-                    <Icon icon="mdi:calendar-month" width="18" />
-                  </Button>
-                  <Button variant={calendarViewMode === 'list' ? 'primary' : 'outline-primary'} onClick={() => setCalendarViewMode('list')}>
-                    <Icon icon="mdi:view-list" width="18" />
-                  </Button>
-                </ButtonGroup>
-              </div> */}
-
               {/* Calendar / List */}
-              {/* <div style={{ flex: 1, minHeight: 0 }}>
+              <div style={{ flex: 1, minHeight: 0 }}>
                 {loading ? (
-                  <div className="text-center py-5"><Spinner animation="border" /></div>
+                  <div className="text-center py-5">
+                    <Spinner animation="border" />
+                  </div>
                 ) : calendarViewMode === 'calendar' ? (
                   <Calendar
-                    ref={calendarRef}
-                    height={calendarHeight}
-                    view={view}
-                    month={{ startDayOfWeek: 1 }}
-                    week={{ showTimezoneCollapseButton: true }}
-                    events={calendarEvents}
-                    calendars={calendars}
-                    useCreationPopup={true}
-                    useDetailPopup={true}
+                    events={events}
+                    onDateClick={onDateClick}
+                    onDrop={onDrop}
+                    onEventClick={onEventClick}
+                    onEventDrop={onEventDrop}
                   />
                 ) : (
-                  <div className="p-3 border rounded bg-white" style={{ height: calendarHeight, overflowY: 'auto' }}>
+                  <div
+                    className="p-3 border rounded bg-white"
+                    style={{ height: calendarHeight, overflowY: 'auto' }}
+                  >
                     {filteredAppointments.length === 0 ? (
                       <p className="text-muted">No appointments found.</p>
                     ) : (
                       filteredAppointments.map((appt) => (
                         <div key={appt.id} className="border-bottom py-2">
                           <strong>{appt.patient}</strong>
-                          <div>{dayjs(`${appt.date}T${appt.time}`).format('MMM D, YYYY h:mm A')}</div>
-                          <small className="text-muted">{appt.doctor} - {appt.branch}</small>
+                          <div>
+                            {dayjs(`${appt.date}T${appt.time}`).format('MMM D, YYYY h:mm A')}
+                          </div>
+                          <small className="text-muted">
+                            {appt.doctor} - {appt.branch}
+                          </small>
                         </div>
                       ))
                     )}
                   </div>
                 )}
-              </div> */}
+              </div>
             </Col>
           </Row>
 
