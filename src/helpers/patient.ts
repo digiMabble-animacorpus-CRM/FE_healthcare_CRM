@@ -126,40 +126,41 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
   }
 };
 
+
 export const createPatient = async (payload: any): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return false;
 
-    //   const safePayload = {
-    //     ...payload,
-    //     branches: (payload.branches || []).map((b: string | number) => Number(b)),
-    //     selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
-    //   };
 
-    const safePayload = {
-      firstname: 'John',
-      middlename: 'Middle',
-      lastname: 'Doe',
-      ssin: '94060768059',
-      legalgender: 'M',
-      language: 'en',
-      primarypatientrecordid: 'primary_record_123',
-      note: 'Some note about the patient',
-      status: 'ACTIVE',
-      mutualitynumber: '12345',
-      mutualityregistrationnumber: '67890',
-      emails: 'john.doe@example.com',
-      country: 'BE',
-      city: 'Brussels',
-      street: 'Rue du Comté',
-      number: '10',
-      zipcode: '5140',
-      birthdate: '1994-06-07',
-      phones: ['+32491079736'],
-    };
+          const safePayload = {
+        ...payload,
+        // branches: (payload.branches || []).map((b: string | number) => Number(b)),
+        // selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
+      };
 
-    const encryptedPayload = encryptAES(safePayload);
+    // // Build payload directly from form/input
+    // const safePayload = {
+    //   firstname: 'John',
+    //   middlename: 'Middle',
+    //   lastname: 'Doe',
+    //   ssin: '94060768059',
+    //   legalgender: 'M',
+    //   language: 'en',
+    //   primarypatientrecordid: 'primary_record_123',
+    //   note: 'Some note about the patient',
+    //   status: 'ACTIVE',
+    //   mutualitynumber: '12345',
+    //   mutualityregistrationnumber: '67890',
+    //   emails: 'john.doe@example.com',
+    //   country: 'BE',
+    //   city: 'Brussels',
+    //   street: 'Rue du Comté',
+    //   number: '10',
+    //   zipcode: '5140',
+    //   birthdate: '1994-06-07',
+    //   phones: ['+32491079736'],
+    // };
 
     const response = await fetch(`${API_BASE_PATH}/customers`, {
       method: 'POST',
@@ -167,7 +168,7 @@ export const createPatient = async (payload: any): Promise<boolean> => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: safePayload }),
+      body: JSON.stringify(safePayload), //  send plain payload
     });
 
     const result = await response.json();
@@ -194,35 +195,36 @@ export const updatePatient = async (
 
     const safePayload = {
       ...payload,
-      branches: (payload.branches || []).map((b: string | number) => Number(b)),
-      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
-    const encryptedId = encryptAES(String(id));
-    const encryptedPayload = encryptAES(safePayload);
+  //  console.log("PATCH URL:", `${API_BASE_PATH}/customers/${id}`);
+   // console.log("PATCH BODY:", JSON.stringify(safePayload, null, 2));
 
-    const response = await fetch(`${API_BASE_PATH}/customers/${encodeURIComponent(encryptedId)}`, {
+    const response = await fetch(`${API_BASE_PATH}/customers/${id}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: safePayload }),
+      body: JSON.stringify(safePayload), // ✅ send raw payload
     });
 
     const result = await response.json();
+   // console.log("Update response:", result);
 
     if (!response.ok || !result.status) {
-      console.error(' Update failed:', result.message || 'Unknown error');
+      console.error('Update failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error(' Error updating patient:', error);
+    console.error('Error updating patient:', error);
     return false;
   }
 };
+
+
 
 export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   return {
