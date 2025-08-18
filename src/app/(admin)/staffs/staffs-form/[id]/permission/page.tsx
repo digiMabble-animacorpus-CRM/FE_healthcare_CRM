@@ -7,7 +7,7 @@ import { toast } from 'react-toastify';
 import type { StaffType } from '@/types/data';
 import { Button, Card, CardBody, CardHeader, CardTitle, Spinner, Row, Col } from 'react-bootstrap';
 import PermissionsSection from '../../components/permissionSection';
-import { getStaffById } from '@/helpers/data';
+import { getStaffById } from '@/helpers/staff';
 
 const PermissionPage = () => {
   const { id } = useParams<{ id: string }>();

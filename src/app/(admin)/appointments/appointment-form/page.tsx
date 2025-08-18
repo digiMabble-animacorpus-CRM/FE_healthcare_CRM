@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { CustomerEnquiriesType } from '@/types/data';
 import { getUserByEmail } from '@/helpers/customer';
 
 // Dynamically import components to avoid SSR issues
@@ -20,8 +19,8 @@ const AppointmentPage = () => {
 
   const [showModal, setShowModal] = useState(true);
   const [isCustomerNotFound, setIsCustomerNotFound] = useState(false);
-  const [existingCustomer, setExistingCustomer] = useState<CustomerEnquiriesType | null>(null);
-  const [customerFormData, setCustomerFormData] = useState<CustomerEnquiriesType | null>(null);
+  const [existingCustomer, setExistingCustomer] = useState<any | null>(null);
+  const [customerFormData, setCustomerFormData] = useState<any | null>(null);
 
   const handleCheckCustomer = async (email: string) => {
     const customer = getUserByEmail(email);
@@ -35,7 +34,7 @@ const AppointmentPage = () => {
     }
   };
 
-  const handleCreateCustomer = (data: CustomerEnquiriesType) => {
+  const handleCreateCustomer = (data: any) => {
     setCustomerFormData(data);
   };
 

@@ -51,7 +51,7 @@ export const getAllPatient = async (
 
     const queryParams = new URLSearchParams(filters).toString();
 
-    const response = await fetch(`${API_BASE_PATH}/customers?${queryParams}`, {
+    const response = await fetch(`${API_BASE_PATH}/patients?${queryParams}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -92,7 +92,7 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
     return null;
   }
 
-  const url = `${API_BASE_PATH}/customers/${patientId}`;
+  const url = `${API_BASE_PATH}/patients/${patientId}`;
   console.log('Requesting patient by ID:', url);
 
   try {
@@ -162,7 +162,7 @@ export const createPatient = async (payload: any): Promise<boolean> => {
     //   phones: ['+32491079736'],
     // };
 
-    const response = await fetch(`${API_BASE_PATH}/customers`, {
+    const response = await fetch(`${API_BASE_PATH}/patients`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -197,10 +197,10 @@ export const updatePatient = async (
       ...payload,
     };
 
-  //  console.log("PATCH URL:", `${API_BASE_PATH}/customers/${id}`);
+  //  console.log("PATCH URL:", `${API_BASE_PATH}/patients/${id}`);
    // console.log("PATCH BODY:", JSON.stringify(safePayload, null, 2));
 
-    const response = await fetch(`${API_BASE_PATH}/customers/${id}`, {
+    const response = await fetch(`${API_BASE_PATH}/patients/${id}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
