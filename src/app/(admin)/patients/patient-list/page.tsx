@@ -2,7 +2,7 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import type { PatientType } from '@/types/data';
 import dayjs from 'dayjs';
 import {
@@ -23,32 +23,114 @@ import {
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import '@/assets/scss/components/_edittogglebtn.scss';
-import { getAllPatient, getPatientById } from '@/helpers/patient';
-import { API_BASE_PATH } from '@/context/constants';
 
-const PAGE_SIZE = 500;
+// API helper function to get patient list with filters
+const getPatientList = async ({
+  searchText = '',
+  pageNo = 1,
+  limit = 10,
+  branch = '',
+  fromDate = '',
+  toDate = '',
+}: {
+  searchText?: string;
+  pageNo?: number;
+  limit?: number;
+  branch?: string;
+  fromDate?: string;
+  toDate?: string;
+}) => {
+  const params = new URLSearchParams();
+  if (searchText) params.append('searchText', searchText);
+  params.append('pageNo', pageNo.toString());
+  params.append('limit', limit.toString());
+  if (branch) params.append('branch', branch);
+  if (fromDate) params.append('fromDate', fromDate);
+  if (toDate) params.append('toDate', toDate);
+
+  const res = await fetch(`http://localhost:8080/api/v1/customers?${params.toString()}`);
+  if (!res.ok) throw new Error('Failed to fetch');
+  return res.json();
+};
+
+// API helper to fetch detailed info of a patient by ID
+const getPatientById = async (id: string) => {
+  const res = await fetch(`http://localhost:8080/api/v1/customers/${id}`);
+  if (!res.ok) throw new Error('Failed to fetch patient details');
+  return res.json();
+};
+
+// Constants
+const PAGE_SIZE = 10;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
 const PatientsListPage = () => {
   const [allPatients, setAllPatients] = useState<PatientType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedPatientDetails, setSelectedPatientDetails] = useState<PatientType | null>(null);
+  const [showViewModal, setShowViewModal] = useState(false);
+
   const router = useRouter();
 
-  // Fetch all patients once
+  const getDateRangeForAPI = () => {
+    const now = dayjs();
+    switch (dateFilter) {
+      case 'today':
+        return {
+          fromDate: now.startOf('day').format('YYYY-MM-DD'),
+          toDate: now.endOf('day').format('YYYY-MM-DD'),
+        };
+      case 'this_week':
+        return {
+          fromDate: now.startOf('week').format('YYYY-MM-DD'),
+          toDate: now.endOf('week').format('YYYY-MM-DD'),
+        };
+      case '15_days':
+        return {
+          fromDate: now.subtract(15, 'day').startOf('day').format('YYYY-MM-DD'),
+          toDate: now.endOf('day').format('YYYY-MM-DD'),
+        };
+      case 'this_month':
+        return {
+          fromDate: now.startOf('month').format('YYYY-MM-DD'),
+          toDate: now.endOf('month').format('YYYY-MM-DD'),
+        };
+      case 'this_year':
+        return {
+          fromDate: now.startOf('year').format('YYYY-MM-DD'),
+          toDate: now.endOf('year').format('YYYY-MM-DD'),
+        };
+      default:
+        return { fromDate: '', toDate: '' };
+    }
+  };
+
+  // Fetch patients list with filters and pagination
   const fetchPatients = async () => {
     setLoading(true);
+    const { fromDate, toDate } = getDateRangeForAPI();
     try {
-      const response = await getAllPatient(1, 10000); // fetch all records
+      const response = await getPatientList({
+        searchText: searchTerm,
+        pageNo: currentPage,
+        limit: PAGE_SIZE,
+        branch: selectedBranch || '',
+        fromDate,
+        toDate,
+      });
       setAllPatients(response.data || []);
+      setTotalPages(Math.ceil((response.totalCount || 0) / PAGE_SIZE));
     } catch (err) {
       console.error('Failed to fetch patients', err);
       setAllPatients([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -56,66 +138,7 @@ const PatientsListPage = () => {
 
   useEffect(() => {
     fetchPatients();
-  }, []);
-
-  const getDateRange = () => {
-    const now = dayjs();
-    switch (dateFilter) {
-      case 'today':
-        return { from: now.startOf('day'), to: now.endOf('day') };
-      case 'this_week':
-        return { from: now.startOf('week'), to: now.endOf('week') };
-      case '15_days':
-        return { from: now.subtract(15, 'day').startOf('day'), to: now.endOf('day') };
-      case 'this_month':
-        return { from: now.startOf('month'), to: now.endOf('month') };
-      case 'this_year':
-        return { from: now.startOf('year'), to: now.endOf('year') };
-      default:
-        return null;
-    }
-  };
-
-  // Apply frontend filters
-  const filteredPatients = useMemo(() => {
-    let data = [...allPatients];
-
-    // Branch filter
-    if (selectedBranch) {
-      data = data.filter((p) => p.city === selectedBranch);
-    }
-
-    // Search filter
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      data = data.filter(
-        (p) =>
-          p?.firstname.toLowerCase().includes(term) ||
-          p?.lastname.toLowerCase().includes(term) ||
-          (p.emails && p.emails.toLowerCase().includes(term)) ||
-          (p.phones && p.phones.join(' ').toLowerCase().includes(term)),
-      );
-    }
-
-    // Date filter
-    const range = getDateRange();
-    if (range) {
-      data = data.filter((p) => {
-        if (!p.createdAt) return false;
-        const created = dayjs(p.createdAt);
-        return created.isAfter(range.from) && created.isBefore(range.to);
-      });
-    }
-
-    return data;
-  }, [allPatients, selectedBranch, searchTerm, dateFilter]);
-
-  const totalPages = Math.ceil(filteredPatients.length / PAGE_SIZE);
-
-  const currentData = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredPatients.slice(start, start + PAGE_SIZE);
-  }, [filteredPatients, currentPage]);
+  }, [searchTerm, currentPage, selectedBranch, dateFilter]);
 
   const calculateAge = (dob: string) => {
     if (!dob) return '';
@@ -132,19 +155,33 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = (id: string) => {
-    router.push(`/patients/details/${id}`);
+  // Handle View: Fetch details and show modal
+  const handleView = async (id: string) => {
+    try {
+      const patient = await getPatientById(id);
+      setSelectedPatientDetails(patient);
+      setShowViewModal(true);
+    } catch (error) {
+      console.error('Failed to fetch patient details', error);
+    }
   };
 
-  const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
+  // Edit button: navigate to edit page (edit page should handle fetching & patch)
+  const handleEditClick = (id: string) => {
+    router.push(`/patients/edit-patient/${id}`);
+  };
+
+  // Delete button: confirm modal open
   const handleDeleteClick = (id: string) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
   };
+
+  // Confirm delete patient via API
   const handleConfirmDelete = async () => {
     if (!selectedPatientId) return;
     try {
-      await fetch(`/api/patients/${selectedPatientId}`, { method: 'DELETE' });
+      await fetch(`http://localhost:8080/api/v1/customers/${selectedPatientId}`, { method: 'DELETE' });
       setAllPatients(allPatients.filter((p) => p.id !== selectedPatientId));
     } catch (err) {
       console.error(err);
@@ -159,7 +196,11 @@ const PatientsListPage = () => {
     setCurrentPage(page);
   };
 
-  console.log(currentData);
+  const handleCloseViewModal = () => {
+    setShowViewModal(false);
+    setSelectedPatientDetails(null);
+  };
+
   return (
     <>
       <PageTitle subName="Patient" title="Patient List" />
@@ -184,7 +225,6 @@ const PatientsListPage = () => {
                   }}
                   style={{ minWidth: 200 }}
                 />
-
                 <Dropdown>
                   <DropdownToggle className="btn btn-sm btn-outline-white">
                     {selectedBranch || 'Filter by Branch'}
@@ -283,7 +323,7 @@ const PatientsListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {currentData.map((item) => (
+                      {allPatients.map((item) => (
                         <tr key={item.id}>
                           <td>
                             <input type="checkbox" />
@@ -374,6 +414,7 @@ const PatientsListPage = () => {
         </Col>
       </Row>
 
+      {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -385,6 +426,34 @@ const PatientsListPage = () => {
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
             Delete
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* View Patient Details Modal */}
+      <Modal show={showViewModal} onHide={handleCloseViewModal} size="lg" centered>
+        <Modal.Header closeButton>
+          <Modal.Title>Patient Details</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          {selectedPatientDetails ? (
+            <div>
+              <p><strong>Name:</strong> {selectedPatientDetails.firstname} {selectedPatientDetails.lastname}</p>
+              <p><strong>Email:</strong> {selectedPatientDetails.emails}</p>
+              <p><strong>Phone:</strong> {selectedPatientDetails.phones}</p>
+              <p><strong>Age:</strong> {calculateAge(selectedPatientDetails.birthdate)}</p>
+              <p><strong>Gender:</strong> {formatGender(selectedPatientDetails.legalgender ?? '')}</p>
+              <p><strong>City:</strong> {selectedPatientDetails.city}</p>
+              <p><strong>Status:</strong> {selectedPatientDetails.status}</p>
+              {/* Add more fields as needed */}
+            </div>
+          ) : (
+            'Loading...'
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={handleCloseViewModal}>
+            Close
           </Button>
         </Modal.Footer>
       </Modal>

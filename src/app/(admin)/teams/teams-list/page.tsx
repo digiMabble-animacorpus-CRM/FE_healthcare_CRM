@@ -78,7 +78,7 @@ const StaffListPage = () => {
 
   const fetchStaffList = async (page: number) => {
     setLoading(true);
-    console.log(' Fetching staff list...');
+    console.log(' Fetching Teams list...');
     try {
       const { from, to } = getDateRange();
       console.log(' Date filter range:', { from, to });
@@ -97,7 +97,7 @@ const StaffListPage = () => {
       setStaffList(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error(' Failed to fetch staff list:', error);
+      console.error(' Failed to fetch Teams list:', error);
     } finally {
       setLoading(false);
     }
@@ -112,17 +112,17 @@ const StaffListPage = () => {
   };
 
   const handleView = (staffId: number | string) => {
-    router.push(`/staffs/staffs-details/${staffId}`);
+    router.push(`/teams/teams-details/${staffId}`);
   };
 
   const handleEdit = (id: string | number) => {
     const encrypted = encodeURIComponent(encryptAES(String(id)));
-    router.push(`/staffs/staffs-form/${encrypted}/edit`);
+    router.push(`/teams/add-teams/create/${encrypted}/edit`);
   };
 
   const handlePermission = (id: string | number) => {
     const encrypted = encodeURIComponent(encryptAES(String(id)));
-    router.push(`/staffs/staffs-form/${encrypted}/permission`);
+    router.push(`/teams/add-teams/create/${encrypted}/permission`);
   };
 
   const handleDelete = (id: string) => {
@@ -149,13 +149,13 @@ const StaffListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Staff" title="Staff List" />
+      <PageTitle subName="Staff" title="Teams List" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Staff List
+                All Teams List
               </CardTitle>
               <div className="d-flex flex-wrap align-items-center gap-2">
                 <div style={{ minWidth: '200px' }}>

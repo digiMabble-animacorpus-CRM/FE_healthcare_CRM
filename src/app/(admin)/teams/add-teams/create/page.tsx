@@ -1,7 +1,9 @@
 'use client';
 
+import { useState } from 'react';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
 import { TeamType } from '@/assets/data/TeamType';
-import React, { useState } from 'react';  
 
 type TeamFormProps = {
   onSubmitHandler: (formData: TeamType) => void;
@@ -42,10 +44,11 @@ const initialFormData: TeamType = {
 
 const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
   const [formData, setFormData] = useState<TeamType>(initialFormData);
+  const router = useRouter();
 
-  const handleChange = (
+  function handleChange(
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  ) {
     const { name, value } = e.target;
     if (name.startsWith('Address.')) {
       const key = name.split('.')[1];
@@ -62,213 +65,228 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
         [name]: value,
       }));
     }
-  };
-
-  // Styles
-  const containerStyle: React.CSSProperties = {
-    background: '#fff',
-    borderRadius: '10px',
-    boxShadow: '0 2px 12px rgba(30,34,90,0.09)',
-    padding: '42px',
-    width: '100%',
-    maxWidth: '1300px',
-    margin: '42px auto',
-    fontFamily: 'system-ui,sans-serif',
-  };
-  const sectionStyle: React.CSSProperties = { marginBottom: '38px' };
-  const headingStyle: React.CSSProperties = { fontWeight: 600, marginBottom: '18px', fontSize: '18px' };
-  const labelStyle: React.CSSProperties = { fontWeight: 500, marginBottom: '7px', display: 'block', color: '#222' };
-  const inputStyle: React.CSSProperties = {
-    width: '100%',
-    padding: '10px',
-    borderRadius: '5px',
-    border: '1px solid #cacaca',
-    fontSize: '15px',
-    marginBottom: '0',
-    boxSizing: 'border-box',
-    background: '#fafaff',
-  };
-  const buttonBarStyle: React.CSSProperties = {
-    display: 'flex',
-    justifyContent: 'flex-end',
-    gap: '16px',
-    marginTop: '38px',
-  };
-  const buttonStyle: React.CSSProperties = {
-    backgroundColor: '#5119d2',
-    color: '#fff',
-    border: 'none',
-    borderRadius: '6px',
-    padding: '11px 36px',
-    fontWeight: 'bold',
-    fontSize: '16px',
-    cursor: 'pointer',
-  };
-  const cancelButtonStyle: React.CSSProperties = {
-    ...buttonStyle,
-    backgroundColor: '#eee',
-    color: '#5119d2',
-    border: '1px solid #5119d2',
-  };
-
-  return (
-    <form onSubmit={handleSubmit} style={containerStyle}>
-      <h2 style={{ fontWeight: 700, fontSize: '2rem', marginBottom: '32px' }}>Create New Team Member</h2>
-
-      {/* PERSONAL INFORMATION */}
-      <section style={sectionStyle}>
-        <h3 style={headingStyle}>Personal Information</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '28px' }}>
-          <div>
-            <label style={labelStyle}>Last Name *</label>
-            <input name="LastName" value={formData.LastName} onChange={handleChange} style={inputStyle} placeholder="Enter last name" required />
-          </div>
-          <div>
-            <label style={labelStyle}>First Name *</label>
-            <input name="FirstName" value={formData.FirstName} onChange={handleChange} style={inputStyle} placeholder="Enter first name" required />
-          </div>
-          <div>
-            <label style={labelStyle}>Full Name (Nom complet)</label>
-            <input name="NomComplet" value={formData.NomComplet} onChange={handleChange} style={inputStyle} placeholder="Enter full name" />
-          </div>
-          <div>
-            <label style={labelStyle}>Phone Number *</label>
-            <input name="PhoneNumber" value={formData.PhoneNumber} onChange={handleChange} style={inputStyle} placeholder="Enter phone" required type="tel" />
-          </div>
-          <div>
-            <label style={labelStyle}>Contact Email *</label>
-            <input name="ContactMail" value={formData.ContactMail} onChange={handleChange} style={inputStyle} placeholder="Enter email" required type="email" />
-          </div>
-          <div>
-            <label style={labelStyle}>Photo URL</label>
-            <input name="Photo" value={formData.Photo} onChange={handleChange} style={inputStyle} placeholder="Photo URL" />
-          </div>
-        </div>
-      </section>
-
-      {/* PROFESSIONAL INFORMATION */}
-      <section style={sectionStyle}>
-        <h3 style={headingStyle}>Professional Information</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '28px' }}>
-          <div>
-            <label style={labelStyle}>Function</label>
-            <input name="Function" value={formData.Function} onChange={handleChange} style={inputStyle} placeholder="Function" />
-          </div>
-          <div>
-            <label style={labelStyle}>Public Specific</label>
-            <input name="PublicSpecific" value={formData.PublicSpecific} onChange={handleChange} style={inputStyle} placeholder="Public specific" />
-          </div>
-          <div>
-            <label style={labelStyle}>Specialisation</label>
-            <input name="Specialisation" value={formData.Specialisation} onChange={handleChange} style={inputStyle} placeholder="Specialisation" />
-          </div>
-          <div>
-            <label style={labelStyle}>Function 2</label>
-            <input name="Function2" value={formData.Function2} onChange={handleChange} style={inputStyle} placeholder="Function 2" />
-          </div>
-          <div>
-            <label style={labelStyle}>Function 3</label>
-            <input name="Function3" value={formData.Function3} onChange={handleChange} style={inputStyle} placeholder="Function 3" />
-          </div>
-          <div>
-            <label style={labelStyle}>Function 4</label>
-            <input name="Function4" value={formData.Function4} onChange={handleChange} style={inputStyle} placeholder="Function 4" />
-          </div>
-        </div>
-      </section>
-
-      {/* BIO & DETAILS */}
-      <section style={sectionStyle}>
-        <h3 style={headingStyle}>Bio & Details</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '28px' }}>
-          <div>
-            <label style={labelStyle}>Who Am I</label>
-            <textarea name="WhoAmI" value={formData.WhoAmI} onChange={handleChange} style={{ ...inputStyle, minHeight: 54, resize: 'vertical' }} placeholder="Describe yourself" rows={2} />
-          </div>
-          <div>
-            <label style={labelStyle}>Consultations</label>
-            <textarea name="Consultations" value={formData.Consultations} onChange={handleChange} style={{ ...inputStyle, minHeight: 54, resize: 'vertical' }} placeholder="Consultation details" rows={2} />
-          </div>
-          <div>
-            <label style={labelStyle}>Hourly Rate</label>
-            <input name="Hourly" value={formData.Hourly} onChange={handleChange} style={inputStyle} placeholder="Hourly Rate" />
-          </div>
-        </div>
-        <div style={{ marginTop: '22px' }}>
-          <label style={labelStyle}>About</label>
-          <textarea name="About" value={formData.About} onChange={handleChange} style={{ ...inputStyle, minHeight: 64, resize: 'vertical' }} placeholder="About..." rows={3} />
-        </div>
-      </section>
-
-      {/* ADDRESS */}
-      <section style={sectionStyle}>
-        <h3 style={headingStyle}>Address</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '28px' }}>
-          <div>
-            <label style={labelStyle}>Street</label>
-            <input name="Address.street" value={formData.Address.street} onChange={handleChange} style={inputStyle} placeholder="Street" />
-          </div>
-          <div>
-            <label style={labelStyle}>City</label>
-            <input name="Address.city" value={formData.Address.city} onChange={handleChange} style={inputStyle} placeholder="City" />
-          </div>
-          <div>
-            <label style={labelStyle}>Zip Code</label>
-            <input name="Address.zip_code" value={formData.Address.zip_code} onChange={handleChange} style={inputStyle} placeholder="Zip Code" />
-          </div>
-          <div>
-            <label style={labelStyle}>Country</label>
-            <input name="Address.country" value={formData.Address.country} onChange={handleChange} style={inputStyle} placeholder="Country" />
-          </div>
-        </div>
-      </section>
-
-      {/* OTHER DETAILS */}
-      <section style={sectionStyle}>
-        <h3 style={headingStyle}>Other Details</h3>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '28px' }}>
-          <div>
-            <label style={labelStyle}>Langues parlées</label>
-            <input name="LanguesParlees" value={formData.LanguesParlees} onChange={handleChange} style={inputStyle} placeholder="Langues parlées" />
-          </div>
-          <div>
-            <label style={labelStyle}>Payment Method</label>
-            <input name="PaymentMethod" value={formData.PaymentMethod} onChange={handleChange} style={inputStyle} placeholder="Payment Method" />
-          </div>
-          <div>
-            <label style={labelStyle}>Diplomas and Trainings</label>
-            <textarea name="DiplomasTrainings" value={formData.DiplomasTrainings} onChange={handleChange} style={{ ...inputStyle, minHeight: 50, resize: 'vertical' }} placeholder="Diplomas and Trainings" />
-          </div>
-          <div>
-            <label style={labelStyle}>Specialisations</label>
-            <textarea name="Specialisations" value={formData.Specialisations} onChange={handleChange} style={{ ...inputStyle, minHeight: 50, resize: 'vertical' }} placeholder="Specialisations" />
-          </div>
-          <div>
-            <label style={labelStyle}>Website</label>
-            <input name="Website" value={formData.Website} onChange={handleChange} style={inputStyle} placeholder="Website" />
-          </div>
-          <div>
-            <label style={labelStyle}>FAQ</label>
-            <textarea name="FAQ" value={formData.FAQ} onChange={handleChange} style={{ ...inputStyle, minHeight: 50, resize: 'vertical' }} placeholder="FAQ" />
-          </div>
-          <div>
-            <label style={labelStyle}>Liens Agenda</label>
-            <input name="LiensAgenda" value={formData.LiensAgenda} onChange={handleChange} style={inputStyle} placeholder="Liens Agenda" />
-          </div>
-        </div>
-      </section>
-
-      <div style={buttonBarStyle}>
-        <button type="button" style={cancelButtonStyle} onClick={() => window.history.back()}>Cancel</button>
-        <button type="submit" style={buttonStyle}>Create Team Member</button>
-      </div>
-    </form>
-  );
+  }
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     onSubmitHandler(formData);
   }
+
+  return (
+    <Form onSubmit={handleSubmit}>
+      <Card>
+        <CardHeader>
+          <CardTitle as="h4">Add Team Member</CardTitle>
+        </CardHeader>
+        <CardBody>
+          {/* Personal Information */}
+          <h5 className="mb-3 mt-1">Personal Information</h5>
+          <Row>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Last Name *</Form.Label>
+                <Form.Control name="LastName" value={formData.LastName} onChange={handleChange} placeholder="Enter last name" required />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>First Name *</Form.Label>
+                <Form.Control name="FirstName" value={formData.FirstName} onChange={handleChange} placeholder="Enter first name" required />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Full Name (Nom complet)</Form.Label>
+                <Form.Control name="NomComplet" value={formData.NomComplet} onChange={handleChange} placeholder="Enter full name" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Phone Number *</Form.Label>
+                <Form.Control name="PhoneNumber" value={formData.PhoneNumber} onChange={handleChange} placeholder="Enter phone" required type="tel" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Contact Email *</Form.Label>
+                <Form.Control name="ContactMail" value={formData.ContactMail} onChange={handleChange} placeholder="Enter email" required type="email" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Photo URL</Form.Label>
+                <Form.Control name="Photo" value={formData.Photo} onChange={handleChange} placeholder="Photo URL" />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Professional Information */}
+          <h5 className="mb-3 mt-4">Professional Information</h5>
+          <Row>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Function</Form.Label>
+                <Form.Control name="Function" value={formData.Function} onChange={handleChange} placeholder="Function" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Public Specific</Form.Label>
+                <Form.Control name="PublicSpecific" value={formData.PublicSpecific} onChange={handleChange} placeholder="Public specific" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Specialisation</Form.Label>
+                <Form.Control name="Specialisation" value={formData.Specialisation} onChange={handleChange} placeholder="Specialisation" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Function 2</Form.Label>
+                <Form.Control name="Function2" value={formData.Function2} onChange={handleChange} placeholder="Function 2" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Function 3</Form.Label>
+                <Form.Control name="Function3" value={formData.Function3} onChange={handleChange} placeholder="Function 3" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Function 4</Form.Label>
+                <Form.Control name="Function4" value={formData.Function4} onChange={handleChange} placeholder="Function 4" />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Bio & Details */}
+          <h5 className="mb-3 mt-4">Bio & Details</h5>
+          <Row>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Who Am I</Form.Label>
+                <Form.Control name="WhoAmI" as="textarea" value={formData.WhoAmI} onChange={handleChange} placeholder="Describe yourself" rows={2} />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Consultations</Form.Label>
+                <Form.Control name="Consultations" as="textarea" value={formData.Consultations} onChange={handleChange} placeholder="Consultation details" rows={2} />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Hourly Rate</Form.Label>
+                <Form.Control name="Hourly" value={formData.Hourly} onChange={handleChange} placeholder="Hourly Rate" />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={12}>
+              <Form.Group className="mb-3">
+                <Form.Label>About</Form.Label>
+                <Form.Control name="About" as="textarea" value={formData.About} onChange={handleChange} placeholder="About..." rows={3} />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Address Information */}
+          <h5 className="mb-3 mt-4">Address Information</h5>
+          <Row>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Street</Form.Label>
+                <Form.Control name="Address.street" value={formData.Address.street} onChange={handleChange} placeholder="Street" />
+              </Form.Group>
+            </Col>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>City</Form.Label>
+                <Form.Control name="Address.city" value={formData.Address.city} onChange={handleChange} placeholder="City" />
+              </Form.Group>
+            </Col>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Zip Code</Form.Label>
+                <Form.Control name="Address.zip_code" value={formData.Address.zip_code} onChange={handleChange} placeholder="Zip Code" />
+              </Form.Group>
+            </Col>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Country</Form.Label>
+                <Form.Control name="Address.country" value={formData.Address.country} onChange={handleChange} placeholder="Country" />
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Other Details */}
+          <h5 className="mb-3 mt-4">Other Details</h5>
+          <Row>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Langues parlées</Form.Label>
+                <Form.Control name="LanguesParlees" value={formData.LanguesParlees} onChange={handleChange} placeholder="Langues parlées" />
+              </Form.Group>
+            </Col>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Payment Method</Form.Label>
+                <Form.Control name="PaymentMethod" value={formData.PaymentMethod} onChange={handleChange} placeholder="Payment Method" />
+              </Form.Group>
+            </Col>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Diplomas and Trainings</Form.Label>
+                <Form.Control name="DiplomasTrainings" as="textarea" value={formData.DiplomasTrainings} onChange={handleChange} placeholder="Diplomas and Trainings" />
+              </Form.Group>
+            </Col>
+            <Col lg={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Specialisations</Form.Label>
+                <Form.Control name="Specialisations" as="textarea" value={formData.Specialisations} onChange={handleChange} placeholder="Specialisations" />
+              </Form.Group>
+            </Col>
+          </Row>
+          <Row>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Website</Form.Label>
+                <Form.Control name="Website" value={formData.Website} onChange={handleChange} placeholder="Website" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>FAQ</Form.Label>
+                <Form.Control name="FAQ" as="textarea" value={formData.FAQ} onChange={handleChange} placeholder="FAQ" />
+              </Form.Group>
+            </Col>
+            <Col lg={4}>
+              <Form.Group className="mb-3">
+                <Form.Label>Liens Agenda</Form.Label>
+                <Form.Control name="LiensAgenda" value={formData.LiensAgenda} onChange={handleChange} placeholder="Liens Agenda" />
+              </Form.Group>
+            </Col>
+          </Row>
+        </CardBody>
+      </Card>
+      <div className="mb-3 rounded">
+        <Row className="justify-content-end g-2 mt-2">
+          <Col lg={2}>
+            <Button variant="outline-primary" type="submit" className="w-100">
+              Add Team Member
+            </Button>
+          </Col>
+          <Col lg={2}>
+            <Button variant="danger" className="w-100" onClick={() => router.back()}>
+              Cancel
+            </Button>
+          </Col>
+        </Row>
+      </div>
+    </Form>
+  );
 };
 
 export default TeamForm;

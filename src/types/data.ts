@@ -62,6 +62,7 @@ export type UserType = {
 };
 
 export type PatientType = {
+  branch: string;
   visits: number;
   prescriptions: number;
   bills: number;
