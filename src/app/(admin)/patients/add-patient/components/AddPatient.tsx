@@ -41,8 +41,8 @@ const schema: yup.ObjectSchema<Partial<PatientType>> = yup
     country: yup.string().required('Please select country'),
     ssin: yup.string(),
     status: yup.string().required('Please select status'),
-    mutualitynumber: yup.string().required('Please select mutuality number'),
-    mutualityregistrationnumber: yup.string().required('Please select mutuality registration number'),
+    mutualitynumber: yup.string().required('Please enter mutuality number'),
+    mutualityregistrationnumber: yup.string().required('Please enter mutuality registration number'),
     branch: yup.string(),
     tags: yup.array().of(yup.string()).min(1, 'Please select at least one tag'),
   })

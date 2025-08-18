@@ -24,7 +24,7 @@ import {
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import '@/assets/scss/components/_edittogglebtn.scss';
-import { getAllPatient, getPatientById } from '@/helpers/patient';
+import { getAllPatient } from '@/helpers/patient';
 import { API_BASE_PATH } from '@/context/constants';
 
 const PAGE_SIZE = 500;
@@ -39,14 +39,14 @@ const PatientsListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
-  const router = useRouter();
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const router = useRouter();
 
-  // Fetch all patients once
+  // Fetch all patients
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      const response = await getAllPatient(1, 10000); // fetch all records
+      const response = await getAllPatient(1, 10000);
       setAllPatients(response.data || []);
     } catch (err) {
       console.error('Failed to fetch patients', err);
@@ -57,15 +57,15 @@ const PatientsListPage = () => {
   };
 
   useEffect(() => {
+    fetchPatients();
+  }, []);
+
+  useEffect(() => {
     if (showSuccessMessage) {
       const timer = setTimeout(() => setShowSuccessMessage(false), 3000);
       return () => clearTimeout(timer);
     }
   }, [showSuccessMessage]);
-
-  useEffect(() => {
-    fetchPatients();
-  }, []);
 
   const getDateRange = () => {
     const now = dayjs();
@@ -85,16 +85,14 @@ const PatientsListPage = () => {
     }
   };
 
-  // Apply frontend filters
+  // Apply filters
   const filteredPatients = useMemo(() => {
     let data = [...allPatients];
 
-    // Branch filter
     if (selectedBranch) {
       data = data.filter((p) => p.city === selectedBranch);
     }
 
-    // Search filter
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       data = data.filter(
@@ -106,7 +104,6 @@ const PatientsListPage = () => {
       );
     }
 
-    // Date filter
     const range = getDateRange();
     if (range) {
       data = data.filter((p) => {
@@ -141,19 +138,18 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = (id: string) => {
-    router.push(`/patients/details/${id}`);
-  };
-
+  const handleView = (id: string) => router.push(`/patients/details/${id}`);
   const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
+
   const handleDeleteClick = (id: string) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!selectedPatientId) return;
     try {
-      await fetch(`http://164.92.220.65/api/v1/customers/${selectedPatientId}`, { method: 'DELETE' });
+      await fetch(`${API_BASE_PATH}/patients/${selectedPatientId}`, { method: 'DELETE' }); // 🔥 fixed endpoint
       setAllPatients(allPatients.filter((p) => p.id !== selectedPatientId));
       setShowSuccessMessage(true);
     } catch (err) {
@@ -169,22 +165,14 @@ const PatientsListPage = () => {
     setCurrentPage(page);
   };
 
-  console.log(currentData);
   return (
     <>
-      {/* Success Alert Popup */}
       {showSuccessMessage && (
         <Alert
           variant="success"
           onClose={() => setShowSuccessMessage(false)}
           dismissible
-          style={{
-            position: 'fixed',
-            top: 20,
-            right: 20,
-            zIndex: 1050,
-            minWidth: 200,
-          }}
+          style={{ position: 'fixed', top: 20, right: 20, zIndex: 1050, minWidth: 200 }}
         >
           Patient deleted successfully!
         </Alert>

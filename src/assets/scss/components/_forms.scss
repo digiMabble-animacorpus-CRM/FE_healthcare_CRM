@@ -115,3 +115,13 @@ input.form-control[type="range"] {
     text-decoration: line-through;
   }
 }
+// Force all form validation error messages to appear in red
+.invalid-feedback,
+.text-danger,
+.form-error,
+span[role="alert"],
+div[role="alert"] {
+  color: rgb(206, 61, 61) !important;
+  font-weight: 500; // optional bold look
+}
+
