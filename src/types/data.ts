@@ -304,6 +304,7 @@ export type TherapistType = {
   appointmentAlert?: string | null;
   availability?: any | null;
   tags?: any;
+  imageUrl?: string
 };
 
 export type TherapistCreatePayload = {
