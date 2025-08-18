@@ -62,31 +62,36 @@ export type UserType = {
 };
 
 export type PatientType = {
-  visits: number;
-  prescriptions: number;
-  bills: number;
-  createdAt?: string;
-  _id?: IdType;
-  birthdate: string;
-  city?: string;
-  country?: string;
-  emails?: string;
+  // Required fields
   firstname: string;
-  id: string;
-  language?: string;
   lastname: string;
-  legalgender?: string;
+  birthdate: string;
+  emails: string;
+  number: string;
+  legalgender: string;
+  language: string;
+  city: string;
+  country: string;
+  street: string;
+  note: string;
+  tags?: string[];
+
+  // Optional fields
+  id?: string;
+  _id?: string;
+  visits?: number;
+  prescriptions?: number;
+  bills?: number;
+  createdAt?: string;
   middlename?: string;
-  mutualitynumber?: string;
-  mutualityregistrationnumber?: string;
-  note?: string;
-  number?: string;
   phones?: string[];
   primarypatientrecordid?: string;
   ssin?: string;
   status?: string;
-  street?: string;
+  mutualitynumber?: string;
+  mutualityregistrationnumber?: string;
   zipcode?: string;
+  branch?: string;
 };
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';

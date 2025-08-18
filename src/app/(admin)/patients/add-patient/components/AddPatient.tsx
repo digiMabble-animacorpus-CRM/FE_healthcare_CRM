@@ -20,16 +20,22 @@ interface Props {
   onSubmitHandler?: (data: PatientType) => void;
 }
 
-const schema: yup.ObjectSchema<Partial<PatientType>> = yup
+export const schema: yup.ObjectSchema<Partial<any>> = yup
   .object({
+    id: yup.string(),
+    _id: yup.string(),
+    visits: yup.number(),
+    prescriptions: yup.number(),
+    bills: yup.number(),
+    createdAt: yup.string(),
+    primarypatientrecordid: yup.string(),
+
+    // required fields
     firstname: yup.string().required('Please enter first name'),
     lastname: yup.string().required('Please enter last name'),
     middlename: yup.string(),
     emails: yup.string().email('Invalid email').required('Please enter email'),
-    number: yup
-      .string()
-      .matches(/^\d{10}$/, 'Enter valid 10-digit number')
-      .required('Please enter number'),
+    number: yup.string().matches(/^\d{10}$/, 'Enter valid 10-digit number').required('Please enter number'),
     phones: yup.array().of(yup.string()),
     birthdate: yup.string().required('Please enter Date of birth'),
     street: yup.string().required('Please enter address'),
@@ -44,7 +50,7 @@ const schema: yup.ObjectSchema<Partial<PatientType>> = yup
     mutualitynumber: yup.string(),
     mutualityregistrationnumber: yup.string(),
     branch: yup.string(),
-    tags: yup.array().of(yup.string()).min(1, 'Please select at least one tag'),
+    tags: yup.array().of(yup.string().required()).min(1, 'Please select at least one tag'),
   })
   .required()
   .noUnknown(true);

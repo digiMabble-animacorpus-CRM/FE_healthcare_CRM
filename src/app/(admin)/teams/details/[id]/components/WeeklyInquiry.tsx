@@ -87,7 +87,7 @@ const WeeklyInquiry = () => {
   return (
     <Card>
       <CardHeader className="d-flex align-items-center justify-content-between">
-        <CardTitle as={'h4'}>Appointments</CardTitle>
+        <CardTitle as={'h4'}>Weekly Inquiry</CardTitle>
         <Dropdown>
           <DropdownToggle
             as={'a'}
@@ -128,7 +128,7 @@ const WeeklyInquiry = () => {
         </Row>
       </CardBody>
       <CardFooter className="d-flex align-items-center justify-content-between border-top">
-        <p className="mb-0 fw-medium fs-15">Jan-Dec 2025 </p>
+        <p className="mb-0 fw-medium fs-15">Jan-Dec 2023 </p>
         <p className="mb-0 text-dark fw-semibold fs-15">First Week 37</p>
       </CardFooter>
     </Card>

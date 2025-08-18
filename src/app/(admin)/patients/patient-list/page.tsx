@@ -132,12 +132,12 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = (id: string) => {
+  const handleView = (id: any) => {
     router.push(`/patients/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
-  const handleDeleteClick = (id: string) => {
+  const handleEditClick = (id: any) => router.push(`/patients/edit-patient/${id}`);
+  const handleDeleteClick = (id: any) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
   };
@@ -315,7 +315,7 @@ const PatientsListPage = () => {
                                   <IconifyIcon icon="solar:pen-2-broken" />
                                 </DropdownToggle>
                                 <DropdownMenu>
-                                  <DropdownItem onClick={() => handleEditClick(item.id)}>
+                                  <DropdownItem onClick={() => handleEditClick(item?.id)}>
                                     Edit
                                   </DropdownItem>
                                 </DropdownMenu>
