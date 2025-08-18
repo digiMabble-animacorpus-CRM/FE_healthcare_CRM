@@ -52,7 +52,7 @@ export const getAllTherapists = async (
 
     const queryParams = new URLSearchParams(filters).toString();
 
-    const response = await fetch(`${API_BASE_PATH}/staff?${queryParams}`, {
+    const response = await fetch(`${API_BASE_PATH}/therapists?${queryParams}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -88,7 +88,7 @@ export const getTherapistById = async (therapistId: any): Promise<TherapistType 
     return null;
   }
 
-  const url = `${API_BASE_PATH}/staff/${therapistId}`;
+  const url = `${API_BASE_PATH}/therapists/${therapistId}`;
   console.log('Requesting therapist by ID:', url);
 
   try {
@@ -136,7 +136,7 @@ export const createTherapist = async (payload: TherapistCreatePayload): Promise<
 
     const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(`${API_BASE_PATH}/staff`, {
+    const response = await fetch(`${API_BASE_PATH}/therapists`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -154,7 +154,7 @@ export const createTherapist = async (payload: TherapistCreatePayload): Promise<
 
     return true;
   } catch (error) {
-    console.error('Error creating staff:', error);
+    console.error('Error creating therapists:', error);
     return false;
   }
 };
@@ -176,7 +176,7 @@ export const updateTherapist = async (
     const encryptedId = encryptAES(String(id));
     const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(`${API_BASE_PATH}/staff/${encodeURIComponent(encryptedId)}`, {
+    const response = await fetch(`${API_BASE_PATH}/therapists/${encodeURIComponent(encryptedId)}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -194,7 +194,7 @@ export const updateTherapist = async (
 
     return true;
   } catch (error) {
-    console.error(' Error updating staff:', error);
+    console.error(' Error updating therapists:', error);
     return false;
   }
 };
