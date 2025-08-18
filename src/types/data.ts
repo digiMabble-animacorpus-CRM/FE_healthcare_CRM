@@ -618,3 +618,78 @@ export type ProfileCreatePayload = {
   branches?: (string | number)[];
   selected_branch?: string | number | null;
 };
+
+
+export type TeamMemberType = {
+  _key: number;
+  idPro: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website: string;
+  faq: string;
+  agendaLinks: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any | null;
+  tags?: any;
+  imageUrl?: string
+};
+
+export type TeamMemberCreatePayload = {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo?: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations?: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule?: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website?: string;
+  faq?: string;
+  agendaLinks?: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any[];
+  tags?: string[];
+  certificationFiles?: File[];
+  branches?: (string | number)[];
+  selected_branch?: string | number | null;
+};
