@@ -34,15 +34,15 @@ const schema: yup.ObjectSchema<Partial<PatientType>> = yup
     birthdate: yup.string().required('Please enter Date of birth'),
     street: yup.string().required('Please enter address'),
     note: yup.string().required('Please enter description'),
-    zipcode: yup.string(),
+    zipcode: yup.string().required('Please enter first name'),
     legalgender: yup.string().required('Please select gender'),
     language: yup.string().required('Please select language'),
     city: yup.string().required('Please select city'),
     country: yup.string().required('Please select country'),
     ssin: yup.string(),
-    status: yup.string(),
-    mutualitynumber: yup.string(),
-    mutualityregistrationnumber: yup.string(),
+    status: yup.string().required('Please select status'),
+    mutualitynumber: yup.string().required('Please select mutuality number'),
+    mutualityregistrationnumber: yup.string().required('Please select mutuality registration number'),
     branch: yup.string(),
     tags: yup.array().of(yup.string()).min(1, 'Please select at least one tag'),
   })
@@ -340,7 +340,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                 control={control}
                 name="mutualitynumber"
                 label="Mutuality Number"
-                placeholder="Enter Mutuality Number"
+                placeholder="Enter Mutuality Number"                                
               />
             </Col>
             <Col lg={6}>

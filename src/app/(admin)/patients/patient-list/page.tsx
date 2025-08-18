@@ -20,6 +20,7 @@ import {
   Modal,
   Row,
   Spinner,
+  Alert,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import '@/assets/scss/components/_edittogglebtn.scss';
@@ -39,6 +40,7 @@ const PatientsListPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const router = useRouter();
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   // Fetch all patients once
   const fetchPatients = async () => {
@@ -53,6 +55,13 @@ const PatientsListPage = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (showSuccessMessage) {
+      const timer = setTimeout(() => setShowSuccessMessage(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessMessage]);
 
   useEffect(() => {
     fetchPatients();
@@ -144,8 +153,9 @@ const PatientsListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedPatientId) return;
     try {
-      await fetch(`/api/patients/${selectedPatientId}`, { method: 'DELETE' });
+      await fetch(`http://164.92.220.65/api/v1/customers/${selectedPatientId}`, { method: 'DELETE' });
       setAllPatients(allPatients.filter((p) => p.id !== selectedPatientId));
+      setShowSuccessMessage(true);
     } catch (err) {
       console.error(err);
     } finally {
@@ -162,6 +172,24 @@ const PatientsListPage = () => {
   console.log(currentData);
   return (
     <>
+      {/* Success Alert Popup */}
+      {showSuccessMessage && (
+        <Alert
+          variant="success"
+          onClose={() => setShowSuccessMessage(false)}
+          dismissible
+          style={{
+            position: 'fixed',
+            top: 20,
+            right: 20,
+            zIndex: 1050,
+            minWidth: 200,
+          }}
+        >
+          Patient deleted successfully!
+        </Alert>
+      )}
+
       <PageTitle subName="Patient" title="Patient List" />
 
       <Row>
