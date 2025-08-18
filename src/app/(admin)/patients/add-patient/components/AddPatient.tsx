@@ -35,7 +35,10 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     lastname: yup.string().required('Please enter last name'),
     middlename: yup.string(),
     emails: yup.string().email('Invalid email').required('Please enter email'),
-    number: yup.string().matches(/^\d{10}$/, 'Enter valid 10-digit number').required('Please enter number'),
+    number: yup
+      .string()
+      .matches(/^\d{10}$/, 'Enter valid 10-digit number')
+      .required('Please enter number'),
     phones: yup.array().of(yup.string()),
     birthdate: yup.string().required('Please enter Date of birth'),
     street: yup.string().required('Please enter address'),

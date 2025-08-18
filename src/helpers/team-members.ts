@@ -81,14 +81,14 @@ export const getAllTeamMembers = async (
   }
 };
 
-export const getTeamMemberById = async (therapistId: any): Promise<TeamMemberType | null> => {
+export const getTeamMemberById = async (team_member_id: any): Promise<TeamMemberType | null> => {
   const token = localStorage.getItem('access_token');
   if (!token) {
     console.warn('No access token found.');
     return null;
   }
 
-  const url = `${API_BASE_PATH}/team-members/${therapistId}`;
+  const url = `${API_BASE_PATH}/team-members/${team_member_id}`;
   console.log('Requesting team members by ID:', url);
 
   try {
@@ -176,14 +176,17 @@ export const updateTeamMember = async (
     const encryptedId = encryptAES(String(id));
     const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(`${API_BASE_PATH}/team-members/${encodeURIComponent(encryptedId)}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${API_BASE_PATH}/team-members/${encodeURIComponent(encryptedId)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: encryptedPayload }),
       },
-      body: JSON.stringify({ data: encryptedPayload }),
-    });
+    );
 
     const result = await response.json();
 
@@ -201,36 +204,30 @@ export const updateTeamMember = async (
 
 export const transformToBackendDto = (formData: TeamMemberType): TeamMemberUpdatePayload => {
   return {
-    id: String(formData.idPro),
-    full_name: formData.fullName,
-    first_name: formData.firstName,
-    last_name: formData.lastName,
-    job_title: formData.jobTitle,
-    about_me: formData.aboutMe,
-    specializations: formData.specializations
-      ? formData.specializations.split('\n').map((s: string) => s.trim())
-      : [],
+    id: String(formData.team_id),
+    full_name: formData.full_name,
+    first_name: formData.first_name,
+    last_name: formData.last_name,
+    job_titles: [formData.job_1, formData.job_2, formData.job_3, formData.job_4].filter(Boolean), // only keep non-empty jobs
+    specific_audience: formData.specific_audience,
+    about_me: formData.who_am_i || formData.about,
+    specializations: [formData.specialization_1, ...formData.specializations].filter(Boolean),
+    consultations: formData.consultations,
     contact: {
-      email: formData.contactEmail,
-      phone: formData.contactPhone,
+      email: formData.contact_email,
+      phone: formData.contact_phone,
     },
     center: {
-      address: formData.centerAddress,
-      email: formData.centerEmail,
-      phone: formData.centerPhoneNumber,
+      address: formData.office_address,
     },
     schedule: formData.schedule,
     website: formData.website,
-    availability: formData.availability || null,
-    languages: formData.spokenLanguages
-      ? formData.spokenLanguages.split(',').map((lang: string) => lang.trim())
-      : [],
-    payment_methods: formData.paymentMethods
-      ? formData.paymentMethods.split(/\r?\n|,/).map((p: string) => p.trim())
-      : [],
-    agenda_links: formData.agendaLinks || null,
-    rosa_link: formData.rosaLink || null,
-    google_agenda_link: formData.googleAgendaLink || null,
+    languages: formData.languages_spoken,
+    payment_methods: formData.payment_methods,
+    diplomas_and_training: formData.diplomas_and_training,
+    faq: formData.frequently_asked_questions,
+    agenda_links: formData.calendar_links,
+    photo: formData.photo,
     updatedBy: [
       {
         staffId: String(localStorage.getItem('staff_id') || ''),

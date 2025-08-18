@@ -910,7 +910,8 @@ export const timelineData: TimelineType = {
     },
     {
       title: 'First release of Reback admin dashboard template',
-      description: 'Outdoor visit at Brussels State Route 85 with John Boltana & Harry Piterson regarding to setup a new show room.',
+      description:
+        'Outdoor visit at Brussels State Route 85 with John Boltana & Harry Piterson regarding to setup a new show room.',
     },
   ],
 };

@@ -94,7 +94,11 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
     }),
   ),
   tags: yup.array().of(yup.string()).min(1, 'Select at least one tag').required(),
-  certificationFiles: yup.array().of(yup.mixed<File>().required()).min(1, 'Upload at least one file').required(),
+  certificationFiles: yup
+    .array()
+    .of(yup.mixed<File>().required())
+    .min(1, 'Upload at least one file')
+    .required(),
 });
 
 interface Props {

@@ -48,7 +48,6 @@ export type PatientDetailsCardProps = {
   files?: any[];
 };
 
-
 const PatientDetails = ({
   id,
   name,
