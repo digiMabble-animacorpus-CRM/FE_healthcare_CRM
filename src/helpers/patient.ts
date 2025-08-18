@@ -135,8 +135,8 @@ export const createPatient = async (payload: any): Promise<boolean> => {
 
           const safePayload = {
         ...payload,
-        branches: (payload.branches || []).map((b: string | number) => Number(b)),
-        selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
+        // branches: (payload.branches || []).map((b: string | number) => Number(b)),
+        // selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
       };
 
     // // Build payload directly from form/input
@@ -168,7 +168,7 @@ export const createPatient = async (payload: any): Promise<boolean> => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(safePayload), // ✅ send plain payload
+      body: JSON.stringify(safePayload), //  send plain payload
     });
 
     const result = await response.json();
@@ -195,35 +195,36 @@ export const updatePatient = async (
 
     const safePayload = {
       ...payload,
-      branches: (payload.branches || []).map((b: string | number) => Number(b)),
-      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
-    const encryptedId = encryptAES(String(id));
-    const encryptedPayload = encryptAES(safePayload);
+  //  console.log("PATCH URL:", `${API_BASE_PATH}/customers/${id}`);
+   // console.log("PATCH BODY:", JSON.stringify(safePayload, null, 2));
 
-    const response = await fetch(`${API_BASE_PATH}/customers/${encodeURIComponent(encryptedId)}`, {
+    const response = await fetch(`${API_BASE_PATH}/customers/${id}`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: safePayload }),
+      body: JSON.stringify(safePayload), // ✅ send raw payload
     });
 
     const result = await response.json();
+   // console.log("Update response:", result);
 
     if (!response.ok || !result.status) {
-      console.error(' Update failed:', result.message || 'Unknown error');
+      console.error('Update failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error(' Error updating patient:', error);
+    console.error('Error updating patient:', error);
     return false;
   }
 };
+
+
 
 export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   return {
