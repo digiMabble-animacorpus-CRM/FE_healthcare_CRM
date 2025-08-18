@@ -126,18 +126,16 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
   }
 };
 
-
 export const createPatient = async (payload: any): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return false;
 
-
-          const safePayload = {
-        ...payload,
-        // branches: (payload.branches || []).map((b: string | number) => Number(b)),
-        // selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
-      };
+    const safePayload = {
+      ...payload,
+      // branches: (payload.branches || []).map((b: string | number) => Number(b)),
+      // selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
+    };
 
     // // Build payload directly from form/input
     // const safePayload = {
@@ -197,8 +195,8 @@ export const updatePatient = async (
       ...payload,
     };
 
-  //  console.log("PATCH URL:", `${API_BASE_PATH}/patients/${id}`);
-   // console.log("PATCH BODY:", JSON.stringify(safePayload, null, 2));
+    //  console.log("PATCH URL:", `${API_BASE_PATH}/patients/${id}`);
+    // console.log("PATCH BODY:", JSON.stringify(safePayload, null, 2));
 
     const response = await fetch(`${API_BASE_PATH}/patients/${id}`, {
       method: 'PATCH',
@@ -210,7 +208,7 @@ export const updatePatient = async (
     });
 
     const result = await response.json();
-   // console.log("Update response:", result);
+    // console.log("Update response:", result);
 
     if (!response.ok || !result.status) {
       console.error('Update failed:', result.message || 'Unknown error');
@@ -223,8 +221,6 @@ export const updatePatient = async (
     return false;
   }
 };
-
-
 
 export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   return {

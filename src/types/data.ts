@@ -309,7 +309,7 @@ export type TherapistType = {
   appointmentAlert?: string | null;
   availability?: any | null;
   tags?: any;
-  imageUrl?: string
+  imageUrl?: string;
 };
 
 export type TherapistCreatePayload = {
@@ -619,77 +619,64 @@ export type ProfileCreatePayload = {
   selected_branch?: string | number | null;
 };
 
-
 export type TeamMemberType = {
-  _key: number;
-  idPro: number;
-  firstName: string;
-  lastName: string;
-  fullName: string;
-  photo: string;
-  jobTitle: string;
-  targetAudience?: string | null;
-  specialization1?: string | null;
-  specialization2?: string | null;
-  aboutMe: string;
+  team_id: string;
+  last_name: string;
+  first_name: string;
+  full_name: string;
+  job_1: string;
+  specific_audience: string;
+  specialization_1: string;
+  job_2: string;
+  job_3: string;
+  job_4: string;
+  who_am_i: string;
   consultations: string;
-  centerAddress: string;
-  centerEmail: string;
-  centerPhoneNumber: string;
-  contactEmail: string;
-  contactPhone: string;
-  schedule: string;
-  about?: string | null;
-  spokenLanguages: string;
-  paymentMethods?: string;
-  degreesAndTraining: string;
-  specializations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: {
+    text: string;
+  };
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
   website: string;
-  faq: string;
-  agendaLinks: string | null;
-  rosaLink?: string | null;
-  googleAgendaLink?: string | null;
-  appointmentStart?: string | null;
-  appointmentEnd?: string | null;
-  appointmentAlert?: string | null;
-  availability?: any | null;
-  tags?: any;
-  imageUrl?: string
+  frequently_asked_questions: string;
+  calendar_links: string[];
+  photo: string;
 };
 
 export type TeamMemberCreatePayload = {
-  firstName: string;
-  lastName: string;
-  fullName: string;
-  photo?: string;
-  jobTitle: string;
-  targetAudience?: string | null;
-  specialization1?: string | null;
-  specialization2?: string | null;
-  aboutMe: string;
-  consultations?: string;
-  centerAddress: string;
-  centerEmail: string;
-  centerPhoneNumber: string;
-  contactEmail: string;
-  contactPhone: string;
-  schedule?: string;
-  about?: string | null;
-  spokenLanguages: string;
-  paymentMethods?: string;
-  degreesAndTraining: string;
-  specializations: string;
-  website?: string;
-  faq?: string;
-  agendaLinks?: string | null;
-  rosaLink?: string | null;
-  googleAgendaLink?: string | null;
-  appointmentStart?: string | null;
-  appointmentEnd?: string | null;
-  appointmentAlert?: string | null;
-  availability?: any[];
-  tags?: string[];
-  certificationFiles?: File[];
+  team_id: string;
+  last_name: string;
+  first_name: string;
+  full_name: string;
+  job_1: string;
+  specific_audience: string;
+  specialization_1: string;
+  job_2: string;
+  job_3: string;
+  job_4: string;
+  who_am_i: string;
+  consultations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: {
+    text: string;
+  };
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
+  website: string;
+  frequently_asked_questions: string;
+  calendar_links: string[];
+  photo: string;
   branches?: (string | number)[];
   selected_branch?: string | number | null;
 };

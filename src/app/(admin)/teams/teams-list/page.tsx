@@ -3,7 +3,7 @@
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useEffect, useState, useMemo } from 'react';
-import type { TherapistType } from '@/types/data';
+import type { TeamMemberType } from '@/types/data';
 import dayjs from 'dayjs';
 import {
   Button,
@@ -28,7 +28,7 @@ const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
 const TeamsListPage = () => {
-  const [allTeamMembers, setAllTeamMembers] = useState<TherapistType[]>([]);
+  const [allTeamMembers, setAllTeamMembers] = useState<TeamMemberType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -79,28 +79,19 @@ const TeamsListPage = () => {
     let data = [...allTeamMembers];
 
     if (selectedBranch) {
-      data = data.filter((t) => t.centerAddress?.includes(selectedBranch));
+      data = data.filter((t) => t.office_address?.includes(selectedBranch));
     }
 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       data = data.filter(
         (t) =>
-          (t.firstName?.toLowerCase().includes(term) ?? false) ||
-          (t.lastName?.toLowerCase().includes(term) ?? false) ||
-          (t.fullName?.toLowerCase().includes(term) ?? false) ||
-          (t.contactEmail?.toLowerCase().includes(term) ?? false) ||
-          (t.contactPhone?.toLowerCase().includes(term) ?? false),
+          (t.first_name?.toLowerCase().includes(term) ?? false) ||
+          (t.last_name?.toLowerCase().includes(term) ?? false) ||
+          (t.full_name?.toLowerCase().includes(term) ?? false) ||
+          (t.contact_email?.toLowerCase().includes(term) ?? false) ||
+          (t.contact_phone?.toLowerCase().includes(term) ?? false),
       );
-    }
-
-    const range = getDateRange();
-    if (range) {
-      data = data.filter((t) => {
-        if (!t.appointmentEnd) return false;
-        const created = dayjs(t.appointmentStart);
-        return created.isAfter(range.from) && created.isBefore(range.to);
-      });
     }
 
     return data;
@@ -113,7 +104,7 @@ const TeamsListPage = () => {
     return filteredTeamMembers.slice(start, start + PAGE_SIZE);
   }, [filteredTeamMembers, currentPage]);
 
-  const handleView = (id: number) => {
+  const handleView = (id: string) => {
     router.push(`/teams/details/${id}`);
   };
 
@@ -128,7 +119,7 @@ const TeamsListPage = () => {
     if (!selectedTherapistId) return;
     try {
       await fetch(`/api/team-members/${selectedTherapistId}`, { method: 'DELETE' });
-      setAllTeamMembers(allTeamMembers.filter((t) => t.idPro.toString() !== selectedTherapistId));
+      setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTherapistId));
     } catch (err) {
       console.error(err);
     } finally {
@@ -232,26 +223,26 @@ const TeamsListPage = () => {
                     </thead>
                     <tbody>
                       {currentData.map((item) => (
-                        <tr key={item._key}>
+                        <tr key={item.team_id}>
                           <td>
                             <input type="checkbox" />
                           </td>
                           <td>
-                            <img src={item.imageUrl} />
+                            <img src={item.photo} />
                           </td>
                           <td>
-                            {item.firstName} {item.lastName}
+                            {item.first_name} {item.last_name}
                           </td>
-                          <td>{item.contactEmail}</td>
-                          <td>{item.centerPhoneNumber}</td>
-                          <td>{item.centerAddress}</td>
-                          <td>{item.jobTitle}</td>
+                          <td>{item.contact_email}</td>
+                          <td>{item.contact_phone}</td>
+                          <td>{item.office_address}</td>
+                          <td>{item.job_1}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(item._key)}
+                                onClick={() => handleView(item.team_id)}
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
@@ -261,7 +252,7 @@ const TeamsListPage = () => {
                                 </DropdownToggle>
                                 <DropdownMenu>
                                   <DropdownItem
-                                    onClick={() => handleEditClick(item.idPro.toString())}
+                                    onClick={() => handleEditClick(item.team_id.toString())}
                                   >
                                     Edit
                                   </DropdownItem>
@@ -270,7 +261,7 @@ const TeamsListPage = () => {
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item.idPro.toString())}
+                                onClick={() => handleDeleteClick(item.team_id.toString())}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>
