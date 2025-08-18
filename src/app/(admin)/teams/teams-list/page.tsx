@@ -22,13 +22,13 @@ import {
   Spinner,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
-import { getAllTherapists, getTherapistById } from '@/helpers/therapist';
+import { getAllTeamMembers } from '@/helpers/team-members';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
 const TeamsListPage = () => {
-  const [allTherapists, setAllTherapists] = useState<TherapistType[]>([]);
+  const [allTeamMembers, setAllTeamMembers] = useState<TherapistType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -39,22 +39,22 @@ const TeamsListPage = () => {
 
   const router = useRouter();
 
-  const fetchTherapists = async () => {
+  const fetchTeamMembers = async () => {
     setLoading(true);
     try {
-      const response = await getAllTherapists(1, 10000); // fetch all
+      const response = await getAllTeamMembers(1, 10000); // fetch all
       console.log(response.data);
-      setAllTherapists(response.data || []);
+      setAllTeamMembers(response.data || []);
     } catch (err) {
-      console.error('Failed to fetch therapists', err);
-      setAllTherapists([]);
+      console.error('Failed to fetch team members', err);
+      setAllTeamMembers([]);
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    fetchTherapists();
+    fetchTeamMembers();
   }, []);
 
   const getDateRange = () => {
@@ -75,8 +75,8 @@ const TeamsListPage = () => {
     }
   };
 
-  const filteredTherapists = useMemo(() => {
-    let data = [...allTherapists];
+  const filteredTeamMembers = useMemo(() => {
+    let data = [...allTeamMembers];
 
     if (selectedBranch) {
       data = data.filter((t) => t.centerAddress?.includes(selectedBranch));
@@ -104,14 +104,14 @@ const TeamsListPage = () => {
     }
 
     return data;
-  }, [allTherapists, selectedBranch, searchTerm, dateFilter]);
+  }, [allTeamMembers, selectedBranch, searchTerm, dateFilter]);
 
-  const totalPages = Math.ceil(filteredTherapists.length / PAGE_SIZE);
+  const totalPages = Math.ceil(filteredTeamMembers.length / PAGE_SIZE);
 
   const currentData = useMemo(() => {
     const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredTherapists.slice(start, start + PAGE_SIZE);
-  }, [filteredTherapists, currentPage]);
+    return filteredTeamMembers.slice(start, start + PAGE_SIZE);
+  }, [filteredTeamMembers, currentPage]);
 
   const handleView = (id: number) => {
     router.push(`/teams/details/${id}`);
@@ -127,8 +127,8 @@ const TeamsListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedTherapistId) return;
     try {
-      await fetch(`/api/therapists/${selectedTherapistId}`, { method: 'DELETE' });
-      setAllTherapists(allTherapists.filter((t) => t.idPro.toString() !== selectedTherapistId));
+      await fetch(`/api/team-members/${selectedTherapistId}`, { method: 'DELETE' });
+      setAllTeamMembers(allTeamMembers.filter((t) => t.idPro.toString() !== selectedTherapistId));
     } catch (err) {
       console.error(err);
     } finally {
