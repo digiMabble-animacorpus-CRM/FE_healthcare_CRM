@@ -1,7 +1,7 @@
 'use client';
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import ReactApexChart from 'react-apexcharts';
+import dynamic from 'next/dynamic';
 import {
   Card,
   CardBody,
@@ -15,6 +15,11 @@ import {
   ProgressBar,
   Row,
 } from 'react-bootstrap';
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
+
 
 type Demographics = {
   gender: { male: number; female: number; other: number };

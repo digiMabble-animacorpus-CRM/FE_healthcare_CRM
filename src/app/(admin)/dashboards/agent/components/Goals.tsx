@@ -1,10 +1,15 @@
 'use client';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import Link from 'next/link';
-import ReactApexChart from 'react-apexcharts';
 import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 import { goalsOptions } from '../data';
 import { currency } from '@/context/constants';
+import dynamic from 'next/dynamic';
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
+
 
 const Goals = () => {
   return (
