@@ -20,11 +20,11 @@ import {
   Modal,
   Row,
   Spinner,
+  Alert,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import '@/assets/scss/components/_edittogglebtn.scss';
-import { getAllPatient, getPatientById } from '@/helpers/patient';
-import { API_BASE_PATH } from '@/context/constants';
+import { getAllPatient, deletePatient } from '@/helpers/patient';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
@@ -38,13 +38,14 @@ const PatientsListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const router = useRouter();
 
-  // Fetch all patients once
+  // Fetch patients
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      const response = await getAllPatient(1, 10000); // fetch all records
+      const response = await getAllPatient(1, 10000);
       setAllPatients(response.data || []);
     } catch (err) {
       console.error('Failed to fetch patients', err);
@@ -57,6 +58,13 @@ const PatientsListPage = () => {
   useEffect(() => {
     fetchPatients();
   }, []);
+
+  useEffect(() => {
+    if (showSuccessMessage) {
+      const timer = setTimeout(() => setShowSuccessMessage(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessMessage]);
 
   const getDateRange = () => {
     const now = dayjs();
@@ -76,28 +84,23 @@ const PatientsListPage = () => {
     }
   };
 
-  // Apply frontend filters
   const filteredPatients = useMemo(() => {
     let data = [...allPatients];
 
-    // Branch filter
     if (selectedBranch) {
       data = data.filter((p) => p.city === selectedBranch);
     }
 
-    // Search filter
     if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      data = data.filter(
-        (p) =>
-          p?.firstname.toLowerCase().includes(term) ||
-          p?.lastname.toLowerCase().includes(term) ||
-          (p.emails && p.emails.toLowerCase().includes(term)) ||
-          (p.phones && p.phones.join(' ').toLowerCase().includes(term)),
+      const term = searchTerm.trim().toLowerCase();
+      data = data.filter((p) =>
+        (p?.firstname ?? '').toLowerCase().includes(term) ||
+        (p?.lastname ?? '').toLowerCase().includes(term) ||
+        (p?.emails ?? '').toLowerCase().includes(term) ||
+        (p?.phones ? p.phones.join(' ').toLowerCase() : '').includes(term)
       );
     }
 
-    // Date filter
     const range = getDateRange();
     if (range) {
       data = data.filter((p) => {
@@ -132,22 +135,26 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = (id: any) => {
-    router.push(`/patients/details/${id}`);
-  };
-
-  const handleEditClick = (id: any) => router.push(`/patients/edit-patient/${id}`);
-  const handleDeleteClick = (id: any) => {
+  const handleView = (id: string) => router.push(`/patients/details/${id}`);
+  const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
+  const handleDeleteClick = (id: string) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
   };
+
   const handleConfirmDelete = async () => {
     if (!selectedPatientId) return;
+
     try {
-      await fetch(`/api/patients/${selectedPatientId}`, { method: 'DELETE' });
-      setAllPatients(allPatients.filter((p) => p.id !== selectedPatientId));
+      const success = await deletePatient(selectedPatientId);
+      if (success) {
+        setAllPatients((prev) => prev.filter((p) => p.id !== selectedPatientId));
+        setShowSuccessMessage(true);
+      } else {
+        console.error('Failed to delete patient');
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Delete error:', err);
     } finally {
       setShowDeleteModal(false);
       setSelectedPatientId(null);
@@ -159,9 +166,19 @@ const PatientsListPage = () => {
     setCurrentPage(page);
   };
 
-  console.log(currentData);
   return (
     <>
+      {showSuccessMessage && (
+        <Alert
+          variant="success"
+          onClose={() => setShowSuccessMessage(false)}
+          dismissible
+          style={{ position: 'fixed', top: 20, right: 20, zIndex: 1050, minWidth: 200 }}
+        >
+          Patient deleted successfully!
+        </Alert>
+      )}
+
       <PageTitle subName="Patient" title="Patient List" />
 
       <Row>
@@ -291,8 +308,12 @@ const PatientsListPage = () => {
                           <td>
                             {item.firstname} {item.lastname}
                           </td>
-                          <td>{item.emails}</td>
-                          <td>{item.phones}</td>
+                          <td>{item.emails ?? ''}</td>
+                          <td>
+                            {Array.isArray(item.phones)
+                              ? item.phones.join(', ')
+                              : item.phones || ''}
+                          </td>
                           <td>
                             {calculateAge(item.birthdate)}
                             {item.legalgender ? ` yrs | ${formatGender(item.legalgender)}` : ' yrs'}
@@ -374,6 +395,7 @@ const PatientsListPage = () => {
         </Col>
       </Row>
 
+      {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>

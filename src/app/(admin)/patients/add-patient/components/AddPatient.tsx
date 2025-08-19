@@ -35,23 +35,27 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     lastname: yup.string().required('Please enter last name'),
     middlename: yup.string(),
     emails: yup.string().email('Invalid email').required('Please enter email'),
-    number: yup
+   phones: yup
+  .array()
+  .of(
+    yup
       .string()
       .matches(/^\d{10}$/, 'Enter valid 10-digit number')
-      .required('Please enter number'),
-    phones: yup.array().of(yup.string()),
+  )
+  .min(1, 'Please provide at least one phone number'),
+
     birthdate: yup.string().required('Please enter Date of birth'),
     street: yup.string().required('Please enter address'),
     note: yup.string().required('Please enter description'),
-    zipcode: yup.string(),
+    zipcode: yup.string().required('Please enter Zipcode'),
     legalgender: yup.string().required('Please select gender'),
     language: yup.string().required('Please select language'),
     city: yup.string().required('Please select city'),
     country: yup.string().required('Please select country'),
     ssin: yup.string(),
-    status: yup.string(),
-    mutualitynumber: yup.string(),
-    mutualityregistrationnumber: yup.string(),
+    status: yup.string().required('Please select status'),
+    mutualitynumber: yup.string().required('Please enter mutuality number'),
+    mutualityregistrationnumber: yup.string().required('Please enter mutuality registration number'),
     branch: yup.string(),
     tags: yup.array().of(yup.string().required()).min(1, 'Please select at least one tag'),
   })
@@ -79,7 +83,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     mutualitynumber: '',
     mutualityregistrationnumber: '',
     note: '',
-    number: '',
     phones: [''],
     primarypatientrecordid: '',
     ssin: '',
@@ -96,7 +99,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     handleSubmit,
     control,
     reset,
-    setValue,
     formState: { errors },
   } = useForm<Partial<PatientType>>({
     resolver: yupResolver(schema),
@@ -109,22 +111,12 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       setLoading(true);
       getPatientById(params.id)
         .then((response) => {
-          console.log(response);
-          const patient: PatientType = response; // directly use data as object
-
+          const patient: PatientType = response;
           if (patient) {
-            console.log(patient);
-
-            // Map API response properly for form
             const mappedPatient: Partial<PatientType> = {
               ...patient,
-              number: patient.number || (patient.phones?.[0] ?? ''),
-              street: patient.street || '',
-              middlename: patient.middlename || '',
-              note: patient.note || '',
-              emails: patient.emails || '',
+              phones: patient.phones?.length ? patient.phones : [''],
             };
-
             setDefaultValues(mappedPatient);
             reset(mappedPatient);
           }
@@ -135,8 +127,14 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   }, [isEditMode, params?.id, reset]);
 
   const onSubmit = async (data: Partial<PatientType>) => {
+    // only phones array, no number field
+    const payload = {
+      ...data,
+      phones: data.phones?.filter((p) => p.trim() !== '') ?? [],
+    };
+
     if (isEditMode && params?.id) {
-      const success = await updatePatient(params.id, data as any);
+      const success = await updatePatient(params.id, payload as any);
       if (success) {
         alert('Patient updated successfully');
         router.back();
@@ -144,10 +142,10 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
         alert('Failed to update patient');
       }
     } else {
-      const success = await createPatient(data as any);
+      const success = await createPatient(payload as any);
       if (success) {
         alert('Patient created successfully');
-        reset(); // clear the form
+        reset();
       } else {
         alert('Failed to create patient');
       }
@@ -201,19 +199,26 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                 placeholder="Enter Email"
               />
             </Col>
+
+            {/* Phones */}
             <Col lg={6}>
               <TextFormInput
                 control={control}
-                name="number"
+                name={`phones.0`}
                 label="Phone Number"
                 placeholder="Enter Phone Number"
                 type="number"
               />
+              {errors.phones && (
+                <small className="text-danger">{(errors.phones as any)?.[0]?.message}</small>
+              )}
             </Col>
+
             <Col lg={6}>
               <TextFormInput control={control} name="birthdate" label="Date of Birth" type="date" />
             </Col>
 
+            {/* Gender */}
             <Col lg={6}>
               <label className="form-label">Gender</label>
               <Controller
@@ -235,6 +240,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               )}
             </Col>
 
+            {/* Language */}
             <Col lg={6}>
               <label className="form-label">Language</label>
               <Controller
@@ -285,6 +291,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               />
             </Col>
 
+            {/* City */}
             <Col lg={4}>
               <label className="form-label">City</label>
               <Controller
@@ -304,6 +311,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               {errors.city && <small className="text-danger">{errors.city.message}</small>}
             </Col>
 
+            {/* Country */}
             <Col lg={4}>
               <label className="form-label">Country</label>
               <Controller
@@ -327,6 +335,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput control={control} name="ssin" label="SSIN" placeholder="Enter SSIN" />
             </Col>
 
+            {/* Status */}
             <Col lg={6}>
               <label className="form-label">Status</label>
               <Controller
@@ -342,6 +351,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
+              {errors.status && <small className="text-danger">{errors.status.message}</small>}
             </Col>
 
             <Col lg={6}>
