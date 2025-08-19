@@ -39,25 +39,6 @@ export const MENU_ITEMS: MenuItemType[] = [
       },
     ],
   },
-  // {
-  //   key: 'staffs',
-  //   label: 'Staffs',
-  //   icon: 'ri:contacts-book-3-line',
-  //   children: [
-  //     {
-  //       key: 'staffs-list',
-  //       label: 'Staffs List',
-  //       url: '/staffs/staffs-list',
-  //       parentKey: 'staffs',
-  //     },
-  //     {
-  //       key: 'staffs-form',
-  //       label: 'Add Staff',
-  //       url: '/staffs/staffs-form/create',
-  //       parentKey: 'staffs',
-  //     },
-  //   ],
-  // },
   {
     key: 'patients',
     label: 'Patient',
