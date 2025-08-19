@@ -144,9 +144,9 @@ const TherapistsListPage = () => {
 
   const getPhotoUrl = (photo: string) => {
     // Regex to extract URL from markdown style "filename (url)"
-    const match = photo.match(/\((https?:\/\/[^\s)]+)\)/);
+  const match = photo.match(/\((https?:\/\/[^\s)]+)\)/);
     return match ? match[1] : '';
-  };
+};
 
   return (
     <>
