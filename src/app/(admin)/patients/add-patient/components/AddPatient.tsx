@@ -154,206 +154,213 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">{isEditMode ? 'Edit Patient' : 'Add Patient'}</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <Row>
-            <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="firstname"
-                label="First Name"
-                placeholder="Enter First Name"
-              />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="lastname"
-                label="Last Name"
-                placeholder="Enter Last Name"
-              />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="middlename"
-                label="Middle Name"
-                placeholder="Enter Middle Name"
-              />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="emails"
-                label="Email"
-                placeholder="Enter Email"
-              />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="number"
-                label="Phone Number"
-                placeholder="Enter Phone Number"
-                type="number"
-              />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput control={control} name="birthdate" label="Date of Birth" type="date" />
-            </Col>
+     <Card>
+  <CardHeader>
+    <CardTitle as="h4">{isEditMode ? 'Edit Patient' : 'Add Patient'}</CardTitle>
+  </CardHeader>
+  <CardBody>
+    <Row>
+      <Col lg={6}>
+        <TextFormInput
+          control={control}
+          name="firstname"
+          label="First Name"
+          placeholder="Enter First Name"
+        />
+      </Col>
+      <Col lg={6}>
+        <TextFormInput
+          control={control}
+          name="lastname"
+          label="Last Name"
+          placeholder="Enter Last Name"
+        />
+      </Col>
+      <Col lg={6}>
+        <TextFormInput
+          control={control}
+          name="middlename"
+          label="Middle Name"
+          placeholder="Enter Middle Name"
+        />
+      </Col>
+      <Col lg={6}>
+        <TextFormInput
+          control={control}
+          name="emails"
+          label="Email"
+          placeholder="Enter Email"
+        />
+      </Col>
+      <Col lg={6}>
+        <TextFormInput
+          control={control}
+          name="number"
+          label="Phone Number"
+          placeholder="Enter Phone Number"
+          type="number"
+        />
+      </Col>
+      <Col lg={6}>
+        <TextFormInput control={control} name="birthdate" label="Date of Birth" type="date" />
+      </Col>
 
-            <Col lg={6}>
-              <label className="form-label">Gender</label>
-              <Controller
-                control={control}
-                name="legalgender"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select Gender
-                    </option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                    <option value="others">Others</option>
-                  </ChoicesFormInput>
-                )}
-              />
-              {errors.legalgender && (
-                <small className="text-danger">{errors.legalgender.message}</small>
-              )}
-            </Col>
+      {/* Gender */}
+      <Col lg={6}>
+        <label className="form-label">Gender</label>
+        <Controller
+          control={control}
+          name="legalgender"
+          render={({ field }) => (
+            <ChoicesFormInput className="form-control" {...field}>
+              <option value="" disabled hidden>
+                Select Gender
+              </option>
+              <option value="male">Male</option>
+              <option value="female">Female</option>
+              <option value="others">Others</option>
+            </ChoicesFormInput>
+          )}
+        />
+        {errors.legalgender && (
+          <small className="text-danger">{errors.legalgender.message}</small>
+        )}
+      </Col>
 
-            <Col lg={6}>
-              <label className="form-label">Language</label>
-              <Controller
-                control={control}
-                name="language"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select Language
-                    </option>
-                    {allLanguages.map((lang) => (
-                      <option key={lang.key} value={lang.key}>
-                        {lang.label}
-                      </option>
-                    ))}
-                  </ChoicesFormInput>
-                )}
-              />
-              {errors.language && <small className="text-danger">{errors.language.message}</small>}
-            </Col>
+      {/* Language */}
+      <Col lg={6}>
+        <label className="form-label">Language</label>
+        <Controller
+          control={control}
+          name="language"
+          render={({ field }) => (
+            <ChoicesFormInput className="form-control" {...field}>
+              <option value="" disabled hidden>
+                Select Language
+              </option>
+              {allLanguages.map((lang) => (
+                <option key={lang.key} value={lang.key}>
+                  {lang.label}
+                </option>
+              ))}
+            </ChoicesFormInput>
+          )}
+        />
+        {errors.language && <small className="text-danger">{errors.language.message}</small>}
+      </Col>
 
-            <Col lg={6}>
-              <TextAreaFormInput
-                control={control}
-                name="street"
-                label="Address"
-                placeholder="Enter Address"
-                rows={3}
-              />
-            </Col>
-            <Col lg={6}>
-              <TextAreaFormInput
-                control={control}
-                name="note"
-                label="Description"
-                placeholder="Enter Description"
-                rows={3}
-              />
-            </Col>
+      <Col lg={6}>
+        <TextAreaFormInput
+          control={control}
+          name="street"
+          label="Address"
+          placeholder="Enter Address"
+          rows={3}
+        />
+      </Col>
+      <Col lg={6}>
+        <TextAreaFormInput
+          control={control}
+          name="note"
+          label="Description"
+          placeholder="Enter Description"
+          rows={3}
+        />
+      </Col>
 
-            <Col lg={4}>
-              <TextFormInput
-                control={control}
-                name="zipcode"
-                label="Zip-Code"
-                placeholder="Enter Zip-Code"
-                type="number"
-              />
-            </Col>
+      <Col lg={4}>
+        <TextFormInput
+          control={control}
+          name="zipcode"
+          label="Zip-Code"
+          placeholder="Enter Zip-Code"
+          type="number"
+        />
+      </Col>
 
-            <Col lg={4}>
-              <label className="form-label">City</label>
-              <Controller
-                control={control}
-                name="city"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select City
-                    </option>
-                    <option value="London">London</option>
-                    <option value="Paris">Paris</option>
-                    <option value="New York">New York</option>
-                  </ChoicesFormInput>
-                )}
-              />
-              {errors.city && <small className="text-danger">{errors.city.message}</small>}
-            </Col>
+      {/* City */}
+      <Col lg={4}>
+        <label className="form-label">City</label>
+        <Controller
+          control={control}
+          name="city"
+          render={({ field }) => (
+            <ChoicesFormInput className="form-control" {...field}>
+              <option value="" disabled hidden>
+                Select City
+              </option>
+              <option value="London">London</option>
+              <option value="Paris">Paris</option>
+              <option value="New York">New York</option>
+            </ChoicesFormInput>
+          )}
+        />
+        {errors.city && <small className="text-danger">{errors.city.message}</small>}
+      </Col>
 
-            <Col lg={4}>
-              <label className="form-label">Country</label>
-              <Controller
-                control={control}
-                name="country"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select Country
-                    </option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="FR">France</option>
-                    <option value="IN">India</option>
-                  </ChoicesFormInput>
-                )}
-              />
-              {errors.country && <small className="text-danger">{errors.country.message}</small>}
-            </Col>
+      {/* Country */}
+      <Col lg={4}>
+        <label className="form-label">Country</label>
+        <Controller
+          control={control}
+          name="country"
+          render={({ field }) => (
+            <ChoicesFormInput className="form-control" {...field}>
+              <option value="" disabled hidden>
+                Select Country
+              </option>
+              <option value="UK">United Kingdom</option>
+              <option value="FR">France</option>
+              <option value="IN">India</option>
+            </ChoicesFormInput>
+          )}
+        />
+        {errors.country && <small className="text-danger">{errors.country.message}</small>}
+      </Col>
 
-            <Col lg={6}>
-              <TextFormInput control={control} name="ssin" label="SSIN" placeholder="Enter SSIN" />
-            </Col>
+      <Col lg={6}>
+        <TextFormInput control={control} name="ssin" label="SSIN" placeholder="Enter SSIN" />
+      </Col>
 
-            <Col lg={6}>
-              <label className="form-label">Status</label>
-              <Controller
-                control={control}
-                name="status"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select Status
-                    </option>
-                    <option value="ACTIVE">Active</option>
-                    <option value="INACTIVE">Inactive</option>
-                  </ChoicesFormInput>
-                )}
-              />
-            </Col>
+      {/* Status */}
+      <Col lg={6}>
+        <label className="form-label">Status</label>
+        <Controller
+          control={control}
+          name="status"
+          render={({ field }) => (
+            <ChoicesFormInput className="form-control" {...field}>
+              <option value="" disabled hidden>
+                Select Status
+              </option>
+              <option value="ACTIVE">Active</option>
+              <option value="INACTIVE">Inactive</option>
+            </ChoicesFormInput>
+          )}
+        />
+        {errors.status && <small className="text-danger">{errors.status.message}</small>}
+      </Col>
 
-            <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="mutualitynumber"
-                label="Mutuality Number"
-                placeholder="Enter Mutuality Number"                                
-              />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput
-                control={control}
-                name="mutualityregistrationnumber"
-                label="Mutuality Registration Number"
-                placeholder="Enter Mutuality Registration Number"
-              />
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
+      <Col lg={6}>
+        <TextFormInput
+          control={control}
+          name="mutualitynumber"
+          label="Mutuality Number"
+          placeholder="Enter Mutuality Number"                                
+        />
+      </Col>
+      <Col lg={6}>
+        <TextFormInput
+          control={control}
+          name="mutualityregistrationnumber"
+          label="Mutuality Registration Number"
+          placeholder="Enter Mutuality Registration Number"
+        />
+      </Col>
+    </Row>
+  </CardBody>
+</Card>
+
 
       <div className="mb-3 rounded">
         <Row className="justify-content-end g-2 mt-2">
