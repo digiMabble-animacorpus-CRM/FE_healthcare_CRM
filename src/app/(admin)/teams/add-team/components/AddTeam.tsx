@@ -1,17 +1,15 @@
 'use client';
-
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
-
 import TextFormInput from '@/components/from/TextFormInput';
 import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
 import DropzoneFormInput from '@/components/from/DropzoneFormInput';
-import { getTherapistById, createTherapist, updateTherapist } from '@/helpers/therapist';
+import { getTherapistById } from '@/helpers/therapist';
 
 const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -25,7 +23,7 @@ type TherapistFormValues = {
   firstName: string;
   lastName: string;
   fullName: string;
-  photo?: string; // optional
+  photo?: string;
   jobTitle: string;
   targetAudience?: string | null;
   specialization1?: string | null;
@@ -52,7 +50,7 @@ type TherapistFormValues = {
   appointmentEnd?: string | null;
   appointmentAlert?: string | null;
   availability?: AvailabilitySlot[];
-  tags?: any[];
+  tags?: string[];
   certificationFiles: File[];
 };
 
@@ -60,7 +58,7 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
   firstName: yup.string().required('First name required'),
   lastName: yup.string().required('Last name required'),
   fullName: yup.string().required('Full name required'),
-  photo: yup.string().optional(), // optional matches type
+  photo: yup.string().optional(),
   jobTitle: yup.string().required('Job title required'),
   targetAudience: yup.string().nullable().optional(),
   specialization1: yup.string().nullable().optional(),
@@ -93,19 +91,15 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
       to: yup.string().required('End time is required'),
     }),
   ),
-  tags: yup.array().of(yup.string()).min(1, 'Select at least one tag').required(),
-  certificationFiles: yup
-    .array()
-    .of(yup.mixed<File>().required())
-    .min(1, 'Upload at least one file')
-    .required(),
+  tags: yup.array().of(yup.string().required()).min(1, 'Select at least one tag').required(),
+  certificationFiles: yup.array().of(yup.mixed<File>().required()).min(1, 'Upload at least one file').required(),
 });
 
 interface Props {
   params?: { id?: string };
 }
 
-const AddTherapist = ({ params }: Props) => {
+const AddTeam = ({ params }: Props) => {
   const router = useRouter();
   const isEditMode = !!params?.id;
   const [loading, setLoading] = useState<boolean>(isEditMode);
@@ -148,12 +142,8 @@ const AddTherapist = ({ params }: Props) => {
     },
   });
 
-  const { control, handleSubmit, reset, formState } = methods;
-  const {
-    fields: availabilityFields,
-    append,
-    remove,
-  } = useFieldArray({
+  const { control, handleSubmit, reset } = methods;
+  const { fields: availabilityFields, append, remove } = useFieldArray({
     control,
     name: 'availability',
   });
@@ -162,17 +152,44 @@ const AddTherapist = ({ params }: Props) => {
     if (isEditMode && params?.id) {
       setLoading(true);
       getTherapistById(params.id)
-        .then((response) => {
-          const data = response; // assume response is the object
+        .then((data) => {
           if (data) {
-            // map API response to form values
-            const mapped: TherapistFormValues = {
-              ...data,
-              tags: data.tags || [],
-              certificationFiles: [],
+            reset({
+              firstName: data.first_name || '',
+              lastName: data.last_name || '',
+              fullName: data.full_name || '',
+              photo: data.photo || '',
+              jobTitle: data.job_1 || '',
+              targetAudience: data.specific_audience || '',
+              specialization1: data.specialization_1 || '',
+              specialization2: data.job_2 || '',
+              aboutMe: data.who_am_i || '',
+              consultations: data.consultations || '',
+              centerAddress: data.office_address || '',
+              centerEmail: data.center_email || data.contact_email || '',
+              centerPhoneNumber: data.center_phone_number || '',
+              contactEmail: data.contact_email || '',
+              contactPhone: data.contact_phone || '',
+              schedule: typeof data.schedule === 'object'
+                ? Object.entries(data.schedule).map(([day, hours]) => `${day.charAt(0).toUpperCase() + day.slice(1)}: ${hours}`).join(', ')
+                : '',
+              about: data.about || '',
+              spokenLanguages: Array.isArray(data.languages_spoken) ? data.languages_spoken.join(', ') : '',
+              paymentMethods: Array.isArray(data.payment_methods) ? data.payment_methods.join(', ') : '',
+              degreesAndTraining: Array.isArray(data.diplomas_and_training) ? data.diplomas_and_training.join(', ') : '',
+              specializations: Array.isArray(data.specializations) ? data.specializations.join(', ') : '',
+              website: data.website || '',
+              faq: data.frequently_asked_questions ? JSON.stringify(data.frequently_asked_questions, null, 2) : '',
+              agendaLinks: Array.isArray(data.calendar_links) ? data.calendar_links.join(', ') : '',
+              rosaLink: data.rosaLink || '',
+              googleAgendaLink: data.googleAgendaLink || '',
+              appointmentStart: data.appointmentStart || '',
+              appointmentEnd: data.appointmentEnd || '',
+              appointmentAlert: data.appointmentAlert || '',
               availability: data.availability || [],
-            };
-            reset(mapped);
+              tags: Array.isArray(data.tags) ? data.tags : [],
+              certificationFiles: [],
+            });
           }
         })
         .catch(console.error)
@@ -180,21 +197,115 @@ const AddTherapist = ({ params }: Props) => {
     }
   }, [isEditMode, params?.id, reset]);
 
+  const parseDelimitedString = (input: string | undefined) =>
+    input?.split(',').map((v) => v.trim()).filter(Boolean) || [];
+
+  const parseFAQ = (input: string) => {
+    try {
+      return JSON.parse(input);
+    } catch {
+      return {};
+    }
+  };
+
+  const parseSchedule = (input: string) => {
+    const obj: Record<string, string> = {};
+    input.split(',').forEach((segment) => {
+      const [day, time] = segment.split(':').map((s) => s.trim());
+      if (day && time) {
+        obj[day.toLowerCase()] = time;
+      }
+    });
+    return obj;
+  };
+
   const onSubmit = async (data: TherapistFormValues) => {
     try {
-      if (isEditMode && params?.id) {
-        const success = await updateTherapist(params.id, data);
-        if (success) alert('Therapist updated successfully');
-      } else {
-        const success = await createTherapist(data);
-        if (success) {
-          alert('Therapist created successfully');
-          reset();
+      setLoading(true);
+
+      // Upload certification files first
+      let certificationFileUrls: string[] = [];
+      if (data.certificationFiles && data.certificationFiles.length > 0) {
+        const formData = new FormData();
+        data.certificationFiles.forEach((file) => {
+          formData.append('certificationFiles', file);
+        });
+
+        const fileRes = await fetch('http://localhost:8080/api/v1/team-members/certifications', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!fileRes.ok) {
+          throw new Error('File upload failed');
         }
+        const fileUploadResponse = await fileRes.json();
+        certificationFileUrls = fileUploadResponse.files || [];
       }
-    } catch (error) {
-      console.error('Submit error:', error);
-      alert('Operation failed');
+
+      // Prepare payload
+      const payload: any = {
+        last_name: data.lastName,
+        first_name: data.firstName,
+        full_name: data.fullName,
+        job_1: data.jobTitle,
+        specific_audience: data.targetAudience || undefined,
+        specialization_1: data.specialization1 || undefined,
+        job_2: data.specialization2 || undefined,
+        who_am_i: data.aboutMe,
+        consultations: data.consultations,
+        office_address: data.centerAddress,
+        center_email: data.centerEmail,
+        center_phone_number: data.centerPhoneNumber,
+        contact_email: data.contactEmail,
+        contact_phone: data.contactPhone,
+        schedule: parseSchedule(data.schedule),
+        about: data.about || undefined,
+        languages_spoken: parseDelimitedString(data.spokenLanguages),
+        payment_methods: parseDelimitedString(data.paymentMethods),
+        diplomas_and_training: parseDelimitedString(data.degreesAndTraining),
+        specializations: parseDelimitedString(data.specializations),
+        website: data.website,
+        frequently_asked_questions: parseFAQ(data.faq),
+        calendar_links: parseDelimitedString(data.agendaLinks ?? undefined),
+        photo: data.photo || undefined,
+        rosaLink: data.rosaLink || undefined,
+        googleAgendaLink: data.googleAgendaLink || undefined,
+        appointmentStart: data.appointmentStart || undefined,
+        appointmentEnd: data.appointmentEnd || undefined,
+        appointmentAlert: data.appointmentAlert || undefined,
+        availability: data.availability || [],
+        tags: data.tags || [],
+        certificationFiles: certificationFileUrls,
+      };
+
+      // Choose method and endpoint based on mode
+      const url = isEditMode
+        ? `http://localhost:8080/api/v1/team-members/${params?.id}`
+        : 'http://localhost:8080/api/v1/team-members';
+      const method = isEditMode ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errMsg = await response.text();
+        throw new Error(errMsg || 'Failed to submit');
+      }
+
+      alert(`Therapist ${isEditMode ? 'updated' : 'created'} successfully`);
+      reset();
+      router.back();
+    } catch (error: any) {
+      console.error(error);
+      alert(`Submit error: ${error.message || 'Unknown error'}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -228,7 +339,6 @@ const AddTherapist = ({ params }: Props) => {
             </Row>
           </CardBody>
         </Card>
-
         {/* Contact Info Card */}
         <Card>
           <CardHeader>
@@ -252,12 +362,11 @@ const AddTherapist = ({ params }: Props) => {
                 <TextFormInput control={control} name="contactPhone" label="Contact Phone" />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="spokenLanguages" label="Spoken Languages" />
+                <TextFormInput control={control} name="spokenLanguages" label="Spoken Languages (comma separated)" />
               </Col>
             </Row>
           </CardBody>
         </Card>
-
         {/* Tags Card */}
         <Card>
           <CardHeader>
@@ -279,7 +388,6 @@ const AddTherapist = ({ params }: Props) => {
             />
           </CardBody>
         </Card>
-
         {/* Availability Card */}
         <Card>
           <CardHeader>
@@ -310,18 +418,14 @@ const AddTherapist = ({ params }: Props) => {
                   <Controller
                     control={control}
                     name={`availability.${index}.from`}
-                    render={({ field }) => (
-                      <input type="time" className="form-control" {...field} />
-                    )}
+                    render={({ field }) => <input type="time" className="form-control" {...field} />}
                   />
                 </Col>
                 <Col lg={3}>
                   <Controller
                     control={control}
                     name={`availability.${index}.to`}
-                    render={({ field }) => (
-                      <input type="time" className="form-control" {...field} />
-                    )}
+                    render={({ field }) => <input type="time" className="form-control" {...field} />}
                   />
                 </Col>
                 <Col lg={2}>
@@ -336,7 +440,6 @@ const AddTherapist = ({ params }: Props) => {
             </Button>
           </CardBody>
         </Card>
-
         {/* Certification Files */}
         <Card>
           <CardHeader>
@@ -357,7 +460,6 @@ const AddTherapist = ({ params }: Props) => {
             />
           </CardBody>
         </Card>
-
         <div className="mb-3 rounded">
           <Row className="justify-content-end g-2 mt-2">
             <Col lg={2}>
@@ -375,6 +477,3 @@ const AddTherapist = ({ params }: Props) => {
       </form>
     </FormProvider>
   );
-};
-
-export default AddTherapist;
