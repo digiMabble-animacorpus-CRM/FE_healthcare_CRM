@@ -1,7 +1,7 @@
 'use client';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { ApexOptions } from 'apexcharts';
-import ReactApexChart from 'react-apexcharts';
+import dynamic from 'next/dynamic';
 import {
   Card,
   CardBody,
@@ -15,6 +15,10 @@ import {
   DropdownToggle,
   Row,
 } from 'react-bootstrap';
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
 
 const WeeklyInquiry = () => {
   const WeeklyInquiryOptions: ApexOptions = {

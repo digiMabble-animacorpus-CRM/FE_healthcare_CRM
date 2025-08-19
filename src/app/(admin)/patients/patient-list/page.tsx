@@ -135,9 +135,9 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = (id: string) => router.push(`/patients/details/${id}`);
-  const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
-  const handleDeleteClick = (id: string) => {
+  const handleView = (id: any) => router.push(`/patients/details/${id}`);
+  const handleEditClick = (id: any) => router.push(`/patients/edit-patient/${id}`);
+  const handleDeleteClick = (id: any) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
   };
@@ -328,7 +328,7 @@ const PatientsListPage = () => {
                           </td>
                           <td>
                             <div className="d-flex gap-2">
-                              <Button variant="light" size="sm" onClick={() => handleView(item.id)}>
+                              <Button variant="light" size="sm" onClick={() => handleView(item?.id)}>
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Dropdown>
@@ -344,7 +344,7 @@ const PatientsListPage = () => {
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item.id)}
+                                onClick={() => handleDeleteClick(item?.id)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>

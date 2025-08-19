@@ -6,8 +6,12 @@ import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import ReactApexChart from 'react-apexcharts';
 import { Card, CardBody, CardHeader, CardTitle, Col, Row, Table, Button } from 'react-bootstrap';
+import dynamic from 'next/dynamic';
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
 
 type WeeklyInquiryType = { week: string; inquiries: number };
 type TransactionStatType = {
