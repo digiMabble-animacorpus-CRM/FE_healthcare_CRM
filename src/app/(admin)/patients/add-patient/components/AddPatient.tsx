@@ -134,25 +134,33 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     }
   }, [isEditMode, params?.id, reset]);
 
-  const onSubmit = async (data: Partial<PatientType>) => {
+    const onSubmit = async (data: Partial<PatientType>) => {
+    // 🔹 Normalize: make sure phones[] and number are in sync
+    const payload = {
+      ...data,
+      number: data.number || data.phones?.[0] || "",
+      phones: data.phones?.filter((p) => p.trim() !== "") ?? [data.number || ""],
+    };
+
     if (isEditMode && params?.id) {
-      const success = await updatePatient(params.id, data as any);
+      const success = await updatePatient(params.id, payload as any);
       if (success) {
-        alert('Patient updated successfully');
+        alert("Patient updated successfully");
         router.back();
       } else {
-        alert('Failed to update patient');
+        alert("Failed to update patient");
       }
     } else {
-      const success = await createPatient(data as any);
+      const success = await createPatient(payload as any);
       if (success) {
-        alert('Patient created successfully');
+        alert("Patient created successfully");
         reset(); // clear the form
       } else {
-        alert('Failed to create patient');
+        alert("Failed to create patient");
       }
     }
   };
+
 
   if (loading)
     return (

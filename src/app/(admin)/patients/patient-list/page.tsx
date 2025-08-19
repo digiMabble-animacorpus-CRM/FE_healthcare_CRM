@@ -94,13 +94,12 @@ const PatientsListPage = () => {
     }
 
     if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      data = data.filter(
-        (p) =>
-          p?.firstname.toLowerCase().includes(term) ||
-          p?.lastname.toLowerCase().includes(term) ||
-          (p.emails && p.emails.toLowerCase().includes(term)) ||
-          (p.phones && p.phones.join(' ').toLowerCase().includes(term)),
+      const term = searchTerm.trim().toLowerCase();
+      data = data.filter((p) =>
+        (p?.firstname ?? '').toLowerCase().includes(term) ||
+        (p?.lastname ?? '').toLowerCase().includes(term) ||
+        (p?.emails ?? '').toLowerCase().includes(term) ||
+        (p?.phones ? p.phones.join(' ').toLowerCase() : '').includes(term)
       );
     }
 
@@ -309,8 +308,12 @@ const PatientsListPage = () => {
                           <td>
                             {item.firstname} {item.lastname}
                           </td>
-                          <td>{item.emails}</td>
-                          <td>{item.phones}</td>
+                          <td>{item.emails ?? ''}</td>
+                          <td>
+                            {Array.isArray(item.phones)
+                              ? item.phones.join(', ')
+                              : item.phones || ''}
+                          </td>
                           <td>
                             {calculateAge(item.birthdate)}
                             {item.legalgender ? ` yrs | ${formatGender(item.legalgender)}` : ' yrs'}
