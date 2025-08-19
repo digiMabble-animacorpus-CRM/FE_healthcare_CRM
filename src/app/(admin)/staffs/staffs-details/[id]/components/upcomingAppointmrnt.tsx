@@ -24,7 +24,7 @@ const UpcomingAppointmrnt = async () => {
         <Card>
           <CardHeader className="d-flex justify-content-between align-items-center">
             <div>
-              <CardTitle as={'h4'}>Upcoming Appointments</CardTitle>
+              <CardTitle as={'h4'}>Appointments</CardTitle>
             </div>
             <Dropdown>
               <DropdownToggle
@@ -32,12 +32,12 @@ const UpcomingAppointmrnt = async () => {
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
                 aria-expanded="false">
-                This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+                Appointments <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem>Download</DropdownItem>
-                <DropdownItem>Export</DropdownItem>
-                <DropdownItem>Import</DropdownItem>
+                <DropdownItem>Upcoming Appointments</DropdownItem>
+                <DropdownItem>Past Appointments</DropdownItem>
+                {/* <DropdownItem>Import</DropdownItem> */}
               </DropdownMenu>
             </Dropdown>
           </CardHeader>

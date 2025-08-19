@@ -4,7 +4,7 @@ import PageTitle from "@/components/PageTitle";
 import IconifyIcon from "@/components/wrappers/IconifyIcon";
 import { useEffect, useState } from "react";
 import type { StaffType } from "@/types/data";
-import Image from 'next/image';
+import Image from "next/image";
 import dayjs from "dayjs";
 import {
   Button,
@@ -134,11 +134,22 @@ const StaffListPage = () => {
     }
   };
 
+  const calculateAge = (dob: string): number => {
+    if (!dob) return 25;
+    const birthDate = new Date(dob);
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const hasBirthdayPassed =
+      today.getMonth() > birthDate.getMonth() ||
+      (today.getMonth() === birthDate.getMonth() &&
+        today.getDate() >= birthDate.getDate());
+
+    if (!hasBirthdayPassed) age--;
+    return age;
+  };
+
   const formatGender = (gender: string): string =>
     gender ? gender.charAt(0).toUpperCase() : "";
-  {
-    console.log(staffList);
-  }
 
   return (
     <>
@@ -148,7 +159,7 @@ const StaffListPage = () => {
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Staff List
+                All Doctor List
               </CardTitle>
               <div className="d-flex flex-wrap align-items-center gap-2">
                 <div style={{ minWidth: "200px" }}>
@@ -163,18 +174,25 @@ const StaffListPage = () => {
                     }}
                   />
                 </div>
-                {/* <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="material-symbols:location-on-outline" width={18} className="me-1" />
-                    {selectedBranch || 'Filter by Branch'}
+                <Dropdown>
+                  <DropdownToggle
+                    className="btn btn-sm btn-outline-white d-flex align-items-center"
+                    id="branchFilter"
+                  >
+                    <IconifyIcon
+                      icon="material-symbols:location-on-outline"
+                      width={18}
+                      className="me-1"
+                    />
+                    {selectedBranch || "Filter by Branch"}
                   </DropdownToggle>
                   <DropdownMenu>
                     {BRANCHES.map((branch) => (
                       <DropdownItem
                         key={branch}
                         onClick={() => {
-                          setSelectedBranch(branch)
-                          setCurrentPage(1)
+                          setSelectedBranch(branch);
+                          setCurrentPage(1);
                         }}
                         active={selectedBranch === branch}
                       >
@@ -185,8 +203,8 @@ const StaffListPage = () => {
                       <DropdownItem
                         className="text-danger"
                         onClick={() => {
-                          setSelectedBranch(null)
-                          setCurrentPage(1)
+                          setSelectedBranch(null);
+                          setCurrentPage(1);
                         }}
                       >
                         Clear Branch Filter
@@ -196,42 +214,51 @@ const StaffListPage = () => {
                 </Dropdown>
 
                 <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-secondary d-flex align-items-center">
-                    <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
-                    {dateFilter === 'all' ? 'Filter by Date' : dateFilter.replace('_', ' ').toUpperCase()}
+                  <DropdownToggle
+                    className="btn btn-sm btn-outline-white d-flex align-items-center"
+                    id="dateFilter"
+                  >
+                    <IconifyIcon
+                      icon="mdi:calendar-clock"
+                      width={18}
+                      className="me-1"
+                    />
+                    {dateFilter === "all"
+                      ? "Filter by Date"
+                      : dateFilter.replace("_", " ").toUpperCase()}
                   </DropdownToggle>
                   <DropdownMenu>
                     {[
-                      { label: 'Today', value: 'today' },
-                      { label: 'This Week', value: 'this_week' },
-                      { label: 'Last 15 Days', value: '15_days' },
-                      { label: 'This Month', value: 'this_month' },
-                      { label: 'This Year', value: 'this_year' },
+                      { label: "Today", value: "today" },
+                      { label: "This Week", value: "this_week" },
+                      { label: "Last 15 Days", value: "15_days" },
+                      { label: "This Month", value: "this_month" },
+                      { label: "This Year", value: "this_year" },
                     ].map((f) => (
                       <DropdownItem
                         key={f.value}
                         onClick={() => {
-                          setDateFilter(f.value)
-                          setCurrentPage(1)
+                          setDateFilter(f.value);
+                          setCurrentPage(1);
                         }}
                         active={dateFilter === f.value}
                       >
                         {f.label}
                       </DropdownItem>
                     ))}
-                    {dateFilter !== 'all' && (
+                    {dateFilter !== "all" && (
                       <DropdownItem
                         className="text-danger"
                         onClick={() => {
-                          setDateFilter('all')
-                          setCurrentPage(1)
+                          setDateFilter("all");
+                          setCurrentPage(1);
                         }}
                       >
                         Clear Date Filter
                       </DropdownItem>
                     )}
                   </DropdownMenu>
-                </Dropdown> */}
+                </Dropdown>
               </div>
             </CardHeader>
 
@@ -248,10 +275,9 @@ const StaffListPage = () => {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Gender</th>
+                        <th>Age | Gender</th>
                         <th>Branch</th>
-                        <th>Status</th>
-                        <th>Role</th>
+                        <th>Specialist</th>
                         <th>Actions</th>
                       </tr>
                     </thead>
@@ -260,24 +286,24 @@ const StaffListPage = () => {
                         <tr key={idx}>
                           <td>
                             <div className="d-flex align-items-center gap-2">
-                              <Image src={avatar1} className="img-fluid me-2 avatar-sm rounded-circle" alt="avatar-1" />
-                              <span>{staff?.name}</span>
+                              <Image
+                                src={avatar1}
+                                className="img-fluid me-2 avatar-sm rounded-circle"
+                                alt="avatar-1"
+                              />
+                              <span>Dr.{staff?.name}</span>
                             </div>
                           </td>
                           <td>{staff?.email}</td>
                           <td>{staff?.phoneNumber}</td>
-                          <td>{formatGender(staff?.gender || "")}</td>
+                          <td>
+                            {calculateAge(staff?.dob ?? "")} yrs |{" "}
+                            {formatGender(staff?.gender || "")}
+                          </td>
                           <td>
                             {staff?.branchesDetailed
                               .map((b: { code: any }) => b.code)
                               .join(", ")}
-                          </td>
-                          <td>
-                            <span
-                              className={`badge bg-${staff.status === "active" ? "success" : "danger"} text-white fs-12 px-2 py-1`}
-                            >
-                              {staff?.status}
-                            </span>
                           </td>
                           <td>{staff?.role?.label}</td>
                           <td>
@@ -299,16 +325,6 @@ const StaffListPage = () => {
                               >
                                 <IconifyIcon
                                   icon="solar:pen-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
-                              <Button
-                                variant="soft-danger"
-                                size="sm"
-                                onClick={() => handleDelete(staff._id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:trash-bin-minimalistic-2-broken"
                                   className="align-middle fs-18"
                                 />
                               </Button>
@@ -338,7 +354,9 @@ const StaffListPage = () => {
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
                     <li
-                      className={`page-item ${currentPage === index + 1 ? "active" : ""}`}
+                      className={`page-item ${
+                        currentPage === index + 1 ? "active" : ""
+                      }`}
                       key={index}
                     >
                       <Button
@@ -377,8 +395,7 @@ const StaffListPage = () => {
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this staff? This action cannot be
-          undone.
+          Are you sure you want to delete this staff? This action cannot be undone.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>

@@ -33,7 +33,7 @@ const StaffDetailPage = async ({ params }: Props) => {
         </Col>
       </Row>
       <UpcomingAppointmrnt />
-      <TransactionHistory />
+      {/* <TransactionHistory /> */}
     </>
   );
 };
