@@ -237,7 +237,7 @@ const TherapistsListPage = () => {
                             <input type="checkbox" />
                           </td>
                           <td>
-                            <img src={getPhotoUrl(item.photo)} />
+                            <img src={item.imageUrl} />
                           </td>
                           <td>
                             {item.firstName} {item.lastName}

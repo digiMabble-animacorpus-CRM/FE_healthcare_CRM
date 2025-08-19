@@ -29,7 +29,8 @@ type FeedbackType = {
 };
 type FileType = { name: string; size: number; icon: string; variant: string };
 
-type PatientDetailsCardProps = {
+export type PatientDetailsCardProps = {
+  id?: string;
   name: string;
   birthdate: string;
   gender?: string;
@@ -40,14 +41,15 @@ type PatientDetailsCardProps = {
   country?: string;
   status?: 'ACTIVE' | 'INACTIVE';
   note?: string;
-  weeklyInquiry?: WeeklyInquiryType[];
-  transactionStats?: TransactionStatType[];
-  transactionHistory?: TransactionHistoryType[];
-  feedbacks?: FeedbackType[];
-  files?: FileType[];
+  weeklyInquiry?: any[]; // replace `any` with the correct type if you have
+  transactionStats?: any[];
+  transactionHistory?: any[];
+  feedbacks?: any[];
+  files?: any[];
 };
 
 const PatientDetails = ({
+  id,
   name,
   birthdate,
   gender,
@@ -65,7 +67,7 @@ const PatientDetails = ({
   files = [],
 }: PatientDetailsCardProps) => {
   const router = useRouter();
-  const handleEditClick = (id: string) => {
+  const handleEditClick = (id: any) => {
     router.push(`/patients/edit-patient/${id}`);
   };
 
@@ -110,7 +112,7 @@ const PatientDetails = ({
               <Button
                 variant="dark"
                 className="avatar-sm d-flex align-items-center justify-content-center fs-20"
-                onClick={() => handleEditClick(data?.id)}
+                onClick={() => handleEditClick(id)}
               >
                 <span>
                   {' '}

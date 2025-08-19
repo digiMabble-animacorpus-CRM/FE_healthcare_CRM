@@ -2,13 +2,14 @@
 
 import { API_BASE_PATH } from '@/context/constants';
 import { encryptAES, decryptAES } from '@/utils/encryption';
+import type { TeamMemberCreatePayload, TeamMemberType } from '@/types/data';
 
-export interface PatientUpdatePayload {
+export interface TeamMemberUpdatePayload {
   name?: string;
   email?: string;
   phoneNumber?: string;
   roleId?: number;
-  accessLevel?: 'patient' | 'branch-admin' | 'super-admin';
+  accessLevel?: 'staff' | 'branch-admin' | 'super-admin';
   branches?: number[];
   selectedBranch?: number | null;
   permissions?: {
@@ -17,13 +18,13 @@ export interface PatientUpdatePayload {
     enabled: boolean;
   }[];
   updatedBy?: {
-    patientId: string;
+    staffId: string;
     updatedAt: string;
   }[];
   [key: string]: any;
 }
 
-export const getAllPatient = async (
+export const getAllTeamMembers = async (
   page: number = 1,
   limit: number = 10,
   branch?: string,
@@ -51,7 +52,7 @@ export const getAllPatient = async (
 
     const queryParams = new URLSearchParams(filters).toString();
 
-    const response = await fetch(`${API_BASE_PATH}/patients?${queryParams}`, {
+    const response = await fetch(`${API_BASE_PATH}/team-members?${queryParams}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -68,32 +69,27 @@ export const getAllPatient = async (
     const jsonData = await response.json();
     console.log('Response from server:', jsonData);
 
-    const patientData: any[] = Array.isArray(jsonData?.data)
-      ? jsonData.data
-      : jsonData?.data
-        ? [jsonData.data]
-        : [];
+    const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
     return {
-      data: patientData,
+      data: therapistData,
       totalCount: jsonData?.totalCount || 0,
     };
   } catch (error) {
-    console.error('Error fetching patient:', error);
+    console.error('Error fetching team members:', error);
     return { data: [], totalCount: 0 };
   }
 };
 
-export const getPatientById = async (patientId: any): Promise<any | null> => {
-  console.log(patientId);
+export const getTeamMemberById = async (team_member_id: any): Promise<TeamMemberType | null> => {
   const token = localStorage.getItem('access_token');
   if (!token) {
     console.warn('No access token found.');
     return null;
   }
 
-  const url = `${API_BASE_PATH}/patients/${patientId}`;
-  console.log('Requesting patient by ID:', url);
+  const url = `${API_BASE_PATH}/team-members/${team_member_id}`;
+  console.log('Requesting team members by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -105,87 +101,67 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
     });
 
     console.log('Response status:', response.status);
+
     const result = await response.json();
     console.log('Full API response:', result);
 
     if (!response.ok) {
-      console.error('Failed to fetch patient:', result?.message || 'Unknown error');
+      console.error('Failed to fetch team members:', result?.message || 'Unknown error');
       return null;
     }
 
-    // Directly return the patient data
-    if (result?.data) {
-      return result.data as any;
+    // Return the team members data directly
+    if (result) {
+      return result as TeamMemberType;
     }
 
     console.warn('No data found in response.');
     return null;
   } catch (error) {
-    console.error('Exception during patient fetch:', error);
+    console.error('Exception during team members fetch:', error);
     return null;
   }
 };
 
-export const createPatient = async (payload: any): Promise<boolean> => {
+export const createTeamMember = async (payload: TeamMemberCreatePayload): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return false;
 
     const safePayload = {
       ...payload,
-      // branches: (payload.branches || []).map((b: string | number) => Number(b)),
-      // selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
+      branches: (payload.branches || []).map((b: any) => Number(b)),
+      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
-    // // Build payload directly from form/input
-    // const safePayload = {
-    //   firstname: 'John',
-    //   middlename: 'Middle',
-    //   lastname: 'Doe',
-    //   ssin: '94060768059',
-    //   legalgender: 'M',
-    //   language: 'en',
-    //   primarypatientrecordid: 'primary_record_123',
-    //   note: 'Some note about the patient',
-    //   status: 'ACTIVE',
-    //   mutualitynumber: '12345',
-    //   mutualityregistrationnumber: '67890',
-    //   emails: 'john.doe@example.com',
-    //   country: 'BE',
-    //   city: 'Brussels',
-    //   street: 'Rue du Comté',
-    //   number: '10',
-    //   zipcode: '5140',
-    //   birthdate: '1994-06-07',
-    //   phones: ['+32491079736'],
-    // };
+    const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(`${API_BASE_PATH}/patients`, {
+    const response = await fetch(`${API_BASE_PATH}/team-members`, {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(safePayload), //  send plain payload
+      body: JSON.stringify({ data: encryptedPayload }),
     });
 
     const result = await response.json();
 
     if (!response.ok || !result.status) {
-      console.error('Create patient failed:', result.message || 'Unknown error');
+      console.error('Create failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error creating patient:', error);
+    console.error('Error creating team members:', error);
     return false;
   }
 };
 
-export const updatePatient = async (
+export const updateTeamMember = async (
   id: string | number,
-  payload: PatientUpdatePayload,
+  payload: TeamMemberUpdatePayload,
 ): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -193,52 +169,68 @@ export const updatePatient = async (
 
     const safePayload = {
       ...payload,
+      branches: (payload.branches || []).map((b: string | number) => Number(b)),
+      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
-    //  console.log("PATCH URL:", `${API_BASE_PATH}/patients/${id}`);
-    // console.log("PATCH BODY:", JSON.stringify(safePayload, null, 2));
+    const encryptedId = encryptAES(String(id));
+    const encryptedPayload = encryptAES(safePayload);
 
-    const response = await fetch(`${API_BASE_PATH}/patients/${id}`, {
-      method: 'PATCH',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      `${API_BASE_PATH}/team-members/${encodeURIComponent(encryptedId)}`,
+      {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ data: encryptedPayload }),
       },
-      body: JSON.stringify(safePayload), // ✅ send raw payload
-    });
+    );
 
     const result = await response.json();
-    // console.log("Update response:", result);
 
     if (!response.ok || !result.status) {
-      console.error('Update failed:', result.message || 'Unknown error');
+      console.error(' Update failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error updating patient:', error);
+    console.error(' Error updating team members:', error);
     return false;
   }
 };
 
-export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
+export const transformToBackendDto = (formData: TeamMemberType): TeamMemberUpdatePayload => {
   return {
-    name: formData.name,
-    email: formData.email,
-    phone_number: formData.phoneNumber,
-    role_id: formData.roleId ? Number(formData.roleId) : undefined,
-    access_level: formData.accessLevelId as 'patient' | 'branch-admin' | 'super-admin',
-    branches: formData.branches.map((b: { id: any }) => Number(b.id)).filter(Boolean),
-    selected_branch: formData.selectedBranch ? Number(formData.selectedBranch) : null,
-    permissions: formData.permissions.map((p: { _id: string; enabled: any }) => ({
-      action: p._id.split('-')[0],
-      resource: p._id.split('-')[1],
-      enabled: !!p.enabled,
-    })),
+    id: String(formData.team_id),
+    full_name: formData.full_name,
+    first_name: formData.first_name,
+    last_name: formData.last_name,
+    job_titles: [formData.job_1, formData.job_2, formData.job_3, formData.job_4].filter(Boolean), // only keep non-empty jobs
+    specific_audience: formData.specific_audience,
+    about_me: formData.who_am_i || formData.about,
+    specializations: [formData.specialization_1, ...formData.specializations].filter(Boolean),
+    consultations: formData.consultations,
+    contact: {
+      email: formData.contact_email,
+      phone: formData.contact_phone,
+    },
+    center: {
+      address: formData.office_address,
+    },
+    schedule: formData.schedule,
+    website: formData.website,
+    languages: formData.languages_spoken,
+    payment_methods: formData.payment_methods,
+    diplomas_and_training: formData.diplomas_and_training,
+    faq: formData.frequently_asked_questions,
+    agenda_links: formData.calendar_links,
+    photo: formData.photo,
     updatedBy: [
       {
-        patientId: String(localStorage.getItem('patient_id') || ''),
+        staffId: String(localStorage.getItem('staff_id') || ''),
         updatedAt: new Date().toISOString(),
       },
     ],
@@ -250,7 +242,7 @@ export const getAllRoles = async (): Promise<any[]> => {
     const token = localStorage.getItem('access_token');
     if (!token) return [];
 
-    const response = await fetch(`${API_BASE_PATH}/patient-role?tag=Role`, {
+    const response = await fetch(`${API_BASE_PATH}/staff-role?tag=Role`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -273,7 +265,7 @@ export const getAllAccessLevels = async (): Promise<any[]> => {
     const token = localStorage.getItem('access_token');
     if (!token) return [];
 
-    const response = await fetch(`${API_BASE_PATH}/patient-role?tag=AccessLevel`, {
+    const response = await fetch(`${API_BASE_PATH}/staff-role?tag=AccessLevel`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,

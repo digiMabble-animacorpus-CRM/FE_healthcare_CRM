@@ -5,7 +5,6 @@ import { CustomerType } from '@/types/data';
 import { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
-import { JSX, Key } from 'react';
 import { Button, Card, CardBody, CardFooter, Col, Row } from 'react-bootstrap';
 
 export const metadata: Metadata = { title: 'Customer Grid' };
@@ -148,13 +147,11 @@ const CustomerGridPage = async () => {
     <>
       <PageTitle subName="Customers" title="Customer Grid" />
       <Row>
-        {customerGridData
-          .slice(0, 6)
-          .map((item: JSX.IntrinsicAttributes & CustomerType, idx: Key | null | undefined) => (
-            <Col md={6} xl={4} key={idx}>
-              <CustomerGridCard {...item} />
-            </Col>
-          ))}
+        {customerGridData.slice(0, 6).map((item, idx) => (
+          <Col md={6} xl={4} key={idx}>
+            <CustomerGridCard {...item} />
+          </Col>
+        ))}
       </Row>
     </>
   );

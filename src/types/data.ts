@@ -62,31 +62,36 @@ export type UserType = {
 };
 
 export type PatientType = {
-  visits: number;
-  prescriptions: number;
-  bills: number;
-  createdAt?: string;
-  _id?: IdType;
-  birthdate: string;
-  city?: string;
-  country?: string;
-  emails?: string;
+  // Required fields
   firstname: string;
-  id: string;
-  language?: string;
   lastname: string;
-  legalgender?: string;
+  birthdate: string;
+  emails: string;
+  number: string;
+  legalgender: string;
+  language: string;
+  city: string;
+  country: string;
+  street: string;
+  note: string;
+  tags?: string[];
+
+  // Optional fields
+  id?: string;
+  _id?: string;
+  visits?: number;
+  prescriptions?: number;
+  bills?: number;
+  createdAt?: string;
   middlename?: string;
-  mutualitynumber?: string;
-  mutualityregistrationnumber?: string;
-  note?: string;
-  number?: string;
   phones?: string[];
   primarypatientrecordid?: string;
   ssin?: string;
   status?: string;
-  street?: string;
+  mutualitynumber?: string;
+  mutualityregistrationnumber?: string;
   zipcode?: string;
+  branch?: string;
 };
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';
@@ -304,6 +309,7 @@ export type TherapistType = {
   appointmentAlert?: string | null;
   availability?: any | null;
   tags?: any;
+  imageUrl?: string;
 };
 
 export type TherapistCreatePayload = {
@@ -609,6 +615,68 @@ export type ProfileCreatePayload = {
   availability?: any[];
   tags?: string[];
   certificationFiles?: File[];
+  branches?: (string | number)[];
+  selected_branch?: string | number | null;
+};
+
+export type TeamMemberType = {
+  team_id: string;
+  last_name: string;
+  first_name: string;
+  full_name: string;
+  job_1: string;
+  specific_audience: string;
+  specialization_1: string;
+  job_2: string;
+  job_3: string;
+  job_4: string;
+  who_am_i: string;
+  consultations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: {
+    text: string;
+  };
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
+  website: string;
+  frequently_asked_questions: string;
+  calendar_links: string[];
+  photo: string;
+};
+
+export type TeamMemberCreatePayload = {
+  team_id: string;
+  last_name: string;
+  first_name: string;
+  full_name: string;
+  job_1: string;
+  specific_audience: string;
+  specialization_1: string;
+  job_2: string;
+  job_3: string;
+  job_4: string;
+  who_am_i: string;
+  consultations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: {
+    text: string;
+  };
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
+  website: string;
+  frequently_asked_questions: string;
+  calendar_links: string[];
+  photo: string;
   branches?: (string | number)[];
   selected_branch?: string | number | null;
 };

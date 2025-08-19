@@ -41,24 +41,24 @@ import paypal from '@/assets/images/card/paypal.svg';
 import visa from '@/assets/images/card/visa.svg';
 import { currency } from '@/context/constants';
 
-// export const customerEnquiriesData: PatientType[] = [
-//   {
-//     _id: '1',
-//     firstname: 'Emma Johnson',
-//     emails: 'emma.johnson@example.com',
-//     number: '+1 555-0123',
-//     birthdate: '1990-03-15',
-//     note: 'Follow-up for migraine issues.',
-//     legalgender: 'Female',
-//     language: 'English',
-//     street: '123 5th Ave, New York, NY 10001, USA',
-//     city: 'New York',
-//     country: 'USA',
-//     zipcode: '10001',
-//     status: 'new',
-//     createdAt: '2025-06-22T10:15:00Z',
-//   },
-// ];
+export const customerEnquiriesData: any[] = [
+  {
+    _id: '1',
+    firstname: 'Emma Johnson',
+    emails: 'emma.johnson@example.com',
+    number: '+1 555-0123',
+    birthdate: '1990-03-15',
+    note: 'Follow-up for migraine issues.',
+    legalgender: 'Female',
+    language: 'English',
+    street: '123 5th Ave, New York, NY 10001, USA',
+    city: 'New York',
+    country: 'USA',
+    zipcode: '10001',
+    status: 'new',
+    createdAt: '2025-06-22T10:15:00Z',
+  },
+];
 
 export const therapistData: TherapistType[] = [
   {
@@ -784,7 +784,7 @@ export const customerData: CustomerType[] = [
   },
 ];
 
-export const customerReviewsData: CustomerReviewsType[] = [
+export const customerReviewsData: any[] = [
   {
     id: '501',
     userId: '1',
@@ -902,17 +902,18 @@ export const timelineData: TimelineType = {
       description: 'Outdoor visit at Brussels State Route 85 with John Boltana & Harry Piterson.',
     },
   ],
-  // '5 days ago': [
-  //   {
-  //     title: 'Join new team member Alex Smith',
-  //     description:
-  //       'Alex Smith is a Senior Software (Full Stack) engineer with a deep passion for building Belgiumble, functional & pretty web applications.',
-  //   },
-  //   {
-  //     title: 'First release of Reback admin dashboard template',
-  //     description: 'Outdoor visit at Brussels State Route 85 with John Boltana & Harry Piterson regarding to setup a new show room.',
-  //   },
-  // ],
+  '5 days ago': [
+    {
+      title: 'Join new team member Alex Smith',
+      description:
+        'Alex Smith is a Senior Software (Full Stack) engineer with a deep passion for building Belgiumble, functional & pretty web applications.',
+    },
+    {
+      title: 'First release of Reback admin dashboard template',
+      description:
+        'Outdoor visit at Brussels State Route 85 with John Boltana & Harry Piterson regarding to setup a new show room.',
+    },
+  ],
 };
 
 export const pricingData: PricingType[] = [

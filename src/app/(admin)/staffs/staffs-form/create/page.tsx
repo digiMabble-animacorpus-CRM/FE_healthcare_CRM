@@ -37,14 +37,14 @@ const initialFormData: TeamType = {
   FAQ: '',
   LiensAgenda: '',
   Photo: '',
-  ID_Pro: ''
+  ID_Pro: '',
 };
 
 const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
   const [formData, setFormData] = useState<TeamType>(initialFormData);
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) => {
     const { name, value } = e.target;
     if (name.startsWith('Address.')) {
@@ -111,7 +111,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
         <h3 style={{ fontWeight: 600, marginBottom: '18px' }}>Personal Information</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '28px' }}>
           <div>
-            <label htmlFor="LastName" style={labelStyle}>Last Name *</label>
+            <label htmlFor="LastName" style={labelStyle}>
+              Last Name *
+            </label>
             <input
               id="LastName"
               name="LastName"
@@ -123,7 +125,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="FirstName" style={labelStyle}>First Name *</label>
+            <label htmlFor="FirstName" style={labelStyle}>
+              First Name *
+            </label>
             <input
               id="FirstName"
               name="FirstName"
@@ -135,7 +139,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="PhoneNumber" style={labelStyle}>Phone Number *</label>
+            <label htmlFor="PhoneNumber" style={labelStyle}>
+              Phone Number *
+            </label>
             <input
               id="PhoneNumber"
               name="PhoneNumber"
@@ -148,7 +154,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="ContactMail" style={labelStyle}>Contact Email *</label>
+            <label htmlFor="ContactMail" style={labelStyle}>
+              Contact Email *
+            </label>
             <input
               id="ContactMail"
               name="ContactMail"
@@ -161,7 +169,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Photo" style={labelStyle}>Photo URL</label>
+            <label htmlFor="Photo" style={labelStyle}>
+              Photo URL
+            </label>
             <input
               id="Photo"
               name="Photo"
@@ -179,7 +189,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
         <h3 style={{ fontWeight: 600, marginBottom: '18px' }}>Professional Information</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '28px' }}>
           <div>
-            <label htmlFor="Function" style={labelStyle}>Function</label>
+            <label htmlFor="Function" style={labelStyle}>
+              Function
+            </label>
             <input
               id="Function"
               name="Function"
@@ -190,7 +202,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="PublicSpecific" style={labelStyle}>Public Specific</label>
+            <label htmlFor="PublicSpecific" style={labelStyle}>
+              Public Specific
+            </label>
             <input
               id="PublicSpecific"
               name="PublicSpecific"
@@ -201,7 +215,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Specialisation" style={labelStyle}>Specialisation</label>
+            <label htmlFor="Specialisation" style={labelStyle}>
+              Specialisation
+            </label>
             <input
               id="Specialisation"
               name="Specialisation"
@@ -212,7 +228,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Function2" style={labelStyle}>Function 2</label>
+            <label htmlFor="Function2" style={labelStyle}>
+              Function 2
+            </label>
             <input
               id="Function2"
               name="Function2"
@@ -223,7 +241,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Function3" style={labelStyle}>Function 3</label>
+            <label htmlFor="Function3" style={labelStyle}>
+              Function 3
+            </label>
             <input
               id="Function3"
               name="Function3"
@@ -234,7 +254,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Function4" style={labelStyle}>Function 4</label>
+            <label htmlFor="Function4" style={labelStyle}>
+              Function 4
+            </label>
             <input
               id="Function4"
               name="Function4"
@@ -252,7 +274,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
         <h3 style={{ fontWeight: 600, marginBottom: '18px' }}>Bio & Details</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '28px' }}>
           <div>
-            <label htmlFor="WhoAmI" style={labelStyle}>Who Am I</label>
+            <label htmlFor="WhoAmI" style={labelStyle}>
+              Who Am I
+            </label>
             <textarea
               id="WhoAmI"
               name="WhoAmI"
@@ -264,7 +288,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Consultations" style={labelStyle}>Consultations</label>
+            <label htmlFor="Consultations" style={labelStyle}>
+              Consultations
+            </label>
             <textarea
               id="Consultations"
               name="Consultations"
@@ -276,7 +302,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Hourly" style={labelStyle}>Hourly Rate</label>
+            <label htmlFor="Hourly" style={labelStyle}>
+              Hourly Rate
+            </label>
             <input
               id="Hourly"
               name="Hourly"
@@ -288,7 +316,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
           </div>
         </div>
         <div style={{ marginTop: '26px' }}>
-          <label htmlFor="About" style={labelStyle}>About</label>
+          <label htmlFor="About" style={labelStyle}>
+            About
+          </label>
           <textarea
             id="About"
             name="About"
@@ -306,7 +336,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
         <h3 style={{ fontWeight: 600, marginBottom: '18px' }}>Address</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '28px' }}>
           <div>
-            <label htmlFor="Address.street" style={labelStyle}>Street</label>
+            <label htmlFor="Address.street" style={labelStyle}>
+              Street
+            </label>
             <input
               id="Address.street"
               name="Address.street"
@@ -317,7 +349,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Address.city" style={labelStyle}>City</label>
+            <label htmlFor="Address.city" style={labelStyle}>
+              City
+            </label>
             <input
               id="Address.city"
               name="Address.city"
@@ -328,7 +362,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Address.zip_code" style={labelStyle}>Zip Code</label>
+            <label htmlFor="Address.zip_code" style={labelStyle}>
+              Zip Code
+            </label>
             <input
               id="Address.zip_code"
               name="Address.zip_code"
@@ -339,7 +375,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Address.country" style={labelStyle}>Country</label>
+            <label htmlFor="Address.country" style={labelStyle}>
+              Country
+            </label>
             <input
               id="Address.country"
               name="Address.country"
@@ -357,7 +395,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
         <h3 style={{ fontWeight: 600, marginBottom: '18px' }}>Other Details</h3>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '28px' }}>
           <div>
-            <label htmlFor="LanguesParlees" style={labelStyle}>Langues parlées</label>
+            <label htmlFor="LanguesParlees" style={labelStyle}>
+              Langues parlées
+            </label>
             <input
               id="LanguesParlees"
               name="LanguesParlees"
@@ -368,7 +408,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="PaymentMethod" style={labelStyle}>Payment Method</label>
+            <label htmlFor="PaymentMethod" style={labelStyle}>
+              Payment Method
+            </label>
             <input
               id="PaymentMethod"
               name="PaymentMethod"
@@ -379,7 +421,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="DiplomasTrainings" style={labelStyle}>Diplomas and Trainings</label>
+            <label htmlFor="DiplomasTrainings" style={labelStyle}>
+              Diplomas and Trainings
+            </label>
             <textarea
               id="DiplomasTrainings"
               name="DiplomasTrainings"
@@ -391,7 +435,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Specialisations" style={labelStyle}>Specialisations</label>
+            <label htmlFor="Specialisations" style={labelStyle}>
+              Specialisations
+            </label>
             <textarea
               id="Specialisations"
               name="Specialisations"
@@ -403,7 +449,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="Website" style={labelStyle}>Website</label>
+            <label htmlFor="Website" style={labelStyle}>
+              Website
+            </label>
             <input
               id="Website"
               name="Website"
@@ -414,7 +462,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="FAQ" style={labelStyle}>FAQ</label>
+            <label htmlFor="FAQ" style={labelStyle}>
+              FAQ
+            </label>
             <textarea
               id="FAQ"
               name="FAQ"
@@ -426,7 +476,9 @@ const TeamForm: React.FC<TeamFormProps> = ({ onSubmitHandler }) => {
             />
           </div>
           <div>
-            <label htmlFor="LiensAgenda" style={labelStyle}>Liens Agenda</label>
+            <label htmlFor="LiensAgenda" style={labelStyle}>
+              Liens Agenda
+            </label>
             <input
               id="LiensAgenda"
               name="LiensAgenda"

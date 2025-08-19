@@ -44,6 +44,9 @@ export type Appointment = {
 
 export type AppointmentsOverviewProps = {
   upcoming: Appointment[];
+  upcomingCount: number;
+  cancellationsWeek: number;
+  completedWeek: number;
 };
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];

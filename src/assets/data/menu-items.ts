@@ -91,7 +91,7 @@ export const MENU_ITEMS: MenuItemType[] = [
       {
         key: 'add-teams',
         label: 'Add Teams',
-        url: '/teams/add-teams/create',
+        url: '/teams/add-team/',
         parentKey: 'teams',
       },
     ],

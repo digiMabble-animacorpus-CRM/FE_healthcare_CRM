@@ -1,10 +1,9 @@
 'use client';
 
 import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
-import type { CustomerEnquiriesType } from '@/types/data';
 
 interface Props {
-  customerInfo: CustomerEnquiriesType;
+  customerInfo: any;
 }
 
 const CustomerInfoCard = ({ customerInfo }: Props) => {

@@ -1,7 +1,7 @@
 import {
   agentData,
   customerData,
-  // customerEnquiriesData,
+  customerEnquiriesData,
   customerReviewsData,
   dataTableRecords,
   pricingData,
@@ -84,108 +84,72 @@ export const getAllAgent = async (): Promise<AgentType[]> => {
   return data;
 };
 
-// export const getAllAgent = async () => {
-//   // Fetch all agents
-//   const agentsCol = collection(db, "agents");
-//   const agentsSnapshot = await getDocs(agentsCol);
-
-//   // Fetch user data for each agent and combine them
-//   const agentsWithUser = await Promise.all(
-//     agentsSnapshot.docs.map(async (agentDoc) => {
-//       const agentData = agentDoc.data();
-//       let userData = null;
-
-//       // Fetch the user linked to the agent (if userId exists in agent data)
-//       if (agentData.userId) {
-//         const userRef = doc(db, "users", agentData.userId);
-//         const userSnap = await getDoc(userRef);
-
-//         // If user exists, retrieve user data
-//         if (userSnap.exists()) {
-//           userData = userSnap.data();
-//         }
-//       }
-
-//       // Combine agent data with user data (if found)
-//       return {
-//         id: agentDoc.id,
-//         ...agentData,
-//         user: userData || null, // Ensure user is null if not found
-//       };
-//     })
-//   );
-
-//   console.log(agentsWithUser)
-
-//   return agentsWithUser;
-// };
-
 export const getAllPricingPlans = async (): Promise<PricingType[]> => {
   await sleep();
   return pricingData;
 };
 
-// export const getAllCustomer = async (): Promise<CustomerType[]> => {
-//   const data = customerData.map((item) => {
-//     const user = userData.find((user) => user.id == item.userId);
-//     return {
-//       ...item,
-//       user,
-//     };
-//   });
-//   await sleep();
-//   return data;
-// };
+export const getAllCustomer = async (): Promise<CustomerType[]> => {
+  const data = customerData.map((item) => {
+    const user = userData.find((user) => user.id == item.userId);
+    return {
+      ...item,
+      user,
+    };
+  });
+  await sleep();
+  return data;
+};
 
 // Patients Api Call
-// export const getAllPatients = async (
-//   page: number = 1,
-//   limit: number = 10,
-//   branch?: string,
-//   from?: string,
-//   to?: string,
-//   search?: string,
-// ): Promise<{ data: PatientType[]; totalCount: number }> => {
-//   await sleep();
+export const getAllPatients = async (
+  page: number = 1,
+  limit: number = 10,
+  branch?: string,
+  from?: string,
+  to?: string,
+  search?: string,
+): Promise<{ data: PatientType[]; totalCount: number }> => {
+  await sleep();
 
-//   let filteredData = customerEnquiriesData;
+  let filteredData = customerEnquiriesData;
 
-//   // Branch Filter
-//   if (branch) {
-//     filteredData = filteredData.filter((item) => item.branch === branch);
-//   }
+  // Branch Filter
+  if (branch) {
+    filteredData = filteredData.filter((item) => item.branch === branch);
+  }
 
-//   // Date Range Filter
-//   if (from && to) {
-//     const fromDate = new Date(from);
-//     const toDate = new Date(to);
-//     filteredData = filteredData.filter((item) => {
-//       const itemDate = new Date(item.lastUpdated);
-//       return itemDate >= fromDate && itemDate <= toDate;
-//     });
-//   }
+  // Date Range Filter
+  if (from && to) {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    filteredData = filteredData.filter((item) => {
+      const itemDate = new Date(item.lastUpdated);
+      return itemDate >= fromDate && itemDate <= toDate;
+    });
+  }
 
-//   // Search Filter
-//   if (search) {
-//     const lowerSearch = search.toLowerCase();
-//     filteredData = filteredData.filter(
-//       (item) =>
-//         item.name.toLowerCase().includes(lowerSearch) ||
-//         item.email.toLowerCase().includes(lowerSearch) ||
-//         item.number.toLowerCase().includes(lowerSearch),
-//     );
-//   }
+  // Search Filter
+  if (search) {
+    const lowerSearch = search.toLowerCase();
+    filteredData = filteredData.filter(
+      (item) =>
+        item.name.toLowerCase().includes(lowerSearch) ||
+        item.email.toLowerCase().includes(lowerSearch) ||
+        item.number.toLowerCase().includes(lowerSearch),
+    );
+  }
 
-//   // Pagination
-//   const start = (page - 1) * limit;
-//   const end = start + limit;
-//   const paginatedData = filteredData.slice(start, end);
+  // Pagination
+  const start = (page - 1) * limit;
+  const end = start + limit;
+  const paginatedData = filteredData.slice(start, end);
 
-//   return {
-//     data: paginatedData,
-//     totalCount: filteredData.length,
-//   };
-// };
+  return {
+    data: paginatedData,
+    totalCount: filteredData.length,
+  };
+};
 
 // export const getAllTherapists = async (
 //   page: number = 1,
