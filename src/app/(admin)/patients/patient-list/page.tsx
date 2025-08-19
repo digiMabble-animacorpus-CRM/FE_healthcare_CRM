@@ -24,8 +24,7 @@ import {
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import '@/assets/scss/components/_edittogglebtn.scss';
-import { getAllPatient } from '@/helpers/patient';
-import { API_BASE_PATH } from '@/context/constants';
+import { getAllPatient, deletePatient } from '@/helpers/patient';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
@@ -42,7 +41,7 @@ const PatientsListPage = () => {
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
   const router = useRouter();
 
-  // Fetch all patients
+  // Fetch patients
   const fetchPatients = async () => {
     setLoading(true);
     try {
@@ -85,7 +84,6 @@ const PatientsListPage = () => {
     }
   };
 
-  // Apply filters
   const filteredPatients = useMemo(() => {
     let data = [...allPatients];
 
@@ -137,24 +135,26 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = (id: any) => {
-    router.push(`/patients/details/${id}`);
-  };
-
-  const handleEditClick = (id: any) => router.push(`/patients/edit-patient/${id}`);
-  const handleDeleteClick = (id: any) => {
+  const handleView = (id: string) => router.push(`/patients/details/${id}`);
+  const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
+  const handleDeleteClick = (id: string) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
     if (!selectedPatientId) return;
+
     try {
-      await fetch(`${API_BASE_PATH}/patients/${selectedPatientId}`, { method: 'DELETE' }); // 🔥 fixed endpoint
-      setAllPatients(allPatients.filter((p) => p.id !== selectedPatientId));
-      setShowSuccessMessage(true);
+      const success = await deletePatient(selectedPatientId);
+      if (success) {
+        setAllPatients((prev) => prev.filter((p) => p.id !== selectedPatientId));
+        setShowSuccessMessage(true);
+      } else {
+        console.error('Failed to delete patient');
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Delete error:', err);
     } finally {
       setShowDeleteModal(false);
       setSelectedPatientId(null);
@@ -395,6 +395,7 @@ const PatientsListPage = () => {
         </Col>
       </Row>
 
+      {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>

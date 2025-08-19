@@ -245,6 +245,50 @@ export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   };
 };
 
+
+
+
+export const deletePatient = async (id: string | number): Promise<boolean> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) return false;
+
+    const response = await fetch(`${API_BASE_PATH}/patients/${id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.status) {
+      console.error('Delete failed:', result.message || 'Unknown error');
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting patient:', error);
+    return false;
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 export const getAllRoles = async (): Promise<any[]> => {
   try {
     const token = localStorage.getItem('access_token');
