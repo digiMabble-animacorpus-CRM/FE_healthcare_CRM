@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import dayjs, { Dayjs } from 'dayjs';
 import Image from 'next/image';
 import { Icon } from '@iconify/react';
-import ReactApexChart from 'react-apexcharts';
+// import ReactApexChart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import {
@@ -31,6 +31,10 @@ import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
 import Calendar from './Calendar';
 import useCalendar from '@/app/(admin)/pages/calendar/useCalendar';
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
 
 export type Appointment = {
   id: string;
