@@ -95,7 +95,7 @@ const PatientDetailsPage = () => {
 
   return (
     <>
-      <PageTitle subName="Healthcare" title="Patient Overview" />
+      <PageTitle subName="Healthcare" title="" />
       <PatientDetails
         name={`${data.firstname} ${data.lastname}`}
         birthdate={data.birthdate}
