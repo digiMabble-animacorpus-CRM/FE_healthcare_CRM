@@ -1,13 +1,25 @@
-'use client'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import { Button, Card, CardBody, CardTitle, Col, Placeholder, PlaceholderButton, Row } from 'react-bootstrap'
+'use client';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardTitle,
+  Col,
+  Placeholder,
+  PlaceholderButton,
+  Row,
+} from 'react-bootstrap';
 
 const DefaultPlaceholders = () => {
   return (
     <ComponentContainerCard
       id="default"
       title="Default"
-      description={<>A progress bar can be used to show a user how far along he/she is in a process.</>}>
+      description={
+        <>A progress bar can be used to show a user how far along he/she is in a process.</>
+      }
+    >
       <Row className="g-4">
         <Col md={4}>
           <Card>
@@ -19,7 +31,8 @@ const DefaultPlaceholders = () => {
               role="img"
               aria-label="Placeholder"
               preserveAspectRatio="xMidYMid slice"
-              focusable="false">
+              focusable="false"
+            >
               <title>Placeholder</title>
               <rect width="100%" height="100%" fill="#20c997" />
             </svg>
@@ -27,7 +40,10 @@ const DefaultPlaceholders = () => {
               <CardTitle as={'h5'} className="mb-2">
                 Card title
               </CardTitle>
-              <p className="card-text">Some quick example text to build on the card title and make up the bulk of the card&apos;s content.</p>
+              <p className="card-text">
+                Some quick example text to build on the card title and make up the bulk of the
+                card&apos;s content.
+              </p>
               <Button variant="primary">Go somewhere</Button>
             </CardBody>
           </Card>
@@ -42,7 +58,8 @@ const DefaultPlaceholders = () => {
               role="img"
               aria-label="Placeholder"
               preserveAspectRatio="xMidYMid slice"
-              focusable="false">
+              focusable="false"
+            >
               <title>Placeholder</title>
               <rect width="100%" height="100%" fill="#868e96" />
             </svg>
@@ -61,8 +78,8 @@ const DefaultPlaceholders = () => {
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const PlaceholdersConcept = () => {
   return (
@@ -71,17 +88,19 @@ const PlaceholdersConcept = () => {
       title="How it works"
       description={
         <>
-          Create placeholders with the <code>.placeholder</code> class and a grid column class (e.g., <code>.col-6</code>) to set the{' '}
-          <code>width</code>. They can replace the text inside an element or be added as a modifier class to an existing component.
+          Create placeholders with the <code>.placeholder</code> class and a grid column class
+          (e.g., <code>.col-6</code>) to set the <code>width</code>. They can replace the text
+          inside an element or be added as a modifier class to an existing component.
         </>
-      }>
+      }
+    >
       <p aria-hidden="true">
         <Placeholder xs={6} />
       </p>
       <PlaceholderButton xs={4} tabIndex={-1} className="disabled" aria-hidden="true" />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const PlaceholdersWidth = () => {
   return (
@@ -90,15 +109,17 @@ const PlaceholdersWidth = () => {
       title="Width"
       description={
         <>
-          You can change the <code>width</code> through grid column classes, width utilities, or inline styles.
+          You can change the <code>width</code> through grid column classes, width utilities, or
+          inline styles.
         </>
-      }>
+      }
+    >
       <Placeholder xs={6} />
       <Placeholder className="w-75" />
       <Placeholder style={{ width: '25%' }} />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const PlaceholdersWithColor = () => {
   return (
@@ -107,9 +128,11 @@ const PlaceholdersWithColor = () => {
       title="Color"
       description={
         <>
-          By default, the <code>placeholder</code> uses <code>currentColor</code>. This can be overridden with a custom color or utility class.
+          By default, the <code>placeholder</code> uses <code>currentColor</code>. This can be
+          overridden with a custom color or utility class.
         </>
-      }>
+      }
+    >
       <Placeholder xs={12} />
       <Placeholder xs={12} bg="primary" />
       <Placeholder xs={12} bg="secondary" />
@@ -120,8 +143,8 @@ const PlaceholdersWithColor = () => {
       <Placeholder xs={12} bg="light" />
       <Placeholder xs={12} bg="dark" />
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AllPlaceholders = () => {
   return (
@@ -131,7 +154,7 @@ const AllPlaceholders = () => {
       <PlaceholdersWidth />
       <PlaceholdersWithColor />
     </>
-  )
-}
+  );
+};
 
-export default AllPlaceholders
+export default AllPlaceholders;

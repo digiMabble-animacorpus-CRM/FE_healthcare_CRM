@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllLineCharts from './components/AllLineCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllLineCharts from './components/AllLineCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Line Charts' }
+export const metadata: Metadata = { title: 'Line Charts' };
 
 const LineCharts = () => {
   return (
@@ -32,7 +32,7 @@ const LineCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default LineCharts
+export default LineCharts;

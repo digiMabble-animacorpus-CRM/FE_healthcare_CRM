@@ -1,13 +1,13 @@
-import 'jsvectormap'
-import 'jsvectormap/dist/maps/russia.js'
+import 'jsvectormap';
+import 'jsvectormap/dist/maps/russia.js';
 
 //components
-import BaseVectorMap from './BaseVectorMap'
+import BaseVectorMap from './BaseVectorMap';
 
 interface RussiaVectorMapProps {
-  width?: string
-  height?: string
-  options?: any
+  width?: string;
+  height?: string;
+  options?: any;
 }
 
 const RussiaVectorMap = ({ width, height, options }: RussiaVectorMapProps) => {
@@ -15,7 +15,7 @@ const RussiaVectorMap = ({ width, height, options }: RussiaVectorMapProps) => {
     <>
       <BaseVectorMap width={width} height={height} options={options} type="russia" />
     </>
-  )
-}
+  );
+};
 
-export default RussiaVectorMap
+export default RussiaVectorMap;

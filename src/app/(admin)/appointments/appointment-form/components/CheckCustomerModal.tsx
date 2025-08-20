@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { Modal, Button, Form } from 'react-bootstrap';
 
 interface Props {
   onCheck: (email: string) => void;
   isCustomerNotFound: boolean;
 }
 
-const CheckCustomerSection = ({ onCheck, isCustomerNotFound }: Props) => {
+const CheckCustomerModal = ({ show, onClose, onCheck, isCustomerNotFound }: Props) => {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState('');
 
   return (
     <div className="p-3 border rounded bg-light">
@@ -46,10 +46,7 @@ const CheckCustomerSection = ({ onCheck, isCustomerNotFound }: Props) => {
             >
               Search Again
             </Button>
-            <Button
-              variant="success"
-              onClick={() => router.push("/customer-enquiries/add-enquiry")}
-            >
+            <Button variant="success" onClick={() => router.push('/patients/add-enquiry')}>
               Create New Customer
             </Button>
           </>

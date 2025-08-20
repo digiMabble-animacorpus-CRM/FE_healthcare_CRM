@@ -1,6 +1,6 @@
-import { Button } from 'react-bootstrap'
+import { Button } from 'react-bootstrap';
 
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 const SidePanel = ({ createNewEvent }: { createNewEvent: () => void }) => {
   // external events
@@ -30,7 +30,7 @@ const SidePanel = ({ createNewEvent }: { createNewEvent: () => void }) => {
       variant: 'warning',
       title: 'Marketing Campaign Kickoff',
     },
-  ]
+  ];
 
   return (
     <>
@@ -45,7 +45,12 @@ const SidePanel = ({ createNewEvent }: { createNewEvent: () => void }) => {
         <p className="text-muted">Drag and drop your event or click in the calendar</p>
 
         {externalEvents.map(({ id, variant, title }) => (
-          <div key={id} className={`external-event pb-1 bg-soft-${variant} text-${variant}`} title={title} data-class={`bg-${variant}`}>
+          <div
+            key={id}
+            className={`external-event pb-1 bg-soft-${variant} text-${variant}`}
+            title={title}
+            data-class={`bg-${variant}`}
+          >
             <span className="icons-center">
               <IconifyIcon icon="bxs:circle" className="me-2 vertical-middle" />
               {title}
@@ -54,7 +59,7 @@ const SidePanel = ({ createNewEvent }: { createNewEvent: () => void }) => {
         ))}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default SidePanel
+export default SidePanel;

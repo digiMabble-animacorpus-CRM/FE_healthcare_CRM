@@ -1,10 +1,10 @@
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import AllPagination from './components/AllPagination'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import AllPagination from './components/AllPagination';
+import { Col, Row } from 'react-bootstrap';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Pagination' }
+export const metadata: Metadata = { title: 'Pagination' };
 
 const Pagination = () => {
   return (
@@ -26,7 +26,7 @@ const Pagination = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Pagination
+export default Pagination;

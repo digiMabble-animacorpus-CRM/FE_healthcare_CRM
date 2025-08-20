@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
-import Maintenance from './components/Maintenance'
+import { Metadata } from 'next';
+import Maintenance from './components/Maintenance';
 
-export const metadata: Metadata = { title: 'Maintenance' }
+export const metadata: Metadata = { title: 'Maintenance' };
 
 const MaintenancePage = () => {
-  return <Maintenance />
-}
+  return <Maintenance />;
+};
 
-export default MaintenancePage
+export default MaintenancePage;

@@ -1,11 +1,11 @@
-import avatar3 from '@/assets/images/users/avatar-3.jpg'
-import avatar4 from '@/assets/images/users/avatar-4.jpg'
-import avatar5 from '@/assets/images/users/avatar-5.jpg'
-import avatar6 from '@/assets/images/users/avatar-6.jpg'
-import avatar7 from '@/assets/images/users/avatar-7.jpg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { currency } from '@/context/constants'
-import Image from 'next/image'
+import avatar3 from '@/assets/images/users/avatar-3.jpg';
+import avatar4 from '@/assets/images/users/avatar-4.jpg';
+import avatar5 from '@/assets/images/users/avatar-5.jpg';
+import avatar6 from '@/assets/images/users/avatar-6.jpg';
+import avatar7 from '@/assets/images/users/avatar-7.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { currency } from '@/context/constants';
+import Image from 'next/image';
 import {
   Button,
   Card,
@@ -18,7 +18,7 @@ import {
   DropdownMenu,
   DropdownToggle,
   ProgressBar,
-} from 'react-bootstrap'
+} from 'react-bootstrap';
 
 const CollectionRent = () => {
   return (
@@ -31,8 +31,10 @@ const CollectionRent = () => {
               as={'a'}
               className="btn btn-sm btn-outline-light rounded content-none icons-center"
               data-bs-toggle="dropdown"
-              aria-expanded="false">
-              This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+              aria-expanded="false"
+            >
+              This Month{' '}
+              <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
               <DropdownItem>Today</DropdownItem>
@@ -48,10 +50,23 @@ const CollectionRent = () => {
               <h3 className="text-dark fw-bold mb-1">{currency}500.50K</h3>
             </div>
             <div className="avatar-md bg-light bg-opacity-50 rounded flex-centered">
-              <IconifyIcon icon="solar:hand-money-broken" width={32} height={32} className="fs-32 text-primary" />
+              <IconifyIcon
+                icon="solar:hand-money-broken"
+                width={32}
+                height={32}
+                className="fs-32 text-primary"
+              />
             </div>
           </div>
-          <ProgressBar style={{ height: 15 }} now={50} striped animated variant="success" className="mt-3" role="progressbar"></ProgressBar>
+          <ProgressBar
+            style={{ height: 15 }}
+            now={50}
+            striped
+            animated
+            variant="success"
+            className="mt-3"
+            role="progressbar"
+          ></ProgressBar>
 
           <div className="d-flex align-items-center justify-content-between mt-3">
             <div>
@@ -68,19 +83,39 @@ const CollectionRent = () => {
               <h5 className="fw-medium mb-1 text-dark fs-16">Tenants with invoice due</h5>
               <div className="avatar-group mt-3">
                 <div className="avatar d-flex align-items-center justify-content-center">
-                  <Image src={avatar4} alt="avatar1" className="rounded-circle avatar border border-light border-3" />
+                  <Image
+                    src={avatar4}
+                    alt="avatar1"
+                    className="rounded-circle avatar border border-light border-3"
+                  />
                 </div>
                 <div className="avatar d-flex align-items-center justify-content-center">
-                  <Image src={avatar5} alt="avatar2" className="rounded-circle avatar border border-light border-3" />
+                  <Image
+                    src={avatar5}
+                    alt="avatar2"
+                    className="rounded-circle avatar border border-light border-3"
+                  />
                 </div>
                 <div className="avatar d-flex align-items-center justify-content-center">
-                  <Image src={avatar3} alt="avatar3" className="rounded-circle avatar border border-light border-3" />
+                  <Image
+                    src={avatar3}
+                    alt="avatar3"
+                    className="rounded-circle avatar border border-light border-3"
+                  />
                 </div>
                 <div className="avatar d-flex align-items-center justify-content-center">
-                  <Image src={avatar6} alt="avatar4" className="rounded-circle avatar border border-light border-3" />
+                  <Image
+                    src={avatar6}
+                    alt="avatar4"
+                    className="rounded-circle avatar border border-light border-3"
+                  />
                 </div>
                 <div className="avatar d-flex align-items-center justify-content-center">
-                  <Image src={avatar7} alt="avatar5" className="rounded-circle avatar border border-light border-3" />
+                  <Image
+                    src={avatar7}
+                    alt="avatar5"
+                    className="rounded-circle avatar border border-light border-3"
+                  />
                 </div>
               </div>
             </div>
@@ -91,7 +126,7 @@ const CollectionRent = () => {
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default CollectionRent
+export default CollectionRent;

@@ -1,4 +1,4 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
 const lineColumnChartOpts: ApexOptions = {
   chart: {
@@ -63,7 +63,7 @@ const lineColumnChartOpts: ApexOptions = {
       bottom: 5,
     },
   },
-}
+};
 
 const multipleYAxisChartOpts: ApexOptions = {
   chart: {
@@ -161,9 +161,9 @@ const multipleYAxisChartOpts: ApexOptions = {
     y: {
       formatter: function (y) {
         if (typeof y !== 'undefined') {
-          return y + ' thousand crores'
+          return y + ' thousand crores';
         }
-        return y
+        return y;
       },
     },
   },
@@ -189,7 +189,7 @@ const multipleYAxisChartOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 const lineAreaChartOpts: ApexOptions = {
   chart: {
@@ -219,7 +219,19 @@ const lineAreaChartOpts: ApexOptions = {
     type: 'solid',
     opacity: [0.35, 1],
   },
-  labels: ['Dec 01', 'Dec 02', 'Dec 03', 'Dec 04', 'Dec 05', 'Dec 06', 'Dec 07', 'Dec 08', 'Dec 09 ', 'Dec 10', 'Dec 11'],
+  labels: [
+    'Dec 01',
+    'Dec 02',
+    'Dec 03',
+    'Dec 04',
+    'Dec 05',
+    'Dec 06',
+    'Dec 07',
+    'Dec 08',
+    'Dec 09 ',
+    'Dec 10',
+    'Dec 11',
+  ],
   markers: {
     size: 0,
   },
@@ -246,9 +258,9 @@ const lineAreaChartOpts: ApexOptions = {
     y: {
       formatter: function (y) {
         if (typeof y !== 'undefined') {
-          return y.toFixed(0) + ' points'
+          return y.toFixed(0) + ' points';
         }
-        return y
+        return y;
       },
     },
   },
@@ -271,7 +283,7 @@ const lineAreaChartOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 const lineColumnAreaChartOpts: ApexOptions = {
   chart: {
@@ -353,9 +365,9 @@ const lineColumnAreaChartOpts: ApexOptions = {
     y: {
       formatter: function (y) {
         if (typeof y !== 'undefined') {
-          return y.toFixed(0) + ' points'
+          return y.toFixed(0) + ' points';
         }
-        return y
+        return y;
       },
     },
   },
@@ -365,6 +377,6 @@ const lineColumnAreaChartOpts: ApexOptions = {
       bottom: 5,
     },
   },
-}
+};
 
-export { lineColumnChartOpts, multipleYAxisChartOpts, lineAreaChartOpts, lineColumnAreaChartOpts }
+export { lineColumnChartOpts, multipleYAxisChartOpts, lineAreaChartOpts, lineColumnAreaChartOpts };

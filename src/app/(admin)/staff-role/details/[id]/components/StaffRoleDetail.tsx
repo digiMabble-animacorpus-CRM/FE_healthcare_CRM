@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { Button, Card, CardBody, Col, Row } from "react-bootstrap";
-import type { PermissionType, StaffRoleType } from "@/types/data";
-import { useRouter } from "next/navigation";
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { Button, Card, CardBody, Col, Row } from 'react-bootstrap';
+import type { PermissionType, StaffRoleType } from '@/types/data';
+import { useRouter } from 'next/navigation';
 
 const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
-  console.log("StaffRoleDetail data:", data);
+  console.log('StaffRoleDetail data:', data);
 
   if (!data) {
     return <div>Loading...</div>; // Handle loading state or error
@@ -47,19 +47,15 @@ const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
           </Col>
           <Col lg={3}>
             <p className="text-dark fw-semibold fs-16 mb-1">Is Internal :</p>
-            <p className="mb-0">{data.internal ? "Yes" : "No"}</p>
+            <p className="mb-0">{data.internal ? 'Yes' : 'No'}</p>
           </Col>
           <Col lg={3}>
-            <p className="text-dark fw-semibold fs-16 mb-1">
-              Requires Details :
-            </p>
-            <p className="mb-0">{data.requiresDetails ? "Yes" : "No"}</p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Requires Details :</p>
+            <p className="mb-0">{data.requiresDetails ? 'Yes' : 'No'}</p>
           </Col>
           <Col lg={2}>
-            <p className="text-dark fw-semibold fs-16 mb-1">
-              Requires Availability :
-            </p>
-            <p className="mb-0">{data.requiresAvailability ? "Yes" : "No"}</p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Requires Availability :</p>
+            <p className="mb-0">{data.requiresAvailability ? 'Yes' : 'No'}</p>
           </Col>
         </Row>
 
@@ -76,17 +72,12 @@ const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
             {Array.isArray(data?.defaultPermissionsDetailed) &&
             data.defaultPermissionsDetailed.length > 0 ? (
               <div className="d-flex gap-2 flex-wrap">
-                {data.defaultPermissionsDetailed.map(
-                  (perm: PermissionType, i: any) => (
-                    <p className="mb-0 d-flex align-items-center" key={i}>
-                      <IconifyIcon
-                        icon="ri:circle-fill"
-                        className="fs-10 me-2 text-success"
-                      />
-                      {perm.label}
-                    </p>
-                  )
-                )}
+                {data.defaultPermissionsDetailed.map((perm: PermissionType, i: any) => (
+                  <p className="mb-0 d-flex align-items-center" key={i}>
+                    <IconifyIcon icon="ri:circle-fill" className="fs-10 me-2 text-success" />
+                    {perm.label}
+                  </p>
+                ))}
               </div>
             ) : (
               <p className="text-muted">No permissions assigned.</p>

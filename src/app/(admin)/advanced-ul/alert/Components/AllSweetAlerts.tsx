@@ -1,10 +1,10 @@
-'use client'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import { Button } from 'react-bootstrap'
-import { withSwal } from 'react-sweetalert2'
+'use client';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import { Button } from 'react-bootstrap';
+import { withSwal } from 'react-sweetalert2';
 
 const AllSweetAlerts = withSwal((props: any) => {
-  const { swal } = props
+  const { swal } = props;
 
   return (
     <>
@@ -19,7 +19,8 @@ const AllSweetAlerts = withSwal((props: any) => {
                 confirmButton: `btn btn-primary w-xs mt-2`,
               },
             })
-          }>
+          }
+        >
           Click me
         </Button>
       </ComponentContainerCard>
@@ -37,7 +38,8 @@ const AllSweetAlerts = withSwal((props: any) => {
                 confirmButton: `btn btn-primary w-xs mt-2`,
               },
             })
-          }>
+          }
+        >
           Click me
         </Button>
       </ComponentContainerCard>
@@ -60,7 +62,8 @@ const AllSweetAlerts = withSwal((props: any) => {
                 buttonsStyling: false,
                 showCloseButton: false,
               })
-            }>
+            }
+          >
             Success
           </Button>
           <Button
@@ -77,7 +80,8 @@ const AllSweetAlerts = withSwal((props: any) => {
                 footer: '<a href="">Why do I have this issue?</a>',
                 showCloseButton: false,
               })
-            }>
+            }
+          >
             Warning
           </Button>
           <Button
@@ -94,7 +98,8 @@ const AllSweetAlerts = withSwal((props: any) => {
                 footer: '<a href="">Why do I have this issue?</a>',
                 showCloseButton: false,
               })
-            }>
+            }
+          >
             Info
           </Button>
           <Button
@@ -111,13 +116,18 @@ const AllSweetAlerts = withSwal((props: any) => {
                 footer: '<a href="">Why do I have this issue?</a>',
                 showCloseButton: false,
               })
-            }>
+            }
+          >
             Error
           </Button>
         </div>
       </ComponentContainerCard>
 
-      <ComponentContainerCard id="longcontent" title="Long content Images Message" titleClass="mb-3">
+      <ComponentContainerCard
+        id="longcontent"
+        title="Long content Images Message"
+        titleClass="mb-3"
+      >
         <Button
           variant="primary"
           onClick={() =>
@@ -131,7 +141,8 @@ const AllSweetAlerts = withSwal((props: any) => {
               buttonsStyling: false,
               showCloseButton: false,
             })
-          }>
+          }
+        >
           Click me
         </Button>
       </ComponentContainerCard>
@@ -166,7 +177,7 @@ const AllSweetAlerts = withSwal((props: any) => {
                       confirmButton: `btn btn-primary w-xs mt-2`,
                     },
                     buttonsStyling: false,
-                  })
+                  });
                 } else if (
                   // Read more about handling dismissals
                   result.dismiss === swal.DismissReason.cancel
@@ -179,15 +190,16 @@ const AllSweetAlerts = withSwal((props: any) => {
                       confirmButton: `btn btn-primary mt-2`,
                     },
                     buttonsStyling: false,
-                  })
+                  });
                 }
               })
-          }>
+          }
+        >
           Click me
         </Button>
       </ComponentContainerCard>
     </>
-  )
-})
+  );
+});
 
-export default AllSweetAlerts
+export default AllSweetAlerts;

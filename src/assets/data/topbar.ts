@@ -1,7 +1,7 @@
-import avatar1 from '@/assets/images/users/avatar-1.jpg'
-import avatar3 from '@/assets/images/users/avatar-3.jpg'
-import avatar5 from '@/assets/images/users/avatar-5.jpg'
-import { NotificationType } from '@/types/data'
+import avatar1 from '@/assets/images/users/avatar-1.jpg';
+import avatar3 from '@/assets/images/users/avatar-3.jpg';
+import avatar5 from '@/assets/images/users/avatar-5.jpg';
+import { NotificationType } from '@/types/data';
 
 export const notificationsData: NotificationType[] = [
   {
@@ -27,4 +27,4 @@ export const notificationsData: NotificationType[] = [
     from: 'Vanessa R. Davis',
     content: 'Delivery processing your order is being shipped',
   },
-]
+];

@@ -1,8 +1,14 @@
-import avatar1 from '@/assets/images/users/main-image.jpeg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Dropdown, DropdownHeader, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap'
+import avatar1 from '@/assets/images/users/main-image.jpeg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Dropdown,
+  DropdownHeader,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+} from 'react-bootstrap';
 
 const ProfileDropdown = () => {
   return (
@@ -14,7 +20,8 @@ const ProfileDropdown = () => {
         id="page-header-user-dropdown "
         data-bs-toggle="dropdown"
         aria-haspopup="true"
-        aria-expanded="false">
+        aria-expanded="false"
+      >
         <span className="d-flex align-items-center">
           <Image className="rounded-circle" width={32} src={avatar1} alt="avatar-3" />
         </span>
@@ -23,9 +30,9 @@ const ProfileDropdown = () => {
         <DropdownHeader as={'h6'} className="dropdown-header">
           Welcome Gaston!
         </DropdownHeader>
-        <DropdownItem as={Link} href="/profile">
+        <DropdownItem as={Link} href="/profile/details">
           <IconifyIcon icon="solar:calendar-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">My Account</span>
+          <span className="align-middle">My Profile</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/pages/pricing">
           <IconifyIcon icon="solar:wallet-broken" className="align-middle me-2 fs-18" />
@@ -46,7 +53,7 @@ const ProfileDropdown = () => {
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
-  )
-}
+  );
+};
 
-export default ProfileDropdown
+export default ProfileDropdown;

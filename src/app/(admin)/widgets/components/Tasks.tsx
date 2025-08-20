@@ -1,11 +1,11 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getAllTasks } from '@/helpers/data'
-import clsx from 'clsx'
-import { Button, Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { getAllTasks } from '@/helpers/data';
+import clsx from 'clsx';
+import { Button, Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
 
 const Tasks = async () => {
-  const allTasks = await getAllTasks()
+  const allTasks = await getAllTasks();
 
   return (
     <Card>
@@ -38,7 +38,7 @@ const Tasks = async () => {
         </SimplebarReactClient>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default Tasks
+export default Tasks;

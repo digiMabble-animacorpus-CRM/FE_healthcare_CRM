@@ -1,5 +1,5 @@
-import type { ApexOptions } from 'apexcharts'
-import dayjs from 'dayjs'
+import type { ApexOptions } from 'apexcharts';
+import dayjs from 'dayjs';
 const seriesData = [
   {
     x: new Date(2016, 1, 1),
@@ -93,7 +93,7 @@ const seriesData = [
     x: new Date(2017, 11, 1),
     y: [61.71, 64.15, 61.29, 63.04],
   },
-]
+];
 export const simpleChartOpts: ApexOptions = {
   chart: {
     height: 400,
@@ -127,7 +127,7 @@ export const simpleChartOpts: ApexOptions = {
   grid: {
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const categoryXAxisChartOpts: ApexOptions = {
   series: [
@@ -435,7 +435,7 @@ export const categoryXAxisChartOpts: ApexOptions = {
     type: 'category',
     labels: {
       formatter: function (val) {
-        return dayjs(val).format('MMM DD HH:mm')
+        return dayjs(val).format('MMM DD HH:mm');
       },
     },
   },
@@ -444,7 +444,7 @@ export const categoryXAxisChartOpts: ApexOptions = {
       enabled: true,
     },
   },
-}
+};
 
 export const candlestickWithLineOpts: ApexOptions = {
   series: [
@@ -756,4 +756,4 @@ export const candlestickWithLineOpts: ApexOptions = {
   xaxis: {
     type: 'datetime',
   },
-}
+};

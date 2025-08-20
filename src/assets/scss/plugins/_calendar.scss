@@ -253,11 +253,14 @@ th.fc-day-header {
      }
 
      .fc-toolbar-title {
-          font-size: 18px;
           text-transform: uppercase;
           font-weight: $font-weight-semibold;
           margin: 0;
      }
+}
+
+.fc-toolbar-title {
+     font-size: 16px !important;
 }
 
 .fc-direction-ltr .fc-toolbar>*> :not(:first-child) {

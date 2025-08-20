@@ -1,10 +1,10 @@
-import UIExamplesList from '@/components/UIExamplesList'
-import { Col, Row } from 'react-bootstrap'
-import AllVectorMaps from './components/AllVectorMaps'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import UIExamplesList from '@/components/UIExamplesList';
+import { Col, Row } from 'react-bootstrap';
+import AllVectorMaps from './components/AllVectorMaps';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Vector Maps' }
+export const metadata: Metadata = { title: 'Vector Maps' };
 
 const VectorMaps = () => {
   return (
@@ -27,7 +27,7 @@ const VectorMaps = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default VectorMaps
+export default VectorMaps;

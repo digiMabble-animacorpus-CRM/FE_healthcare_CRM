@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { Card, Col, FormLabel, FormText, Row } from 'react-bootstrap'
-import Dropzone from 'react-dropzone'
-import useFileUploader from '@/hooks/useFileUploader'
-import IconifyIcon from '../wrappers/IconifyIcon'
-import { DropzoneFormInputProps } from '@/types/component-props'
+import { Card, Col, FormLabel, FormText, Row } from 'react-bootstrap';
+import Dropzone from 'react-dropzone';
+import useFileUploader from '@/hooks/useFileUploader';
+import IconifyIcon from '../wrappers/IconifyIcon';
+import { DropzoneFormInputProps } from '@/types/component-props';
 
 const DropzoneFormInput = ({
   label,
@@ -17,7 +17,7 @@ const DropzoneFormInput = ({
   textClassName,
   onFileUpload,
 }: DropzoneFormInputProps) => {
-  const { selectedFiles, handleAcceptedFiles, removeFile } = useFileUploader(showPreview)
+  const { selectedFiles, handleAcceptedFiles, removeFile } = useFileUploader(showPreview);
 
   return (
     <>
@@ -39,14 +39,18 @@ const DropzoneFormInput = ({
                 <input {...getInputProps()} />
                 <IconifyIcon icon={iconProps?.icon ?? 'bx:cloud-upload'} {...iconProps} />
                 <h3 className={textClassName}>{text}</h3>
-                {helpText && typeof helpText === 'string' ? <FormText>{helpText}</FormText> : helpText}
+                {helpText && typeof helpText === 'string' ? (
+                  <FormText>{helpText}</FormText>
+                ) : (
+                  helpText
+                )}
               </div>
             </div>
 
             {showPreview && selectedFiles.length > 0 && (
               <div className="dz-preview mt-3">
                 {selectedFiles.map((file, idx) => {
-                  const ext = file.name?.split('.').pop()?.toUpperCase() || 'FILE'
+                  const ext = file.name?.split('.').pop()?.toUpperCase() || 'FILE';
 
                   return (
                     <Card className="mt-1 mb-0 shadow-none border" key={`${idx}-file`}>
@@ -84,7 +88,7 @@ const DropzoneFormInput = ({
                         </Row>
                       </div>
                     </Card>
-                  )
+                  );
                 })}
               </div>
             )}
@@ -92,7 +96,7 @@ const DropzoneFormInput = ({
         )}
       </Dropzone>
     </>
-  )
-}
+  );
+};
 
-export default DropzoneFormInput
+export default DropzoneFormInput;

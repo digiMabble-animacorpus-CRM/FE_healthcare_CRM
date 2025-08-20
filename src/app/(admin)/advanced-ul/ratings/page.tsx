@@ -1,10 +1,10 @@
-import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllRatings from './components/AllRatings'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllRatings from './components/AllRatings';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Ratings' }
+export const metadata: Metadata = { title: 'Ratings' };
 
 const Ratings = () => {
   return (
@@ -19,13 +19,18 @@ const Ratings = () => {
                 <a
                   className="btn btn-sm btn-outline-success rounded-2 float-end"
                   href="https://www.npmjs.com/package/@smastrom/react-rating"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </a>
               </CardTitle>
-              <p className="text-muted mb-3">Zero dependency, highly customizable rating component for React.</p>
+              <p className="text-muted mb-3">
+                Zero dependency, highly customizable rating component for React.
+              </p>
               <h5 className="mt-2">Usage</h5>
-              <p className="mb-0">React Rating&apos;s css needs to be imported when using the Rating component</p>
+              <p className="mb-0">
+                React Rating&apos;s css needs to be imported when using the Rating component
+              </p>
             </CardBody>
           </Card>
           <AllRatings />
@@ -44,7 +49,7 @@ const Ratings = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Ratings
+export default Ratings;

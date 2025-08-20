@@ -1,10 +1,10 @@
-import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllSwiper from './AllSwiper'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllSwiper from './AllSwiper';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Swiper' }
+export const metadata: Metadata = { title: 'Swiper' };
 
 const Swiper = () => {
   return (
@@ -16,11 +16,20 @@ const Swiper = () => {
             <CardBody>
               <CardTitle as={'h5'} className="mb-1 anchor" id="overview">
                 Overview
-                <Button variant="outline-success" size="sm" className="rounded-2 float-end" href="https://swiperjs.com/get-started" target="_blank">
+                <Button
+                  variant="outline-success"
+                  size="sm"
+                  className="rounded-2 float-end"
+                  href="https://swiperjs.com/get-started"
+                  target="_blank"
+                >
                   Official Website
                 </Button>
               </CardTitle>
-              <p className="text-muted mb-3">Swiper is the most modern slider with hardware accelerated transitions and amazing native behavior.</p>
+              <p className="text-muted mb-3">
+                Swiper is the most modern slider with hardware accelerated transitions and amazing
+                native behavior.
+              </p>
             </CardBody>
           </Card>
           <AllSwiper />
@@ -44,7 +53,7 @@ const Swiper = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Swiper
+export default Swiper;

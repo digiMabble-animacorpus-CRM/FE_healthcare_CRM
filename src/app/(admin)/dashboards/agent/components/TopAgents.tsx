@@ -1,8 +1,8 @@
-import agent1Img from '@/assets/images/agent-1.png'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
+import agent1Img from '@/assets/images/agent-1.png';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
 
 const TopAgents = () => {
   return (
@@ -16,7 +16,7 @@ const TopAgents = () => {
           <div className="d-flex align-items-center justify-content-between bg-light bg-opacity-25 p-2 mt-2 rounded text-start">
             <div>
               <Link href="" className="text-white fw-medium fs-16">
-              Anima Corpus
+                Anima Corpus
               </Link>
               <p className="mb-0 text-white-50">Brussels, Belgium</p>
               <div className="d-flex flex-wrap gap-2 align-items-center mt-1">
@@ -53,7 +53,7 @@ const TopAgents = () => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default TopAgents
+export default TopAgents;

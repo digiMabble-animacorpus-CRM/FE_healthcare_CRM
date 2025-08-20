@@ -1,6 +1,6 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { Card, CardBody, Col } from 'react-bootstrap'
-import { statData, StatType } from '../data'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { Card, CardBody, Col } from 'react-bootstrap';
+import { statData, StatType } from '../data';
 
 const StatCard = ({ amount, icon, title, change, variant }: StatType) => {
   return (
@@ -27,8 +27,8 @@ const StatCard = ({ amount, icon, title, change, variant }: StatType) => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const Statistics = () => {
   return (
@@ -39,7 +39,7 @@ const Statistics = () => {
         </Col>
       ))}
     </>
-  )
-}
+  );
+};
 
-export default Statistics
+export default Statistics;

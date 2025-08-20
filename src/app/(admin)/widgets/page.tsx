@@ -1,16 +1,16 @@
-import React from 'react'
-import Stats from './components/Stats'
-import Statistic from './components/Statistic'
-import ProjectSummary from './components/ProjectSummary'
-import { Col, Row } from 'react-bootstrap'
-import Schedules from './components/Schedules'
-import Conversions from './components/Conversions'
-import Tasks from './components/Tasks'
-import FriendsRequest from './components/FriendsRequest'
-import RecentTransactions from './components/RecentTransactions'
-import { Metadata } from 'next'
+import React from 'react';
+import Stats from './components/Stats';
+import Statistic from './components/Statistic';
+import ProjectSummary from './components/ProjectSummary';
+import { Col, Row } from 'react-bootstrap';
+import Schedules from './components/Schedules';
+import Conversions from './components/Conversions';
+import Tasks from './components/Tasks';
+import FriendsRequest from './components/FriendsRequest';
+import RecentTransactions from './components/RecentTransactions';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Widgets' }
+export const metadata: Metadata = { title: 'Widgets' };
 
 const WidgetsPage = () => {
   return (
@@ -44,7 +44,7 @@ const WidgetsPage = () => {
         </Row>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default WidgetsPage
+export default WidgetsPage;

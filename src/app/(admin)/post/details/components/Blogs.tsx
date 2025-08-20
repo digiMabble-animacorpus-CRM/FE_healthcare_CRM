@@ -1,8 +1,8 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Image from 'next/image'
-import { blogData } from '../data'
-import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import Link from 'next/link'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import { blogData } from '../data';
+import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import Link from 'next/link';
 
 const Blogs = () => {
   return (
@@ -26,7 +26,12 @@ const Blogs = () => {
               </label>
             </div>
             <div className="form-check mb-2">
-              <input className="form-check-input fs-16" type="checkbox" id="flexCheckChecked1" defaultChecked />
+              <input
+                className="form-check-input fs-16"
+                type="checkbox"
+                id="flexCheckChecked1"
+                defaultChecked
+              />
               <label className="form-check-label text-dark ms-2" htmlFor="flexCheckChecked1">
                 Business
               </label>
@@ -70,7 +75,11 @@ const Blogs = () => {
                     </Link>
                     <p className="text-muted mb-0">
                       <IconifyIcon icon="ti:calendar-due" />
-                      {item.date.toLocaleString('en-us', { month: 'short', day: '2-digit', year: 'numeric' })}
+                      {item.date.toLocaleString('en-us', {
+                        month: 'short',
+                        day: '2-digit',
+                        year: 'numeric',
+                      })}
                     </p>
                   </Col>
                 </Row>
@@ -83,9 +92,11 @@ const Blogs = () => {
             <CardTitle as={'h4'}>Text Widget</CardTitle>
           </div>
           <p className="mt-3 text-muted">
-            Our blog delivers valuable content designed to help you excel in your role. Explore our articles, interviews, and expert commentary to
-            gain valuable insights, expand your knowledge, and stay ahead of the curve. Whether you&apos;re seeking practical tips, strategic advice,
-            or inspiration for your career, Admin Nexus is here to support your journey to success.
+            Our blog delivers valuable content designed to help you excel in your role. Explore our
+            articles, interviews, and expert commentary to gain valuable insights, expand your
+            knowledge, and stay ahead of the curve. Whether you&apos;re seeking practical tips,
+            strategic advice, or inspiration for your career, Admin Nexus is here to support your
+            journey to success.
           </p>
         </div>
         <div className="mt-4">
@@ -102,7 +113,7 @@ const Blogs = () => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default Blogs
+export default Blogs;

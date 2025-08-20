@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllClipboards from './components/AllClipboards'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllClipboards from './components/AllClipboards';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Clipboard' }
+export const metadata: Metadata = { title: 'Clipboard' };
 
 const Clipboard = () => {
   return (
@@ -25,7 +25,7 @@ const Clipboard = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Clipboard
+export default Clipboard;

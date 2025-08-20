@@ -1,6 +1,17 @@
-import WorldVectorMap from '@/components/VectorMap/WorldMap'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { Card, CardBody, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
+import WorldVectorMap from '@/components/VectorMap/WorldMap';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from 'react-bootstrap';
 
 const SalesLocation = () => {
   const salesLocationOptions = {
@@ -36,7 +47,7 @@ const SalesLocation = () => {
         fillOpacity: 1,
       },
     },
-  }
+  };
   return (
     <Col xl={6} lg={6}>
       <Card>
@@ -49,8 +60,10 @@ const SalesLocation = () => {
               as={'a'}
               className="btn btn-sm btn-outline-light rounded content-none icons-center"
               data-bs-toggle="dropdown"
-              aria-expanded="false">
-              Belgium <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+              aria-expanded="false"
+            >
+              Belgium{' '}
+              <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
             </DropdownToggle>
             {/* <DropdownMenu className="dropdown-menu-end">
               <DropdownItem>Belgium</DropdownItem>
@@ -90,11 +103,18 @@ const SalesLocation = () => {
               style={{ width: '20%' }}
               aria-valuenow={30}
               aria-valuemin={0}
-              aria-valuemax={100}>
-              <p className="progress-value text-start text-dark mb-0 mt-1 fs-14 fw-medium" style={{ left: '0%', top: '-50px' }}>
+              aria-valuemax={100}
+            >
+              <p
+                className="progress-value text-start text-dark mb-0 mt-1 fs-14 fw-medium"
+                style={{ left: '0%', top: '-50px' }}
+              >
                 Belgium{' '}
               </p>
-              <p className="progress-value text-start text-light mb-0 mt-1 fs-14 fw-medium" style={{ left: '0%', top: '-30px' }}>
+              <p
+                className="progress-value text-start text-light mb-0 mt-1 fs-14 fw-medium"
+                style={{ left: '0%', top: '-30px' }}
+              >
                 |{' '}
               </p>
               <p className="mb-0  text-start ps-1 ps-lg-2 text-white fs-14">67.0%</p>
@@ -148,7 +168,7 @@ const SalesLocation = () => {
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default SalesLocation
+export default SalesLocation;

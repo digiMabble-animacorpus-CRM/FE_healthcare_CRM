@@ -1,11 +1,11 @@
-import FileUpload from '@/components/FileUpload'
-import PageTitle from '@/components/PageTitle'
-import { Col, Row } from 'react-bootstrap'
-import AgentAdd from './components/AgentAdd'
-import AgentAddCard from './components/AgentAddCard'
-import { Metadata } from 'next'
+import FileUpload from '@/components/FileUpload';
+import PageTitle from '@/components/PageTitle';
+import { Col, Row } from 'react-bootstrap';
+import AgentAdd from './components/AgentAdd';
+import AgentAddCard from './components/AgentAddCard';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Add Agent' }
+export const metadata: Metadata = { title: 'Add Agent' };
 
 const AgentAddPage = () => {
   return (
@@ -19,7 +19,7 @@ const AgentAddPage = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default AgentAddPage
+export default AgentAddPage;

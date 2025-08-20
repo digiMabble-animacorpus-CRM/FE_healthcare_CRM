@@ -1,16 +1,16 @@
-'use client'
-import { useEffect, useState } from 'react'
+'use client';
+import { useEffect, useState } from 'react';
 
 interface BaseVectorMapProps {
-  width?: string
-  height?: string
-  options?: any
-  type: string
+  width?: string;
+  height?: string;
+  options?: any;
+  type: string;
 }
 
 const BaseVectorMap = ({ width, height, options, type }: BaseVectorMapProps) => {
-  const selectorId = type + new Date().getTime()
-  const [map, setMap] = useState<any>()
+  const selectorId = type + new Date().getTime();
+  const [map, setMap] = useState<any>();
 
   useEffect(() => {
     if (!map) {
@@ -19,17 +19,17 @@ const BaseVectorMap = ({ width, height, options, type }: BaseVectorMapProps) => 
         selector: '#' + selectorId,
         map: type,
         ...options,
-      })
+      });
 
-      setMap(map)
+      setMap(map);
     }
-  }, [selectorId, map, options, type])
+  }, [selectorId, map, options, type]);
 
   return (
     <>
       <div id={selectorId} style={{ width: width, height: height }}></div>
     </>
-  )
-}
+  );
+};
 
-export default BaseVectorMap
+export default BaseVectorMap;

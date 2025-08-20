@@ -1,7 +1,7 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllAgent } from '@/helpers/data'
-import Image from 'next/image'
-import Link from 'next/link'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getAllAgent } from '@/helpers/data';
+import Image from 'next/image';
+import Link from 'next/link';
 import {
   Button,
   Card,
@@ -15,10 +15,10 @@ import {
   DropdownMenu,
   DropdownToggle,
   Row,
-} from 'react-bootstrap'
+} from 'react-bootstrap';
 
 const AgentList = async () => {
-  const agentData = await getAllAgent()
+  const agentData = await getAllAgent();
   return (
     <Row>
       <Col xl={12}>
@@ -32,8 +32,10 @@ const AgentList = async () => {
                 as={'a'}
                 className=" btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
-                aria-expanded="false">
-                This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+                aria-expanded="false"
+              >
+                This Month{' '}
+                <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem>Download</DropdownItem>
@@ -62,7 +64,15 @@ const AgentList = async () => {
                     <tr key={idx}>
                       <td>
                         <div className="d-flex align-items-center gap-2">
-                          <div>{item.user?.avatar && <Image src={item.user.avatar} alt="avatar" className="avatar-sm rounded-circle" />}</div>
+                          <div>
+                            {item.user?.avatar && (
+                              <Image
+                                src={item.user.avatar}
+                                alt="avatar"
+                                className="avatar-sm rounded-circle"
+                              />
+                            )}
+                          </div>
                           <div>
                             <Link href="" className="text-dark fw-medium fs-15">
                               {item.user?.name}
@@ -74,10 +84,17 @@ const AgentList = async () => {
                       <td>{item.user?.email}</td>
                       <td>{item.user?.contact}</td>
                       <td>{item.experience}&nbsp;Year</td>
-                      <td>{item.date.toLocaleString('en-us', { day: 'numeric', month: 'short', year: 'numeric' })}</td>
+                      <td>
+                        {item.date.toLocaleString('en-us', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })}
+                      </td>
                       <td>
                         <span
-                          className={`badge bg-${item.user?.status == 'Active' ? 'success' : 'danger'}-subtle text-${item.user?.status == 'Active' ? 'success' : 'danger'} py-1 px-2 fs-13`}>
+                          className={`badge bg-${item.user?.status == 'Active' ? 'success' : 'danger'}-subtle text-${item.user?.status == 'Active' ? 'success' : 'danger'} py-1 px-2 fs-13`}
+                        >
                           {item.user?.status}
                         </span>
                       </td>
@@ -90,7 +107,10 @@ const AgentList = async () => {
                             <IconifyIcon icon="solar:pen-2-broken" className="align-middle fs-18" />
                           </Button>
                           <Button variant="soft-danger" size="sm">
-                            <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" className="align-middle fs-18" />
+                            <IconifyIcon
+                              icon="solar:trash-bin-minimalistic-2-broken"
+                              className="align-middle fs-18"
+                            />
                           </Button>
                         </div>
                       </td>
@@ -134,7 +154,7 @@ const AgentList = async () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default AgentList
+export default AgentList;

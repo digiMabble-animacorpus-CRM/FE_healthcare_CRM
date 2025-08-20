@@ -1,17 +1,21 @@
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
-function generateDayWiseTimeSeries(baseval: number, count: number, yrange: { max: number; min: number }): any[] {
-  let i = 0
-  const series = []
+function generateDayWiseTimeSeries(
+  baseval: number,
+  count: number,
+  yrange: { max: number; min: number },
+): any[] {
+  let i = 0;
+  const series = [];
   while (i < count) {
-    const x = baseval
-    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
+    const x = baseval;
+    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
 
-    series.push([x, y])
-    baseval += 86400000
-    i++
+    series.push([x, y]);
+    baseval += 86400000;
+    i++;
   }
-  return series
+  return series;
 }
 
 const dataSeries = [
@@ -1461,35 +1465,35 @@ const dataSeries = [
       value: 67956992,
     },
   ],
-]
+];
 //Irregular TimeSeries
-let ts1 = 1388534400000
-let ts2 = 1388620800000
-let ts3 = 1389052800000
+let ts1 = 1388534400000;
+let ts2 = 1388620800000;
+let ts3 = 1389052800000;
 
-const dataSet: any = [[], [], []]
+const dataSet: any = [[], [], []];
 
 for (let i = 0; i < 12; i++) {
-  ts1 = ts1 + 86400000
-  const innerArr = [ts1, dataSeries[2][i].value]
-  dataSet[0].push(innerArr)
+  ts1 = ts1 + 86400000;
+  const innerArr = [ts1, dataSeries[2][i].value];
+  dataSet[0].push(innerArr);
 }
 for (let i = 0; i < 18; i++) {
-  ts2 = ts2 + 86400000
-  const innerArr = [ts2, dataSeries[1][i].value]
-  dataSet[1].push(innerArr)
+  ts2 = ts2 + 86400000;
+  const innerArr = [ts2, dataSeries[1][i].value];
+  dataSet[1].push(innerArr);
 }
 for (let i = 0; i < 12; i++) {
-  ts3 = ts3 + 86400000
-  const innerArr = [ts3, dataSeries[0][i].value]
-  dataSet[2].push(innerArr)
+  ts3 = ts3 + 86400000;
+  const innerArr = [ts3, dataSeries[0][i].value];
+  dataSet[2].push(innerArr);
 }
 
 const series = {
   monthDataSeries1: {
     prices: [
-      8107.85, 8128.0, 8122.9, 8165.5, 8340.7, 8423.7, 8423.5, 8514.3, 8481.85, 8487.7, 8506.9, 8626.2, 8668.95, 8602.3, 8607.55, 8512.9, 8496.25,
-      8600.65, 8881.1, 9340.85,
+      8107.85, 8128.0, 8122.9, 8165.5, 8340.7, 8423.7, 8423.5, 8514.3, 8481.85, 8487.7, 8506.9,
+      8626.2, 8668.95, 8602.3, 8607.55, 8512.9, 8496.25, 8600.65, 8881.1, 9340.85,
     ],
     dates: [
       '13 Nov 2017',
@@ -1516,8 +1520,8 @@ const series = {
   },
   monthDataSeries2: {
     prices: [
-      8423.7, 8423.5, 8514.3, 8481.85, 8487.7, 8506.9, 8626.2, 8668.95, 8602.3, 8607.55, 8512.9, 8496.25, 8600.65, 8881.1, 9040.85, 8340.7, 8165.5,
-      8122.9, 8107.85, 8128.0,
+      8423.7, 8423.5, 8514.3, 8481.85, 8487.7, 8506.9, 8626.2, 8668.95, 8602.3, 8607.55, 8512.9,
+      8496.25, 8600.65, 8881.1, 9040.85, 8340.7, 8165.5, 8122.9, 8107.85, 8128.0,
     ],
     dates: [
       '13 Nov 2017',
@@ -1544,14 +1548,18 @@ const series = {
   },
   monthDataSeries3: {
     prices: [
-      7114.25, 7126.6, 7116.95, 7203.7, 7233.75, 7451.0, 7381.15, 7348.95, 7347.75, 7311.25, 7266.4, 7253.25, 7215.45, 7266.35, 7315.25, 7237.2,
-      7191.4, 7238.95, 7222.6, 7217.9, 7359.3, 7371.55, 7371.15, 7469.2, 7429.25, 7434.65, 7451.1, 7475.25, 7566.25, 7556.8, 7525.55, 7555.45, 7560.9,
-      7490.7, 7527.6, 7551.9, 7514.85, 7577.95, 7592.3, 7621.95, 7707.95, 7859.1, 7815.7, 7739.0, 7778.7, 7839.45, 7756.45, 7669.2, 7580.45, 7452.85,
-      7617.25, 7701.6, 7606.8, 7620.05, 7513.85, 7498.45, 7575.45, 7601.95, 7589.1, 7525.85, 7569.5, 7702.5, 7812.7, 7803.75, 7816.3, 7851.15, 7912.2,
-      7972.8, 8145.0, 8161.1, 8121.05, 8071.25, 8088.2, 8154.45, 8148.3, 8122.05, 8132.65, 8074.55, 7952.8, 7885.55, 7733.9, 7897.15, 7973.15, 7888.5,
-      7842.8, 7838.4, 7909.85, 7892.75, 7897.75, 7820.05, 7904.4, 7872.2, 7847.5, 7849.55, 7789.6, 7736.35, 7819.4, 7875.35, 7871.8, 8076.5, 8114.8,
-      8193.55, 8217.1, 8235.05, 8215.3, 8216.4, 8301.55, 8235.25, 8229.75, 8201.95, 8164.95, 8107.85, 8128.0, 8122.9, 8165.5, 8340.7, 8423.7, 8423.5,
-      8514.3, 8481.85, 8487.7, 8506.9, 8626.2,
+      7114.25, 7126.6, 7116.95, 7203.7, 7233.75, 7451.0, 7381.15, 7348.95, 7347.75, 7311.25, 7266.4,
+      7253.25, 7215.45, 7266.35, 7315.25, 7237.2, 7191.4, 7238.95, 7222.6, 7217.9, 7359.3, 7371.55,
+      7371.15, 7469.2, 7429.25, 7434.65, 7451.1, 7475.25, 7566.25, 7556.8, 7525.55, 7555.45, 7560.9,
+      7490.7, 7527.6, 7551.9, 7514.85, 7577.95, 7592.3, 7621.95, 7707.95, 7859.1, 7815.7, 7739.0,
+      7778.7, 7839.45, 7756.45, 7669.2, 7580.45, 7452.85, 7617.25, 7701.6, 7606.8, 7620.05, 7513.85,
+      7498.45, 7575.45, 7601.95, 7589.1, 7525.85, 7569.5, 7702.5, 7812.7, 7803.75, 7816.3, 7851.15,
+      7912.2, 7972.8, 8145.0, 8161.1, 8121.05, 8071.25, 8088.2, 8154.45, 8148.3, 8122.05, 8132.65,
+      8074.55, 7952.8, 7885.55, 7733.9, 7897.15, 7973.15, 7888.5, 7842.8, 7838.4, 7909.85, 7892.75,
+      7897.75, 7820.05, 7904.4, 7872.2, 7847.5, 7849.55, 7789.6, 7736.35, 7819.4, 7875.35, 7871.8,
+      8076.5, 8114.8, 8193.55, 8217.1, 8235.05, 8215.3, 8216.4, 8301.55, 8235.25, 8229.75, 8201.95,
+      8164.95, 8107.85, 8128.0, 8122.9, 8165.5, 8340.7, 8423.7, 8423.5, 8514.3, 8481.85, 8487.7,
+      8506.9, 8626.2,
     ],
     dates: [
       '02 Jun 2017',
@@ -1679,7 +1687,7 @@ const series = {
       '28 Nov 2017',
     ],
   },
-}
+};
 
 export const basicChartOpts: ApexOptions = {
   chart: {
@@ -1742,7 +1750,7 @@ export const basicChartOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const spilineChart: ApexOptions = {
   chart: {
@@ -1792,7 +1800,7 @@ export const spilineChart: ApexOptions = {
       bottom: 5,
     },
   },
-}
+};
 
 export const dateTimeChartOpts: ApexOptions = {
   annotations: {
@@ -2145,7 +2153,7 @@ export const dateTimeChartOpts: ApexOptions = {
       stops: [0, 100],
     },
   },
-}
+};
 
 export const negativeValuesChartOpts: ApexOptions = {
   chart: {
@@ -2392,7 +2400,7 @@ export const negativeValuesChartOpts: ApexOptions = {
     },
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const stackedChartOpts: ApexOptions = {
   chart: {
@@ -2404,7 +2412,7 @@ export const stackedChartOpts: ApexOptions = {
     },
     events: {
       selection: function (e: any) {
-        console.info(new Date(e.xaxis.min))
+        console.info(new Date(e.xaxis.min));
       },
     },
   },
@@ -2474,7 +2482,7 @@ export const stackedChartOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const irregularTimeSeriesOpts: ApexOptions = {
   chart: {
@@ -2536,7 +2544,7 @@ export const irregularTimeSeriesOpts: ApexOptions = {
       },
       offsetX: 0,
       formatter: function (val: any) {
-        return (val / 1000000).toFixed(0)
+        return (val / 1000000).toFixed(0);
       },
     },
     axisBorder: {
@@ -2566,7 +2574,7 @@ export const irregularTimeSeriesOpts: ApexOptions = {
     shared: true,
     y: {
       formatter: function (val: any) {
-        return (val / 1000000).toFixed(0) + ' points'
+        return (val / 1000000).toFixed(0) + ' points';
       },
     },
   },
@@ -2582,7 +2590,7 @@ export const irregularTimeSeriesOpts: ApexOptions = {
     },
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const areaNullValueChartOpts: ApexOptions = {
   chart: {
@@ -2759,4 +2767,4 @@ export const areaNullValueChartOpts: ApexOptions = {
       },
     },
   ],
-}
+};

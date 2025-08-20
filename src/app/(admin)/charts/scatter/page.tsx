@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Col, Row } from 'react-bootstrap'
-import AllScatterCharts from './components/AllScatterCharts'
+import PageTitle from '@/components/PageTitle';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import { Col, Row } from 'react-bootstrap';
+import AllScatterCharts from './components/AllScatterCharts';
 
-export const metadata: Metadata = { title: 'Scatter Charts' }
+export const metadata: Metadata = { title: 'Scatter Charts' };
 
 const ScatterCharts = () => {
   return (
@@ -25,7 +25,7 @@ const ScatterCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default ScatterCharts
+export default ScatterCharts;

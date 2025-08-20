@@ -1,6 +1,6 @@
-import type { ApexOptions } from 'apexcharts'
+import type { ApexOptions } from 'apexcharts';
 
-import small4 from '@/assets/images/small/img-4.jpg'
+import small4 from '@/assets/images/small/img-4.jpg';
 export const basicChartOpts: ApexOptions = {
   chart: {
     height: 380,
@@ -29,12 +29,23 @@ export const basicChartOpts: ApexOptions = {
   },
   colors: ['#4697ce'],
   xaxis: {
-    categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan', 'United States', 'China', 'Germany'],
+    categories: [
+      'South Korea',
+      'Canada',
+      'United Kingdom',
+      'Netherlands',
+      'Italy',
+      'France',
+      'Japan',
+      'United States',
+      'China',
+      'Germany',
+    ],
   },
   grid: {
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const groupedBarChartOpts: ApexOptions = {
   chart: {
@@ -93,7 +104,7 @@ export const groupedBarChartOpts: ApexOptions = {
       bottom: 5,
     },
   },
-}
+};
 
 export const stackedChartOpts: ApexOptions = {
   chart: {
@@ -138,7 +149,7 @@ export const stackedChartOpts: ApexOptions = {
     categories: [2016, 2017, 2018, 2019, 2021, 2022, 2023],
     labels: {
       formatter: function (val) {
-        return val + 'K'
+        return val + 'K';
       },
     },
   },
@@ -152,7 +163,7 @@ export const stackedChartOpts: ApexOptions = {
   tooltip: {
     y: {
       formatter: function (val) {
-        return val + 'K'
+        return val + 'K';
       },
     },
   },
@@ -172,7 +183,7 @@ export const stackedChartOpts: ApexOptions = {
   grid: {
     borderColor: '#f1f3fa',
   },
-}
+};
 
 export const fullStackedChartOpts: ApexOptions = {
   chart: {
@@ -222,7 +233,7 @@ export const fullStackedChartOpts: ApexOptions = {
   tooltip: {
     y: {
       formatter: function (val) {
-        return val + 'K'
+        return val + 'K';
       },
     },
   },
@@ -245,7 +256,7 @@ export const fullStackedChartOpts: ApexOptions = {
       top: 0,
     },
   },
-}
+};
 
 export const negativeValueChartOpts: ApexOptions = {
   chart: {
@@ -273,11 +284,17 @@ export const negativeValueChartOpts: ApexOptions = {
   series: [
     {
       name: 'Males',
-      data: [0.75, 0.85, 0.96, 1.08, 1.7, 2.3, 3.1, 4.0, 4.1, 4.4, 4.2, 4.5, 4.3, 4.4, 4.7, 4.1, 3.7, 3.2],
+      data: [
+        0.75, 0.85, 0.96, 1.08, 1.7, 2.3, 3.1, 4.0, 4.1, 4.4, 4.2, 4.5, 4.3, 4.4, 4.7, 4.1, 3.7,
+        3.2,
+      ],
     },
     {
       name: 'Females',
-      data: [-0.75, -0.85, -0.86, -0.98, -1.2, -2.0, -2.65, -3.5, -3.76, -4.02, -4.1, -4.2, -3.9, -3.8, -3.9, -3.2, -2.9, -2.6],
+      data: [
+        -0.75, -0.85, -0.86, -0.98, -1.2, -2.0, -2.65, -3.5, -3.76, -4.02, -4.1, -4.2, -3.9, -3.8,
+        -3.9, -3.2, -2.9, -2.6,
+      ],
     },
   ],
   yaxis: {
@@ -291,12 +308,12 @@ export const negativeValueChartOpts: ApexOptions = {
     shared: false,
     x: {
       formatter: function (val: any) {
-        return val
+        return val;
       },
     },
     y: {
       formatter: function (val) {
-        return Math.abs(val) + '%'
+        return Math.abs(val) + '%';
       },
     },
   },
@@ -326,14 +343,14 @@ export const negativeValueChartOpts: ApexOptions = {
     },
     labels: {
       formatter: function (val: any) {
-        return Math.abs(Math.round(val)) + '%'
+        return Math.abs(Math.round(val)) + '%';
       },
     },
   },
   legend: {
     offsetY: 7,
   },
-}
+};
 
 export const reversedChartOpts: ApexOptions = {
   series: [
@@ -398,7 +415,7 @@ export const reversedChartOpts: ApexOptions = {
       show: true,
     },
   },
-}
+};
 
 export const imageChartOpts: ApexOptions = {
   chart: {
@@ -427,7 +444,10 @@ export const imageChartOpts: ApexOptions = {
   series: [
     {
       name: 'coins',
-      data: [2, 4, 3, 4, 3, 5, 5, 6.5, 6, 5, 4, 5, 8, 7, 7, 8, 8, 10, 9, 9, 12, 12, 11, 12, 13, 14, 16, 14, 15, 17, 19, 21],
+      data: [
+        2, 4, 3, 4, 3, 5, 5, 6.5, 6, 5, 4, 5, 8, 7, 7, 8, 8, 10, 9, 9, 12, 12, 11, 12, 13, 14, 16,
+        14, 15, 17, 19, 21,
+      ],
     },
   ],
   yaxis: {
@@ -457,7 +477,7 @@ export const imageChartOpts: ApexOptions = {
       height: 406,
     },
   },
-}
+};
 
 export const customDataLabelsChartOpts: ApexOptions = {
   chart: {
@@ -477,7 +497,18 @@ export const customDataLabelsChartOpts: ApexOptions = {
       },
     },
   },
-  colors: ['#4697ce', '#53389f', '#7f56da', '#ff86c8', '#e06d94', '#f8b421', '#f8ac59', '#7dcc93', '#040505', '#63b7e6'],
+  colors: [
+    '#4697ce',
+    '#53389f',
+    '#7f56da',
+    '#ff86c8',
+    '#e06d94',
+    '#f8b421',
+    '#f8ac59',
+    '#7dcc93',
+    '#040505',
+    '#63b7e6',
+  ],
   dataLabels: {
     enabled: true,
     textAnchor: 'start',
@@ -485,7 +516,7 @@ export const customDataLabelsChartOpts: ApexOptions = {
       colors: ['#fff'],
     },
     formatter: function (val, opt) {
-      return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val
+      return opt.w.globals.labels[opt.dataPointIndex] + ':  ' + val;
     },
     offsetX: 0,
     dropShadow: {
@@ -502,7 +533,18 @@ export const customDataLabelsChartOpts: ApexOptions = {
     colors: ['#fff'],
   },
   xaxis: {
-    categories: ['South Korea', 'Canada', 'United Kingdom', 'Netherlands', 'Italy', 'France', 'Japan', 'United States', 'China', 'India'],
+    categories: [
+      'South Korea',
+      'Canada',
+      'United Kingdom',
+      'Netherlands',
+      'Italy',
+      'France',
+      'Japan',
+      'United States',
+      'China',
+      'India',
+    ],
   },
   yaxis: {
     labels: {
@@ -521,12 +563,12 @@ export const customDataLabelsChartOpts: ApexOptions = {
     y: {
       title: {
         formatter: function () {
-          return ''
+          return '';
         },
       },
     },
   },
-}
+};
 
 export const patternChartOpts: ApexOptions = {
   chart: {
@@ -579,7 +621,7 @@ export const patternChartOpts: ApexOptions = {
     shared: false,
     y: {
       formatter: function (val) {
-        return val + 'K'
+        return val + 'K';
       },
     },
   },
@@ -612,7 +654,7 @@ export const patternChartOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const chartWithMarkerOpts: ApexOptions = {
   series: [
@@ -721,7 +763,7 @@ export const chartWithMarkerOpts: ApexOptions = {
       // if (goals && goals.length) {
       //   return `${val} / ${goals[0].value}`
       // }
-      return val
+      return val;
     },
   },
   legend: {
@@ -732,4 +774,4 @@ export const chartWithMarkerOpts: ApexOptions = {
       fillColors: ['#f9b931', '#22c55e'],
     },
   },
-}
+};

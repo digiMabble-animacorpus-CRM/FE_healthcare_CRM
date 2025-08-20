@@ -1,5 +1,5 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
+'use client';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import {
   Button,
   Card,
@@ -16,15 +16,15 @@ import {
   TabContent,
   TabPane,
   Tabs,
-} from 'react-bootstrap'
-import Account from './Account'
-import Profile from './Profile'
-import SocialLinks from './SocialLinks'
-import Finish from './Finish'
-import type { TabMenuItem } from '@/types/menu'
-import { useState } from 'react'
-import clsx from 'clsx'
-import Link from 'next/link'
+} from 'react-bootstrap';
+import Account from './Account';
+import Profile from './Profile';
+import SocialLinks from './SocialLinks';
+import Finish from './Finish';
+import type { TabMenuItem } from '@/types/menu';
+import { useState } from 'react';
+import clsx from 'clsx';
+import Link from 'next/link';
 
 const wizardSteps: TabMenuItem[] = [
   {
@@ -51,9 +51,9 @@ const wizardSteps: TabMenuItem[] = [
     icon: 'iconamoon:check-circle-1-duotone',
     tab: <Finish />,
   },
-]
+];
 const HorizontalWizard = () => {
-  const [activeStep, setActiveStep] = useState<number>(1)
+  const [activeStep, setActiveStep] = useState<number>(1);
 
   return (
     <Card>
@@ -74,7 +74,8 @@ const HorizontalWizard = () => {
                 activeKey={activeStep}
                 variant="pills"
                 justify
-                className="icon-wizard form-wizard-header bg-light p-1">
+                className="icon-wizard form-wizard-header bg-light p-1"
+              >
                 {wizardSteps.map((step) => (
                   <Tab
                     key={step.index}
@@ -86,7 +87,8 @@ const HorizontalWizard = () => {
                         <IconifyIcon icon={step.icon} className="fs-26" />
                         {step.name}
                       </>
-                    }>
+                    }
+                  >
                     <>{step.tab}</>
                   </Tab>
                 ))}
@@ -99,7 +101,11 @@ const HorizontalWizard = () => {
                 </div>
                 <div className="d-flex gap-2">
                   <div className="previous">
-                    <Button onClick={() => setActiveStep(() => activeStep - 1)} variant="primary" className={clsx({ disabled: activeStep === 1 })}>
+                    <Button
+                      onClick={() => setActiveStep(() => activeStep - 1)}
+                      variant="primary"
+                      className={clsx({ disabled: activeStep === 1 })}
+                    >
                       <IconifyIcon icon="bx:left-arrow-alt" className="me-2" />
                       Back To Previous
                     </Button>
@@ -108,7 +114,8 @@ const HorizontalWizard = () => {
                     <Button
                       variant="primary"
                       onClick={() => setActiveStep(() => activeStep + 1)}
-                      className={clsx({ disabled: wizardSteps.length === activeStep })}>
+                      className={clsx({ disabled: wizardSteps.length === activeStep })}
+                    >
                       Next Step
                       <IconifyIcon icon="bx:right-arrow-alt" className="ms-2" />
                     </Button>
@@ -125,11 +132,11 @@ const HorizontalWizard = () => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const VerticalWizard = () => {
-  const [activeStep, setActiveStep] = useState<number>(1)
+  const [activeStep, setActiveStep] = useState<number>(1);
 
   return (
     <Card>
@@ -147,10 +154,20 @@ const VerticalWizard = () => {
             <TabContainer activeKey={activeStep} onSelect={(e) => setActiveStep(Number(e))}>
               <Row>
                 <Col lg={3}>
-                  <Nav variant="pills" justify className="nav-justified flex-column icon-wizard form-wizard-header bg-light p-1" role="tablist">
+                  <Nav
+                    variant="pills"
+                    justify
+                    className="nav-justified flex-column icon-wizard form-wizard-header bg-light p-1"
+                    role="tablist"
+                  >
                     {wizardSteps.map((step) => (
                       <NavItem key={step.index}>
-                        <NavLink eventKey={step.index} className="rounded-0 py-2" aria-selected="true" role="tab">
+                        <NavLink
+                          eventKey={step.index}
+                          className="rounded-0 py-2"
+                          aria-selected="true"
+                          role="tab"
+                        >
                           <IconifyIcon icon={step.icon} className="fs-26" />
                           {step.name}{' '}
                         </NavLink>
@@ -176,7 +193,8 @@ const VerticalWizard = () => {
                           <Button
                             onClick={() => setActiveStep(() => activeStep - 1)}
                             variant="primary"
-                            className={clsx({ disabled: activeStep === 1 })}>
+                            className={clsx({ disabled: activeStep === 1 })}
+                          >
                             <IconifyIcon icon="bx:left-arrow-alt" className="me-2" />
                             Back To Previous
                           </Button>
@@ -185,14 +203,18 @@ const VerticalWizard = () => {
                           <Button
                             variant="primary"
                             onClick={() => setActiveStep(() => activeStep + 1)}
-                            className={clsx({ disabled: wizardSteps.length === activeStep })}>
+                            className={clsx({ disabled: wizardSteps.length === activeStep })}
+                          >
                             Next Step
                             <IconifyIcon icon="bx:right-arrow-alt" className="ms-2" />
                           </Button>
                         </div>
                       </div>
                       <div className="last">
-                        <Button variant="soft-primary" onClick={() => setActiveStep(wizardSteps.length)}>
+                        <Button
+                          variant="soft-primary"
+                          onClick={() => setActiveStep(wizardSteps.length)}
+                        >
                           Finish
                         </Button>
                       </div>
@@ -205,8 +227,8 @@ const VerticalWizard = () => {
         </div>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const AllWizard = () => {
   return (
@@ -216,7 +238,7 @@ const AllWizard = () => {
         <VerticalWizard />
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default AllWizard
+export default AllWizard;

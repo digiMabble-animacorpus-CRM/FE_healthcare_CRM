@@ -1,28 +1,28 @@
-import { currency } from '@/context/constants'
-import { ApexOptions } from 'apexcharts'
+import { currency } from '@/context/constants';
+import { ApexOptions } from 'apexcharts';
 
 export type StatType = {
-  title: string
-  amount: string
-  icon: string
-  change?: number
-  variant: string
-}
+  title: string;
+  amount: string;
+  icon: string;
+  change?: number;
+  variant: string;
+};
 
 export type RevenueType = {
-  title: string
-  amount: string
-  variant: string
-  progress: number
-}
+  title: string;
+  amount: string;
+  variant: string;
+  progress: number;
+};
 
 export type CountryType = {
-  country: string
-  progress: number
-  view: number
-  icon: string
-  variant: string
-}
+  country: string;
+  progress: number;
+  view: number;
+  icon: string;
+  variant: string;
+};
 
 export const statData: StatType[] = [
   {
@@ -50,7 +50,7 @@ export const statData: StatType[] = [
     icon: 'solar:chart-2-broken',
     variant: 'info',
   },
-]
+];
 
 export const revenueData: RevenueType[] = [
   {
@@ -77,7 +77,7 @@ export const revenueData: RevenueType[] = [
     progress: 20,
     variant: 'info',
   },
-]
+];
 
 export const countryData: CountryType[] = [
   {
@@ -108,7 +108,7 @@ export const countryData: CountryType[] = [
   //   icon: 'circle-flags:ca',
   //   variant: 'success',
   // },
-]
+];
 
 export const salesFunnelOptions: ApexOptions = {
   chart: {
@@ -152,7 +152,7 @@ export const salesFunnelOptions: ApexOptions = {
     y: {
       title: {
         formatter: function (seriesName) {
-          return ''
+          return '';
         },
       },
     },
@@ -160,7 +160,7 @@ export const salesFunnelOptions: ApexOptions = {
       show: false,
     },
   },
-}
+};
 
 export const agentOptions: ApexOptions = {
   series: [
@@ -198,7 +198,20 @@ export const agentOptions: ApexOptions = {
     },
   },
   xaxis: {
-    categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    categories: [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'May',
+      'Jun',
+      'Jul',
+      'Aug',
+      'Sep',
+      'Oct',
+      'Nov',
+      'Dec',
+    ],
     axisTicks: {
       show: false,
     },
@@ -242,30 +255,30 @@ export const agentOptions: ApexOptions = {
       {
         formatter: function (y) {
           if (typeof y !== 'undefined') {
-            return y.toFixed(0)
+            return y.toFixed(0);
           }
-          return y
+          return y;
         },
       },
       {
         formatter: function (y) {
           if (typeof y !== 'undefined') {
-            return '€' + y.toFixed(2) + 'k'
+            return '€' + y.toFixed(2) + 'k';
           }
-          return y
+          return y;
         },
       },
       {
         formatter: function (y) {
           if (typeof y !== 'undefined') {
-            return y.toFixed(0) + ' Sales'
+            return y.toFixed(0) + ' Sales';
           }
-          return y
+          return y;
         },
       },
     ],
   },
-}
+};
 
 export const goalsOptions: ApexOptions = {
   chart: {
@@ -287,7 +300,7 @@ export const goalsOptions: ApexOptions = {
           fontSize: '22px',
           color: undefined,
           formatter: function (val) {
-            return val + '%'
+            return val + '%';
           },
         },
       },
@@ -323,4 +336,4 @@ export const goalsOptions: ApexOptions = {
       },
     },
   ],
-}
+};

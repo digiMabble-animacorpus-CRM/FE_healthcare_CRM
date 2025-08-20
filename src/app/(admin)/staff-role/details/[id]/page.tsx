@@ -1,11 +1,11 @@
-import PageTitle from "@/components/PageTitle";
-import type { StaffRoleType } from "@/types/data";
-import { Col, Row } from "react-bootstrap";
-import { Metadata } from "next";
-import { getStaffRoleById } from "@/helpers/staff";
-import StaffRoleDetail from "./components/StaffRoleDetail";
+import PageTitle from '@/components/PageTitle';
+import type { StaffRoleType } from '@/types/data';
+import { Col, Row } from 'react-bootstrap';
+import { Metadata } from 'next';
+import { getStaffRoleById } from '@/helpers/staff';
+import StaffRoleDetail from './components/StaffRoleDetail';
 
-export const metadata: Metadata = { title: "Staff Role Overview" };
+export const metadata: Metadata = { title: 'Staff Role Overview' };
 
 interface Props {
   params: { id: string };

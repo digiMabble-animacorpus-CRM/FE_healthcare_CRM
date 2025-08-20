@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import TextFormInput from "@/components/from/TextFormInput";
-import type { PermissionType } from "@/types/data";
+import { FormProvider, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import TextFormInput from '@/components/from/TextFormInput';
+import type { PermissionType } from '@/types/data';
 
 // ✅ Form Values Type
 interface PermissionFormValues {
@@ -17,8 +17,8 @@ interface PermissionFormValues {
 
 // ✅ Validation Schema
 const schema = yup.object({
-  key: yup.string().required("Key is required"),
-  label: yup.string().required("Label is required"),
+  key: yup.string().required('Key is required'),
+  label: yup.string().required('Label is required'),
   description: yup.string().optional(),
 });
 
@@ -28,31 +28,25 @@ interface Props {
   onSubmitHandler: (data: PermissionFormValues & { _id?: string }) => Promise<void>;
 }
 
-const PermissionForm = ({
-  defaultValues,
-  isEditMode = false,
-  onSubmitHandler,
-}: Props) => {
+const PermissionForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
   const router = useRouter();
 
   const methods = useForm<PermissionFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      key: defaultValues?.key || "",
-      label: defaultValues?.label || "",
-      description: defaultValues?.description || "",
+      key: defaultValues?.key || '',
+      label: defaultValues?.label || '',
+      description: defaultValues?.description || '',
     },
   });
 
-  const {
-    handleSubmit,
-    control,
-  } = methods;
+  const { handleSubmit, control } = methods;
 
   const handleFormSubmit = async (data: PermissionFormValues) => {
-    const payload = isEditMode && (defaultValues as any)?._id
-      ? { ...data, _id: (defaultValues as any)._id }
-      : data;
+    const payload =
+      isEditMode && (defaultValues as any)?._id
+        ? { ...data, _id: (defaultValues as any)._id }
+        : data;
 
     await onSubmitHandler(payload);
   };
@@ -63,7 +57,7 @@ const PermissionForm = ({
         <Card>
           <CardHeader>
             <CardTitle as="h5">
-              {isEditMode ? "Edit Permission Details" : "Create New Permission"}
+              {isEditMode ? 'Edit Permission Details' : 'Create New Permission'}
             </CardTitle>
           </CardHeader>
 
@@ -110,7 +104,7 @@ const PermissionForm = ({
 
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">
-                {isEditMode ? "Update" : "Create"} Permission
+                {isEditMode ? 'Update' : 'Create'} Permission
               </Button>
               <Button variant="secondary" onClick={() => router.back()}>
                 Cancel

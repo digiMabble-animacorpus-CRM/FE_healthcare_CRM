@@ -1,9 +1,26 @@
-'use client'
-import ReactApexChart from 'react-apexcharts'
-import { Card, CardBody, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
-import { agentOptions } from '../data'
-import { currency } from '@/context/constants'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
+'use client';
+
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from 'react-bootstrap';
+import { agentOptions } from '../data';
+import { currency } from '@/context/constants';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import dynamic from 'next/dynamic';
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
+
 
 const RecentAgent = () => {
   return (
@@ -21,8 +38,10 @@ const RecentAgent = () => {
               as={'a'}
               className="btn btn-sm btn-outline-light rounded content-none icons-center"
               data-bs-toggle="dropdown"
-              aria-expanded="false">
-              This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+              aria-expanded="false"
+            >
+              This Month{' '}
+              <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
               <DropdownItem>Today</DropdownItem>
@@ -64,13 +83,19 @@ const RecentAgent = () => {
                   </div>
                 </Col>
               </Row>
-              <ReactApexChart options={agentOptions} series={agentOptions.series} height={330} type="line" className="apex-charts mt-5" />
+              <ReactApexChart
+                options={agentOptions}
+                series={agentOptions.series}
+                height={330}
+                type="line"
+                className="apex-charts mt-5"
+              />
             </Col>
           </Row>
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default RecentAgent
+export default RecentAgent;

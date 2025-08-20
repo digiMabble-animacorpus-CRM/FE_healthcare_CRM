@@ -1,10 +1,22 @@
-'use client'
-import React from 'react'
-import ReactApexChart from 'react-apexcharts'
-import { salesChart } from '../data'
-import { Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, Row } from 'react-bootstrap'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { currency } from '@/context/constants'
+'use client';
+import React from 'react';
+import ReactApexChart from 'react-apexcharts';
+import { salesChart } from '../data';
+import {
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  Row,
+} from 'react-bootstrap';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { currency } from '@/context/constants';
 
 const SalesChart = () => {
   return (
@@ -19,8 +31,10 @@ const SalesChart = () => {
               as={'a'}
               className="btn btn-sm btn-outline-light rounded content-none icons-center"
               data-bs-toggle="dropdown"
-              aria-expanded="false">
-              This Month <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+              aria-expanded="false"
+            >
+              This Month{' '}
+              <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
               <DropdownItem>Week</DropdownItem>
@@ -32,12 +46,19 @@ const SalesChart = () => {
         <CardBody>
           <div className="text-end">
             <p className="mb-0 fs-18 fw-medium text-dark icons-center">
-              <IconifyIcon icon="ri:wallet-3-fill" className="me-1" /> Earnings : <span className="text-primary fw-bold">&nbsp;{currency}85,934</span>
+              <IconifyIcon icon="ri:wallet-3-fill" className="me-1" /> Earnings :{' '}
+              <span className="text-primary fw-bold">&nbsp;{currency}85,934</span>
             </p>
           </div>
           <Row className="align-items-top text-center">
             <Col lg={12}>
-              <ReactApexChart options={salesChart} series={salesChart.series} height={341} type="area" className="apex-charts mt-2" />
+              <ReactApexChart
+                options={salesChart}
+                series={salesChart.series}
+                height={341}
+                type="area"
+                className="apex-charts mt-2"
+              />
             </Col>
           </Row>
         </CardBody>
@@ -77,7 +98,7 @@ const SalesChart = () => {
         </CardFooter>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default SalesChart
+export default SalesChart;

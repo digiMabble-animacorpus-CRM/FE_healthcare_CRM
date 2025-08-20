@@ -1,13 +1,12 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { Card, CardBody, CardHeader, CardTitle, Col, Row, Button, Form, Alert } from "react-bootstrap";
-import type { CustomerEnquiriesType } from "@/types/data";
-import { customerEnquiriesData } from "@/assets/data/other";
+import { customerEnquiriesData } from '@/assets/data/other';
+import { CustomerEnquiriesType } from '@/types/data';
+import { useState } from 'react';
+import { Alert, Button, Card, CardBody, CardHeader, CardTitle, Col, Form, Row } from 'react-bootstrap';
 
 interface Props {
-  customerInfo?: CustomerEnquiriesType;
-  onSave?: (updatedInfo: CustomerEnquiriesType) => void;
+  customerInfo: any;
 }
 
 const emptyCustomer: CustomerEnquiriesType = {
@@ -129,66 +128,45 @@ const CustomerInfoCard = ({ customerInfo = emptyCustomer, onSave }: Props) => {
 
       <CardBody>
         <Row>
-          {Object.entries({
-            name: "Name",
-            email: "Email",
-            number: "Phone",
-            gender: "Gender",
-            language: "Preferred Language",
-            branch: "Branch",
-            dob: "Date of Birth",
-            city: "City",
-            country: "Country",
-            zip_code: "Zip Code",
-            address: "Address",
-            tags: "Tags",
-            description: "Description",
-          }).map(([key, label]) => (
-            <Col
-              md={key === "address" || key === "tags" || key === "description" ? 12 : 6}
-              className="mt-2"
-              key={key}
-            >
-              <strong>{label}:</strong>{" "}
-              {isEditing ? (
-                key === "gender" ? (
-                  <Form.Select
-                    size="sm"
-                    value={formState[key as keyof CustomerEnquiriesType] as string}
-                    onChange={(e) =>
-                      handleChange(key as keyof CustomerEnquiriesType, e.target.value)
-                    }
-                  >
-                    <option value="">Select</option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
-                  </Form.Select>
-                ) : (
-                  <Form.Control
-                    as={key === "address" || key === "description" ? "textarea" : "input"}
-                    size="sm"
-                    value={
-                      Array.isArray(formState[key as keyof CustomerEnquiriesType])
-                        ? (formState[key as keyof CustomerEnquiriesType] as string[]).join(", ")
-                        : (formState[key as keyof CustomerEnquiriesType] as string)
-                    }
-                    onChange={(e) =>
-                      handleChange(
-                        key as keyof CustomerEnquiriesType,
-                        key === "tags"
-                          ? e.target.value.split(",").map((tag) => tag.trim())
-                          : e.target.value
-                      )
-                    }
-                  />
-                )
-              ) : Array.isArray(formState[key as keyof CustomerEnquiriesType]) ? (
-                (formState[key as keyof CustomerEnquiriesType] as string[]).join(", ") || "-"
-              ) : (
-                (formState[key as keyof CustomerEnquiriesType] as string) || "-"
-              )}
-            </Col>
-          ))}
+          <Col md={6}>
+            <strong>Name:</strong> {customerInfo.name}
+          </Col>
+          <Col md={6}>
+            <strong>Email:</strong> {customerInfo.email}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>Phone:</strong> {customerInfo.number}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>Gender:</strong> {customerInfo.gender}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>Preferred Language:</strong> {customerInfo.language}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>Branch:</strong> {customerInfo.branch}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>Date of Birth:</strong> {customerInfo.dob}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>City:</strong> {customerInfo.city}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>Country:</strong> {customerInfo.country}
+          </Col>
+          <Col md={6} className="mt-2">
+            <strong>Zip Code:</strong> {customerInfo.zip_code}
+          </Col>
+          <Col md={12} className="mt-2">
+            <strong>Address:</strong> {customerInfo.address}
+          </Col>
+          <Col md={12} className="mt-2">
+            <strong>Tags:</strong> {customerInfo.tags.length ? customerInfo.tags.join(', ') : '-'}
+          </Col>
+          <Col md={12} className="mt-2">
+            <strong>Description:</strong> {customerInfo.description || '-'}
+          </Col>
         </Row>
       </CardBody>
     </Card>
