@@ -135,9 +135,9 @@ const PatientsListPage = () => {
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
 
-  const handleView = (id: string) => router.push(`/patients/details/${id}`);
-  const handleEditClick = (id: string) => router.push(`/patients/edit-patient/${id}`);
-  const handleDeleteClick = (id: string) => {
+  const handleView = (id: any) => router.push(`/patients/details/${id}`);
+  const handleEditClick = (id: any) => router.push(`/patients/edit-patient/${id}`);
+  const handleDeleteClick = (id: any) => {
     setSelectedPatientId(id);
     setShowDeleteModal(true);
   };

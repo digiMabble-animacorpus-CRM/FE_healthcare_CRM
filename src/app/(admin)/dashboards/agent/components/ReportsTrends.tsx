@@ -1,7 +1,6 @@
 'use client';
 
 import React, { useState } from 'react';
-import ReactApexChart from 'react-apexcharts';
 import {
   Card,
   CardBody,
@@ -21,6 +20,11 @@ import {
 } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { currency } from '@/context/constants';
+import dynamic from "next/dynamic"; 
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
 
 type MetricsBox = {
   label: string;

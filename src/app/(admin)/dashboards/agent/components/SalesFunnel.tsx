@@ -1,5 +1,5 @@
 'use client';
-import ReactApexChart from 'react-apexcharts';
+
 import {
   Card,
   CardBody,
@@ -15,6 +15,12 @@ import {
 } from 'react-bootstrap';
 import { salesFunnelOptions } from '../data';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import dynamic from 'next/dynamic';
+
+const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+  ssr: false,
+});
+
 
 const SalesFunnel = () => {
   return (
