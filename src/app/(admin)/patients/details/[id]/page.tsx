@@ -7,6 +7,19 @@ import type { PatientType } from '@/types/data';
 import { getPatientById } from '@/helpers/patient';
 import PatientDetails from './components/PatientDetails';
 
+// 👉 Age calculation helper
+const calculateAge = (birthdate: string): number => {
+  if (!birthdate) return 0;
+  const today = new Date();
+  const dob = new Date(birthdate);
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+  return age;
+};
+
 const PatientDetailsPage = () => {
   const { id } = useParams();
   const router = useRouter();
@@ -98,8 +111,11 @@ const PatientDetailsPage = () => {
       <PageTitle subName="Healthcare" title="Patient Overview" />
       <PatientDetails
         name={`${data.firstname} ${data.lastname}`}
-        birthdate={data.birthdate}
-        gender={data.legalgender}
+        // 👇 Now showing Age along with DOB + Gender
+         birthdate={
+          data.birthdate
+            ? `${data.birthdate} | ${data.legalgender || ''} | ${calculateAge(data.birthdate)} yrs`
+            : ''}
         email={data.emails}
         phones={
           Array.isArray(data.phones)
