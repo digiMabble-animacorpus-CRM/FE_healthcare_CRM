@@ -99,13 +99,6 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
     .of(yup.mixed<File>().required())
     .min(1, 'Upload at least one file')
     .required(),
-  availability: yup.array().of(
-      yup.object().shape({
-        day: yup.string().required(),
-        from: yup.string().required(),
-        to: yup.string().required(),
-    }),
-  ),
 });
 
 interface Props {
@@ -117,7 +110,7 @@ const AddTherapist = ({ params }: Props) => {
   const isEditMode = !!params?.id;
   const [loading, setLoading] = useState<boolean>(isEditMode);
 
-const methods = useForm<TherapistFormValues>({
+  const methods = useForm<TherapistFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
       firstName: '',
@@ -173,7 +166,7 @@ const methods = useForm<TherapistFormValues>({
           const data = response; // assume response is the object
           if (data) {
             // map API response to form values
-           const mapped: TherapistFormValues = {
+            const mapped: TherapistFormValues = {
               ...data,
               tags: data.tags || [],
               certificationFiles: [],
@@ -187,23 +180,23 @@ const methods = useForm<TherapistFormValues>({
     }
   }, [isEditMode, params?.id, reset]);
 
-const onSubmit = async (data: TherapistFormValues) => {
-  try {
-    if (isEditMode && params?.id) {
+  const onSubmit = async (data: TherapistFormValues) => {
+    try {
+      if (isEditMode && params?.id) {
         const success = await updateTherapist(params.id, data);
         if (success) alert('Therapist updated successfully');
-    } else {
+      } else {
         const success = await createTherapist(data);
         if (success) {
           alert('Therapist created successfully');
           reset();
         }
-    }
-  } catch (error) {
-    console.error('Submit error:', error);
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
       alert('Operation failed');
-  }
-};
+    }
+  };
 
   if (loading) return <Spinner animation="border" className="my-5 d-block mx-auto" />;
 
