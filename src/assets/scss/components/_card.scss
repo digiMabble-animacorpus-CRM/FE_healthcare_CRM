@@ -4,7 +4,9 @@
 
 .card {
     margin-bottom: $spacer * 1.25;
-    box-shadow: $box-shadow-sm;
+    box-shadow: $box-shadow-lg; 
+    border-radius: $border-radius-lg;
+    border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .card-link+.card-link {
@@ -21,7 +23,6 @@
 .card-height-100 {
     height: calc(100% - #{$spacer});
 }
-
 
 // Card title / Card Header
 .card-title,

@@ -110,9 +110,10 @@ const PatientDetailsPage = () => {
     <>
       <PageTitle subName="Healthcare" title="Patient Overview" />
       <PatientDetails
+        id={data.id}
         name={`${data.firstname} ${data.lastname}`}
         // 👇 Now showing Age along with DOB + Gender
-         birthdate={
+        birthdate={
           data.birthdate
             ? `${data.birthdate} | ${data.legalgender || ''} | ${calculateAge(data.birthdate)} yrs`
             : ''}

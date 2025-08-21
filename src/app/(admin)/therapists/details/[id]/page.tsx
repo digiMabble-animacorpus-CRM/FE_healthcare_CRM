@@ -93,7 +93,8 @@ const TherapistDetailsPage = () => {
 
   return (
     <TherapistDetails
-      name={data.fullName}
+      id={data.idPro.toString()}
+      name={`${data.firstName} ${data.lastName}`}
       jobTitle={data.jobTitle}
       email={data.contactEmail}
       phone={data.contactPhone}

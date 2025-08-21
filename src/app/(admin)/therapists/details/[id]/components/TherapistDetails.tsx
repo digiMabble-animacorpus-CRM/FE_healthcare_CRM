@@ -6,7 +6,8 @@ import { Card, CardBody, Col, Row, Button, Badge, Collapse, Table } from 'react-
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { ApexOptions } from 'apexcharts';
 import ReactApexChart from 'react-apexcharts';
-import { FaClock, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa';
+import { FaClock, FaMapMarkerAlt, FaEnvelope, FaPhone, FaEdit } from 'react-icons/fa';
+import { useRouter } from 'next/navigation';
 
 type WeeklySessionType = { week: string; sessions: number };
 type StatType = { title: string; count: number; progress: number; icon: string; variant: string };
@@ -30,6 +31,7 @@ type CabinetType = {
 };
 
 type TherapistDetailsCardProps = {
+  id: string;
   name: string;
   jobTitle?: string;
   email?: string;
@@ -51,6 +53,7 @@ type TherapistDetailsCardProps = {
 };
 
 const TherapistDetails = ({
+  id,
   name,
   jobTitle,
   email,
@@ -72,7 +75,8 @@ const TherapistDetails = ({
 }: TherapistDetailsCardProps) => {
   const [aboutOpen, setAboutOpen] = useState(true);
   const [cabinetsOpen, setCabinetsOpen] = useState(true);
-
+  const router = useRouter();
+  const handleEditClick = (id: string) => router.push(`/therapists/edit-therapist/${id}`);
   const photoUrl = photo?.match(/^https?:\/\//) ? photo : '/placeholder-avatar.jpg';
 
   const options: ApexOptions = {
@@ -85,7 +89,7 @@ const TherapistDetails = ({
     <div>
       {/* Top Buttons */}
       <div className="d-flex justify-content-between mb-3">
-        <Button variant="secondary" onClick={() => window.history.back()}>
+        <Button variant="link" onClick={() => window.history.back()}>
           <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back
         </Button>
         {agendaLink && (
@@ -96,7 +100,7 @@ const TherapistDetails = ({
       </div>
 
       {/* Profile / Avatar */}
-      <Card className="mb-4 shadow-sm" style={{ backgroundColor: '#f8f9fa' }}>
+      <Card className="mb-4 shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
         <CardBody>
           <Row className="align-items-center">
             <Col lg={2} className="d-flex justify-content-center">
@@ -105,19 +109,28 @@ const TherapistDetails = ({
                 style={{
                   width: '100px',
                   height: '100px',
-                  backgroundColor: '#0d6efd',
-                  color: '#fff',
+                  backgroundColor: '#e7ddff',
+                  color: '#341539',
                   fontSize: '36px',
                   fontWeight: 'bold',
                 }}
               >
-                {name ? name[0].toUpperCase() : 'T'}
+                {name[0].toUpperCase()}
               </div>
             </Col>
-            <Col lg={8}>
-              <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
-                {name}
-              </h2>
+            <Col lg={10}>
+              <div className='d-flex justify-content-between'>
+                <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
+                  {name}
+                </h2>
+                <Button
+                  variant="outline-primary"
+                  size="sm"
+                  onClick={() => handleEditClick(id)}
+                >
+                  <FaEdit className="me-1" /> Edit
+                </Button>
+              </div>
               <p className="text-muted mb-2">{jobTitle || '-'}</p>
               <div className="d-flex flex-column gap-2">
                 {email && (
@@ -154,63 +167,77 @@ const TherapistDetails = ({
         <Card className="mb-4">
           <CardBody>
             <div className="d-flex justify-content-between mb-2">
-              <h4>Localisation & Branches</h4>
-              <Button variant="link" size="sm" onClick={() => setCabinetsOpen(!cabinetsOpen)}>
-                {cabinetsOpen ? 'Hide' : 'Show'}
+              <h4>Availability & Branches</h4>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => setCabinetsOpen(!cabinetsOpen)}
+              >
+                {cabinetsOpen ? "Hide" : "Show"}
               </Button>
             </div>
-            <Collapse in={cabinetsOpen}>
-              <div className="d-flex gap-3 overflow-auto py-2">
-                {cabinets.map((cab, idx) => (
-                  <Card
-                    key={idx}
-                    className="p-3 flex-shrink-0 shadow-sm"
-                    style={{
-                      minWidth: '260px',
-                      border: cab.isPrimary ? '2px solid #0d6efd' : '1px solid #dee2e6',
-                    }}
-                  >
-                    <div className="d-flex align-items-center gap-2 mb-2">
-                      {cab.isPrimary && <Badge bg="primary">Primary</Badge>}
-                      <FaMapMarkerAlt className="text-danger" />
-                      <strong>{cab.address}</strong>
-                    </div>
-                    {cab.email && (
-                      <div className="d-flex align-items-center gap-2 mb-1">
-                        <FaEnvelope className="text-secondary" /> {cab.email}
-                      </div>
-                    )}
-                    {cab.phone && (
-                      <div className="d-flex align-items-center gap-2 mb-2">
-                        <FaPhone className="text-secondary" /> {cab.phone}
-                      </div>
-                    )}
 
-                    <p className="fw-semibold mb-1">Weekly Hours:</p>
-                    <div className="d-flex flex-column gap-1">
-                      {cab.hours
-                        ? Object.entries(cab.hours).map(([day, h]) => (
+            <Collapse in={cabinetsOpen}>
+              {/* 👇 Wrap inside a div so Collapse can animate height properly */}
+              <div>
+                <div className="d-flex gap-3 overflow-auto py-2">
+                  {cabinets.map((cab, idx) => (
+                    <Card
+                      key={idx}
+                      className="p-3 flex-shrink-0 shadow-sm"
+                      style={{
+                        minWidth: "260px",
+                        border: cab.isPrimary
+                          ? "2px solid #0d6efd"
+                          : "1px solid #dee2e6",
+                      }}
+                    >
+                      <div className="d-flex align-items-center gap-2 mb-2">
+                        {cab.isPrimary && <Badge bg="primary">Primary</Badge>}
+                        <FaMapMarkerAlt className="text-danger" />
+                        <strong>{cab.address}</strong>
+                      </div>
+
+                      {cab.email && (
+                        <div className="d-flex align-items-center gap-2 mb-1">
+                          <FaEnvelope className="text-secondary" /> {cab.email}
+                        </div>
+                      )}
+                      {cab.phone && (
+                        <div className="d-flex align-items-center gap-2 mb-2">
+                          <FaPhone className="text-secondary" /> {cab.phone}
+                        </div>
+                      )}
+
+                      <p className="fw-semibold mb-1">Weekly Hours:</p>
+                      <div className="d-flex flex-column gap-1">
+                        {cab.hours && Object.keys(cab.hours).length > 0 ? (
+                          Object.entries(cab.hours).map(([day, h]) => (
                             <div
                               key={day}
-                              className={`d-flex align-items-center gap-2 p-1 rounded ${
-                                h.toLowerCase() === 'closed'
-                                  ? 'bg-light text-muted'
-                                  : 'bg-primary bg-opacity-10'
-                              }`}
+                              className={`d-flex align-items-center gap-2 p-1 rounded ${h.toLowerCase() === "closed"
+                                ? "bg-light text-muted"
+                                : "bg-primary bg-opacity-10"
+                                }`}
                             >
                               <FaClock
                                 className={
-                                  h.toLowerCase() === 'closed' ? 'text-muted' : 'text-primary'
+                                  h.toLowerCase() === "closed"
+                                    ? "text-muted"
+                                    : "text-primary"
                                 }
                               />
-                              <strong style={{ width: '80px' }}>{day}:</strong>
+                              <strong style={{ width: "80px" }}>{day}:</strong>
                               <span>{h}</span>
                             </div>
                           ))
-                        : 'No hours provided'}
-                    </div>
-                  </Card>
-                ))}
+                        ) : (
+                          <span className="text-muted">No hours provided</span>
+                        )}
+                      </div>
+                    </Card>
+                  ))}
+                </div>
               </div>
             </Collapse>
           </CardBody>

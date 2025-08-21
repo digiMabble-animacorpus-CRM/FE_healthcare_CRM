@@ -82,7 +82,7 @@ const SignIn = () => {
                     <div className="mb-1 text-center d-grid">
                       <button
                         disabled={loading}
-                        className="btn btn-danger py-2 fw-medium"
+                        className="btn btn-primary py-2 fw-medium"
                         type="submit"
                       >
                         Sign In
