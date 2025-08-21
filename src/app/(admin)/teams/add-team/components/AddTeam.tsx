@@ -148,6 +148,7 @@ const AddTeam = ({ params }: Props) => {
     name: 'availability',
   });
 
+ // Fetch Team for edit mode
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
@@ -155,32 +156,36 @@ const AddTeam = ({ params }: Props) => {
         .then((data) => {
           if (data) {
             reset({
-              firstName: data.first_name || '',
-              lastName: data.last_name || '',
-              fullName: data.full_name || '',
+              firstName: data.firstName || '',
+              lastName: data.lastName || '',
+              fullName: data.fullName || '',
               photo: data.photo || '',
-              jobTitle: data.job_1 || '',
-              targetAudience: data.specific_audience || '',
-              specialization1: data.specialization_1 || '',
-              specialization2: data.job_2 || '',
-              aboutMe: data.who_am_i || '',
+              jobTitle: data.jobTitle || '',
+              targetAudience: data.targetAudience || '',
+              specialization1: data.specialization1 || '',
+              specialization2: data.specialization2 || '',
+              aboutMe: data.aboutMe || '',
               consultations: data.consultations || '',
-              centerAddress: data.office_address || '',
-              centerEmail: data.center_email || data.contact_email || '',
-              centerPhoneNumber: data.center_phone_number || '',
-              contactEmail: data.contact_email || '',
-              contactPhone: data.contact_phone || '',
+              centerAddress: data.centerAddress || '',
+              centerEmail: data.centerEmail || data.contactEmail || '',
+              centerPhoneNumber: data.centerPhoneNumber || '',
+              contactEmail: data.contactEmail || '',
+              contactPhone: data.contactPhone || '',
               schedule: typeof data.schedule === 'object'
                 ? Object.entries(data.schedule).map(([day, hours]) => `${day.charAt(0).toUpperCase() + day.slice(1)}: ${hours}`).join(', ')
                 : '',
               about: data.about || '',
-              spokenLanguages: Array.isArray(data.languages_spoken) ? data.languages_spoken.join(', ') : '',
-              paymentMethods: Array.isArray(data.payment_methods) ? data.payment_methods.join(', ') : '',
-              degreesAndTraining: Array.isArray(data.diplomas_and_training) ? data.diplomas_and_training.join(', ') : '',
+              spokenLanguages: Array.isArray(data.languages_spoken)
+                ? data.languages_spoken.join(', ')
+                : typeof data.languages_spoken === 'function'
+                  ? ''
+                  : (typeof data.languages_spoken === 'string' ? data.languages_spoken : ''),
+              paymentMethods: Array.isArray(data.paymentMethods) ? data.paymentMethods.join(', ') : '',
+              degreesAndTraining: Array.isArray(data.degreesAndTraining) ? data.degreesAndTraining.join(', ') : '',
               specializations: Array.isArray(data.specializations) ? data.specializations.join(', ') : '',
               website: data.website || '',
               faq: data.frequently_asked_questions ? JSON.stringify(data.frequently_asked_questions, null, 2) : '',
-              agendaLinks: Array.isArray(data.calendar_links) ? data.calendar_links.join(', ') : '',
+              agendaLinks: Array.isArray(data.agendaLinks) ? data.agendaLinks.join(', ') : '',
               rosaLink: data.rosaLink || '',
               googleAgendaLink: data.googleAgendaLink || '',
               appointmentStart: data.appointmentStart || '',
@@ -298,7 +303,7 @@ const AddTeam = ({ params }: Props) => {
         throw new Error(errMsg || 'Failed to submit');
       }
 
-      alert(`Therapist ${isEditMode ? 'updated' : 'created'} successfully`);
+      alert(`Details ${isEditMode ? 'updated' : 'created'} successfully`);
       reset();
       router.back();
     } catch (error: any) {
@@ -317,7 +322,7 @@ const AddTeam = ({ params }: Props) => {
         {/* Basic Info Card */}
         <Card>
           <CardHeader>
-            <CardTitle as="h4">{isEditMode ? 'Edit Therapist' : 'Add Therapist'}</CardTitle>
+            <CardTitle as="h4">{isEditMode ? 'Edit Details' : 'Add Details'}</CardTitle>
           </CardHeader>
           <CardBody>
             <Row>
@@ -454,7 +459,7 @@ const AddTeam = ({ params }: Props) => {
                   className="py-5"
                   text="Drop your certification files here or click to browse"
                   showPreview
-                  onFileUpload={(files) => field.onChange(files)}
+                  onFileUpload={(files: any) => field.onChange(files)}
                 />
               )}
             />
@@ -477,3 +482,4 @@ const AddTeam = ({ params }: Props) => {
       </form>
     </FormProvider>
   );
+};
