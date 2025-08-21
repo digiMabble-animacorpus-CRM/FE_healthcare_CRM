@@ -75,7 +75,7 @@ const PatientDetails = ({
     <div>
       {/* Top Buttons */}
       <div className="d-flex justify-content-between mb-3 gap-2 flex-wrap">
-        <Button variant="outline-secondary" onClick={() => router.push('/patients/patient-list')}>
+        <Button variant="link" onClick={() => router.push('/patients/patient-list')}>
           <IconifyIcon icon="ri:arrow-left-line" /> Back to List
         </Button>
         <Button variant="primary" onClick={() => alert('Book Appointment clicked!')}>
