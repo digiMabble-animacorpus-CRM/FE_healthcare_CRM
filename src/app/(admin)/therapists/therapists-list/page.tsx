@@ -263,8 +263,8 @@ const TherapistsListPage = () => {
                                 <img
                                   src={item.imageUrl}
                                   alt={item.firstName}
-                                  className="w-10 h-10 rounded-full object-cover"
-                                  style={{ width: "100px", height: "100px" }}
+                                  className="rounded-circle object-cover"
+                                  style={{ width: "40px", height: "40px" }}
                                 />
                               ) : (
                                 <div
@@ -274,13 +274,14 @@ const TherapistsListPage = () => {
                                     height: "40px",
                                     backgroundColor: "#e7ddff",
                                     color: "#341539",
-                                    fontSize: "28px",
+                                    fontSize: "20px", // looks balanced in 40px circle
                                     fontWeight: "bold",
                                   }}
                                 >
                                   {item.firstName?.charAt(0).toUpperCase()}
                                 </div>
                               )}
+
                             </td>
 
                           </td>
