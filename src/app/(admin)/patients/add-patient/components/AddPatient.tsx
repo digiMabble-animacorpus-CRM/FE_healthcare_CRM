@@ -145,7 +145,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       const success = await createPatient(payload as any);
       if (success) {
         alert('Patient created successfully');
-        reset();
+        router.back();
       } else {
         alert('Failed to create patient');
       }
