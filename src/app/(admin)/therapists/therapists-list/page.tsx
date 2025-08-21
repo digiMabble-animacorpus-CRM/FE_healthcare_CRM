@@ -302,7 +302,8 @@ const TherapistsListPage = () => {
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Button
-                                variant="danger"
+                                variant="danger
+                                "
                                 size="sm"
                                 onClick={() => handleEditClick(item._key)}
                               >
