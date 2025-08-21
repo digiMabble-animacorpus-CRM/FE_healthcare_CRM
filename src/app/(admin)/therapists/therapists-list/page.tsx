@@ -20,9 +20,10 @@ import {
   Modal,
   Row,
   Spinner,
+  Alert,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
-import { getAllTherapists, getTherapistById } from '@/helpers/therapist';
+import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
@@ -36,6 +37,7 @@ const TherapistsListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTherapistId, setSelectedTherapistId] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const router = useRouter();
 
@@ -97,7 +99,7 @@ const TherapistsListPage = () => {
     const range = getDateRange();
     if (range) {
       data = data.filter((t) => {
-        if (!t.appointmentEnd) return false;
+        if (!t.appointmentStart) return false;
         const created = dayjs(t.appointmentStart);
         return created.isAfter(range.from) && created.isBefore(range.to);
       });
@@ -113,7 +115,7 @@ const TherapistsListPage = () => {
     return filteredTherapists.slice(start, start + PAGE_SIZE);
   }, [filteredTherapists, currentPage]);
 
-  const handleView = (id: number) => {
+  const handleView = (id: string) => {
     router.push(`/therapists/details/${id}`);
   };
 
@@ -126,11 +128,17 @@ const TherapistsListPage = () => {
 
   const handleConfirmDelete = async () => {
     if (!selectedTherapistId) return;
+
     try {
-      await fetch(`/api/therapists/${selectedTherapistId}`, { method: 'DELETE' });
-      setAllTherapists(allTherapists.filter((t) => t.idPro.toString() !== selectedTherapistId));
+      const success = await deleteTherapist(selectedTherapistId);
+      if (success) {
+        setAllTherapists((prev) => prev.filter((t) => t._id !== selectedTherapistId));
+        setShowSuccessMessage(true);
+      } else {
+        console.error('Failed to delete therapist');
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Delete error:', err);
     } finally {
       setShowDeleteModal(false);
       setSelectedTherapistId(null);
@@ -152,6 +160,18 @@ const TherapistsListPage = () => {
   return (
     <>
       <PageTitle subName="Therapist" title="Therapists List" />
+
+      {showSuccessMessage && (
+        <Alert
+          variant="success"
+          dismissible
+          onClose={() => setShowSuccessMessage(false)}
+          className="mb-3"
+        >
+          Therapist deleted successfully!
+        </Alert>
+      )}
+
       <Row>
         <Col xl={12}>
           <Card>
@@ -226,14 +246,14 @@ const TherapistsListPage = () => {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Branch</th>
+                        <th>Address</th>
                         <th>Job Title</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {currentData.map((item) => (
-                        <tr key={item._key}>
+                        <tr key={item._id}>
                           <td>
                             <input type="checkbox" />
                           </td>
@@ -276,7 +296,7 @@ const TherapistsListPage = () => {
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(item._key)}
+                                onClick={() => handleView(item._id)}
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
@@ -290,7 +310,7 @@ const TherapistsListPage = () => {
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item.idPro.toString())}
+                                onClick={() => handleDeleteClick(item._id)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>
