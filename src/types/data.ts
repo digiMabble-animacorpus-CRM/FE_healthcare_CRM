@@ -276,6 +276,7 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
+  _id: string;
   id: string;
   _key: number;
   idPro: number;

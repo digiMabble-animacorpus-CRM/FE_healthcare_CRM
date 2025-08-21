@@ -150,6 +150,13 @@ const TherapistsListPage = () => {
     setCurrentPage(page);
   };
 
+  const getPhotoUrl = (photo: string) => {
+    // Regex to extract URL from markdown style "filename (url)"
+    const match = photo.match(/\((https?:\/\/[^\s)]+)\)/);
+    return match ? match[1] : '';
+  };
+
+  console.log(currentData)
   return (
     <>
       <PageTitle subName="Therapist" title="Therapists List" />
@@ -235,7 +242,7 @@ const TherapistsListPage = () => {
                         <th style={{ width: 30 }}>
                           <input type="checkbox" />
                         </th>
-                        <th>Photo</th>
+                        <th>Profile Pic</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -251,7 +258,31 @@ const TherapistsListPage = () => {
                             <input type="checkbox" />
                           </td>
                           <td>
-                            <img src={item.imageUrl} alt="therapist" width={50} height={50} />
+                            <td>
+                              {item.imageUrl && item.imageUrl !== "null" && item.imageUrl.trim() !== "" ? (
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.firstName}
+                                  className="w-10 h-10 rounded-full object-cover"
+                                  style={{ width: "100px", height: "100px" }}
+                                />
+                              ) : (
+                                <div
+                                  className="rounded-circle d-flex align-items-center justify-content-center"
+                                  style={{
+                                    width: "40px",
+                                    height: "40px",
+                                    backgroundColor: "#e7ddff",
+                                    color: "#341539",
+                                    fontSize: "28px",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  {item.firstName?.charAt(0).toUpperCase()}
+                                </div>
+                              )}
+                            </td>
+
                           </td>
                           <td>
                             {item.firstName} {item.lastName}
@@ -273,7 +304,7 @@ const TherapistsListPage = () => {
                                 variant="danger
                                 "
                                 size="sm"
-                                onClick={() => handleEditClick(item._id)}
+                                onClick={() => handleEditClick(item.idPro.toString())}
                               >
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>

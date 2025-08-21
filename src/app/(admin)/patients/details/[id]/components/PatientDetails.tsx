@@ -75,20 +75,13 @@ const PatientDetails = ({
     <div>
       {/* Top Buttons */}
       <div className="d-flex justify-content-between mb-3 gap-2 flex-wrap">
-        <Button variant="outline-secondary" onClick={() => router.push('/patients/patient-list')}>
+        <Button variant="link" onClick={() => router.push('/patients/patient-list')}>
           <IconifyIcon icon="ri:arrow-left-line" /> Back to List
         </Button>
         <Button variant="primary" onClick={() => alert('Book Appointment clicked!')}>
           <IconifyIcon icon="ri:calendar-event-line" /> Book Appointment
         </Button>
       </div>
-
-      {/* Banner */}
-      <Card className="mb-4">
-        <CardBody className="p-0">
-          <Image src={patientBannerImg} alt="banner" className="img-fluid rounded-top" />
-        </CardBody>
-      </Card>
 
       {/* Profile / Avatar / Contact / Status / Action Buttons */}
       <Card className="mb-4">
@@ -110,7 +103,7 @@ const PatientDetails = ({
             </div>
             <div className="d-flex gap-1">
               <Button
-                variant="dark"
+                variant="secondary"
                 className="avatar-sm d-flex align-items-center justify-content-center fs-20"
                 onClick={() => handleEditClick(id)}
               >

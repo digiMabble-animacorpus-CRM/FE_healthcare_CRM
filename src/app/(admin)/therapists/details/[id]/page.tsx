@@ -77,24 +77,67 @@ const TherapistDetailsPage = () => {
     <>
       <PageTitle subName="Healthcare" title="Therapist Overview" />
       <TherapistDetails
-        name={data.fullName || ''}
-        jobTitle={data.jobTitle || ''}
-        email={data.contactEmail || ''}
-        phone={data.contactPhone || ''}
-        about={data.aboutMe || ''}
-        languages={safeSplit(data.spokenLanguages, ',')}
-        website={data.website || ''}
-        education={safeSplit(data.degreesAndTraining, '\n')}
-        specializations={safeSplit(data.specializations, '\n')}
+        id={data.idPro.toString()}
+        name={`${data.firstName} ${data.lastName}`}
+        jobTitle={data.jobTitle}
+        email={data.contactEmail}
+        phone={data.contactPhone}
+        cabinets={[
+          {
+            address: '15 Place de l’Orneau, Gembloux',
+            email: 'contact@animacorpus.be',
+            phone: '+32492401877',
+            hours: {
+              Monday: '08:00-20:30',
+              Tuesday: '08:00-20:30',
+              Wednesday: '08:00-20:30',
+              Thursday: '08:00-20:30',
+              Friday: '08:00-20:30',
+              Saturday: '08:00-20:30',
+              Sunday: 'Closed',
+            },
+            isPrimary: true,
+          },
+          {
+            address: '273 Grand route, Lillois',
+            hours: {
+              Monday: '09:00-18:00',
+              Tuesday: '09:00-18:00',
+              Wednesday: '09:00-18:00',
+              Thursday: '09:00-18:00',
+              Friday: '09:00-18:00',
+              Saturday: 'Closed',
+              Sunday: 'Closed',
+            },
+          },
+          {
+            address: '62 Rue Gustave Fiévet, Sombreffe',
+            hours: {
+              Monday: '10:00-16:00',
+              Tuesday: '10:00-16:00',
+              Wednesday: '10:00-16:00',
+              Thursday: '10:00-16:00',
+              Friday: '10:00-16:00',
+              Saturday: 'Closed',
+              Sunday: 'Closed',
+            },
+          },
+        ]}
+        about={data.aboutMe}
+        languages={data.spokenLanguages?.split(',') || []}
+        website={data.website}
+        education={data.degreesAndTraining?.split('\n') || []}
+        specializations={data.specializations?.split('\n') || []}
         weeklySessions={defaultWeeklySessions}
         stats={defaultStats}
-        transactions={defaultTransactions}
+        transactions={defaultTransactions} // mock transactions if needed
         feedbacks={defaultFeedbacks}
         files={defaultFiles}
         photo={data.photo || undefined}
         agendaLink={data.agendaLinks || undefined}
       />
     </>
+
   );
 };
 

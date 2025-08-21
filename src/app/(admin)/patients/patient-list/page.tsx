@@ -321,7 +321,7 @@ const PatientsListPage = () => {
                           <td>{item.city}</td>
                           <td>
                             <span
-                              className={`badge bg-${item.status === 'new' ? 'success' : 'danger'} text-white`}
+                              className={`badge bg-${item.status === 'ACTIVE' ? 'success' : 'secondary'} text-white`}
                             >
                               {item.status}
                             </span>
@@ -336,7 +336,7 @@ const PatientsListPage = () => {
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Button
-                                variant="danger"
+                                variant="secondary"
                                 size="sm"
                                 onClick={() => handleEditClick(item.id)}
                               >
