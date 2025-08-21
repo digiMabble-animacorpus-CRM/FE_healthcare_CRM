@@ -118,7 +118,7 @@ const TeamsListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedTherapistId) return;
     try {
-      await fetch(`/api/team-members/${selectedTherapistId}`, { method: 'DELETE' });
+      await fetch(`http://localhost:8080/api/v1/team-members/${selectedTherapistId}`, { method: 'DELETE' });
       setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTherapistId));
     } catch (err) {
       console.error(err);
