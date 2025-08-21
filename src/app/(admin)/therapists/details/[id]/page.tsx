@@ -1,7 +1,7 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import TherapistDetails from './components/TherapistDetails';
 import { getTherapistById } from '@/helpers/therapist';
@@ -21,27 +21,9 @@ const TherapistDetailsPage = () => {
   ];
 
   const defaultStats = [
-    {
-      title: 'Total Appointments',
-      count: 12,
-      progress: 75,
-      icon: 'ri:calendar-line',
-      variant: 'primary',
-    },
-    {
-      title: 'Completed Visits',
-      count: 9,
-      progress: 60,
-      icon: 'ri:check-line',
-      variant: 'success',
-    },
-    {
-      title: 'Pending Visits',
-      count: 3,
-      progress: 25,
-      icon: 'ri:time-line',
-      variant: 'warning',
-    },
+    { title: 'Total Appointments', count: 12, progress: 75, icon: 'ri:calendar-line', variant: 'primary' },
+    { title: 'Completed Visits', count: 9, progress: 60, icon: 'ri:check-line', variant: 'success' },
+    { title: 'Pending Visits', count: 3, progress: 25, icon: 'ri:time-line', variant: 'warning' },
   ];
 
   const defaultTransactions = [
@@ -51,22 +33,8 @@ const TherapistDetailsPage = () => {
   ];
 
   const defaultFeedbacks = [
-    {
-      name: 'John Doe',
-      userName: 'jdoe',
-      country: 'USA',
-      day: 2,
-      description: 'Very satisfied with the service.',
-      rating: 5,
-    },
-    {
-      name: 'Jane Smith',
-      userName: 'jsmith',
-      country: 'UK',
-      day: 5,
-      description: 'Helpful and attentive.',
-      rating: 4,
-    },
+    { name: 'John Doe', userName: 'jdoe', country: 'USA', day: 2, description: 'Very satisfied with the service.', rating: 5 },
+    { name: 'Jane Smith', userName: 'jsmith', country: 'UK', day: 5, description: 'Helpful and attentive.', rating: 4 },
   ];
 
   const defaultFiles = [
@@ -95,6 +63,13 @@ const TherapistDetailsPage = () => {
     fetchTherapist();
   }, [id, router]);
 
+  // Safe splitting helpers
+  const safeSplit = (value?: string | string[], separator = ',') => {
+    if (!value) return [];
+    if (Array.isArray(value)) return value;
+    return value.split(separator).map((v) => v.trim());
+  };
+
   if (loading) return <p>Loading...</p>;
   if (!data) return <p>No therapist found.</p>;
 
@@ -102,63 +77,21 @@ const TherapistDetailsPage = () => {
     <>
       <PageTitle subName="Healthcare" title="Therapist Overview" />
       <TherapistDetails
-        id={data.idPro.toString()}
-        name={`${data.firstName} ${data.lastName}`}
-        jobTitle={data.jobTitle}
-        email={data.contactEmail}
-        phone={data.contactPhone}
-        cabinets={[
-          {
-            address: '15 Place de l’Orneau, Gembloux',
-            email: 'contact@animacorpus.be',
-            phone: '+32492401877',
-            hours: {
-              Monday: '08:00-20:30',
-              Tuesday: '08:00-20:30',
-              Wednesday: '08:00-20:30',
-              Thursday: '08:00-20:30',
-              Friday: '08:00-20:30',
-              Saturday: '08:00-20:30',
-              Sunday: 'Closed',
-            },
-            isPrimary: true,
-          },
-          {
-            address: '273 Grand route, Lillois',
-            hours: {
-              Monday: '09:00-18:00',
-              Tuesday: '09:00-18:00',
-              Wednesday: '09:00-18:00',
-              Thursday: '09:00-18:00',
-              Friday: '09:00-18:00',
-              Saturday: 'Closed',
-              Sunday: 'Closed',
-            },
-          },
-          {
-            address: '62 Rue Gustave Fiévet, Sombreffe',
-            hours: {
-              Monday: '10:00-16:00',
-              Tuesday: '10:00-16:00',
-              Wednesday: '10:00-16:00',
-              Thursday: '10:00-16:00',
-              Friday: '10:00-16:00',
-              Saturday: 'Closed',
-              Sunday: 'Closed',
-            },
-          },
-        ]}
-        about={data.aboutMe}
-        languages={data.spokenLanguages?.split(',') || []}
-        website={data.website}
-        education={data.degreesAndTraining?.split('\n') || []}
-        specializations={data.specializations?.split('\n') || []}
+        name={data.fullName || ''}
+        jobTitle={data.jobTitle || ''}
+        email={data.contactEmail || ''}
+        phone={data.contactPhone || ''}
+        about={data.aboutMe || ''}
+        languages={safeSplit(data.spokenLanguages, ',')}
+        website={data.website || ''}
+        education={safeSplit(data.degreesAndTraining, '\n')}
+        specializations={safeSplit(data.specializations, '\n')}
         weeklySessions={defaultWeeklySessions}
         stats={defaultStats}
         transactions={defaultTransactions} // mock transactions if needed
         feedbacks={defaultFeedbacks}
         files={defaultFiles}
-        photo={data.photo}
+        photo={data.photo || undefined}
         agendaLink={data.agendaLinks || undefined}
       />
     </>
