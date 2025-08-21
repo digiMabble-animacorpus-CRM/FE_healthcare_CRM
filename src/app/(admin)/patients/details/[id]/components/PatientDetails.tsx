@@ -83,13 +83,6 @@ const PatientDetails = ({
         </Button>
       </div>
 
-      {/* Banner */}
-      <Card className="mb-4">
-        <CardBody className="p-0">
-          <Image src={patientBannerImg} alt="banner" className="img-fluid rounded-top" />
-        </CardBody>
-      </Card>
-
       {/* Profile / Avatar / Contact / Status / Action Buttons */}
       <Card className="mb-4">
         <CardBody>
@@ -110,7 +103,7 @@ const PatientDetails = ({
             </div>
             <div className="d-flex gap-1">
               <Button
-                variant="dark"
+                variant="secondary"
                 className="avatar-sm d-flex align-items-center justify-content-center fs-20"
                 onClick={() => handleEditClick(id)}
               >

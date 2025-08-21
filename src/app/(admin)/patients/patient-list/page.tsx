@@ -321,30 +321,32 @@ const PatientsListPage = () => {
                           <td>{item.city}</td>
                           <td>
                             <span
-                              className={`badge bg-${item.status === 'new' ? 'success' : 'danger'} text-white`}
+                              className={`badge bg-${item.status === 'ACTIVE' ? 'success' : 'secondary'} text-white`}
                             >
                               {item.status}
                             </span>
                           </td>
                           <td>
                             <div className="d-flex gap-2">
-                              <Button variant="light" size="sm" onClick={() => handleView(item?.id)}>
+                               <Button
+                                variant="light"
+                                size="sm"
+                                onClick={() => handleView(item.id)}
+                              >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
-                              <Dropdown>
-                                <DropdownToggle className="editToggleBtn" size="sm">
-                                  <IconifyIcon icon="solar:pen-2-broken" />
-                                </DropdownToggle>
-                                <DropdownMenu>
-                                  <DropdownItem onClick={() => handleEditClick(item?.id)}>
-                                    Edit
-                                  </DropdownItem>
-                                </DropdownMenu>
-                              </Dropdown>
+                              <Button
+                                variant="secondary"
+                                size="sm"
+                                onClick={() => handleEditClick(item.id)}
+                              >
+                                <IconifyIcon icon="solar:pen-2-broken" />
+                              </Button>
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item?.id)}
+                                onClick={() => handleDeleteClick(item.id)}
+                              
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>

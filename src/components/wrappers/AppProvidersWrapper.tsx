@@ -16,11 +16,7 @@ import { ChildrenType } from '@/types/component-props';
 
 const AppProvidersWrapper = ({ children }: ChildrenType) => {
   const handleChangeTitle = () => {
-    if (document.visibilityState === 'hidden') {
-      document.title = 'Please come back 🥺';
-    } else {
-      document.title = DEFAULT_PAGE_TITLE;
-    }
+    document.title = DEFAULT_PAGE_TITLE;
   };
 
   useEffect(() => {
@@ -52,7 +48,9 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
     <SessionProvider>
       <LayoutProvider>
         <NotificationProvider>
-          {children}
+          <div style={{ backgroundColor: '#FAF5FF', minHeight: '100vh' }}>
+            {children}
+          </div>
           <ToastContainer theme="colored" />
         </NotificationProvider>
       </LayoutProvider>
