@@ -1,5 +1,6 @@
 'use client';
 
+import PageTitle from '@/components/PageTitle';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import TherapistDetails from './components/TherapistDetails';
@@ -12,7 +13,7 @@ const TherapistDetailsPage = () => {
   const [data, setData] = useState<TherapistType | null>(null);
   const [loading, setLoading] = useState(true);
 
-  // Default mock data
+  // 👉 Default mock data
   const defaultWeeklySessions = [
     { week: 'Week 1', sessions: 5 },
     { week: 'Week 2', sessions: 3 },
@@ -34,7 +35,19 @@ const TherapistDetailsPage = () => {
       icon: 'ri:check-line',
       variant: 'success',
     },
-    { title: 'Pending Visits', count: 3, progress: 25, icon: 'ri:time-line', variant: 'warning' },
+    {
+      title: 'Pending Visits',
+      count: 3,
+      progress: 25,
+      icon: 'ri:time-line',
+      variant: 'warning',
+    },
+  ];
+
+  const defaultTransactions = [
+    { date: '2025-08-01', type: 'Consultation', amount: 120, status: 'Completed' },
+    { date: '2025-08-03', type: 'Follow-up', amount: 80, status: 'Pending' },
+    { date: '2025-08-05', type: 'Therapy Session', amount: 150, status: 'Completed' },
   ];
 
   const defaultFeedbacks = [
@@ -43,7 +56,7 @@ const TherapistDetailsPage = () => {
       userName: 'jdoe',
       country: 'USA',
       day: 2,
-      description: 'Very satisfied.',
+      description: 'Very satisfied with the service.',
       rating: 5,
     },
     {
@@ -51,7 +64,7 @@ const TherapistDetailsPage = () => {
       userName: 'jsmith',
       country: 'UK',
       day: 5,
-      description: 'Helpful.',
+      description: 'Helpful and attentive.',
       rating: 4,
     },
   ];
@@ -59,12 +72,6 @@ const TherapistDetailsPage = () => {
   const defaultFiles = [
     { name: 'Report.pdf', size: 2, icon: 'ri:file-pdf-line', variant: 'danger' },
     { name: 'Prescription.docx', size: 1.2, icon: 'ri:file-word-line', variant: 'primary' },
-  ];
-
-  const defaultTransactions = [
-    { date: '2025-08-01', type: 'Consultation', amount: 120, status: 'Completed' },
-    { date: '2025-08-03', type: 'Follow-up', amount: 80, status: 'Pending' },
-    { date: '2025-08-05', type: 'Therapy Session', amount: 150, status: 'Completed' },
   ];
 
   useEffect(() => {
@@ -92,66 +99,70 @@ const TherapistDetailsPage = () => {
   if (!data) return <p>No therapist found.</p>;
 
   return (
-    <TherapistDetails
-      id={data.idPro.toString()}
-      name={`${data.firstName} ${data.lastName}`}
-      jobTitle={data.jobTitle}
-      email={data.contactEmail}
-      phone={data.contactPhone}
-      cabinets={[
-        {
-          address: '15 Place de l’Orneau, Gembloux',
-          email: 'contact@animacorpus.be',
-          phone: '+32492401877',
-          hours: {
-            Monday: '08:00-20:30',
-            Tuesday: '08:00-20:30',
-            Wednesday: '08:00-20:30',
-            Thursday: '08:00-20:30',
-            Friday: '08:00-20:30',
-            Saturday: '08:00-20:30',
-            Sunday: 'Closed',
+    <>
+      <PageTitle subName="Healthcare" title="Therapist Overview" />
+      <TherapistDetails
+        id={data.idPro.toString()}
+        name={`${data.firstName} ${data.lastName}`}
+        jobTitle={data.jobTitle}
+        email={data.contactEmail}
+        phone={data.contactPhone}
+        cabinets={[
+          {
+            address: '15 Place de l’Orneau, Gembloux',
+            email: 'contact@animacorpus.be',
+            phone: '+32492401877',
+            hours: {
+              Monday: '08:00-20:30',
+              Tuesday: '08:00-20:30',
+              Wednesday: '08:00-20:30',
+              Thursday: '08:00-20:30',
+              Friday: '08:00-20:30',
+              Saturday: '08:00-20:30',
+              Sunday: 'Closed',
+            },
+            isPrimary: true,
           },
-          isPrimary: true,
-        },
-        {
-          address: '273 Grand route, Lillois',
-          hours: {
-            Monday: '09:00-18:00',
-            Tuesday: '09:00-18:00',
-            Wednesday: '09:00-18:00',
-            Thursday: '09:00-18:00',
-            Friday: '09:00-18:00',
-            Saturday: 'Closed',
-            Sunday: 'Closed',
+          {
+            address: '273 Grand route, Lillois',
+            hours: {
+              Monday: '09:00-18:00',
+              Tuesday: '09:00-18:00',
+              Wednesday: '09:00-18:00',
+              Thursday: '09:00-18:00',
+              Friday: '09:00-18:00',
+              Saturday: 'Closed',
+              Sunday: 'Closed',
+            },
           },
-        },
-        {
-          address: '62 Rue Gustave Fiévet, Sombreffe',
-          hours: {
-            Monday: '10:00-16:00',
-            Tuesday: '10:00-16:00',
-            Wednesday: '10:00-16:00',
-            Thursday: '10:00-16:00',
-            Friday: '10:00-16:00',
-            Saturday: 'Closed',
-            Sunday: 'Closed',
+          {
+            address: '62 Rue Gustave Fiévet, Sombreffe',
+            hours: {
+              Monday: '10:00-16:00',
+              Tuesday: '10:00-16:00',
+              Wednesday: '10:00-16:00',
+              Thursday: '10:00-16:00',
+              Friday: '10:00-16:00',
+              Saturday: 'Closed',
+              Sunday: 'Closed',
+            },
           },
-        },
-      ]}
-      about={data.aboutMe}
-      languages={data.spokenLanguages?.split(',') || []}
-      website={data.website}
-      education={data.degreesAndTraining?.split('\n') || []}
-      specializations={data.specializations?.split('\n') || []}
-      weeklySessions={defaultWeeklySessions}
-      stats={defaultStats}
-      transactions={defaultTransactions} // mock transactions if needed
-      feedbacks={defaultFeedbacks}
-      files={defaultFiles}
-      photo={data.photo}
-      agendaLink={data.agendaLinks || undefined}
-    />
+        ]}
+        about={data.aboutMe}
+        languages={data.spokenLanguages?.split(',') || []}
+        website={data.website}
+        education={data.degreesAndTraining?.split('\n') || []}
+        specializations={data.specializations?.split('\n') || []}
+        weeklySessions={defaultWeeklySessions}
+        stats={defaultStats}
+        transactions={defaultTransactions} // mock transactions if needed
+        feedbacks={defaultFeedbacks}
+        files={defaultFiles}
+        photo={data.photo}
+        agendaLink={data.agendaLinks || undefined}
+      />
+    </>
+
   );
 };
 
