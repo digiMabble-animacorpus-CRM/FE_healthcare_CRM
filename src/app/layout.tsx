@@ -1,25 +1,27 @@
-import logoDark from '@/assets/images/logo-dark.png'
-import AppProvidersWrapper from '@/components/wrappers/AppProvidersWrapper'
-import type { Metadata } from 'next'
-import { Figtree } from 'next/font/google'
-import Image from 'next/image'
-import NextTopLoader from 'nextjs-toploader'
-import '@/assets/scss/app.scss'
-import { DEFAULT_PAGE_TITLE } from '@/context/constants'
+import logoDark from '@/assets/images/logo-dark.png';
+import AppProvidersWrapper from '@/components/wrappers/AppProvidersWrapper';
+import type { Metadata } from 'next';
+import { Figtree } from 'next/font/google';
+import Image from 'next/image';
+import logoLight2 from '@/assets/images/logo-light2.png';
+import NextTopLoader from 'nextjs-toploader';
+import '@/assets/scss/app.scss';
+import { DEFAULT_PAGE_TITLE } from '@/context/constants';
 
 const figtree = Figtree({
   subsets: ['latin'],
   weight: ['300', '400', '500', '600', '700', '800', '900'],
   display: 'swap',
-})
+});
 
 export const metadata: Metadata = {
   title: {
-    template: '%s | Pavimmo Nextjs - Real Estate Management Admin Template',
+    template: '%s | Animacorpus CRM',
     default: DEFAULT_PAGE_TITLE,
   },
-  description: 'A fully responsive premium admin dashboard template, Real Estate Management Admin Template',
-}
+  description:
+    'A fully responsive premium admin dashboard template, Real Estate Management Admin Template',
+};
 
 const splashScreenStyles = `
 #splash-screen {
@@ -50,12 +52,12 @@ const splashScreenStyles = `
     visibility: hidden;
   }
 }
-`
+`;
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
   return (
     <html lang="en">
@@ -64,13 +66,20 @@ export default function RootLayout({
       </head>
       <body className={figtree.className}>
         <div id="splash-screen">
-          <Image alt="Logo" width={112} height={24} src={logoDark} style={{ height: '6%', width: 'auto' }} priority />
+          <Image
+            alt="Logo"
+            width={112}
+            height={24}
+            src={logoLight2}
+            style={{ height: '6%', width: 'auto' }}
+            priority
+          />
         </div>
-        <NextTopLoader color="#caaa71" showSpinner={false} />
+        <NextTopLoader color="#9035e3" showSpinner={false} />
         <div id="__next_splash">
           <AppProvidersWrapper>{children}</AppProvidersWrapper>
         </div>
       </body>
     </html>
-  )
+  );
 }

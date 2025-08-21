@@ -1,10 +1,20 @@
-import { Accordion, AccordionBody, AccordionHeader, AccordionItem, Button, Card, CardBody, Col, Row } from 'react-bootstrap'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { faqData } from './data'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import {
+  Accordion,
+  AccordionBody,
+  AccordionHeader,
+  AccordionItem,
+  Button,
+  Card,
+  CardBody,
+  Col,
+  Row,
+} from 'react-bootstrap';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { faqData } from './data';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'FAQs' }
+export const metadata: Metadata = { title: 'FAQs' };
 
 const GeneralFaq = () => {
   return (
@@ -21,8 +31,8 @@ const GeneralFaq = () => {
         ))}
       </Accordion>
     </>
-  )
-}
+  );
+};
 
 const RefundFaqs = () => {
   return (
@@ -39,8 +49,8 @@ const RefundFaqs = () => {
         ))}
       </Accordion>
     </>
-  )
-}
+  );
+};
 
 const PaymentsFaqs = () => {
   return (
@@ -57,8 +67,8 @@ const PaymentsFaqs = () => {
         ))}
       </Accordion>
     </>
-  )
-}
+  );
+};
 
 const SupportFaqs = () => {
   return (
@@ -75,8 +85,8 @@ const SupportFaqs = () => {
         ))}
       </Accordion>
     </>
-  )
-}
+  );
+};
 
 const FAQs = () => {
   return (
@@ -112,7 +122,7 @@ const FAQs = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default FAQs
+export default FAQs;

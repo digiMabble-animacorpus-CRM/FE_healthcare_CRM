@@ -1,30 +1,30 @@
-import avatar3 from '@/assets/images/users/avatar-3.jpg'
-import avatar4 from '@/assets/images/users/avatar-4.jpg'
-import { StaticImageData } from 'next/image'
+import avatar3 from '@/assets/images/users/avatar-3.jpg';
+import avatar4 from '@/assets/images/users/avatar-4.jpg';
+import { StaticImageData } from 'next/image';
 
 export type PropertyStatusType = {
-  icon: string
-  title: string
-  count: number
-  progress: number
-  variant: string
-}
+  icon: string;
+  title: string;
+  count: number;
+  progress: number;
+  variant: string;
+};
 
 export type ReviewType = {
-  name: string
-  userName: string
-  image: StaticImageData
-  country: string
-  description: string
-  day: number
-}
+  name: string;
+  userName: string;
+  image: StaticImageData;
+  country: string;
+  description: string;
+  day: number;
+};
 
 export type PropertyFileType = {
-  name: string
-  icon: string
-  data: number
-  variant: string
-}
+  name: string;
+  icon: string;
+  data: number;
+  variant: string;
+};
 
 export const propertyStatusData: PropertyStatusType[] = [
   {
@@ -48,7 +48,7 @@ export const propertyStatusData: PropertyStatusType[] = [
     progress: 56,
     variant: '#027ef4',
   },
-]
+];
 
 export const reviewData: ReviewType[] = [
   {
@@ -69,7 +69,7 @@ export const reviewData: ReviewType[] = [
     day: 15,
     image: avatar4,
   },
-]
+];
 
 export const propertyFileData: PropertyFileType[] = [
   {
@@ -96,4 +96,4 @@ export const propertyFileData: PropertyFileType[] = [
     data: 2.3,
     variant: 'warning',
   },
-]
+];

@@ -1,27 +1,70 @@
-.editToggleBtn {
-  padding: 6px 8px !important;
-  background-color: #f8f0ff !important;
-  border: none !important;
-  box-shadow: none !important;
-  border-radius: 6px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* Base styles for all action buttons */
 
-  // ✅ Remove Bootstrap's default dropdown caret
+.editToggleBtn {
   &::after {
     content: none !important;
     
+  }}
+.action-btn {
+  padding: 6px;
+  border-radius: 6px;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+
+  &.view {
+    background-color: var(--btn-view-bg);
+    color: var(--btn-view-icon);
   }
 
-  &:focus,
-  &:active {
-    box-shadow: none !important;
-    background-color: #f0e5ff !important;
+  &.edit {
+    background-color: var(--btn-edit-bg);
+    color: var(--btn-edit-icon);
   }
 
-  .iconify {
-    font-size: 18px;
-    color: #9c27b0; // purple shade
+  &.delete {
+    background-color: var(--btn-delete-bg);
+    color: var(--btn-delete-icon);
   }
+  &:hover,
+  &:focus {
+    background-color: var(--btn-hover-bg);
+  }
+}
+
+/* Light Theme Variables (default) */
+:root {
+  --btn-view-bg: #f1f3f5;
+  --btn-view-icon: #343a40;
+
+  --btn-edit-bg: #f8f0ff;
+  --btn-edit-icon: #6f42c1;
+
+  --btn-delete-bg: #f3e8ff;
+  --btn-delete-icon: #8a6cf6;
+
+  --btn-hover-bg: #e2e6ea;
+}
+
+/* Dark Theme Variables */
+body.dark,
+html[data-bs-theme="dark"] {
+  --btn-view-bg: #2a2f35;
+  --btn-view-icon: #afb9cf;
+
+  --btn-edit-bg: #3a2e4d;
+  --btn-edit-icon: #c084fc;
+
+  --btn-delete-bg: #3b2e4f;
+  --btn-delete-icon: #d0a9ff;
+
+  --btn-hover-bg: #4d3a61;
+}
+
+.selected-branch {
+  background-color: #F3E8FF !important; // Custom background color
+  color: #FFFFFF !important; // White text color
+  font-weight: bold; // Optional: make the selected item stand out
 }

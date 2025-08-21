@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import Choices, { type Options as ChoiceOption } from "choices.js";
+import Choices, { type Options as ChoiceOption } from 'choices.js';
 import {
   type HTMLAttributes,
   type ReactNode,
@@ -8,7 +8,7 @@ import {
   useImperativeHandle,
   useRef,
   forwardRef,
-} from "react";
+} from 'react';
 
 export type ChoiceProps = HTMLAttributes<HTMLInputElement> &
   HTMLAttributes<HTMLSelectElement> & {
@@ -21,26 +21,41 @@ export type ChoiceProps = HTMLAttributes<HTMLInputElement> &
     allowInput?: boolean;
   };
 
-const ChoicesFormInput = forwardRef<
-  HTMLInputElement | HTMLSelectElement,
-  ChoiceProps
->(
-  (
-    {
-      children,
-      multiple,
-      className,
-      onChange,
-      allowInput,
-      options,
-      value,
-      ...props
-    },
-    ref
-  ) => {
+const ChoicesFormInput = forwardRef<HTMLInputElement | HTMLSelectElement, ChoiceProps>(
+  ({ children, multiple, className, onChange, allowInput, options, value, ...props }, ref) => {
     const choicesRef = useRef<HTMLInputElement & HTMLSelectElement>(null);
 
     useImperativeHandle(ref, () => choicesRef.current as any, []);
+
+    // useEffect(() => {
+    //   if (choicesRef.current) {
+    //     const choices = new Choices(choicesRef.current, {
+    //       ...options,
+    //       placeholder: true,
+    //       allowHTML: true,
+    //       shouldSort: false,
+    //     });
+
+    //     choices.passedElement.element.addEventListener("change", (e: Event) => {
+    //       if (!(e.target instanceof HTMLSelectElement)) return;
+
+    //       if (onChange) {
+    //         if (multiple) {
+    //           const values = Array.from(e.target.selectedOptions).map(
+    //             (opt) => opt.value
+    //           );
+    //           onChange(values);
+    //         } else {
+    //           onChange(e.target.value);
+    //         }
+    //       }
+    //     });
+
+    //     return () => {
+    //       choices.destroy();
+    //     };
+    //   }
+    // }, [choicesRef]);
 
     useEffect(() => {
       if (choicesRef.current) {
@@ -49,16 +64,24 @@ const ChoicesFormInput = forwardRef<
           placeholder: true,
           allowHTML: true,
           shouldSort: false,
+          removeItemButton: multiple,
         });
 
-        choices.passedElement.element.addEventListener("change", (e: Event) => {
+        //  Ensure current value is set on mount
+        if (value) {
+          if (multiple && Array.isArray(value)) {
+            choices.setChoiceByValue(value);
+          } else if (typeof value === 'string') {
+            choices.setChoiceByValue([value]);
+          }
+        }
+
+        choices.passedElement.element.addEventListener('change', (e: Event) => {
           if (!(e.target instanceof HTMLSelectElement)) return;
 
           if (onChange) {
             if (multiple) {
-              const values = Array.from(e.target.selectedOptions).map(
-                (opt) => opt.value
-              );
+              const values = Array.from(e.target.selectedOptions).map((opt) => opt.value);
               onChange(values);
             } else {
               onChange(e.target.value);
@@ -70,7 +93,7 @@ const ChoicesFormInput = forwardRef<
           choices.destroy();
         };
       }
-    }, [choicesRef]);
+    }, [choicesRef, value, multiple]);
 
     return allowInput ? (
       <input
@@ -78,7 +101,7 @@ const ChoicesFormInput = forwardRef<
         multiple={multiple}
         className={className}
         onChange={(e) => onChange?.(e.target.value)}
-        value={typeof value === "string" ? value : ""}
+        value={typeof value === 'string' ? value : ''}
         {...props}
       />
     ) : (
@@ -89,9 +112,7 @@ const ChoicesFormInput = forwardRef<
         onChange={(e) => {
           if (onChange) {
             if (multiple) {
-              const values = Array.from(e.target.selectedOptions).map(
-                (opt) => opt.value
-              );
+              const values = Array.from(e.target.selectedOptions).map((opt) => opt.value);
               onChange(values);
             } else {
               onChange(e.target.value);
@@ -104,7 +125,7 @@ const ChoicesFormInput = forwardRef<
         {children}
       </select>
     );
-  }
+  },
 );
 
 export default ChoicesFormInput;

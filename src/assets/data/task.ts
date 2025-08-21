@@ -1,4 +1,4 @@
-import type { TodoType } from '@/types/data'
+import type { TodoType } from '@/types/data';
 
 export const todoData: TodoType[] = [
   {
@@ -91,4 +91,4 @@ export const todoData: TodoType[] = [
     priority: 'High',
     employeeId: '110',
   },
-]
+];

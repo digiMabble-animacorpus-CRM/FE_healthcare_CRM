@@ -1,19 +1,19 @@
-'use client'
-import logoDark from '@/assets/images/logo-dark.png'
-import logoLight from '@/assets/images/logo-light.png'
-import maintenanceImg from '@/assets/images/maintenance.svg'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useEffect } from 'react'
-import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap'
+'use client';
+import logoDark from '@/assets/images/logo-dark.png';
+import logoLight from '@/assets/images/logo-light.png';
+import maintenanceImg from '@/assets/images/maintenance.svg';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useEffect } from 'react';
+import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap';
 
 const Maintenance = () => {
   useEffect(() => {
-    document.body.classList.add('authentication-bg')
+    document.body.classList.add('authentication-bg');
     return () => {
-      document.body.classList.remove('authentication-bg')
-    }
-  }, [])
+      document.body.classList.remove('authentication-bg');
+    };
+  }, []);
   return (
     <div className="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
       <Container>
@@ -30,15 +30,19 @@ const Maintenance = () => {
                   <Col lg={8}>
                     <div className="p-4">
                       <div className="mx-auto mb-5 text-center auth-logo">
-                        <Link href="/dashboards/analytics" className="logo-dark">
+                        <Link href="/dashboards/agent" className="logo-dark">
                           <Image src={logoDark} height={32} alt="logo dark" />
                         </Link>
-                        <Link href="/dashboards/analytics" className="logo-light">
+                        <Link href="/dashboards/agent" className="logo-light">
                           <Image src={logoLight} height={28} alt="logo light" />
                         </Link>
                       </div>
-                      <h2 className="fw-bold text-center lh-base">We are currently performing maintenance</h2>
-                      <p className="text-muted text-center mt-1 mb-4">We&apos;re making the system more awesome. We&apos;ll be back shortly.</p>
+                      <h2 className="fw-bold text-center lh-base">
+                        We are currently performing maintenance
+                      </h2>
+                      <p className="text-muted text-center mt-1 mb-4">
+                        We&apos;re making the system more awesome. We&apos;ll be back shortly.
+                      </p>
                       <div className="text-center">
                         <Button variant="danger">Contact Us</Button>
                       </div>
@@ -51,7 +55,7 @@ const Maintenance = () => {
         </Row>
       </Container>
     </div>
-  )
-}
+  );
+};
 
-export default Maintenance
+export default Maintenance;

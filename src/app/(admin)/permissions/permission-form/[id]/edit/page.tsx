@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { PermissionType } from "@/types/data";
-import PermissionForm from "../../permissionForm";
-import { getPermissionById } from "@/helpers/permission";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { PermissionType } from '@/types/data';
+import PermissionForm from '../../permissionForm';
+import { getPermissionById } from '@/helpers/permission';
 
 interface Props {
   params: { id?: string };
@@ -37,24 +37,20 @@ const EditPermissionPage = ({ params }: Props) => {
     fetchData();
   }, [params.id]);
 
-  const onSubmitHandler = async (data: Omit<PermissionType, "_id">) => {
+  const onSubmitHandler = async (data: Omit<PermissionType, '_id'>) => {
     try {
-      console.log("Permission updated", data);
+      console.log('Permission updated', data);
       // await updatePermission(params.id as string, data);
-      router.push("/permissions");
+      router.push('/permissions');
     } catch {
-      console.error("Error updating permission");
+      console.error('Error updating permission');
     }
   };
 
   if (loading) return <div>Loading permission details...</div>;
 
   return (
-    <PermissionForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
+    <PermissionForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
   );
 };
 

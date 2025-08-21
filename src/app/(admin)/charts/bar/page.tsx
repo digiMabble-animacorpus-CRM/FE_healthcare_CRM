@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllBarCharts from './components/AllBarCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllBarCharts from './components/AllBarCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Bar Charts' }
+export const metadata: Metadata = { title: 'Bar Charts' };
 
 const BarCharts = () => {
   return (
@@ -32,7 +32,7 @@ const BarCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default BarCharts
+export default BarCharts;

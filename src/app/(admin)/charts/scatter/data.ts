@@ -1,20 +1,24 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
-import dribbble from '@/assets/images/brands/dribbble.svg'
-import github from '@/assets/images/brands/github.svg'
+import dribbble from '@/assets/images/brands/dribbble.svg';
+import github from '@/assets/images/brands/github.svg';
 
-function generateDayWiseTimeSeries(baseval: number, count: number, yrange: { max: number; min: number }): any[] {
-  let i = 0
-  const series = []
+function generateDayWiseTimeSeries(
+  baseval: number,
+  count: number,
+  yrange: { max: number; min: number },
+): any[] {
+  let i = 0;
+  const series = [];
   while (i < count) {
-    const x = baseval
-    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min
+    const x = baseval;
+    const y = Math.floor(Math.random() * (yrange.max - yrange.min + 1)) + yrange.min;
 
-    series.push([x, y])
-    baseval += 86400000
-    i++
+    series.push([x, y]);
+    baseval += 86400000;
+    i++;
   }
-  return series
+  return series;
 }
 
 export const scatterXYOpts: ApexOptions = {
@@ -170,7 +174,7 @@ export const scatterXYOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const dateTimeOpts: ApexOptions = {
   chart: {
@@ -260,7 +264,7 @@ export const dateTimeOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const scatterWithImagesOpts: ApexOptions = {
   chart: {
@@ -349,4 +353,4 @@ export const scatterWithImagesOpts: ApexOptions = {
     },
     offsetY: 7,
   },
-}
+};

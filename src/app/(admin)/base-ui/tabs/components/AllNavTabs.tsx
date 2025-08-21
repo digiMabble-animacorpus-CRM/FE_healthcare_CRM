@@ -1,8 +1,19 @@
-'use client'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { Col, Nav, NavItem, NavLink, Row, Tab, TabContainer, TabContent, TabPane, Tabs } from 'react-bootstrap'
-import { tabContents } from '../data'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
+'use client';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import {
+  Col,
+  Nav,
+  NavItem,
+  NavLink,
+  Row,
+  Tab,
+  TabContainer,
+  TabContent,
+  TabPane,
+  Tabs,
+} from 'react-bootstrap';
+import { tabContents } from '../data';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
 
 const NavTabs = () => {
   return (
@@ -13,7 +24,8 @@ const NavTabs = () => {
         <>
           Use the <code>.nav-tabs</code> class to generate a tabbed interface.
         </>
-      }>
+      }
+    >
       <Tabs defaultActiveKey={'2'} variant="underline" className="card-tabs border-bottom">
         {tabContents.map((tab, idx) => (
           <Tab
@@ -27,14 +39,15 @@ const NavTabs = () => {
                 </span>
                 <span className="d-none d-sm-block">{tab.title}</span>
               </div>
-            }>
+            }
+          >
             {tab.description}
           </Tab>
         ))}
       </Tabs>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TabsJustified = () => {
   return (
@@ -43,9 +56,11 @@ const TabsJustified = () => {
       title="Tabs Justified"
       description={
         <>
-          Using class <code>.nav-justified</code>, you can force your tabs menu items to use the full available width.
+          Using class <code>.nav-justified</code>, you can force your tabs menu items to use the
+          full available width.
         </>
-      }>
+      }
+    >
       <Tabs justify defaultActiveKey={'2'} variant="underline" className="border-bottom card-tabs">
         {tabContents.map((tab, idx) => (
           <Tab
@@ -59,14 +74,15 @@ const TabsJustified = () => {
                 </span>
                 <span className="d-none d-sm-block">{tab.title}</span>
               </div>
-            }>
+            }
+          >
             {tab.description}
           </Tab>
         ))}
       </Tabs>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const NavPills = () => {
   return (
@@ -78,7 +94,8 @@ const NavPills = () => {
           {' '}
           Use the <code>.nav-pills</code> class to generate a pilled interface.
         </>
-      }>
+      }
+    >
       <TabContainer defaultActiveKey={'2'}>
         <Nav as={'ul'} variant="pills">
           {tabContents.map((tab, idx) => (
@@ -101,8 +118,8 @@ const NavPills = () => {
         </TabContent>
       </TabContainer>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const PillsJustified = () => {
   return (
@@ -111,9 +128,11 @@ const PillsJustified = () => {
       title="Pills Justified"
       description={
         <>
-          Using class <code>.nav-justified</code>, you can force your pills menu items to use the full available width.
+          Using class <code>.nav-justified</code>, you can force your pills menu items to use the
+          full available width.
         </>
-      }>
+      }
+    >
       <div className="d-flex flex-wrap gap-2">
         <TabContainer defaultActiveKey={'2'}>
           <Nav as={'ul'} variant="pills" justify className="p-1">
@@ -138,8 +157,8 @@ const PillsJustified = () => {
         </TabContainer>
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TabsVerticalLeft = () => {
   return (
@@ -149,9 +168,11 @@ const TabsVerticalLeft = () => {
       description={
         <>
           {' '}
-          You can stack your navigation by changing the flex item direction with the <code>.flex-column</code> utility.
+          You can stack your navigation by changing the flex item direction with the{' '}
+          <code>.flex-column</code> utility.
         </>
-      }>
+      }
+    >
       <Row>
         <TabContainer defaultActiveKey={'1'}>
           <Col sm={3} className="mb-2 mb-sm-0">
@@ -175,8 +196,8 @@ const TabsVerticalLeft = () => {
         </TabContainer>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const TabsVerticalRight = () => {
   return (
@@ -186,9 +207,11 @@ const TabsVerticalRight = () => {
       description={
         <>
           {' '}
-          You can stack your navigation by changing the flex item direction with the <code>.flex-column</code> utility.
+          You can stack your navigation by changing the flex item direction with the{' '}
+          <code>.flex-column</code> utility.
         </>
-      }>
+      }
+    >
       <Row>
         <TabContainer defaultActiveKey={'1'}>
           <Col sm={9} className="mb-2 mb-sm-0">
@@ -212,8 +235,8 @@ const TabsVerticalRight = () => {
         </TabContainer>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AllNavTabs = () => {
   return (
@@ -225,7 +248,7 @@ const AllNavTabs = () => {
       <TabsVerticalLeft />
       <TabsVerticalRight />
     </>
-  )
-}
+  );
+};
 
-export default AllNavTabs
+export default AllNavTabs;

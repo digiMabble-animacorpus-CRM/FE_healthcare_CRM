@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllMixedCharts from './components/AllMixedCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllMixedCharts from './components/AllMixedCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Mixed Charts' }
+export const metadata: Metadata = { title: 'Mixed Charts' };
 
 const MixedCharts = () => {
   return (
@@ -26,7 +26,7 @@ const MixedCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default MixedCharts
+export default MixedCharts;

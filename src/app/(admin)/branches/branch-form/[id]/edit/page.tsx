@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { BranchType } from "@/types/data";
-import { getBranchById } from "@/helpers/branch";
-import BranchForm, { BranchFormValues } from "../../branchForm";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { BranchType } from '@/types/data';
+import { getBranchById } from '@/helpers/branch';
+import BranchForm, { BranchFormValues } from '../../branchForm';
 
 interface Props {
   params: { id?: string };
@@ -29,15 +29,15 @@ const EditBranchPage = ({ params }: Props) => {
         if (branch?._id) {
           setDefaultValues({
             name: branch.name,
-            code: branch.code || "",
-            email: branch.email || "",
-            phoneNumber: branch.phoneNumber || "",
+            code: branch.code || '',
+            email: branch.email || '',
+            phoneNumber: branch.phoneNumber || '',
             address: {
-              line1: branch.address?.line1 || "",
-              line2: branch.address?.line2 || "",
-              city: branch.address?.city || "",
-              zipCode: branch.address?.zipCode || "",
-              country: branch.address?.country || "",
+              street: branch.address?.street || '',
+              line2: branch.address?.line2 || '',
+              city: branch.address?.city || '',
+              zip_code: branch.address?.zip_code || '',
+              country: branch.address?.country || '',
             },
           });
         }
@@ -51,23 +51,17 @@ const EditBranchPage = ({ params }: Props) => {
 
   const onSubmitHandler = async (data: BranchFormValues) => {
     try {
-      console.log("Branch updated", data);
+      console.log('Branch updated', data);
       // await updateBranch(params.id as string, data);
-      router.push("/branches");
+      router.push('/branches');
     } catch {
-      console.error("Error updating branch");
+      console.error('Error updating branch');
     }
   };
 
   if (loading) return <div>Loading branch details...</div>;
 
-  return (
-    <BranchForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
-  );
+  return <BranchForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />;
 };
 
 export default EditBranchPage;

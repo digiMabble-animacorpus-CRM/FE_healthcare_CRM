@@ -79,3 +79,15 @@
 @import "pages/pricing";
 @import "pages/timeline";
 @import "pages/custom-react";
+
+// =========================
+// ✅ Custom Overrides
+// =========================
+
+// Force invalid border red
+.form-control.is-invalid,
+.was-validated .form-control:invalid {
+  border-color:  rgb(206, 61, 61)!important;   // bootstrap red
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25) !important;
+}
+

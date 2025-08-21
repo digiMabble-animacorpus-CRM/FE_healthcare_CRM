@@ -1,18 +1,32 @@
-import { branches } from "@/assets/data/branchData";
-import { languageData } from "@/assets/data/languageData";
-import { permissionData } from "@/assets/data/permissionData";
-import { staffData } from "@/assets/data/staffData";
-import { staffRoleData } from "@/assets/data/staffRoleData";
+'use client';
 
-import {
-  StaffType,
-  StaffRoleType,
-  PermissionType,
-  LanguageType,
-  BranchType,
-} from "@/types/data";
+import { API_BASE_PATH } from '@/context/constants';
+import { encryptAES, decryptAES } from '@/utils/encryption';
+import type { StaffType, StaffRoleType, PermissionType } from '@/types/data';
+import { staffRoleData } from '@/assets/data/staffRoleData';
+import { permissionData } from '@/assets/data/permissionData';
 
 const sleep = (ms = 500) => new Promise((res) => setTimeout(res, ms));
+
+export interface StaffUpdatePayload {
+  name?: string;
+  email?: string;
+  phoneNumber?: string;
+  roleId?: number;
+  accessLevel?: 'staff' | 'branch-admin' | 'super-admin';
+  branches?: number[];
+  selectedBranch?: number | null;
+  permissions?: {
+    action: string;
+    resource: string;
+    enabled: boolean;
+  }[];
+  updatedBy?: {
+    staffId: string;
+    updatedAt: string;
+  }[];
+  [key: string]: any;
+}
 
 export const getAllStaff = async (
   page: number = 1,
@@ -20,208 +34,216 @@ export const getAllStaff = async (
   branch?: string,
   from?: string,
   to?: string,
-  search?: string
-): Promise<{
-  data: (StaffType & {
-    role?: StaffRoleType;
-    accessLevel?: StaffRoleType;
-    languagesDetailed: LanguageType[];
-    permissionsDetailed: (PermissionType & { enabled: boolean })[];
-    branchesDetailed: BranchType[];
-    selectedBranchDetailed?: BranchType | null;
-  })[];
-  totalCount: number;
-}> => {
-  await sleep(); // simulate delay
+  search?: string,
+): Promise<{ data: StaffType[]; totalCount: number }> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.warn('No access token found.');
+      return { data: [], totalCount: 0 };
+    }
 
-  let filteredData = staffData;
+    const filters: Record<string, string> = {
+      page: page.toString(),
+      limit: limit.toString(),
+      ...(branch ? { branch } : {}),
+      ...(from ? { fromDate: from } : {}), // match backend param name
+      ...(to ? { toDate: to } : {}),
+      ...(search ? { searchText: search } : {}),
+    };
 
-  // Branch Filter (matches any assigned branch)
-  if (branch) {
-    filteredData = filteredData.filter((item) =>
-      item.branches.some((b) => b.id === branch)
-    );
-  }
+    console.log('Filters (plain):', filters);
 
-  // Date Range Filter (based on updatedAt)
-  if (from && to) {
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
-    filteredData = filteredData.filter((item) => {
-      const lastUpdated =
-        item.updatedBy?.[item.updatedBy.length - 1]?.updatedAt ||
-        item.createdAt;
-      const updatedDate = new Date(lastUpdated);
+    const queryParams = new URLSearchParams(filters).toString();
 
-      return (
-        !isNaN(updatedDate.getTime()) &&
-        updatedDate >= fromDate &&
-        updatedDate <= toDate
-      );
-    });
-  }
-
-  // Search Filter (name, email, phoneNumber)
-  if (search) {
-    const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter(
-      (item) =>
-        item.name.toLowerCase().includes(lowerSearch) ||
-        item.email?.toLowerCase().includes(lowerSearch) ||
-        item.phoneNumber.toLowerCase().includes(lowerSearch)
-    );
-  }
-
-  // Pagination
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedData = filteredData.slice(start, end);
-
-  // Enrich each staff with detailed related data
-  const enrichedData = paginatedData.map((staff: StaffType) => {
-    // Find role object
-    const role = staffRoleData.find(
-      (r) => r._id === staff.roleId && r.tag === "Role"
-    );
-
-    // Find accessLevel object
-    const accessLevel = staffRoleData.find(
-      (r) => r._id === staff.accessLevelId && r.tag === "AccessLevel"
-    );
-
-    // Map languages IDs to full objects
-    const languagesDetailed = (staff.languages || [])
-      .map((langId) => languageData.find((l) => l._id === langId))
-      .filter(Boolean) as LanguageType[];
-
-    // Map permissions IDs to full objects plus enabled flag
-    const permissionsDetailed = (staff.permissions || []).map((perm) => {
-      const permDetails = permissionData.find((p) => p._id === perm._id);
-      return {
-        ...(permDetails || {
-          _id: perm._id,
-          key: "",
-          label: "",
-          description: "",
-        }),
-        enabled: perm.enabled,
-      };
+    const response = await fetch(`${API_BASE_PATH}/staff?${queryParams}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     });
 
-    // Map branch IDs to full branch objects
-    const branchesDetailed = (staff.branches || [])
-      .map((b) => branches.find((br) => br._id === b.id))
-      .filter(Boolean) as BranchType[];
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Backend error:', response.status, errorText);
+      return { data: [], totalCount: 0 };
+    }
 
-    // Expand selectedBranch id to full branch object
-    const selectedBranchDetailed =
-      branches.find((br) => br._id === staff.selectedBranch) || null;
+    const jsonData = await response.json();
+    console.log('Response from server:', jsonData);
+
+    const staffData: StaffType[] = Array.isArray(jsonData?.data)
+      ? jsonData.data
+      : jsonData?.data
+        ? [jsonData.data]
+        : [];
 
     return {
-      ...staff,
-      role,
-      accessLevel,
-      languagesDetailed,
-      permissionsDetailed,
-      branchesDetailed,
-      selectedBranchDetailed,
+      data: staffData,
+      totalCount: jsonData?.totalCount || 0,
     };
-  });
+  } catch (error) {
+    console.error('Error fetching staff:', error);
+    return { data: [], totalCount: 0 };
+  }
+};
 
+export const getStaffById = async (staffId: string): Promise<StaffType | null> => {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    console.warn('No access token found.');
+    return null;
+  }
+
+  const url = `${API_BASE_PATH}/staff/${staffId}`;
+  console.log('Requesting staff by ID:', url);
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log('Response status:', response.status);
+    const result = await response.json();
+    console.log('Full API response:', result);
+
+    if (!response.ok) {
+      console.error('Failed to fetch staff:', result?.message || 'Unknown error');
+      return null;
+    }
+
+    // Directly return the staff data
+    if (result?.data) {
+      return result.data as StaffType;
+    }
+
+    console.warn('No data found in response.');
+    return null;
+  } catch (error) {
+    console.error('Exception during staff fetch:', error);
+    return null;
+  }
+};
+
+export const updateStaff = async (
+  id: string | number,
+  payload: StaffUpdatePayload,
+): Promise<boolean> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) return false;
+
+    const safePayload = {
+      ...payload,
+      branches: (payload.branches || []).map((b: string | number) => Number(b)),
+      selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
+    };
+
+    const encryptedId = encryptAES(String(id));
+    const encryptedPayload = encryptAES(safePayload);
+
+    const response = await fetch(`${API_BASE_PATH}/staff/${encodeURIComponent(encryptedId)}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ data: encryptedPayload }),
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || !result.status) {
+      console.error(' Update failed:', result.message || 'Unknown error');
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error(' Error updating staff:', error);
+    return false;
+  }
+};
+
+export const transformToBackendDto = (formData: StaffType): StaffUpdatePayload => {
   return {
-    data: enrichedData,
-    totalCount: filteredData.length,
+    name: formData.name,
+    email: formData.email,
+    phone_number: formData.phoneNumber,
+    role_id: formData.roleId ? Number(formData.roleId) : undefined,
+    access_level: formData.accessLevelId as 'staff' | 'branch-admin' | 'super-admin',
+    branches: formData.branches.map((b) => Number(b.id)).filter(Boolean),
+    selected_branch: formData.selectedBranch ? Number(formData.selectedBranch) : null,
+    permissions: formData.permissions.map((p) => ({
+      action: p._id.split('-')[0],
+      resource: p._id.split('-')[1],
+      enabled: !!p.enabled,
+    })),
+    updatedBy: [
+      {
+        staffId: String(localStorage.getItem('staff_id') || ''),
+        updatedAt: new Date().toISOString(),
+      },
+    ],
   };
 };
 
-export const getStaffById = async (
-  id?: string
-): Promise<{ data: StaffType[] }> => {
-  await sleep();
+export const getAllRoles = async (): Promise<StaffRoleType[]> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) return [];
 
-  if (!id) {
-    return { data: [] };
-  }
-
-  const filtered = staffData.filter((p) => p._id === id);
-
-  const enriched = filtered.map((staff) => {
-    const role = staffRoleData.find(
-      (r) => r._id === staff.roleId && r.tag === "Role"
-    );
-
-    const accessLevel = staffRoleData.find(
-      (r) => r._id === staff.accessLevelId && r.tag === "AccessLevel"
-    );
-
-    const languagesDetailed = (staff.languages || [])
-      .map((langId) => languageData.find((l) => l._id === langId))
-      .filter(Boolean) as LanguageType[];
-
-    const permissionsDetailed = (staff.permissions || []).map((perm) => {
-      const permDetails = permissionData.find((p) => p._id === perm._id);
-      return {
-        ...(permDetails || {
-          _id: perm._id,
-          key: "",
-          label: "",
-          description: "",
-        }),
-        enabled: perm.enabled,
-      };
+    const response = await fetch(`${API_BASE_PATH}/staff-role?tag=Role`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
     });
 
-    const branchesDetailed = (staff.branches || [])
-      .map((b) => branches.find((br) => br._id === b.id))
-      .filter(Boolean) as BranchType[];
+    const encryptedText = await response.text();
+    const decrypted = decryptAES(encryptedText);
 
-    // New: expand selectedBranch id to full branch object
-    const selectedBranchDetailed = branches.find(
-      (br) => br._id === staff.selectedBranch
-    );
-
-    return {
-      ...staff,
-      role,
-      accessLevel,
-      languagesDetailed,
-      permissionsDetailed,
-      branchesDetailed,
-      selectedBranchDetailed,
-    };
-  });
-
-  return { data: enriched };
-};
-
-// Optionally, get all roles and access levels for dropdowns
-export const getAllRoles = (): StaffRoleType[] => {
-  return staffRoleData.filter((role) => role.tag === "Role");
-};
-
-export const getAllAccessLevels = (): StaffRoleType[] => {
-  return staffRoleData.filter((role) => role.tag === "AccessLevel");
-};
-
-export const getDefaultStaffById = async (
-  id?: string
-): Promise<{ data: StaffType[] }> => {
-  await sleep();
-
-  if (!id) {
-    return { data: [] };
+    return Array.isArray(decrypted?.data) ? decrypted.data : [];
+  } catch (error) {
+    console.error(' Error fetching roles:', error);
+    return [];
   }
+};
 
-  const result = staffData.filter((p) => p._id === id);
+export const getAllAccessLevels = async (): Promise<StaffRoleType[]> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) return [];
 
-  return { data: result };
+    const response = await fetch(`${API_BASE_PATH}/staff-role?tag=AccessLevel`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const encryptedText = await response.text();
+    const decrypted = decryptAES(encryptedText);
+
+    return Array.isArray(decrypted?.data) ? decrypted.data : [];
+  } catch (error) {
+    console.error(' Error fetching access levels:', error);
+    return [];
+  }
 };
 
 export const getAllStaffRoll = async (
   page: number = 1,
   limit: number = 10,
   tag?: string,
-  search?: string
+  search?: string,
 ): Promise<{
   data: (StaffRoleType & { permissionsDetailed: PermissionType[] })[];
   totalCount: number;
@@ -241,7 +263,7 @@ export const getAllStaffRoll = async (
     filteredData = filteredData.filter(
       (item) =>
         item.key?.toLowerCase().includes(lowerSearch) ||
-        item.label?.toLowerCase().includes(lowerSearch)
+        item.label?.toLowerCase().includes(lowerSearch),
     );
   }
 
@@ -252,18 +274,16 @@ export const getAllStaffRoll = async (
 
   // ✅ Enrich Roles with Permission Details
   const enrichedData = paginatedData.map((role) => {
-    const permissionsDetailed = (role.defaultPermissions || []).map(
-      (permKey) => {
-        return (
-          permissionData.find((p) => p.key === permKey) || {
-            _id: permKey,
-            key: permKey,
-            label: permKey,
-            description: "",
-          }
-        );
-      }
-    );
+    const permissionsDetailed = (role.defaultPermissions || []).map((permKey) => {
+      return (
+        permissionData.find((p) => p.key === permKey) || {
+          _id: permKey,
+          key: permKey,
+          label: permKey,
+          description: '',
+        }
+      );
+    });
 
     return {
       ...role,
@@ -277,9 +297,7 @@ export const getAllStaffRoll = async (
   };
 };
 
-export const getStaffRoleById = async (
-  id?: string
-): Promise<{ data: StaffRoleType[] }> => {
+export const getStaffRoleById = async (id?: string): Promise<{ data: StaffRoleType[] }> => {
   await sleep();
 
   if (!id) {
@@ -295,8 +313,8 @@ export const getStaffRoleById = async (
         ...(permDetails || {
           _id: perm,
           key: perm,
-          label: "",
-          description: "",
+          label: '',
+          description: '',
         }),
       };
     });

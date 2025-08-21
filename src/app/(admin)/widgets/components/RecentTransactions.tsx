@@ -1,10 +1,10 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getAllTransaction } from '@/helpers/data'
-import { Button, Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { getAllTransaction } from '@/helpers/data';
+import { Button, Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
 
 const RecentTransactions = async () => {
-  const transactionsData = await getAllTransaction()
+  const transactionsData = await getAllTransaction();
   return (
     <Card>
       <CardHeader className="d-flex justify-content-between align-items-center">
@@ -22,10 +22,18 @@ const RecentTransactions = async () => {
             <tbody>
               {transactionsData.map((item, idx) => (
                 <tr key={idx}>
-                  <td>{item.purchaseDate.toLocaleString('en-us', { day: '2-digit', month: 'long', year: 'numeric' })}</td>
+                  <td>
+                    {item.purchaseDate.toLocaleString('en-us', {
+                      day: '2-digit',
+                      month: 'long',
+                      year: 'numeric',
+                    })}
+                  </td>
                   <td>€{item.amount}</td>
                   <td>
-                    <span className={`badge bg-${item.status == 'Dr' ? 'danger' : 'success'}`}>{item.status}</span>
+                    <span className={`badge bg-${item.status == 'Dr' ? 'danger' : 'success'}`}>
+                      {item.status}
+                    </span>
                   </td>
                   <td>{item.description} </td>
                 </tr>
@@ -35,7 +43,7 @@ const RecentTransactions = async () => {
         </SimplebarReactClient>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default RecentTransactions
+export default RecentTransactions;

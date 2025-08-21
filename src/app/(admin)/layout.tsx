@@ -1,12 +1,14 @@
-import Footer from '@/components/layout/Footer'
-import AuthProtectionWrapper from '@/components/wrappers/AuthProtectionWrapper'
-import { ChildrenType } from '@/types/component-props'
-import dynamic from 'next/dynamic'
-import { Suspense } from 'react'
-import { Container } from 'react-bootstrap'
+import Footer from '@/components/layout/Footer';
+import AuthProtectionWrapper from '@/components/wrappers/AuthProtectionWrapper';
+import { ChildrenType } from '@/types/component-props';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
+import { Container } from 'react-bootstrap';
 
-const TopNavigationBar = dynamic(() => import('@/components/layout/TopNavigationBar/page'))
-const VerticalNavigationBar = dynamic(() => import('@/components/layout/VerticalNavigationBar/page'))
+const TopNavigationBar = dynamic(() => import('@/components/layout/TopNavigationBar/page'));
+const VerticalNavigationBar = dynamic(
+  () => import('@/components/layout/VerticalNavigationBar/page'),
+);
 
 const AdminLayout = ({ children }: ChildrenType) => {
   return (
@@ -22,7 +24,7 @@ const AdminLayout = ({ children }: ChildrenType) => {
         </div>
       </div>
     </AuthProtectionWrapper>
-  )
-}
+  );
+};
 
-export default AdminLayout
+export default AdminLayout;

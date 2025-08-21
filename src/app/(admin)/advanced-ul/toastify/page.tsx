@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import AllToastify from './AllToastify'
+import PageTitle from '@/components/PageTitle';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import AllToastify from './AllToastify';
 
-export const metadata: Metadata = { title: 'Toastify' }
+export const metadata: Metadata = { title: 'Toastify' };
 
 const Toastify = () => {
   return (
@@ -21,13 +21,16 @@ const Toastify = () => {
                   size="sm"
                   className="rounded-2 float-end"
                   href="https://www.npmjs.com/package/react-toastify"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </Button>
               </CardTitle>
               <p className="text-muted mb-3">Better notification messages</p>
               <h5 className="mt-2">Usage</h5>
-              <p className="mb-0">React Toastify&apos;s css needs to be imported when using the Toastify component</p>
+              <p className="mb-0">
+                React Toastify&apos;s css needs to be imported when using the Toastify component
+              </p>
             </CardBody>
           </Card>
           <AllToastify />
@@ -44,7 +47,7 @@ const Toastify = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Toastify
+export default Toastify;

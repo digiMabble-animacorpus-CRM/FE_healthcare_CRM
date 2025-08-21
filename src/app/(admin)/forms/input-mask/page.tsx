@@ -1,9 +1,9 @@
-import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap'
-import AllInputMasks from './components/AllInputMasks'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Button, Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
+import AllInputMasks from './components/AllInputMasks';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Input Mask' }
+export const metadata: Metadata = { title: 'Input Mask' };
 
 const InputMasks = () => {
   return (
@@ -20,19 +20,22 @@ const InputMasks = () => {
                   size="sm"
                   className="rounded-2 float-end"
                   href="https://github.com/RobinHerbots/Inputmask"
-                  target="_blank">
+                  target="_blank"
+                >
                   {' '}
                   Official Website{' '}
                 </Button>
               </CardTitle>
-              <p className="text-muted mb-3">Inputmask is a javascript library that creates an input mask.</p>
+              <p className="text-muted mb-3">
+                Inputmask is a javascript library that creates an input mask.
+              </p>
             </CardBody>
           </Card>
           <AllInputMasks />
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default InputMasks
+export default InputMasks;

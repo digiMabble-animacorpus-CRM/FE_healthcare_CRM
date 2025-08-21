@@ -1,10 +1,10 @@
-import { Col, Row } from 'react-bootstrap'
-import UIExamplesList from '@/components/UIExamplesList'
-import AllHeatmapCharts from './components/AllHeatmapCharts'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Col, Row } from 'react-bootstrap';
+import UIExamplesList from '@/components/UIExamplesList';
+import AllHeatmapCharts from './components/AllHeatmapCharts';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Heatmap Alert' }
+export const metadata: Metadata = { title: 'Heatmap Alert' };
 
 const HeatmapCharts = () => {
   return (
@@ -26,7 +26,7 @@ const HeatmapCharts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default HeatmapCharts
+export default HeatmapCharts;

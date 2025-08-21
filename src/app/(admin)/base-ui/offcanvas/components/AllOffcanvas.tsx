@@ -1,5 +1,5 @@
-'use client'
-import useToggle from '@/hooks/useToggle'
+'use client';
+import useToggle from '@/hooks/useToggle';
 import {
   Card,
   Col,
@@ -13,10 +13,15 @@ import {
   DropdownToggle,
   DropdownMenu,
   DropdownItem,
-} from 'react-bootstrap'
-import { backdropOptions, placementOptions, type BackdropOption, type PlacementOption } from '../data'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
+} from 'react-bootstrap';
+import {
+  backdropOptions,
+  placementOptions,
+  type BackdropOption,
+  type PlacementOption,
+} from '../data';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
 
 const OffcanvasDropdown = () => {
   return (
@@ -36,10 +41,10 @@ const OffcanvasDropdown = () => {
         </li>
       </DropdownMenu>
     </Dropdown>
-  )
-}
+  );
+};
 const DefaultOffcanvas = () => {
-  const { isTrue, toggle } = useToggle()
+  const { isTrue, toggle } = useToggle();
 
   return (
     <ComponentContainerCard
@@ -47,10 +52,12 @@ const DefaultOffcanvas = () => {
       title="Default Buttons"
       description={
         <>
-          You can use a link with the href attribute, or a button with the <code>data-bs-target</code> attribute. In both cases, the{' '}
+          You can use a link with the href attribute, or a button with the{' '}
+          <code>data-bs-target</code> attribute. In both cases, the{' '}
           <code>data-bs-toggle=&quot;offcanvas&quot;</code> is required.
         </>
-      }>
+      }
+    >
       <div className="button-list">
         <Button variant="primary" onClick={toggle}>
           Link with href
@@ -64,17 +71,20 @@ const DefaultOffcanvas = () => {
           </OffcanvasTitle>
         </OffcanvasHeader>
         <OffcanvasBody>
-          <p>Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.</p>
+          <p>
+            Some text as placeholder. In real life you can have the elements you have chosen. Like,
+            text, images, lists, etc.
+          </p>
           <OffcanvasDropdown />
         </OffcanvasBody>
       </BSOffcanvas>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const OffcanvasPositions = () => {
   const OffcanvasPlacement = ({ name, variant, ...props }: PlacementOption) => {
-    const { isTrue, toggle } = useToggle()
+    const { isTrue, toggle } = useToggle();
 
     return (
       <>
@@ -90,30 +100,34 @@ const OffcanvasPositions = () => {
           </OffcanvasHeader>
 
           <OffcanvasBody>
-            <p>Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.</p>
+            <p>
+              Some text as placeholder. In real life you can have the elements you have chosen.
+              Like, text, images, lists, etc.
+            </p>
             <OffcanvasDropdown />
           </OffcanvasBody>
         </BSOffcanvas>
       </>
-    )
-  }
+    );
+  };
   return (
     <ComponentContainerCard
       id="offcanvas-position"
       title="Offcanvas Position"
-      description={<>Try the top, right, bottom and left examples out below.</>}>
+      description={<>Try the top, right, bottom and left examples out below.</>}
+    >
       <div className="button-list">
         {placementOptions.map((props, idx) => (
           <OffcanvasPlacement {...props} key={idx} />
         ))}
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const OffCanvasWithBackdropOptions = () => {
   const OffCanvasWithBackdrop = ({ name, variant, ...props }: BackdropOption) => {
-    const { isTrue, toggle } = useToggle()
+    const { isTrue, toggle } = useToggle();
     return (
       <>
         <Button onClick={toggle} variant={variant} type="button">
@@ -127,32 +141,37 @@ const OffCanvasWithBackdropOptions = () => {
             </OffcanvasTitle>
           </OffcanvasHeader>
           <OffcanvasBody>
-            <p>Some text as placeholder. In real life you can have the elements you have chosen. Like, text, images, lists, etc.</p>
+            <p>
+              Some text as placeholder. In real life you can have the elements you have chosen.
+              Like, text, images, lists, etc.
+            </p>
             <OffcanvasDropdown />
           </OffcanvasBody>
         </BSOffcanvas>
       </>
-    )
-  }
+    );
+  };
   return (
     <ComponentContainerCard
       id="static-backdrop"
       title="Static Backdrop"
       description={
         <>
-          Scrolling the <code>&lt;body&gt;</code> element is disabled when an offcanvas and its backdrop are visible. Use the{' '}
-          <code>data-bs-scroll</code> attribute to toggle <code>&lt;body&gt;</code> scrolling and <code>data-bs-backdrop</code> to toggle the
+          Scrolling the <code>&lt;body&gt;</code> element is disabled when an offcanvas and its
+          backdrop are visible. Use the <code>data-bs-scroll</code> attribute to toggle{' '}
+          <code>&lt;body&gt;</code> scrolling and <code>data-bs-backdrop</code> to toggle the
           backdrop.
         </>
-      }>
+      }
+    >
       <div className="button-list">
         {backdropOptions.map((offcanvas, idx) => (
           <OffCanvasWithBackdrop {...offcanvas} key={idx} />
         ))}
       </div>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AllOffcanvas = () => {
   return (
@@ -161,7 +180,7 @@ const AllOffcanvas = () => {
       <OffCanvasWithBackdropOptions />
       <OffcanvasPositions />
     </>
-  )
-}
+  );
+};
 
-export default AllOffcanvas
+export default AllOffcanvas;

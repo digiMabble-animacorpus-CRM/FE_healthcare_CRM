@@ -1,18 +1,23 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import Link from 'next/link'
-import { Card, CardBody, CardFooter, Col, Row } from 'react-bootstrap'
-import { statisticData } from '../data'
-import { StatisticType } from '../type'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Link from 'next/link';
+import { Card, CardBody, CardFooter, Col, Row } from 'react-bootstrap';
+import { statisticData } from '../data';
+import { StatisticType } from '../type';
 
 const StatCard = ({ stat }: { stat: StatisticType }) => {
-  const { amount, change, changeColor, icon, iconColor, title } = stat
+  const { amount, change, changeColor, icon, iconColor, title } = stat;
   return (
     <Card>
       <CardBody>
         <Row>
           <Col xs={6}>
             <div className="avatar-md bg-light bg-opacity-50 rounded flex-centered">
-              <IconifyIcon icon={icon} width={32} height={32} className={`fs-32 text-${iconColor}`} />
+              <IconifyIcon
+                icon={icon}
+                width={32}
+                height={32}
+                className={`fs-32 text-${iconColor}`}
+              />
             </div>
           </Col>
           <Col xs={6} className="text-end">
@@ -40,8 +45,8 @@ const StatCard = ({ stat }: { stat: StatisticType }) => {
         </div>
       </CardFooter>
     </Card>
-  )
-}
+  );
+};
 
 const Statistic = () => {
   return (
@@ -52,7 +57,7 @@ const Statistic = () => {
         </Col>
       ))}
     </Row>
-  )
-}
+  );
+};
 
-export default Statistic
+export default Statistic;

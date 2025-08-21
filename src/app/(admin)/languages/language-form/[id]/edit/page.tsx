@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { LanguageType } from "@/types/data";
-import { getLanguageById } from "@/helpers/languages";
-import LanguageForm from "../../languageForm";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import type { LanguageType } from '@/types/data';
+import { getLanguageById } from '@/helpers/languages';
+import LanguageForm from '../../languageForm';
 
 interface Props {
   params: { id?: string };
@@ -37,24 +37,20 @@ const EditLanguagePage = ({ params }: Props) => {
     fetchData();
   }, [params.id]);
 
-  const onSubmitHandler = async (data: Omit<LanguageType, "_id">) => {
+  const onSubmitHandler = async (data: Omit<LanguageType, '_id'>) => {
     try {
-      console.log("Language updated", data);
+      console.log('Language updated', data);
       // await updateLanguage(params.id as string, data)
-      router.push("/languages");
+      router.push('/languages');
     } catch {
-      console.error("Error updating language");
+      console.error('Error updating language');
     }
   };
 
   if (loading) return <div>Loading language details...</div>;
 
   return (
-    <LanguageForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
+    <LanguageForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
   );
 };
 

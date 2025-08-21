@@ -1,21 +1,26 @@
-"use client";
+'use client';
 
-import { useState } from "react";
-import { CustomerEnquiriesType } from "@/types/data";
-import CheckCustomerModal from "./components/CheckCustomerModal";
-import BookAppointmentForm from "./components/BookAppointmentForm";
-import { getUserByEmail } from "@/helpers/customer";
-import { useRouter } from "next/navigation";
-import CustomerInfoCard from "./components/CustomerInfoCard";
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
+import { getUserByEmail } from '@/helpers/customer';
+
+// Dynamically import components to avoid SSR issues
+const CheckCustomerModal = dynamic(() => import('./components/CheckCustomerModal'), { ssr: false });
+
+const BookAppointmentForm = dynamic(() => import('./components/BookAppointmentForm'), {
+  ssr: false,
+});
+
+const CustomerInfoCard = dynamic(() => import('./components/CustomerInfoCard'), { ssr: false });
 
 const AppointmentPage = () => {
   const router = useRouter();
+
   const [showModal, setShowModal] = useState(true);
   const [isCustomerNotFound, setIsCustomerNotFound] = useState(false);
-  const [existingCustomer, setExistingCustomer] =
-    useState<CustomerEnquiriesType | null>(null);
-  const [customerFormData, setCustomerFormData] =
-    useState<CustomerEnquiriesType | null>(null);
+  const [existingCustomer, setExistingCustomer] = useState<any | null>(null);
+  const [customerFormData, setCustomerFormData] = useState<any | null>(null);
 
   const handleCheckCustomer = async (email: string) => {
     const customer = getUserByEmail(email);
@@ -29,7 +34,7 @@ const AppointmentPage = () => {
     }
   };
 
-  const handleCreateCustomer = (data: CustomerEnquiriesType) => {
+  const handleCreateCustomer = (data: any) => {
     setCustomerFormData(data);
   };
 
@@ -40,21 +45,21 @@ const AppointmentPage = () => {
 
   const handleCreateAppointment = async (data: any) => {
     if (customerFormData) {
-      await fetch("/api/customers/create", {
-        method: "POST",
+      await fetch('/api/customers/create', {
+        method: 'POST',
         body: JSON.stringify(customerFormData),
       });
     }
 
-    await fetch("/api/appointments/create", {
-      method: "POST",
+    await fetch('/api/appointments/create', {
+      method: 'POST',
       body: JSON.stringify({
         ...data,
-        customerId: existingCustomer?._id ?? "newly-created-id",
+        customerId: existingCustomer?._id ?? 'newly-created-id',
       }),
     });
 
-    alert("Appointment Booked!");
+    alert('Appointment Booked!');
   };
 
   return (

@@ -1,5 +1,5 @@
-import { currency } from '@/context/constants'
-import { ScheduleType, StatisticType, StatType } from './type'
+import { currency } from '@/context/constants';
+import { ScheduleType, StatisticType, StatType } from './type';
 
 export const stateData: StatType[] = [
   {
@@ -47,7 +47,7 @@ export const stateData: StatType[] = [
     changeColor: 'success',
     badgeIcon: 'bx:cricket-ball',
   },
-]
+];
 
 export const statisticData: StatisticType[] = [
   {
@@ -82,7 +82,7 @@ export const statisticData: StatisticType[] = [
     change: '10.6',
     changeColor: 'danger',
   },
-]
+];
 
 export const scheduleData: ScheduleType[] = [
   {
@@ -109,4 +109,4 @@ export const scheduleData: ScheduleType[] = [
     variant: 'warning',
     duration: '01:00 - 02:00',
   },
-]
+];

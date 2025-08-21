@@ -1,26 +1,26 @@
-import type { Metadata } from 'next'
+import type { Metadata } from 'next';
 
-import { colorVariants } from '@/context/constants'
-import Image, { type StaticImageData } from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
+import { colorVariants } from '@/context/constants';
+import Image, { type StaticImageData } from 'next/image';
+import Link from 'next/link';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 
-import cardImg from '@/assets/images/small/img-1.jpg'
-import cardImg2 from '@/assets/images/small/img-2.jpg'
-import cardImg3 from '@/assets/images/small/img-3.jpg'
-import cardImg4 from '@/assets/images/small/img-4.jpg'
-import cardImg5 from '@/assets/images/small/img-5.jpg'
-import PageTitle from '@/components/PageTitle'
+import cardImg from '@/assets/images/small/img-1.jpg';
+import cardImg2 from '@/assets/images/small/img-2.jpg';
+import cardImg3 from '@/assets/images/small/img-3.jpg';
+import cardImg4 from '@/assets/images/small/img-4.jpg';
+import cardImg5 from '@/assets/images/small/img-5.jpg';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Cards' }
+export const metadata: Metadata = { title: 'Cards' };
 
 type CardGroupType = {
-  id: number
-  image: StaticImageData
-  title: string
-  text: string
-  subtext: string
-}
+  id: number;
+  image: StaticImageData;
+  title: string;
+  text: string;
+  subtext: string;
+};
 
 const CardWithImage = () => {
   return (
@@ -32,8 +32,9 @@ const CardWithImage = () => {
             Card title
           </CardTitle>
           <p className="card-text text-muted">
-            Some quick example text to build on the card title and make up the bulk of the card&apos;s content. With supporting text below as a
-            natural lead-in to additional content.
+            Some quick example text to build on the card title and make up the bulk of the
+            card&apos;s content. With supporting text below as a natural lead-in to additional
+            content.
           </p>
           <Link href="" className="btn btn-primary">
             Button
@@ -41,8 +42,8 @@ const CardWithImage = () => {
         </CardBody>
       </Card>
     </>
-  )
-}
+  );
+};
 
 const CardWithImage2 = () => {
   return (
@@ -66,8 +67,8 @@ const CardWithImage2 = () => {
         </Link>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const CardWithImage3 = () => {
   return (
@@ -75,16 +76,16 @@ const CardWithImage3 = () => {
       <Image className="card-img-top img-fluid" src={cardImg4} alt="img-4" />
       <CardBody>
         <p className="card-text text-muted">
-          Some quick example text to build on the card title and make up the bulk of the card&apos;s content. With supporting text below as a natural
-          lead-in to additional content.
+          Some quick example text to build on the card title and make up the bulk of the card&apos;s
+          content. With supporting text below as a natural lead-in to additional content.
         </p>
         <Link href="" className="btn btn-primary">
           Button
         </Link>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const CardWithTitleAndImage = () => {
   return (
@@ -103,8 +104,8 @@ const CardWithTitleAndImage = () => {
         </Link>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const CardWithSpecialTitle = () => {
   return (
@@ -117,8 +118,8 @@ const CardWithSpecialTitle = () => {
         Go somewhere
       </Link>
     </Card>
-  )
-}
+  );
+};
 
 const CardWithHeader = () => {
   return (
@@ -134,8 +135,8 @@ const CardWithHeader = () => {
         </Link>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const CardWithHeaderAndQuote = () => {
   return (
@@ -143,7 +144,9 @@ const CardWithHeaderAndQuote = () => {
       <CardHeader>Quote</CardHeader>
       <CardBody>
         <blockquote>
-          <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+          <p>
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.
+          </p>
           <footer>
             Someone famous in
             <cite>Source Title</cite>
@@ -151,8 +154,8 @@ const CardWithHeaderAndQuote = () => {
         </blockquote>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const CardWithHeaderAndFooter = () => {
   return (
@@ -165,8 +168,8 @@ const CardWithHeaderAndFooter = () => {
       </CardBody>
       <div className="card-footer text-muted">2 days ago</div>
     </Card>
-  )
-}
+  );
+};
 
 const ColorCards = () => {
   return (
@@ -189,7 +192,10 @@ const ColorCards = () => {
           <Card className={`bg-${color} text-white`}>
             <CardBody>
               <blockquote>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante.</p>
+                <p>
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a
+                  ante.
+                </p>
                 <footer>
                   Someone famous in&nbsp;
                   <cite title="Source Title">Source Title</cite>
@@ -200,8 +206,8 @@ const ColorCards = () => {
         </Col>
       ))}
     </Row>
-  )
-}
+  );
+};
 
 const BorderedCards = () => {
   return (
@@ -213,7 +219,9 @@ const BorderedCards = () => {
               <CardTitle as={'h5'} className={`text-${color} mb-2`}>
                 Special title treatment
               </CardTitle>
-              <p className="card-text">With supporting text below as a natural lead-in to additional content.</p>
+              <p className="card-text">
+                With supporting text below as a natural lead-in to additional content.
+              </p>
               <Link href="" className={`btn btn-${color} btn-sm`}>
                 Button
               </Link>
@@ -222,8 +230,8 @@ const BorderedCards = () => {
         </Col>
       ))}
     </Row>
-  )
-}
+  );
+};
 
 const HorizontalCards = () => {
   return (
@@ -240,7 +248,8 @@ const HorizontalCards = () => {
                   Card title
                 </CardTitle>
                 <p className="card-text">
-                  This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.
+                  This is a wider card with supporting text below as a natural lead-in to additional
+                  content. This content is a little bit longer.
                 </p>
                 <p className="card-text">
                   <small className="text-muted">Last updated 3 mins ago</small>
@@ -259,7 +268,8 @@ const HorizontalCards = () => {
                   Card title
                 </CardTitle>
                 <p className="card-text">
-                  This is a wider card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.
+                  This is a wider card with supporting text below as a natural lead-in to additional
+                  content. This content is a little bit longer.
                 </p>
                 <p className="card-text">
                   <small className="text-muted">Last updated 3 mins ago</small>
@@ -273,8 +283,8 @@ const HorizontalCards = () => {
         </Card>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
 const CardWithStretchedLink = () => {
   return (
@@ -301,7 +311,9 @@ const CardWithStretchedLink = () => {
                 Card with stretched link
               </Link>
             </CardTitle>
-            <p className="card-text">Some quick example text to build on the card up the bulk of the card&apos;s content.</p>
+            <p className="card-text">
+              Some quick example text to build on the card up the bulk of the card&apos;s content.
+            </p>
           </CardBody>
         </Card>
       </Col>
@@ -327,13 +339,15 @@ const CardWithStretchedLink = () => {
                 Card with stretched link
               </Link>
             </CardTitle>
-            <p className="card-text">Some quick example text to build on the card up the bulk of the card&apos;s content.</p>
+            <p className="card-text">
+              Some quick example text to build on the card up the bulk of the card&apos;s content.
+            </p>
           </CardBody>
         </Card>
       </Col>
     </>
-  )
-}
+  );
+};
 
 const CardDecks = () => {
   return (
@@ -347,7 +361,8 @@ const CardDecks = () => {
                 Card title
               </CardTitle>
               <p className="card-text">
-                This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.
+                This is a longer card with supporting text below as a natural lead-in to additional
+                content. This content is a little bit longer.
               </p>
               <p className="card-text">
                 <small className="text-muted">Last updated 3 mins ago</small>
@@ -357,8 +372,8 @@ const CardDecks = () => {
         </Col>
       ))}
     </Row>
-  )
-}
+  );
+};
 
 const CardWithGroup = ({ item }: { item: CardGroupType }) => {
   return (
@@ -374,8 +389,8 @@ const CardWithGroup = ({ item }: { item: CardGroupType }) => {
         </p>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
 const Cards = () => {
   const CardGroupDetails: CardGroupType[] = [
@@ -400,7 +415,7 @@ const Cards = () => {
       text: 'This is a wider card with supporting text below as a natural lead-in to additional content. This card has even longer content than the first to show that equal height action.',
       subtext: 'Last updated 3 mins ago',
     },
-  ]
+  ];
   return (
     <>
       <PageTitle subName="UI" title="Cards" />
@@ -500,7 +515,7 @@ const Cards = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Cards
+export default Cards;

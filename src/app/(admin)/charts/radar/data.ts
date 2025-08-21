@@ -1,4 +1,4 @@
-import { type ApexOptions } from 'apexcharts'
+import { type ApexOptions } from 'apexcharts';
 
 export const basicRadarOpts: ApexOptions = {
   chart: {
@@ -16,7 +16,7 @@ export const basicRadarOpts: ApexOptions = {
   ],
   colors: ['#7f56da'],
   labels: ['January', 'February', 'March', 'April', 'May', 'June'],
-}
+};
 
 export const polygonFillOpts: ApexOptions = {
   chart: {
@@ -48,7 +48,7 @@ export const polygonFillOpts: ApexOptions = {
   tooltip: {
     y: {
       formatter: function (val: number) {
-        return val.toString()
+        return val.toString();
       },
     },
   },
@@ -57,14 +57,14 @@ export const polygonFillOpts: ApexOptions = {
     labels: {
       formatter: function (val: number, i): string {
         if (i % 2 === 0) {
-          return val.toString()
+          return val.toString();
         } else {
-          return ''
+          return '';
         }
       },
     },
   },
-}
+};
 
 export const multipleSeriesOpts: ApexOptions = {
   chart: {
@@ -102,4 +102,4 @@ export const multipleSeriesOpts: ApexOptions = {
   },
   colors: ['#4697ce', '#e06d94', '#7dcc93'],
   labels: ['2011', '2012', '2013', '2014', '2015', '2016'],
-}
+};

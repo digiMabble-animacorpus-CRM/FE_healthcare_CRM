@@ -1,10 +1,10 @@
-import PageTitle from '@/components/PageTitle'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { Card, CardHeader, Col, Row } from 'react-bootstrap'
-import AgentList from './components/AgentList'
-import { Metadata } from 'next'
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { Card, CardHeader, Col, Row } from 'react-bootstrap';
+import AgentList from './components/AgentList';
+import { Metadata } from 'next';
 
-export const metadata: Metadata = { title: 'Agent List' }
+export const metadata: Metadata = { title: 'Agent List' };
 
 const ListViewPage = () => {
   return (
@@ -20,8 +20,16 @@ const ListViewPage = () => {
                     <Col lg={6}>
                       <form className="app-search d-none d-md-block me-auto">
                         <div className="position-relative">
-                          <input type="search" className="form-control" placeholder="Search Agent" autoComplete="off" />
-                          <IconifyIcon icon="solar:magnifer-broken" className="search-widget-icon" />
+                          <input
+                            type="search"
+                            className="form-control"
+                            placeholder="Search Agent"
+                            autoComplete="off"
+                          />
+                          <IconifyIcon
+                            icon="solar:magnifer-broken"
+                            className="search-widget-icon"
+                          />
                         </div>
                       </form>
                     </Col>
@@ -53,7 +61,7 @@ const ListViewPage = () => {
       </Row>
       <AgentList />
     </>
-  )
-}
+  );
+};
 
-export default ListViewPage
+export default ListViewPage;

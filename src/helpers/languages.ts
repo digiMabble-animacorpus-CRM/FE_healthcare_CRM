@@ -1,9 +1,5 @@
-
-
-import { languageData } from "@/assets/data/languageData";
-import {
-  LanguageType,
-} from "@/types/data";
+import { languageData } from '@/assets/data/languageData';
+import { LanguageType } from '@/types/data';
 
 const sleep = (ms = 500) => new Promise((res) => setTimeout(res, ms));
 
@@ -14,7 +10,7 @@ export const getAllLanguages = (): LanguageType[] => {
 export const getLanguages = async (
   page: number = 1,
   limit: number = 10,
-  search?: string
+  search?: string,
 ): Promise<{
   data: LanguageType[];
   totalCount: number;
@@ -25,9 +21,7 @@ export const getLanguages = async (
 
   if (search) {
     const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter(
-      (item) => item.label.toLowerCase().includes(lowerSearch)
-    );
+    filteredData = filteredData.filter((item) => item.label.toLowerCase().includes(lowerSearch));
   }
 
   const start = (page - 1) * limit;

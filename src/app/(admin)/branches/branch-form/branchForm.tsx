@@ -1,17 +1,17 @@
-"use client";
+'use client';
 
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import TextFormInput from "@/components/from/TextFormInput";
+import { FormProvider, useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import * as yup from 'yup';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import TextFormInput from '@/components/from/TextFormInput';
 
 interface Address {
-  line1: string;
+  street: string;
   line2?: string;
   city: string;
-  zipCode: string;
+  zip_code: string;
   country: string;
 }
 
@@ -24,16 +24,16 @@ export interface BranchFormValues {
 }
 
 const schema = yup.object({
-  name: yup.string().required("Branch name is required"),
-  code: yup.string().required("Branch code is required"),
-  email: yup.string().email("Invalid email").required("Email is required"),
-  phoneNumber: yup.string().required("Phone number is required"),
+  name: yup.string().required('Branch name is required'),
+  code: yup.string().required('Branch code is required'),
+  email: yup.string().email('Invalid email').required('Email is required'),
+  phoneNumber: yup.string().required('Phone number is required'),
   address: yup.object({
-    line1: yup.string().required("Address Line 1 is required"),
+    street: yup.string().required('Address Line 1 is required'),
     line2: yup.string(),
-    city: yup.string().required("City is required"),
-    zipCode: yup.string().required("Zip Code is required"),
-    country: yup.string().required("Country is required"),
+    city: yup.string().required('City is required'),
+    zip_code: yup.string().required('Zip Code is required'),
+    country: yup.string().required('Country is required'),
   }),
 });
 
@@ -43,26 +43,22 @@ interface Props {
   onSubmitHandler: (data: BranchFormValues & { _id?: string }) => Promise<void>;
 }
 
-const BranchForm = ({
-  defaultValues,
-  isEditMode = false,
-  onSubmitHandler,
-}: Props) => {
+const BranchForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
   const router = useRouter();
 
   const methods = useForm<BranchFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      name: defaultValues?.name || "",
-      code: defaultValues?.code || "",
-      email: defaultValues?.email || "",
-      phoneNumber: defaultValues?.phoneNumber || "",
+      name: defaultValues?.name || '',
+      code: defaultValues?.code || '',
+      email: defaultValues?.email || '',
+      phoneNumber: defaultValues?.phoneNumber || '',
       address: defaultValues?.address || {
-        line1: "",
-        line2: "",
-        city: "",
-        zipCode: "",
-        country: "",
+        street: '',
+        line2: '',
+        city: '',
+        zip_code: '',
+        country: '',
       },
     },
   });
@@ -70,9 +66,10 @@ const BranchForm = ({
   const { handleSubmit, control } = methods;
 
   const handleFormSubmit = async (data: BranchFormValues) => {
-    const payload = isEditMode && (defaultValues as any)?._id
-      ? { ...data, _id: (defaultValues as any)._id }
-      : data;
+    const payload =
+      isEditMode && (defaultValues as any)?._id
+        ? { ...data, _id: (defaultValues as any)._id }
+        : data;
 
     await onSubmitHandler(payload);
   };
@@ -83,44 +80,97 @@ const BranchForm = ({
         <Card>
           <CardHeader>
             <CardTitle as="h5">
-              {isEditMode ? "Edit Branch Details" : "Create New Branch"}
+              {isEditMode ? 'Edit Branch Details' : 'Create New Branch'}
             </CardTitle>
           </CardHeader>
 
           <CardBody>
             <Row className="mb-4">
               <Col lg={6}>
-                <TextFormInput required control={control} name="name" label="Branch Name" placeholder="Ex: Bangalore Main Branch" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="name"
+                  label="Branch Name"
+                  placeholder="Ex: Bangalore Main Branch"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="code" label="Branch Code" placeholder="Ex: BLR-MAIN" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="code"
+                  label="Branch Code"
+                  placeholder="Ex: BLR-MAIN"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="email" label="Email" placeholder="Ex: branch@example.com" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="email"
+                  label="Email"
+                  placeholder="Ex: branch@example.com"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="phoneNumber" label="Phone Number" placeholder="Ex: +91 9876543210" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="phoneNumber"
+                  label="Phone Number"
+                  placeholder="Ex: +91 9876543210"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.line1" label="Address Line 1" placeholder="Ex: 123 MG Road" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.street"
+                  label="Address Line 1"
+                  placeholder="Ex: 123 MG Road"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="address.line2" label="Address Line 2 (Optional)" placeholder="Ex: Near Park" />
+                <TextFormInput
+                  control={control}
+                  name="address.line2"
+                  label="Address Line 2 (Optional)"
+                  placeholder="Ex: Near Park"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.city" label="City" placeholder="Ex: Bangalore" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.city"
+                  label="City"
+                  placeholder="Ex: Bangalore"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.zipCode" label="Zip Code" placeholder="Ex: 560001" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.zip_code"
+                  label="Zip Code"
+                  placeholder="Ex: 560001"
+                />
               </Col>
               <Col lg={6}>
-                <TextFormInput required control={control} name="address.country" label="Country" placeholder="Ex: India" />
+                <TextFormInput
+                  required
+                  control={control}
+                  name="address.country"
+                  label="Country"
+                  placeholder="Ex: India"
+                />
               </Col>
             </Row>
 
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">
-                {isEditMode ? "Update" : "Create"} Branch
+                {isEditMode ? 'Update' : 'Create'} Branch
               </Button>
               <Button variant="secondary" onClick={() => router.back()}>
                 Cancel

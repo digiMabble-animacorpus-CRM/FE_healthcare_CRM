@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { Controller, useFormContext, useWatch } from "react-hook-form";
-import { FormCheck, FormSelect } from "react-bootstrap";
-import TextFormInput from "@/components/from/TextFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import { StaffRoleType } from "@/types/data";
-import { getAllPermissions } from "@/helpers/permission";
-import { useMemo } from "react";
+import { Controller, useFormContext, useWatch } from 'react-hook-form';
+import { FormCheck, FormSelect } from 'react-bootstrap';
+import TextFormInput from '@/components/from/TextFormInput';
+import ChoicesFormInput from '@/components/from/ChoicesFormInput';
+import { StaffRoleType } from '@/types/data';
+import { getAllPermissions } from '@/helpers/permission';
+import { useMemo } from 'react';
 
 const StaffRoleFormFields = () => {
   const {
@@ -15,11 +15,11 @@ const StaffRoleFormFields = () => {
     formState: { errors },
   } = useFormContext<StaffRoleType>();
 
-  const tag = useWatch({ control, name: "tag" });
+  const tag = useWatch({ control, name: 'tag' });
   const allPermissions = useMemo(() => getAllPermissions(), []);
 
-  const isRole = tag === "Role";
-  const isAccessLevel = tag === "AccessLevel";
+  const isRole = tag === 'Role';
+  const isAccessLevel = tag === 'AccessLevel';
 
   return (
     <>
@@ -40,18 +40,10 @@ const StaffRoleFormFields = () => {
             </FormSelect>
           )}
         />
-        {errors.tag && (
-          <small className="text-danger">{errors.tag.message as string}</small>
-        )}
+        {errors.tag && <small className="text-danger2">{errors.tag.message as string}</small>}
       </div>
       <div className="mb-3">
-        <TextFormInput
-          required
-          control={control}
-          name="key"
-          label="Key"
-          placeholder="Ex: doctor"
-        />
+        <TextFormInput required control={control} name="key" label="Key" placeholder="Ex: doctor" />
       </div>
 
       <div className="mb-3">
@@ -97,9 +89,7 @@ const StaffRoleFormFields = () => {
           )}
         />
         {errors.defaultPermissions && (
-          <small className="text-danger">
-            {errors.defaultPermissions.message as string}
-          </small>
+          <small className="text-danger2">{errors.defaultPermissions.message as string}</small>
         )}
       </div>
 
@@ -109,21 +99,21 @@ const StaffRoleFormFields = () => {
           id="internal"
           label="Is Internal Role"
           disabled={!isAccessLevel}
-          {...register("internal")}
+          {...register('internal')}
         />
         <FormCheck
           type="checkbox"
           id="requiresDetails"
           label="Requires Additional Details"
           disabled={!isRole}
-          {...register("requiresDetails")}
+          {...register('requiresDetails')}
         />
         <FormCheck
           type="checkbox"
           id="requiresAvailability"
           label="Requires Availability Info"
           disabled={!isRole}
-          {...register("requiresAvailability")}
+          {...register('requiresAvailability')}
         />
       </div>
     </>

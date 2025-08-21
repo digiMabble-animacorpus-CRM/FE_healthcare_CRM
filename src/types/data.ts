@@ -1,19 +1,14 @@
-import { StaticImageData } from "next/image";
-import { BootstrapVariantType } from "./component-props";
+import { StaticImageData } from 'next/image';
+import { BootstrapVariantType } from './component-props';
 export type IdType = string;
 
-export type EmailLabelType =
-  | "Primary"
-  | "Social"
-  | "Promotions"
-  | "Updates"
-  | "Forums";
+export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
 
 export type EmailType = {
   id: IdType;
-  fromId: UserType["id"];
+  fromId: UserType['id'];
   from?: UserType;
-  toId: UserType["id"];
+  toId: UserType['id'];
   to?: UserType;
   subject?: string;
   content?: string;
@@ -31,6 +26,7 @@ export type ReviewType = {
   count: number;
   stars: number;
 };
+
 export type Employee = {
   id: IdType;
   name: string;
@@ -53,9 +49,9 @@ export type UserType = {
   email: string;
   mutualCount: number;
   contact: string;
-  activityStatus: "typing" | "online" | "offline";
+  activityStatus: 'typing' | 'online' | 'offline';
   languages: string[];
-  status?: "Active" | "Inactive";
+  status?: 'Active' | 'Inactive';
   address?: string;
   message?: string;
   time: Date;
@@ -65,61 +61,64 @@ export type UserType = {
   emailMessage?: string;
 };
 
-export type CustomerEnquiriesType = {
-  _id: IdType;
-  name: string;
-  email: string;
+export type PatientType = {
+  // Required fields
+  firstname: string;
+  lastname: string;
+  birthdate: string;
+  emails: string;
   number: string;
-  dob: string;
-  description: string;
-  address: string;
-  zipCode: string;
-  gender: string;
+  legalgender: string;
   language: string;
-  tags: string[];
   city: string;
   country: string;
-  status: "new" | "old";
-  lastUpdated: string;
-  source: string;
-  branch: string;
+  street: string;
+  note: string;
+  tags?: string[];
+
+  // Optional fields
+  id?: string;
+  _id?: string;
+  visits?: number;
+  prescriptions?: number;
+  bills?: number;
+  createdAt?: string;
+  middlename?: string;
+  phones?: string[];
+  primarypatientrecordid?: string;
+  ssin?: string;
+  status?: string;
+  mutualitynumber?: string;
+  mutualityregistrationnumber?: string;
+  zipcode?: string;
+  branch?: string;
 };
 
-export type AppointmentStatus = 
-  | "scheduled"
-  | "completed"
-  | "cancelled"
-  | "no_show";
+export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';
 
-export type AppointmentSource = 
-  | "phone"
-  | "website"
-  | "walk_in"
-  | "referral"
-  | "other";
+export type AppointmentSource = 'phone' | 'website' | 'walk_in' | 'referral' | 'other';
 
 export interface AppointmentType {
-  _id: string;              // Unique appointment ID
-  customerId: string;        // Linked to Customer
-  branchId: string;          // Linked to Branch
-  assignedStaffId?: string;  // Optional assigned staff
+  _id: string; // Unique appointment ID
+  customerId: string; // Linked to Customer
+  branchId: string; // Linked to Branch
+  assignedStaffId?: string; // Optional assigned staff
 
-  date: string;              // YYYY-MM-DD
-  time: string;              // HH:mm (24-hour)
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm (24-hour)
 
-  service?: string;          // Purpose / Service
-  notes?: string;            // Optional notes
+  service?: string; // Purpose / Service
+  notes?: string; // Optional notes
 
   status: AppointmentStatus; // scheduled, completed, cancelled, no_show
-  cancelledReason?: string;  // Reason if cancelled
+  cancelledReason?: string; // Reason if cancelled
 
   source?: AppointmentSource; // How appointment was booked
-  reminderSent?: boolean;     // SMS/Email reminder flag
+  reminderSent?: boolean; // SMS/Email reminder flag
 
-  createdAt: string;         // ISO timestamp
-  updatedAt: string;         // ISO timestamp
+  createdAt: string; // ISO timestamp
+  updatedAt: string; // ISO timestamp
 }
-
 
 export type BranchType = {
   _id: string;
@@ -129,7 +128,7 @@ export type BranchType = {
   email?: string;
   phoneNumber?: string;
   address?: Address;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
 
   createdBy: string;
   updatedBy: {
@@ -150,7 +149,7 @@ export type PermissionType = {
 
 export type StaffRoleType = {
   _id: string;
-  tag: "Role" | "AccessLevel";
+  tag: 'Role' | 'AccessLevel';
   key: string;
   label: string;
   description?: string;
@@ -161,6 +160,7 @@ export type StaffRoleType = {
   requiresAvailability?: boolean;
 };
 
+export type AccessLevelType = StaffRoleType;
 // export type PermissionType =
 //   | "view-patients"
 //   | "edit-patients"
@@ -172,18 +172,18 @@ export type StaffRoleType = {
 //   | "custom";
 
 export type StaffRole =
-  | ""
-  | "Therapist"
-  | "Doctor"
-  | "Nurse"
-  | "Receptionist"
-  | "Admin"
-  | "Pharmacist"
-  | "Technician"
-  | "SupportStaff"
-  | "LabTechnician"
-  | "Assistant"
-  | "Other";
+  | ''
+  | 'Therapist'
+  | 'Doctor'
+  | 'Nurse'
+  | 'Receptionist'
+  | 'Admin'
+  | 'Pharmacist'
+  | 'Technician'
+  | 'SupportStaff'
+  | 'LabTechnician'
+  | 'Assistant'
+  | 'Other';
 
 export type AvailabilitySlot = {
   day: string; // "Monday"
@@ -197,21 +197,23 @@ export type LanguageType = {
   label: string;
 };
 
-export type Language = "french" | "dutch" | "english";
+export type Language = 'french' | 'dutch' | 'english';
 
 export type Address = {
-  line1: string;
+  line1?: string; // street
+  street?: string;
   line2?: string;
   city: string;
-  zipCode: string;
+  zip_code: string;
   country: string;
 };
 
 export type StaffType = {
   [x: string]: any;
-  _id: string;
+  _id?: string;
   name: string;
   phoneNumber: string;
+  // phone_number: string;
   email: string;
 
   gender: string;
@@ -223,6 +225,11 @@ export type StaffType = {
 
   roleId: string;
   accessLevelId?: string;
+
+  //  branchesDetailed: {
+  //   code: string;
+  //   name?: string; // optional if not used
+  // }[];
 
   branches: { id: string; isPrimary?: boolean }[];
   selectedBranch: string;
@@ -239,7 +246,7 @@ export type StaffType = {
 
   availability?: AvailabilitySlot[];
   tags?: string[];
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
 
   permissions: {
     _id: string;
@@ -262,44 +269,90 @@ export type StaffType = {
   }[];
 };
 
-export type TherapistType = {
-  _id: string;
+export type BranchDetails = {
+  id: number;
   name: string;
-  email: string;
-  number: string;
-  dob: string;
-  description: string;
-  address: string;
-  zipCode: string;
-  gender: string;
-  language: string;
-  city: string;
-  country: string;
-  specialization: string;
-  experience: string;
-  education: string;
-  certificationFiles: {
-    path: string;
-    preview: string | null;
-    formattedSize: string;
-  }[];
-  registrationNumber: string;
-  availability: {
-    day: string; // e.g., "Monday"
-    from: string; // e.g., "09:00"
-    to: string; // e.g., "14:00"
-  }[];
-  tags: string[];
-  status: "active" | "inactive";
-  lastUpdated: string;
-  source: string;
-  branch: "Gembloux - Orneau" | "Gembloux - Tout Vent" | "Anima Corpus Namur";
+  code: string;
+};
+
+export type TherapistType = {
+  _key: number;
+  idPro: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website: string;
+  faq: string;
+  agendaLinks: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any | null;
+  tags?: any;
+  imageUrl?: string;
+};
+
+export type TherapistCreatePayload = {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo?: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations?: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule?: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website?: string;
+  faq?: string;
+  agendaLinks?: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any[];
+  tags?: string[];
+  certificationFiles?: File[];
+  branches?: (string | number)[];
+  selected_branch?: string | number | null;
 };
 
 export type AgentType = {
   id: IdType;
   address: string;
-  userId: UserType["id"];
+  userId: UserType['id'];
   user?: UserType;
   experience: number;
   properties: number;
@@ -311,17 +364,17 @@ export type TransactionType = {
   invoiceNumber: string;
   purchaseDate: Date;
   description: string;
-  status: "Cr" | "Dr";
-  userId: UserType["id"];
+  status: 'Cr' | 'Dr';
+  userId: UserType['id'];
   user?: UserType;
-  propertyId: PropertyType["id"];
+  propertyId: PropertyType['id'];
   property?: PropertyType;
   amount: string;
-  paymentType: "Mastercard" | "Visa" | "Paypal";
-  paymentStatus: "Completed" | "Cancel" | "Pending";
+  paymentType: 'Mastercard' | 'Visa' | 'Paypal';
+  paymentStatus: 'Completed' | 'Cancel' | 'Pending';
   orderId: string;
   agentName: string;
-  amountStatus: "Paid" | "Unpaid" | "Pending";
+  amountStatus: 'Paid' | 'Unpaid' | 'Pending';
   investedProperty: string;
   paymentMethod: {
     card: StaticImageData;
@@ -342,7 +395,7 @@ export type PropertyType = {
   size: number;
   price: string;
   country: string;
-  type: "Rent" | "Sold" | "Sale";
+  type: 'Rent' | 'Sold' | 'Sale';
   variant: string;
   save?: boolean;
 };
@@ -350,47 +403,44 @@ export type PropertyType = {
 export type CustomerType = {
   id: IdType;
   propertyType: string;
-  userId: UserType["id"];
+  userId: UserType['id'];
   user?: UserType;
   interestedProperties: string;
-  customerStatus: "Interested" | "Under Review" | "Follow-up";
+  customerStatus: 'Interested' | 'Under Review' | 'Follow-up';
   date: Date;
-  status: "Available" | "Unavailable";
+  status: 'Available' | 'Unavailable';
   propertyView: number;
   propertyOwn: number;
   invest: string;
 };
 
 export type CustomerReviewsType = {
+  name: string;
+  email: string;
+  number: string;
+  dob: string;
+  description: string;
+  address: string;
+  zip_code: string;
+  gender: string;
+  language: string;
+  branch: string;
+  tags: never[];
+  city: string;
+  country: string;
   id: IdType;
   rating: number;
-  userId: UserType["id"];
+  userId: UserType['id'];
   user?: UserType;
-  propertyId: PropertyType["id"];
+  propertyId: PropertyType['id'];
   property?: PropertyType;
   review: {
     title: string;
     description: string;
   };
-  reviewStatus: "Published" | "Pending";
+  reviewStatus: 'Published' | 'Pending';
   date: Date;
 };
-
-// export type SocialUserType = {
-//   id: IdType
-//   avatar: StaticImageData
-//   name: string
-//   activityStatus: 'typing' | 'online' | 'offline'
-//   email: string
-//   phone: string
-//   languages: string[]
-//   location: string
-//   mutualCount: number
-//   hasRequested?: boolean
-//   message?: string
-//   time: Date
-//   status?: string
-// }
 
 export type FileType = Partial<File> & {
   preview?: string;
@@ -401,7 +451,7 @@ export type ChatMessageType = {
   from: UserType;
   to: UserType;
   message: {
-    type: "file" | "text";
+    type: 'file' | 'text';
     value: FileType[] | string;
   };
   sentOn?: Date;
@@ -411,10 +461,10 @@ export type ActivityType = {
   title: string;
   icon?: string;
   variant?: BootstrapVariantType;
-  status?: "completed" | "latest";
+  status?: 'completed' | 'latest';
   files?: FileType[];
   time: Date;
-  type?: "task" | "design" | "achievement";
+  type?: 'task' | 'design' | 'achievement';
   content?: string;
 };
 
@@ -422,7 +472,7 @@ export type SocialEventType = {
   id: IdType;
   title: string;
   venue: string;
-  type: "togetherness" | "celebration" | "professional";
+  type: 'togetherness' | 'celebration' | 'professional';
   image: StaticImageData;
   startsAt: Date;
 };
@@ -478,9 +528,9 @@ export type TodoType = {
   task: string;
   createdAt: Date;
   dueDate: Date;
-  status: "Pending" | "In-Progress" | "Completed";
-  priority: "High" | "Medium" | "Low";
-  employeeId: SellerType["id"];
+  status: 'Pending' | 'In-Progress' | 'Completed';
+  priority: 'High' | 'Medium' | 'Low';
+  employeeId: SellerType['id'];
   employee?: SellerType;
 };
 
@@ -494,4 +544,139 @@ export type SellerType = {
   walletBalance: number;
   createdAt: Date;
   revenue: number;
+};
+
+export type ProfileType = {
+  _key: number;
+  idPro: number;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website: string;
+  faq: string;
+  agendaLinks: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any | null;
+  tags?: any;
+};
+
+export type ProfileCreatePayload = {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo?: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+  consultations?: string;
+  centerAddress: string;
+  centerEmail: string;
+  centerPhoneNumber: string;
+  contactEmail: string;
+  contactPhone: string;
+  schedule?: string;
+  about?: string | null;
+  spokenLanguages: string;
+  paymentMethods?: string;
+  degreesAndTraining: string;
+  specializations: string;
+  website?: string;
+  faq?: string;
+  agendaLinks?: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: any[];
+  tags?: string[];
+  certificationFiles?: File[];
+  branches?: (string | number)[];
+  selected_branch?: string | number | null;
+};
+
+export type TeamMemberType = {
+  team_id: string;
+  last_name: string;
+  first_name: string;
+  full_name: string;
+  job_1: string;
+  specific_audience: string;
+  specialization_1: string;
+  job_2: string;
+  job_3: string;
+  job_4: string;
+  who_am_i: string;
+  consultations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: {
+    text: string;
+  };
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
+  website: string;
+  frequently_asked_questions: string;
+  calendar_links: string[];
+  photo: string;
+};
+
+export type TeamMemberCreatePayload = {
+  team_id: string;
+  last_name: string;
+  first_name: string;
+  full_name: string;
+  job_1: string;
+  specific_audience: string;
+  specialization_1: string;
+  job_2: string;
+  job_3: string;
+  job_4: string;
+  who_am_i: string;
+  consultations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: {
+    text: string;
+  };
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
+  website: string;
+  frequently_asked_questions: string;
+  calendar_links: string[];
+  photo: string;
+  branches?: (string | number)[];
+  selected_branch?: string | number | null;
 };

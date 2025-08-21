@@ -1,13 +1,13 @@
-import { Alert, Col, Row } from 'react-bootstrap'
-import Link from 'next/link'
+import { Alert, Col, Row } from 'react-bootstrap';
+import Link from 'next/link';
 
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import UIExamplesList from '@/components/UIExamplesList'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import UIExamplesList from '@/components/UIExamplesList';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Alerts' }
+export const metadata: Metadata = { title: 'Alerts' };
 
 const BasicAlerts = () => {
   return (
@@ -16,10 +16,12 @@ const BasicAlerts = () => {
       title="Basic Example"
       description={
         <>
-          Provide contextual feedback messages for typical user actions with the handful of available and flexible alert messages. Alerts are
-          available for any length of text, as well as an optional dismiss button.
+          Provide contextual feedback messages for typical user actions with the handful of
+          available and flexible alert messages. Alerts are available for any length of text, as
+          well as an optional dismiss button.
         </>
-      }>
+      }
+    >
       <Alert variant="primary" role="alert">
         A simple primary alert—check it out!
       </Alert>
@@ -45,8 +47,8 @@ const BasicAlerts = () => {
         A simple dark alert—check it out!
       </Alert>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const DismissibleAlerts = () => {
   return (
@@ -56,10 +58,11 @@ const DismissibleAlerts = () => {
       description={
         <>
           {' '}
-          Add a dismiss button and the <code>.alert-dismissible</code> class, which adds extra padding to the right of the alert and positions the{' '}
-          <code>.btn-close</code> button.
+          Add a dismiss button and the <code>.alert-dismissible</code> class, which adds extra
+          padding to the right of the alert and positions the <code>.btn-close</code> button.
         </>
-      }>
+      }
+    >
       <Alert variant="primary" dismissible className="fade show" role="alert">
         A simple primary alert—check it out!
       </Alert>
@@ -85,8 +88,8 @@ const DismissibleAlerts = () => {
         A simple dark alert—check it out!
       </Alert>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const LinkAlerts = () => {
   return (
@@ -95,9 +98,11 @@ const LinkAlerts = () => {
       title="Alert Link Example"
       description={
         <>
-          Use the <code>.alert-link</code> utility class to quickly provide matching colored links within any alert.
+          Use the <code>.alert-link</code> utility class to quickly provide matching colored links
+          within any alert.
         </>
-      }>
+      }
+    >
       <Alert variant="primary" role="alert">
         A simple primary alert with
         <Link href="" className="alert-link">
@@ -127,15 +132,21 @@ const LinkAlerts = () => {
         . Give it a click if you like.
       </Alert>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const IconAlerts = () => {
   return (
     <ComponentContainerCard
       id="alert-icon"
       title="Icons Alert Example"
-      description={<>You can also include additional elements like icons, heading, etc along side the actual message.</>}>
+      description={
+        <>
+          You can also include additional elements like icons, heading, etc along side the actual
+          message.
+        </>
+      }
+    >
       <Alert variant="primary" className="alert-icon" role="alert">
         <div className="d-flex align-items-center">
           <div className="avatar-sm rounded bg-primary d-flex justify-content-center align-items-center fs-18 me-2 flex-shrink-0">
@@ -169,42 +180,53 @@ const IconAlerts = () => {
         </div>
       </Alert>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AdditionalContentAlerts = () => {
   return (
     <ComponentContainerCard
       id="alert-additional"
       title="Additional Content Alert Example"
-      description={<>Alerts can also contain additional HTML elements like headings, paragraphs and dividers.</>}>
+      description={
+        <>
+          Alerts can also contain additional HTML elements like headings, paragraphs and dividers.
+        </>
+      }
+    >
       <Row>
         <Col xl={6}>
           <Alert variant="primary" className="mb-3 p-3 mb-xl-0" role="alert">
             <h4 className="alert-heading">Well done!</h4>
             <p className="mb-0">
-              Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how
-              spacing within an alert works with this kind of content.
+              Aww yeah, you successfully read this important alert message. This example text is
+              going to run a bit longer so that you can see how spacing within an alert works with
+              this kind of content.
             </p>
             <hr />
-            <p className="mb-0">Whenever you need to, be sure to use margin utilities to keep things nice and tidy.</p>
+            <p className="mb-0">
+              Whenever you need to, be sure to use margin utilities to keep things nice and tidy.
+            </p>
           </Alert>
         </Col>
         <Col xl={6}>
           <Alert variant="secondary" className="p-3 mb-0" role="alert">
             <h4 className="alert-heading">Well done!</h4>
             <p className="mb-0">
-              Aww yeah, you successfully read this important alert message. This example text is going to run a bit longer so that you can see how
-              spacing within an alert works with this kind of content.
+              Aww yeah, you successfully read this important alert message. This example text is
+              going to run a bit longer so that you can see how spacing within an alert works with
+              this kind of content.
             </p>
             <hr />
-            <p className="mb-0">Whenever you need to, be sure to use margin utilities to keep things nice and tidy.</p>
+            <p className="mb-0">
+              Whenever you need to, be sure to use margin utilities to keep things nice and tidy.
+            </p>
           </Alert>
         </Col>
       </Row>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const Alerts = () => {
   return (
@@ -231,7 +253,7 @@ const Alerts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Alerts
+export default Alerts;

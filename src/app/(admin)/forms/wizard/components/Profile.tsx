@@ -1,13 +1,13 @@
-import avatar1 from '@/assets/images/users/dummy-avatar.jpg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { useForm } from 'react-hook-form'
-import { Col, Row } from 'react-bootstrap'
-import Image from 'next/image'
-import TextFormInput from '@/components/from/TextFormInput'
-import SelectFormInput from '@/components/from/SelectFormInput'
+import avatar1 from '@/assets/images/users/dummy-avatar.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { useForm } from 'react-hook-form';
+import { Col, Row } from 'react-bootstrap';
+import Image from 'next/image';
+import TextFormInput from '@/components/from/TextFormInput';
+import SelectFormInput from '@/components/from/SelectFormInput';
 
 const Profile = () => {
-  const { control } = useForm()
+  const { control } = useForm();
   return (
     <>
       <h4 className="fs-16 fw-semibold mb-1">Profile Information</h4>
@@ -24,18 +24,41 @@ const Profile = () => {
                 </div>
               </label>
               <input className="hidden" type="file" id="imageInput" accept="image/*" />
-              <Image id="preview" src={avatar1} alt="Preview Image" className="rounded-circle img-fluid" />
+              <Image
+                id="preview"
+                src={avatar1}
+                alt="Preview Image"
+                className="rounded-circle img-fluid"
+              />
             </div>
           </div>
           <Row>
             <Col md={6}>
-              <TextFormInput name="fName" label="First Name" placeholder="Chris" containerClassName="mb-3" control={control} />
+              <TextFormInput
+                name="fName"
+                label="First Name"
+                placeholder="Chris"
+                containerClassName="mb-3"
+                control={control}
+              />
             </Col>
             <Col md={6}>
-              <TextFormInput name="lName" label="Last Name" placeholder="Keller" containerClassName="mb-3" control={control} />
+              <TextFormInput
+                name="lName"
+                label="Last Name"
+                placeholder="Keller"
+                containerClassName="mb-3"
+                control={control}
+              />
             </Col>
             <Col md={6}>
-              <TextFormInput name="number" label="Number" placeholder="Mobile Number" containerClassName="mb-3" control={control} />
+              <TextFormInput
+                name="number"
+                label="Number"
+                placeholder="Mobile Number"
+                containerClassName="mb-3"
+                control={control}
+              />
             </Col>
             <Col md={6}>
               <SelectFormInput
@@ -65,7 +88,7 @@ const Profile = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

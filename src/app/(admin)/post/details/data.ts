@@ -1,28 +1,28 @@
-import avatar4 from '@/assets/images/users/avatar-4.jpg'
-import avatar6 from '@/assets/images/users/avatar-6.jpg'
-import avatar8 from '@/assets/images/users/avatar-8.jpg'
-import small1Img from '@/assets/images/small/img-1.jpg'
-import small3Img from '@/assets/images/small/img-3.jpg'
-import small4Img from '@/assets/images/small/img-4.jpg'
-import { addOrSubtractDaysFromDate } from '@/utils/date'
-import { StaticImageData } from 'next/image'
+import avatar4 from '@/assets/images/users/avatar-4.jpg';
+import avatar6 from '@/assets/images/users/avatar-6.jpg';
+import avatar8 from '@/assets/images/users/avatar-8.jpg';
+import small1Img from '@/assets/images/small/img-1.jpg';
+import small3Img from '@/assets/images/small/img-3.jpg';
+import small4Img from '@/assets/images/small/img-4.jpg';
+import { addOrSubtractDaysFromDate } from '@/utils/date';
+import { StaticImageData } from 'next/image';
 
 export type CommentsType = {
-  image: StaticImageData
-  name: string
-  description: string
-  like: number
-  comment: number
-  date: Date
-  icon?: string
-  reply?: CommentsType[]
-}
+  image: StaticImageData;
+  name: string;
+  description: string;
+  like: number;
+  comment: number;
+  date: Date;
+  icon?: string;
+  reply?: CommentsType[];
+};
 
 export type BlogType = {
-  image: StaticImageData
-  title: string
-  date: Date
-}
+  image: StaticImageData;
+  title: string;
+  date: Date;
+};
 
 export const commentsData: CommentsType[] = [
   {
@@ -48,14 +48,15 @@ export const commentsData: CommentsType[] = [
       {
         image: avatar6,
         name: 'Danial D. Mitzel',
-        description: 'From the latest industry news to practical tips and strategies, every article is a gem. Highly recommend giving it a read',
+        description:
+          'From the latest industry news to practical tips and strategies, every article is a gem. Highly recommend giving it a read',
         like: 23,
         comment: 3,
         date: addOrSubtractDaysFromDate(154),
       },
     ],
   },
-]
+];
 
 export const blogData: BlogType[] = [
   {
@@ -73,4 +74,4 @@ export const blogData: BlogType[] = [
     title: 'The Future of Urban Development: Smart Cities and Real Estate',
     date: addOrSubtractDaysFromDate(512),
   },
-]
+];

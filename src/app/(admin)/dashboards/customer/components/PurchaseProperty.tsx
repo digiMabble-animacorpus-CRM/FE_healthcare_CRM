@@ -1,10 +1,10 @@
-import propertiesImg from '@/assets/images/properties/p-10.jpg'
-import avatar6 from '@/assets/images/users/avatar-6.jpg'
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { currency } from '@/context/constants'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap'
+import propertiesImg from '@/assets/images/properties/p-10.jpg';
+import avatar6 from '@/assets/images/users/avatar-6.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { currency } from '@/context/constants';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 
 const PurchaseProperty = () => {
   return (
@@ -22,7 +22,12 @@ const PurchaseProperty = () => {
           </div>
           <div className="d-flex align-items-center gap-2 mt-3 pt-1 ">
             <div className="avatar bg-light rounded flex-centered">
-              <IconifyIcon icon="solar:buildings-3-bold-duotone" width={24} height={24} className="fs-24 text-primary" />
+              <IconifyIcon
+                icon="solar:buildings-3-bold-duotone"
+                width={24}
+                height={24}
+                className="fs-24 text-primary"
+              />
             </div>
             <div>
               <Link href="" className="text-dark fw-medium fs-16">
@@ -87,7 +92,7 @@ const PurchaseProperty = () => {
         </CardBody>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default PurchaseProperty
+export default PurchaseProperty;

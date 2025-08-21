@@ -1,12 +1,12 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient'
-import { getAllProjects } from '@/helpers/data'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Card, CardBody, CardTitle, ProgressBar } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import SimplebarReactClient from '@/components/wrappers/SimplebarReactClient';
+import { getAllProjects } from '@/helpers/data';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Card, CardBody, CardTitle, ProgressBar } from 'react-bootstrap';
 
 const ProjectSummary = async () => {
-  const projectData = await getAllProjects()
+  const projectData = await getAllProjects();
 
   return (
     <Card>
@@ -43,13 +43,21 @@ const ProjectSummary = async () => {
                       <td className="avatar-group">
                         {project.teamMembers.map((member, idx) => (
                           <Link href="" key={idx} className="avatar-group-item">
-                            <Image src={member} alt="avatar-2" className="img-fluid avatar-xs rounded-circle avatar-border" />
+                            <Image
+                              src={member}
+                              alt="avatar-2"
+                              className="img-fluid avatar-xs rounded-circle avatar-border"
+                            />
                           </Link>
                         ))}
                       </td>
                       <td>{new Date(project.deadlineDate).toDateString()}</td>
                       <td>
-                        <ProgressBar variant={project.variant} now={project.progressValue} className="progress-sm" />
+                        <ProgressBar
+                          variant={project.variant}
+                          now={project.progressValue}
+                          className="progress-sm"
+                        />
                       </td>
                     </tr>
                   ))}
@@ -59,7 +67,7 @@ const ProjectSummary = async () => {
         </SimplebarReactClient>
       </CardBody>
     </Card>
-  )
-}
+  );
+};
 
-export default ProjectSummary
+export default ProjectSummary;

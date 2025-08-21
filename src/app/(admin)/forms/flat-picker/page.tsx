@@ -1,11 +1,11 @@
-import { Card, CardBody, CardTitle, Col, Container, Row } from 'react-bootstrap'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import CustomFlatpickr from '@/components/CustomFlatpickr'
-import UIExamplesList from '@/components/UIExamplesList'
-import type { Metadata } from 'next'
-import PageTitle from '@/components/PageTitle'
+import { Card, CardBody, CardTitle, Col, Container, Row } from 'react-bootstrap';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+// import CustomFlatpickr from '@/components/CustomFlatpickr';
+import UIExamplesList from '@/components/UIExamplesList';
+import type { Metadata } from 'next';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Flatpicker' }
+export const metadata: Metadata = { title: 'Flatpicker' };
 
 const FlatPicker = () => {
   return (
@@ -20,17 +20,24 @@ const FlatPicker = () => {
                 <a
                   className="btn btn-sm btn-outline-success rounded-2 float-end"
                   href="https://www.npmjs.com/package/react-flatpickr"
-                  target="_blank">
+                  target="_blank"
+                >
                   Official Website
                 </a>
               </CardTitle>
-              <p className="text-muted mb-3">flatpickr is a lightweight and powerful datetime picker.</p>
+              <p className="text-muted mb-3">
+                flatpickr is a lightweight and powerful datetime picker.
+              </p>
             </CardBody>
           </Card>
           <ComponentContainerCard id="basic" title="Basic" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr className="form-control" placeholder="Basic datepicker" options={{ enableTime: false }} />
+                {/* <CustomFlatpickr
+                  className="form-control"
+                  placeholder="Basic datepicker"
+                  options={{ enableTime: false }}
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -38,22 +45,26 @@ const FlatPicker = () => {
           <ComponentContainerCard id="datetime" title="DateTime" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="Date and Time"
                   options={{
                     enableTime: true,
                     dateFormat: 'Y-m-d H:i',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
 
-          <ComponentContainerCard id="human-friendly-dates" title="Human-friendly Dates" titleClass="mb-3">
+          <ComponentContainerCard
+            id="human-friendly-dates"
+            title="Human-friendly Dates"
+            titleClass="mb-3"
+          >
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="October 9,2018"
                   options={{
@@ -62,7 +73,7 @@ const FlatPicker = () => {
                     altFormat: 'F j, Y',
                     dateFormat: 'Y-m-d',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -70,7 +81,7 @@ const FlatPicker = () => {
           <ComponentContainerCard id="minmax" title="MinDate and MaxDate" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="mindate - maxdate"
                   options={{
@@ -78,7 +89,7 @@ const FlatPicker = () => {
                     minDate: '2020-01-01',
                     maxDate: '2020-03-05',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -86,7 +97,7 @@ const FlatPicker = () => {
           <ComponentContainerCard id="disable" title="Disabling dates" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="Disabling dates"
                   options={{
@@ -94,7 +105,7 @@ const FlatPicker = () => {
                     enableTime: false,
                     defaultDate: '2025-01',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -102,7 +113,7 @@ const FlatPicker = () => {
           <ComponentContainerCard id="multiple" title="Selecting multiple dates" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="Multiple dates"
                   options={{
@@ -110,15 +121,19 @@ const FlatPicker = () => {
                     mode: 'multiple',
                     dateFormat: 'Y-m-d',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
 
-          <ComponentContainerCard id="conjunction" title="Selecting multiple dates - Conjunction" titleClass="mb-3">
+          <ComponentContainerCard
+            id="conjunction"
+            title="Selecting multiple dates - Conjunction"
+            titleClass="mb-3"
+          >
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="2018-10-10 :: 2018-10-11"
                   options={{
@@ -127,7 +142,7 @@ const FlatPicker = () => {
                     conjunction: ' :: ',
                     enableTime: false,
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -135,14 +150,14 @@ const FlatPicker = () => {
           <ComponentContainerCard id="range-calendar" title="Range Calendar" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="2018-10-03 to 2018-10-10"
                   options={{
                     mode: 'range',
                     enableTime: false,
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -150,14 +165,14 @@ const FlatPicker = () => {
           <ComponentContainerCard id="inline-calendar" title="Inline Calendar" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="Inline Calender"
                   options={{
                     inline: true,
                     enableTime: false,
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -165,14 +180,14 @@ const FlatPicker = () => {
           <ComponentContainerCard id="timepicker-basic" title="Basic Timepicker" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="Basic timepicker"
                   options={{
                     noCalendar: true,
                     dateFormat: 'H:i',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -180,7 +195,7 @@ const FlatPicker = () => {
           <ComponentContainerCard id="24hours" title="24-hour Time Picker" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="16:21"
                   options={{
@@ -188,15 +203,19 @@ const FlatPicker = () => {
                     dateFormat: 'H:i',
                     time_24hr: true,
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
 
-          <ComponentContainerCard id="timepicker-minmax" title="Time Picker w/ Limits" titleClass="mb-3">
+          <ComponentContainerCard
+            id="timepicker-minmax"
+            title="Time Picker w/ Limits"
+            titleClass="mb-3"
+          >
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="Limits"
                   options={{
@@ -205,7 +224,7 @@ const FlatPicker = () => {
                     minTime: '16:00',
                     maxTime: '22:30',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -213,7 +232,7 @@ const FlatPicker = () => {
           <ComponentContainerCard id="preloading-time" title="Preloading Time" titleClass="mb-3">
             <Row>
               <Col lg={6}>
-                <CustomFlatpickr
+                {/* <CustomFlatpickr
                   className="form-control"
                   placeholder="01:45"
                   options={{
@@ -222,7 +241,7 @@ const FlatPicker = () => {
                     dateFormat: 'H:i',
                     defaultDate: '13:45',
                   }}
-                />
+                /> */}
               </Col>
             </Row>
           </ComponentContainerCard>
@@ -249,7 +268,7 @@ const FlatPicker = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default FlatPicker
+export default FlatPicker;

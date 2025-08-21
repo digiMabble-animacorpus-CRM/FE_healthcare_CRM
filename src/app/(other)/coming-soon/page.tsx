@@ -1,10 +1,10 @@
-import { Metadata } from 'next'
-import ComingSoon from './components/ComingSoon'
+import { Metadata } from 'next';
+import ComingSoon from './components/ComingSoon';
 
-export const metadata: Metadata = { title: 'Coming Soon' }
+export const metadata: Metadata = { title: 'Coming Soon' };
 
 const ComingSoonPage = () => {
-  return <ComingSoon />
-}
+  return <ComingSoon />;
+};
 
-export default ComingSoonPage
+export default ComingSoonPage;

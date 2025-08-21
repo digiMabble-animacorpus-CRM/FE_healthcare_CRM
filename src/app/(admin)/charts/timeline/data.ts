@@ -1,7 +1,7 @@
-import { type ApexOptions } from 'apexcharts'
-import moment from 'moment'
+import { type ApexOptions } from 'apexcharts';
+import moment from 'moment';
 
-const colors = ['#4697ce', '#7f56da', '#e06d94', '#f8ac59', '#7dcc93']
+const colors = ['#4697ce', '#7f56da', '#e06d94', '#f8ac59', '#7dcc93'];
 
 export const basicTimelineOpts: ApexOptions = {
   series: [
@@ -42,7 +42,7 @@ export const basicTimelineOpts: ApexOptions = {
   xaxis: {
     type: 'datetime',
   },
-}
+};
 
 export const distributedTimelineOpts: ApexOptions = {
   series: [
@@ -95,11 +95,11 @@ export const distributedTimelineOpts: ApexOptions = {
   dataLabels: {
     enabled: true,
     formatter: function (val: any[], opts) {
-      const label = opts.w.globals.labels[opts.dataPointIndex]
-      const a = moment(val[0])
-      const b = moment(val[1])
-      const diff = b.diff(a, 'days')
-      return label + ': ' + diff + (diff > 1 ? ' days' : ' day')
+      const label = opts.w.globals.labels[opts.dataPointIndex];
+      const a = moment(val[0]);
+      const b = moment(val[1]);
+      const diff = b.diff(a, 'days');
+      return label + ': ' + diff + (diff > 1 ? ' days' : ' day');
     },
     style: {
       colors: ['#f3f4f5', '#fff'],
@@ -123,7 +123,7 @@ export const distributedTimelineOpts: ApexOptions = {
       left: -10,
     },
   },
-}
+};
 
 export const multiSeriesTimelineOpts: ApexOptions = {
   series: [
@@ -177,10 +177,10 @@ export const multiSeriesTimelineOpts: ApexOptions = {
   dataLabels: {
     enabled: true,
     formatter: function (val: any[]) {
-      const a = moment(val[0])
-      const b = moment(val[1])
-      const diff = b.diff(a, 'days')
-      return diff + (diff > 1 ? ' days' : ' day')
+      const a = moment(val[0]);
+      const b = moment(val[1]);
+      const diff = b.diff(a, 'days');
+      return diff + (diff > 1 ? ' days' : ' day');
     },
   },
   fill: {
@@ -203,7 +203,7 @@ export const multiSeriesTimelineOpts: ApexOptions = {
   legend: {
     position: 'top',
   },
-}
+};
 
 export const advancedTimelineOpts: ApexOptions = {
   series: [
@@ -321,7 +321,7 @@ export const advancedTimelineOpts: ApexOptions = {
     position: 'top',
     horizontalAlign: 'left',
   },
-}
+};
 
 export const groupRowsTimelineOpts: ApexOptions = {
   series: [
@@ -493,4 +493,4 @@ export const groupRowsTimelineOpts: ApexOptions = {
   //       )
   //     }
   //   }
-}
+};

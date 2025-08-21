@@ -1,10 +1,10 @@
-import type { Metadata } from 'next'
-import AllToasts from './components/AllToasts'
-import UIExamplesList from '@/components/UIExamplesList'
-import { Col, Row } from 'react-bootstrap'
-import PageTitle from '@/components/PageTitle'
+import type { Metadata } from 'next';
+import AllToasts from './components/AllToasts';
+import UIExamplesList from '@/components/UIExamplesList';
+import { Col, Row } from 'react-bootstrap';
+import PageTitle from '@/components/PageTitle';
 
-export const metadata: Metadata = { title: 'Toasts' }
+export const metadata: Metadata = { title: 'Toasts' };
 
 const Toasts = () => {
   return (
@@ -28,7 +28,7 @@ const Toasts = () => {
         </Col>
       </Row>
     </>
-  )
-}
+  );
+};
 
-export default Toasts
+export default Toasts;

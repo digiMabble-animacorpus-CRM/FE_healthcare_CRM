@@ -1,5 +1,5 @@
-import small2 from '@/assets/images/small/img-2.jpg'
-import { type ApexOptions } from 'apexcharts'
+import small2 from '@/assets/images/small/img-2.jpg';
+import { type ApexOptions } from 'apexcharts';
 
 export const basicRadialBarOpts: ApexOptions = {
   chart: {
@@ -19,7 +19,7 @@ export const basicRadialBarOpts: ApexOptions = {
   colors: ['#7f56da'],
   series: [70],
   labels: ['CRICKET'],
-}
+};
 
 export const multipleRadialBarsOpts: ApexOptions = {
   chart: {
@@ -51,7 +51,7 @@ export const multipleRadialBarsOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const customAngleOpts: ApexOptions = {
   chart: {
@@ -96,7 +96,7 @@ export const customAngleOpts: ApexOptions = {
       useSeriesColors: true,
     },
     formatter: function (seriesName, opts) {
-      return seriesName + ':  ' + opts.w.globals.series[opts.seriesIndex]
+      return seriesName + ':  ' + opts.w.globals.series[opts.seriesIndex];
     },
     itemMargin: {
       horizontal: 1,
@@ -112,7 +112,7 @@ export const customAngleOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const circleWithImageOpts: ApexOptions = {
   chart: {
@@ -147,7 +147,7 @@ export const circleWithImageOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const strokedCircularGuageOpts: ApexOptions = {
   chart: {
@@ -169,7 +169,7 @@ export const strokedCircularGuageOpts: ApexOptions = {
           fontSize: '22px',
           color: undefined,
           formatter: function (val) {
-            return val + '%'
+            return val + '%';
           },
         },
       },
@@ -206,7 +206,7 @@ export const strokedCircularGuageOpts: ApexOptions = {
       },
     },
   ],
-}
+};
 
 export const gradientCircularOpts: ApexOptions = {
   chart: {
@@ -252,7 +252,7 @@ export const gradientCircularOpts: ApexOptions = {
         },
         value: {
           formatter: function (val: number) {
-            return val.toString()
+            return val.toString();
           },
           color: '#111',
           fontSize: '36px',
@@ -279,7 +279,7 @@ export const gradientCircularOpts: ApexOptions = {
     lineCap: 'round',
   },
   labels: ['Percent'],
-}
+};
 
 export const semiCircleGaugeOpts: ApexOptions = {
   series: [76],
@@ -324,4 +324,4 @@ export const semiCircleGaugeOpts: ApexOptions = {
   },
   colors: ['#4697ce'],
   labels: ['Average Results'],
-}
+};

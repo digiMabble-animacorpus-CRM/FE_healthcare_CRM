@@ -1,6 +1,6 @@
-import { Col, Row } from 'react-bootstrap'
-import IconifyIcon from './wrappers/IconifyIcon'
-import Link from 'next/link'
+import { Col, Row } from 'react-bootstrap';
+import IconifyIcon from './wrappers/IconifyIcon';
+import Link from 'next/link';
 
 const PageTitle = ({ title, subName }: { title: string; subName: string }) => {
   return (
@@ -20,7 +20,7 @@ const PageTitle = ({ title, subName }: { title: string; subName: string }) => {
         </div>
       </Col>
     </Row>
-  )
-}
+  );
+};
 
-export default PageTitle
+export default PageTitle;

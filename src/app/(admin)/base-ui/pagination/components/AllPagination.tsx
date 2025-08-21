@@ -1,15 +1,15 @@
-'use client'
-import ComponentContainerCard from '@/components/ComponentContainerCard'
-import { Card, CardBody, Pagination } from 'react-bootstrap'
+'use client';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import { Card, CardBody, Pagination } from 'react-bootstrap';
 
 const DefaultPagination = () => {
-  let items = []
+  let items = [];
   for (let number = 1; number <= 3; number++) {
     items.push(
       <Pagination.Item key={number} active={number === 1}>
         {number}
       </Pagination.Item>,
-    )
+    );
   }
   return (
     <ComponentContainerCard
@@ -17,9 +17,11 @@ const DefaultPagination = () => {
       title="Default Pagination"
       description={
         <>
-          Use the button classes on an <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code> or <code>&lt;input&gt;</code> element.
+          Use the button classes on an <code>&lt;a&gt;</code>, <code>&lt;button&gt;</code> or{' '}
+          <code>&lt;input&gt;</code> element.
         </>
-      }>
+      }
+    >
       <nav>
         <Pagination>
           <Pagination.Prev>Previous</Pagination.Prev>
@@ -36,23 +38,24 @@ const DefaultPagination = () => {
         </Pagination>
       </nav>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const RoundedPagination = () => {
-  let items = []
+  let items = [];
   for (let number = 1; number <= 3; number++) {
     items.push(
       <Pagination.Item key={number} active={number === 2}>
         {number}
       </Pagination.Item>,
-    )
+    );
   }
   return (
     <ComponentContainerCard
       id="rounded-pagination"
       title="Rounded Pagination"
-      description={<>Simple pagination inspired by Rdio, great for apps and search results.</>}>
+      description={<>Simple pagination inspired by Rdio, great for apps and search results.</>}
+    >
       <nav>
         <Pagination className="pagination-rounded">
           <Pagination.Prev>Previous</Pagination.Prev>
@@ -68,20 +71,24 @@ const RoundedPagination = () => {
         </Pagination>
       </nav>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const PaginationAlignment = () => {
-  let items = []
+  let items = [];
   for (let number = 1; number <= 3; number++) {
     items.push(
       <Pagination.Item key={number} active={number === 1}>
         {number}
       </Pagination.Item>,
-    )
+    );
   }
   return (
-    <ComponentContainerCard id="alignment" title="Alignment" description={<>Change the alignment of pagination components with flexbox utilitie</>}>
+    <ComponentContainerCard
+      id="alignment"
+      title="Alignment"
+      description={<>Change the alignment of pagination components with flexbox utilitie</>}
+    >
       <nav aria-label="Page navigation example">
         <Pagination className="justify-content-center">
           <Pagination.Prev>Previous</Pagination.Prev>
@@ -97,17 +104,17 @@ const PaginationAlignment = () => {
         </Pagination>
       </nav>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const PaginationSizes = () => {
-  let items = []
+  let items = [];
   for (let number = 1; number <= 3; number++) {
     items.push(
       <Pagination.Item key={number} active={number === 1}>
         {number}
       </Pagination.Item>,
-    )
+    );
   }
   return (
     <ComponentContainerCard
@@ -117,7 +124,8 @@ const PaginationSizes = () => {
         <>
           Add <code>.pagination-lg</code> or <code>.pagination-sm</code> for additional sizes.
         </>
-      }>
+      }
+    >
       <nav aria-label="...">
         <Pagination size="lg">{items}</Pagination>
       </nav>
@@ -130,8 +138,8 @@ const PaginationSizes = () => {
         </Pagination>
       </nav>
     </ComponentContainerCard>
-  )
-}
+  );
+};
 
 const AllPagination = () => {
   return (
@@ -141,7 +149,7 @@ const AllPagination = () => {
       <PaginationAlignment />
       <PaginationSizes />
     </>
-  )
-}
+  );
+};
 
-export default AllPagination
+export default AllPagination;

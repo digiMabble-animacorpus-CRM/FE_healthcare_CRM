@@ -1,10 +1,9 @@
-"use client";
+'use client';
 
-import { Card, CardBody, CardHeader, CardTitle, Col, Row } from "react-bootstrap";
-import type { CustomerEnquiriesType } from "@/types/data";
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 
 interface Props {
-  customerInfo: CustomerEnquiriesType;
+  customerInfo: any;
 }
 
 const CustomerInfoCard = ({ customerInfo }: Props) => {
@@ -43,16 +42,16 @@ const CustomerInfoCard = ({ customerInfo }: Props) => {
             <strong>Country:</strong> {customerInfo.country}
           </Col>
           <Col md={6} className="mt-2">
-            <strong>Zip Code:</strong> {customerInfo.zipCode}
+            <strong>Zip Code:</strong> {customerInfo.zip_code}
           </Col>
           <Col md={12} className="mt-2">
             <strong>Address:</strong> {customerInfo.address}
           </Col>
           <Col md={12} className="mt-2">
-            <strong>Tags:</strong> {customerInfo.tags.length ? customerInfo.tags.join(", ") : "-"}
+            <strong>Tags:</strong> {customerInfo.tags.length ? customerInfo.tags.join(', ') : '-'}
           </Col>
           <Col md={12} className="mt-2">
-            <strong>Description:</strong> {customerInfo.description || "-"}
+            <strong>Description:</strong> {customerInfo.description || '-'}
           </Col>
         </Row>
       </CardBody>

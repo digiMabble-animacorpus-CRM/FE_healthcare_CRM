@@ -1,14 +1,26 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon'
-import { getAllTransaction } from '@/helpers/data'
-import clsx from 'clsx'
-import Image from 'next/image'
-import Link from 'next/link'
-import { Button, Card, CardBody, CardFooter, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle } from 'react-bootstrap'
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getAllTransaction } from '@/helpers/data';
+import clsx from 'clsx';
+import Image from 'next/image';
+import Link from 'next/link';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+} from 'react-bootstrap';
 
 const TopCustomer = async () => {
-  const customerData = await getAllTransaction()
+  const customerData = await getAllTransaction();
 
-  const joinDataLength = customerData.slice(0, 5).length - 1
+  const joinDataLength = customerData.slice(0, 5).length - 1;
 
   return (
     <Col xl={4} lg={6}>
@@ -21,7 +33,12 @@ const TopCustomer = async () => {
             <p className="mb-0 fs-13">390 Customer</p>
           </div>
           <Dropdown>
-            <DropdownToggle as={'a'} className="rounded  arrow-none" data-bs-toggle="dropdown" aria-expanded="false">
+            <DropdownToggle
+              as={'a'}
+              className="rounded  arrow-none"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
               <IconifyIcon icon="ri:edit-box-line" className="fs-20 text-dark" />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
@@ -36,10 +53,17 @@ const TopCustomer = async () => {
               className={clsx(
                 `d-flex align-items-center justify-content-between  ${joinDataLength == idx ? '' : 'border-bottom'}  ${joinDataLength == idx || idx == 0 ? '' : 'py-3'} gap-2 ${idx == 0 && 'pb-3'} ${joinDataLength == idx && 'pt-3'}`,
               )}
-              key={idx}>
+              key={idx}
+            >
               <div className="d-flex align-items-center gap-2">
                 <div className="avatar">
-                  {item.user?.avatar && <Image src={item.user?.avatar} alt="avatar-3" className="img-fluid rounded-circle" />}
+                  {item.user?.avatar && (
+                    <Image
+                      src={item.user?.avatar}
+                      alt="avatar-3"
+                      className="img-fluid rounded-circle"
+                    />
+                  )}
                 </div>
                 <div className="d-block">
                   <span className="text-dark">
@@ -63,7 +87,7 @@ const TopCustomer = async () => {
         </CardFooter>
       </Card>
     </Col>
-  )
-}
+  );
+};
 
-export default TopCustomer
+export default TopCustomer;
