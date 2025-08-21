@@ -3,7 +3,7 @@ import { ProgressBar } from 'react-bootstrap';
 import { CustomerType } from '../data';
 
 const PatientCard = ({ customer }: { customer: CustomerType }) => {
-  const { Property, count, icon, progress, title, variant } = customer;
+  const {  count, icon, progress, title, variant } = customer;
   return (
     <div className="border p-2 rounded">
       <div className="d-flex gap-3 align-items-center">
@@ -13,7 +13,6 @@ const PatientCard = ({ customer }: { customer: CustomerType }) => {
         <div>
           <p className="text-dark fw-semibold fs-16 mb-0">{title}</p>
           <p className="mb-0">
-            {Property} Property{' '}
             {variant == 'warning' ? 'View' : variant == 'primary' ? 'Own' : 'Active'}
           </p>
         </div>
