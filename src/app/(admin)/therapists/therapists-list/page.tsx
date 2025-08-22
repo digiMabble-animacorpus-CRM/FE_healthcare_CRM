@@ -115,13 +115,13 @@ const TherapistsListPage = () => {
     return filteredTherapists.slice(start, start + PAGE_SIZE);
   }, [filteredTherapists, currentPage]);
 
-  const handleView = (id: string) => {
+  const handleView = (id: any) => {
     router.push(`/therapists/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => router.push(`/therapists/edit-therapist/${id}`);
+  const handleEditClick = (id: any) => router.push(`/therapists/edit-therapist/${id}`);
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: any) => {
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
@@ -297,21 +297,21 @@ const TherapistsListPage = () => {
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(item._id)}
+                                onClick={() => handleView(item._key)}
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => handleEditClick(item.idPro.toString())}
+                                onClick={() => handleEditClick(item._key)}
                               >
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
+                                onClick={() => handleDeleteClick(item._key)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>
