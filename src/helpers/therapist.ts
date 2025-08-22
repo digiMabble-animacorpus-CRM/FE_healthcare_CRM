@@ -2,7 +2,7 @@
 
 import { API_BASE_PATH } from '@/context/constants';
 import { encryptAES, decryptAES } from '@/utils/encryption';
-import type { TherapistCreatePayload, TherapistType } from '@/types/data';
+// import type { TherapistCreatePayload, TherapistType } from '@/types/data';
 export interface TherapistUpdatePayload {
   name?: string;
   email?: string;
@@ -107,7 +107,7 @@ export const getTherapistById = async (therapistId: any): Promise<any | null> =>
       return null;
     }
 
-    return result?.data ?? null;
+    return result ?? null;
   } catch (error) {
     console.error('Exception during therapist fetch:', error);
     return null;
@@ -214,7 +214,7 @@ export const transformToBackendDto = (formData: any): TherapistUpdatePayload => 
     email: formData.email,
     phoneNumber: formData.phoneNumber,
     roleId: formData.roleId ? Number(formData.roleId) : undefined,
-    accessLevel: formData.accessLevelId as 'therapist' | 'branch-admin' | 'super-admin',
+    accessLevel: formData.accessLevelId,
     branches: formData.branches.map((b: { id: any }) => Number(b.id)).filter(Boolean),
     selectedBranch: formData.selectedBranch ? Number(formData.selectedBranch) : null,
     permissions: formData.permissions.map((p: { _id: string; enabled: any }) => ({
