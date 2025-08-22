@@ -1,12 +1,11 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardBody, Col, Row, Button, Badge, Collapse, Table } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { ApexOptions } from 'apexcharts';
-import ReactApexChart from 'react-apexcharts';
-import { FaClock, FaMapMarkerAlt, FaEnvelope, FaPhone, FaEdit } from 'react-icons/fa';
+import { FaClock, FaMapMarkerAlt, FaEnvelope, FaPhone, FaEdit, FaGlobe } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
 
 type WeeklySessionType = { week: string; sessions: number };
@@ -76,14 +75,13 @@ const TherapistDetails = ({
   const [aboutOpen, setAboutOpen] = useState(true);
   const [cabinetsOpen, setCabinetsOpen] = useState(true);
   const router = useRouter();
-  const handleEditClick = (id: string) => router.push(`/therapists/edit-therapist/${id}`);
-  const photoUrl = photo?.match(/^https?:\/\//) ? photo : '/placeholder-avatar.jpg';
 
-  const options: ApexOptions = {
-    chart: { type: 'radialBar', height: 90, sparkline: { enabled: true } },
-    plotOptions: { radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } } },
-    colors: ['#0d6efd'],
-  };
+  // ✅ Scroll to top when component loads
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }, []);
+
+  const handleEditClick = (id: string) => router.push(`/therapists/edit-therapist/${id}`);
 
   return (
     <div>
@@ -99,24 +97,33 @@ const TherapistDetails = ({
         )}
       </div>
 
-      {/* Profile / Avatar */}
+      {/* Profile */}
       <Card className="mb-4 shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
         <CardBody>
           <Row className="align-items-center">
             <Col lg={2} className="d-flex justify-content-center">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center"
-                style={{
-                  width: '100px',
-                  height: '100px',
-                  backgroundColor: '#e7ddff',
-                  color: '#341539',
-                  fontSize: '36px',
-                  fontWeight: 'bold',
-                }}
-              >
-                {name[0].toUpperCase()}
-              </div>
+              {photo && photo !== "null" && photo.trim() !== "" ? (
+                <img
+                  src={photo}
+                  alt={name}
+                  className="rounded-circle object-cover"
+                  style={{ width: "140px", height: "140px" }}
+                />
+              ) : (
+                <div
+                  className="rounded-circle d-flex align-items-center justify-content-center"
+                  style={{
+                    width: '140px',
+                    height: '140px',
+                    backgroundColor: '#e7ddff',
+                    color: '#341539',
+                    fontSize: '52px',
+                    fontWeight: 'bold',
+                  }}
+                >
+                  {name[0].toUpperCase()}
+                </div>
+              )}
             </Col>
             <Col lg={10}>
               <div className='d-flex justify-content-between'>
@@ -145,7 +152,7 @@ const TherapistDetails = ({
                 )}
                 {website && (
                   <div className="d-flex align-items-center gap-2">
-                    <FaMapMarkerAlt className="text-warning" />{' '}
+                    <FaGlobe className="text-info" />
                     <a
                       href={website}
                       target="_blank"
