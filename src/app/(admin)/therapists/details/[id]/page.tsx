@@ -2,14 +2,15 @@
 
 import PageTitle from '@/components/PageTitle';
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
+import { useParams } from 'next/navigation';
 import TherapistDetails from './components/TherapistDetails';
 import { getTherapistById } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
 
 const TherapistDetailsPage = () => {
-  const { id } = useParams();
-  const router = useRouter();
+  const params = useParams();
+  const therapistId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+
   const [data, setData] = useState<TherapistType | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -74,26 +75,26 @@ const TherapistDetailsPage = () => {
     { name: 'Prescription.docx', size: 1.2, icon: 'ri:file-word-line', variant: 'primary' },
   ];
 
+  // ✅ Typed fetcher
+  const fetchTherapist = async (): Promise<void> => {
+    setLoading(true);
+    try {
+      if (!therapistId) return;
+      const therapist = await getTherapistById(therapistId);
+      console.log("Full therapist object:", therapist);
+      setData(therapist);
+    } catch (error) {
+      console.error(error, "Error");
+      alert('Failed to load therapist details');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    if (!id) return;
-
-    const fetchTherapist = async () => {
-      setLoading(true);
-      try {
-        const therapist = await getTherapistById(id);
-        if (!therapist) throw new Error('Failed to fetch therapist');
-        setData(therapist);
-      } catch (error) {
-        console.error(error);
-        alert('Failed to load therapist details');
-        router.push('/therapists');
-      } finally {
-        setLoading(false);
-      }
-    };
-
+    if (!therapistId) return;
     fetchTherapist();
-  }, [id, router]);
+  }, [therapistId]); // ✅ no router dependency
 
   if (loading) return <p>Loading...</p>;
   if (!data) return <p>No therapist found.</p>;
@@ -103,6 +104,7 @@ const TherapistDetailsPage = () => {
       <PageTitle subName="Healthcare" title="Therapist Overview" />
       <TherapistDetails
         id={data.idPro.toString()}
+        photo={data.imageUrl}
         name={`${data.firstName} ${data.lastName}`}
         jobTitle={data.jobTitle}
         email={data.contactEmail}
@@ -155,14 +157,12 @@ const TherapistDetailsPage = () => {
         specializations={data.specializations?.split('\n') || []}
         weeklySessions={defaultWeeklySessions}
         stats={defaultStats}
-        transactions={defaultTransactions} // mock transactions if needed
+        transactions={defaultTransactions}
         feedbacks={defaultFeedbacks}
         files={defaultFiles}
-        photo={data.photo}
         agendaLink={data.agendaLinks || undefined}
       />
     </>
-
   );
 };
 

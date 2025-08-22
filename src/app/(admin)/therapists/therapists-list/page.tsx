@@ -115,13 +115,13 @@ const TherapistsListPage = () => {
     return filteredTherapists.slice(start, start + PAGE_SIZE);
   }, [filteredTherapists, currentPage]);
 
-  const handleView = (id: string) => {
+  const handleView = (id: any) => {
     router.push(`/therapists/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => router.push(`/therapists/edit-therapist/${id}`);
+  const handleEditClick = (id: any) => router.push(`/therapists/edit-therapist/${id}`);
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: any) => {
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
@@ -263,8 +263,8 @@ const TherapistsListPage = () => {
                                 <img
                                   src={item.imageUrl}
                                   alt={item.firstName}
-                                  className="w-10 h-10 rounded-full object-cover"
-                                  style={{ width: "100px", height: "100px" }}
+                                  className="rounded-circle object-cover"
+                                  style={{ width: "40px", height: "40px" }}
                                 />
                               ) : (
                                 <div
@@ -274,13 +274,14 @@ const TherapistsListPage = () => {
                                     height: "40px",
                                     backgroundColor: "#e7ddff",
                                     color: "#341539",
-                                    fontSize: "28px",
+                                    fontSize: "20px", // looks balanced in 40px circle
                                     fontWeight: "bold",
                                   }}
                                 >
                                   {item.firstName?.charAt(0).toUpperCase()}
                                 </div>
                               )}
+
                             </td>
 
                           </td>
@@ -296,21 +297,21 @@ const TherapistsListPage = () => {
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(item._id)}
+                                onClick={() => handleView(item._key)}
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => handleEditClick(item.idPro.toString())}
+                                onClick={() => handleEditClick(item._key)}
                               >
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
+                                onClick={() => handleDeleteClick(item._key)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>
