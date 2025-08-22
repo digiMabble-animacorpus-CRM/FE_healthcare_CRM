@@ -622,6 +622,7 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
+  tags(tags: any): unknown;
   team_id: string;
   last_name: string;
   first_name: string;

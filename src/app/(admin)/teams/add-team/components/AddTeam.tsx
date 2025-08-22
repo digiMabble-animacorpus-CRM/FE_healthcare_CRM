@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
@@ -12,87 +12,62 @@ import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
 import DropzoneFormInput from '@/components/from/DropzoneFormInput';
 import { getTherapistById, createTherapist, updateTherapist } from '@/helpers/therapist';
+import { createTeamMember, getTeamMemberById, updateTeamMember} from '@/helpers/team-members';
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-type AvailabilitySlot = {
-  day: string;
-  from: string;
-  to: string;
-};
-
-type TherapistFormValues = {
-  firstName: string;
-  lastName: string;
-  fullName: string;
-  photo?: string; // optional
-  jobTitle: string;
-  targetAudience?: string | null;
-  specialization1?: string | null;
-  specialization2?: string | null;
-  aboutMe: string;
+type TeamsFormValues = {
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  job_1?: string | null;
+  job_2?: string | null;
+  job_3?: string | null;
+  job_4?: string | null;
+  specific_audience?: string | null;
+  specialization_1?: string | null;
+  who_am_i: string;
   consultations: string;
-  centerAddress: string;
-  centerEmail: string;
-  centerPhoneNumber: string;
-  contactEmail: string;
-  contactPhone: string;
-  schedule: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: Record<string, string>; // flexible object { monday: "9am-5pm" }
   about?: string | null;
-  spokenLanguages: string;
-  paymentMethods?: string;
-  degreesAndTraining: string;
-  specializations: string;
+  languages_spoken: string[];
+  payment_methods?: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
   website: string;
-  faq: string;
-  agendaLinks?: string | null;
-  rosaLink?: string | null;
-  googleAgendaLink?: string | null;
-  appointmentStart?: string | null;
-  appointmentEnd?: string | null;
-  appointmentAlert?: string | null;
-  availability?: AvailabilitySlot[];
+  frequently_asked_questions: Record<string, string>;
+  calendar_links?: string[];
+  photo?: string;
   tags?: any[];
   certificationFiles: File[];
 };
 
-const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
-  firstName: yup.string().required('First name required'),
-  lastName: yup.string().required('Last name required'),
-  fullName: yup.string().required('Full name required'),
-  photo: yup.string().optional(), // optional matches type
-  jobTitle: yup.string().required('Job title required'),
-  targetAudience: yup.string().nullable().optional(),
-  specialization1: yup.string().nullable().optional(),
-  specialization2: yup.string().nullable().optional(),
-  aboutMe: yup.string().required('About me required'),
+const schema: yup.ObjectSchema<TeamsFormValues> = yup.object({
+  first_name: yup.string().required('First name required'),
+  last_name: yup.string().required('Last name required'),
+  full_name: yup.string().required('Full name required'),
+  job_1: yup.string().nullable().optional(),
+  job_2: yup.string().nullable().optional(),
+  job_3: yup.string().nullable().optional(),
+  job_4: yup.string().nullable().optional(),
+  specific_audience: yup.string().nullable().optional(),
+  specialization_1: yup.string().nullable().optional(),
+  who_am_i: yup.string().required('About me required'),
   consultations: yup.string().required('Consultations required'),
-  centerAddress: yup.string().required('Center address required'),
-  centerEmail: yup.string().email('Invalid email').required('Center email required'),
-  centerPhoneNumber: yup.string().required('Center phone required'),
-  contactEmail: yup.string().email('Invalid email').required('Contact email required'),
-  contactPhone: yup.string().required('Contact phone required'),
-  schedule: yup.string().required('Schedule required'),
+  office_address: yup.string().required('Center address required'),
+  contact_email: yup.string().email().required('Contact email required'),
+  contact_phone: yup.string().required('Contact phone required'),
+  schedule: yup.object().required(),
   about: yup.string().nullable().optional(),
-  spokenLanguages: yup.string().required('Spoken languages required'),
-  paymentMethods: yup.string().optional(),
-  degreesAndTraining: yup.string().required('Degrees & training required'),
-  specializations: yup.string().required('Specializations required'),
+  languages_spoken: yup.array().of(yup.string()).required(),
+  payment_methods: yup.array().of(yup.string()).optional(),
+  diplomas_and_training: yup.array().of(yup.string()).required(),
+  specializations: yup.array().of(yup.string()).required(),
   website: yup.string().required('Website required'),
-  faq: yup.string().required('FAQ required'),
-  agendaLinks: yup.string().nullable().optional(),
-  rosaLink: yup.string().nullable().optional(),
-  googleAgendaLink: yup.string().nullable().optional(),
-  appointmentStart: yup.string().nullable().optional(),
-  appointmentEnd: yup.string().nullable().optional(),
-  appointmentAlert: yup.string().nullable().optional(),
-  availability: yup.array().of(
-    yup.object({
-      day: yup.string().required('Day is required'),
-      from: yup.string().required('Start time is required'),
-      to: yup.string().required('End time is required'),
-    }),
-  ),
+  frequently_asked_questions: yup.object().required(),
+  calendar_links: yup.array().of(yup.string()).optional(),
+  photo: yup.string().optional(),
   tags: yup.array().of(yup.string()).min(1, 'Select at least one tag').required(),
   certificationFiles: yup
     .array()
@@ -105,72 +80,86 @@ interface Props {
   params?: { id?: string };
 }
 
-const AddTherapist = ({ params }: Props) => {
+const AddTeam = ({ params }: Props) => {
   const router = useRouter();
   const isEditMode = !!params?.id;
   const [loading, setLoading] = useState<boolean>(isEditMode);
 
-  const methods = useForm<TherapistFormValues>({
+  const methods = useForm<TeamsFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      firstName: '',
-      lastName: '',
-      fullName: '',
-      photo: '',
-      jobTitle: '',
-      targetAudience: '',
-      specialization1: '',
-      specialization2: '',
-      aboutMe: '',
+      first_name: '',
+      last_name: '',
+      full_name: '',
+      job_1: '',
+      job_2: '',
+      job_3: '',
+      job_4: '',
+      specific_audience: '',
+      specialization_1: '',
+      who_am_i: '',
       consultations: '',
-      centerAddress: '',
-      centerEmail: '',
-      centerPhoneNumber: '',
-      contactEmail: '',
-      contactPhone: '',
-      schedule: '',
+      office_address: '',
+      contact_email: '',
+      contact_phone: '',
+      schedule: {},
       about: '',
-      spokenLanguages: '',
-      paymentMethods: '',
-      degreesAndTraining: '',
-      specializations: '',
+      languages_spoken: [],
+      payment_methods: [],
+      diplomas_and_training: [],
+      specializations: [],
       website: '',
-      faq: '',
-      agendaLinks: '',
-      rosaLink: '',
-      googleAgendaLink: '',
-      appointmentStart: '',
-      appointmentEnd: '',
-      appointmentAlert: '',
-      availability: [],
+      frequently_asked_questions: {},
+      calendar_links: [],
+      photo: '',
       tags: [],
       certificationFiles: [],
     },
   });
 
-  const { control, handleSubmit, reset, formState } = methods;
-  const {
-    fields: availabilityFields,
-    append,
-    remove,
-  } = useFieldArray({
-    control,
-    name: 'availability',
-  });
+  const { control, handleSubmit, reset } = methods;
 
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
-      getTherapistById(params.id)
-        .then((response) => {
-          const data = response; // assume response is the object
+      getTeamMemberById(params.id)
+        .then((data) => {
           if (data) {
-            // map API response to form values
-            const mapped: TherapistFormValues = {
-              ...data,
-              tags: data.tags || [],
+            const mapped: TeamsFormValues = {
+              first_name: data.first_name,
+              last_name: data.last_name,
+              full_name: data.full_name,
+              job_1: data.job_1 || '',
+              job_2: data.job_2 || '',
+              job_3: data.job_3 || '',
+              job_4: data.job_4 || '',
+              specific_audience: data.specific_audience || '',
+              specialization_1: data.specialization_1 || '',
+              who_am_i: data.who_am_i || '',
+              consultations: data.consultations,
+              office_address: data.office_address,
+              contact_email: data.contact_email,
+              contact_phone: data.contact_phone,
+              schedule: data.schedule || {},
+              about: data.about || '',
+              languages_spoken: data.languages_spoken || [],
+              payment_methods: data.payment_methods || [],
+              diplomas_and_training: data.diplomas_and_training || [],
+              specializations: data.specializations || [],
+              website: data.website,
+              frequently_asked_questions: typeof data.frequently_asked_questions === 'object' && data.frequently_asked_questions !== null
+                ? data.frequently_asked_questions
+                : {},
+              calendar_links: data.calendar_links || [],
+              photo: data.photo || '',
+              tags: Array.isArray(data.tags)
+                ? data.tags
+                : typeof data.tags === 'function'
+                  ? []
+                  : Array.isArray(data.tags)
+                    ? data.tags
+                    : [],
               certificationFiles: [],
-              availability: data.availability || [],
             };
             reset(mapped);
           }
@@ -180,13 +169,15 @@ const AddTherapist = ({ params }: Props) => {
     }
   }, [isEditMode, params?.id, reset]);
 
-  const onSubmit = async (data: TherapistFormValues) => {
+  const onSubmit = async (formData: TeamsFormValues) => {
     try {
+      // backend payload mapping
+
       if (isEditMode && params?.id) {
-        const success = await updateTherapist(params.id, data);
+        const success = await updateTeamMember(params.id, safePayload);
         if (success) alert('Therapist updated successfully');
       } else {
-        const success = await createTherapist(data);
+        const success = await createTeamMember(safePayload);
         if (success) {
           alert('Therapist created successfully');
           reset();
@@ -206,24 +197,24 @@ const AddTherapist = ({ params }: Props) => {
         {/* Basic Info Card */}
         <Card>
           <CardHeader>
-            <CardTitle as="h4">{isEditMode ? 'Edit Therapist' : 'Add Therapist'}</CardTitle>
+            <CardTitle as="h4">{isEditMode ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
           </CardHeader>
           <CardBody>
             <Row>
               <Col lg={6}>
-                <TextFormInput control={control} name="firstName" label="First Name" />
+                <TextFormInput control={control} name="first_name" label="First Name" />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="lastName" label="Last Name" />
+                <TextFormInput control={control} name="last_name" label="Last Name" />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="fullName" label="Full Name" />
+                <TextFormInput control={control} name="full_name" label="Full Name" />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="jobTitle" label="Job Title" />
+                <TextFormInput control={control} name="job_1" label="Job Title" />
               </Col>
               <Col lg={12}>
-                <TextAreaFormInput control={control} name="aboutMe" label="About Me" rows={3} />
+                <TextAreaFormInput control={control} name="who_am_i" label="About Me" rows={3} />
               </Col>
             </Row>
           </CardBody>
@@ -237,22 +228,20 @@ const AddTherapist = ({ params }: Props) => {
           <CardBody>
             <Row>
               <Col lg={6}>
-                <TextFormInput control={control} name="centerAddress" label="Center Address" />
+                <TextFormInput control={control} name="office_address" label="Center Address" />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="centerEmail" label="Center Email" />
+                <TextFormInput control={control} name="contact_email" label="Contact Email" />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="centerPhoneNumber" label="Center Phone" />
+                <TextFormInput control={control} name="contact_phone" label="Contact Phone" />
               </Col>
               <Col lg={6}>
-                <TextFormInput control={control} name="contactEmail" label="Contact Email" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="contactPhone" label="Contact Phone" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="spokenLanguages" label="Spoken Languages" />
+                <TextFormInput
+                  control={control}
+                  name="languages_spoken.0"
+                  label="Spoken Languages"
+                />
               </Col>
             </Row>
           </CardBody>
@@ -265,75 +254,27 @@ const AddTherapist = ({ params }: Props) => {
           </CardHeader>
           <CardBody>
             <Controller
-              control={control}
-              name="tags"
-              render={({ field }) => (
-                <ChoicesFormInput className="form-control" multiple {...field}>
-                  <option value="Physiotherapy">Physiotherapy</option>
-                  <option value="Occupational Therapy">Occupational Therapy</option>
-                  <option value="Speech Therapy">Speech Therapy</option>
-                  <option value="Cognitive Behavioral Therapy">CBT</option>
-                  <option value="Psychotherapy">Psychotherapy</option>
-                </ChoicesFormInput>
-              )}
-            />
-          </CardBody>
-        </Card>
+  control={control}
+  name="tags"
+  render={({ field }) => (
+    <ChoicesFormInput
+      className="form-control"
+      multiple
+      value={field.value || []} // must be string[]
+      onChange={(val: string | string[]) => {
+        // Ensure RHF always receives string[]
+        return field.onChange(Array.isArray(val) ? val : [val]);
+      }}
+    >
+      <option value="Physiotherapy">Physiotherapy</option>
+      <option value="Occupational Therapy">Occupational Therapy</option>
+      <option value="Speech Therapy">Speech Therapy</option>
+      <option value="Cognitive Behavioral Therapy">CBT</option>
+      <option value="Psychotherapy">Psychotherapy</option>
+    </ChoicesFormInput>
+  )}
+/>
 
-        {/* Availability Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Availability</CardTitle>
-          </CardHeader>
-          <CardBody>
-            {availabilityFields.map((item, index) => (
-              <Row key={item.id} className="mb-2 align-items-end">
-                <Col lg={4}>
-                  <Controller
-                    control={control}
-                    name={`availability.${index}.day`}
-                    render={({ field }) => (
-                      <select className="form-control" {...field}>
-                        <option value="" disabled>
-                          Select Day
-                        </option>
-                        {days.map((day) => (
-                          <option key={day} value={day}>
-                            {day}
-                          </option>
-                        ))}
-                      </select>
-                    )}
-                  />
-                </Col>
-                <Col lg={3}>
-                  <Controller
-                    control={control}
-                    name={`availability.${index}.from`}
-                    render={({ field }) => (
-                      <input type="time" className="form-control" {...field} />
-                    )}
-                  />
-                </Col>
-                <Col lg={3}>
-                  <Controller
-                    control={control}
-                    name={`availability.${index}.to`}
-                    render={({ field }) => (
-                      <input type="time" className="form-control" {...field} />
-                    )}
-                  />
-                </Col>
-                <Col lg={2}>
-                  <Button variant="danger" onClick={() => remove(index)}>
-                    Remove
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button variant="outline-primary" onClick={() => append({ day: '', from: '', to: '' })}>
-              Add Availability
-            </Button>
           </CardBody>
         </Card>
 
@@ -377,4 +318,4 @@ const AddTherapist = ({ params }: Props) => {
   );
 };
 
-export default AddTherapist;
+export default AddTeam;
