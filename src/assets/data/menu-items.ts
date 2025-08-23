@@ -101,4 +101,10 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri:chat-quote-line',
     url: '/permissions',
   },
+  {
+    key: 'branchs',
+    label: 'Branches',
+    icon: 'ri:chat-quote-line',
+    url: '/branches',
+  },
 ];
