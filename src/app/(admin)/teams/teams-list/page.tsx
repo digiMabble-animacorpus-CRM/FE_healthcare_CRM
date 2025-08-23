@@ -35,7 +35,7 @@ const TeamsListPage = () => {
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedTherapistId, setSelectedTherapistId] = useState<string | null>(null);
+  const [selectedTherapistId, setSelectedTeamMemberId] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -111,7 +111,7 @@ const TeamsListPage = () => {
   const handleEditClick = (id: string) => router.push(`/teams/edit-team/${id}`);
 
   const handleDeleteClick = (id: string) => {
-    setSelectedTherapistId(id);
+    setSelectedTeamMemberId(id);
     setShowDeleteModal(true);
   };
 
@@ -124,7 +124,7 @@ const TeamsListPage = () => {
       console.error(err);
     } finally {
       setShowDeleteModal(false);
-      setSelectedTherapistId(null);
+      setSelectedTeamMemberId(null);
     }
   };
 
