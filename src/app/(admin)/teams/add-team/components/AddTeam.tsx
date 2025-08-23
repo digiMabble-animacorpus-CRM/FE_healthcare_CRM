@@ -30,7 +30,7 @@ type TeamsFormValues = {
   office_address: string;
   contact_email: string;
   contact_phone: string;
-  schedule: Record<string, string>; // flexible object { monday: "9am-5pm" }
+  schedule: Record<string, string | null>;
   about: string;
   languages_spoken: string[];
   payment_methods: string[];
@@ -41,47 +41,47 @@ type TeamsFormValues = {
   calendar_links: string[];
   photo: string;
   tags: string[];
-  certificationFiles: File[];
 };
 
 const schema: yup.ObjectSchema<TeamsFormValues> = yup.object({
   first_name: yup.string().required('First name required'),
   last_name: yup.string().required('Last name required'),
   full_name: yup.string().required('Full name required'),
-  job_1: yup.string().nullable().optional(),
+  job_1: yup.string().nullable().required('At least one job title required'),
   job_2: yup.string().nullable().optional(),
   job_3: yup.string().nullable().optional(),
   job_4: yup.string().nullable().optional(),
   specific_audience: yup.string().nullable().optional(),
   specialization_1: yup.string().nullable().optional(),
   who_am_i: yup.string().required('About me required'),
-  consultations: yup.string().required('Consultations required'),
-  office_address: yup.string().required('Center address required'),
+  consultations: yup.string().optional(),
+  office_address: yup.string().optional(),
   contact_email: yup.string().email().required('Contact email required'),
   contact_phone: yup.string().required('Contact phone required'),
-  schedule: yup.object().required(),
+  schedule: yup.object().optional(),
   about: yup.string().nullable().optional(),
-  languages_spoken: yup.array()
+  languages_spoken: yup
+    .array()
     .of(yup.string().required())
     .min(1, 'Select at least one language')
     .required('Languages spoken required')
-    .default([]),
-  payment_methods: yup.array().of(yup.string()).min(1, 'Select at least one payment method').required(),
-  diplomas_and_training: yup.array().of(yup.string().required()).min(1, 'Add at least one diploma or training').required(),
+    .default(['']),
+  payment_methods: yup.array().of(yup.string()).optional(),
+  diplomas_and_training: yup.array().of(yup.string().required()).optional(),
   specializations: yup.array().of(yup.string().required()).min(1, 'Add at least one specialization').required(),
-  website: yup.string().required('Website required'),
+  website: yup.string().optional(),
   frequently_asked_questions: yup
-      .array()
-      .of(
-        yup.object({
-          question: yup.string().optional(),
-          answer: yup.string().optional(),
-        })
-      ),
+    .array()
+    .of(
+      yup.object({
+        question: yup.string().optional(),
+        answer: yup.string().optional(),
+      })
+    )
+    .default([{ question: '', answer: '' }]),
   calendar_links: yup.array().of(yup.string().url()).optional(),
   photo: yup.string().optional(),
-  tags: yup.array().of(yup.string()).min(1, 'Select at least one tag').required(),
-  certificationFiles: yup.array().of(yup.mixed<File>().required()).min(1, 'Upload at least one file').required(),
+  tags: yup.array().of(yup.string()).optional(),
 });
 
 interface Props {
@@ -112,32 +112,34 @@ const AddTeam = ({ params }: Props) => {
       contact_phone: '',
       schedule: {},
       about: '',
-      languages_spoken: [],
+      languages_spoken: [''], // start with one empty item to avoid empty map
       payment_methods: [],
-      diplomas_and_training: [''],   // start with one empty field
-      specializations: [''],         // start with one empty field
+      diplomas_and_training: [''],
+      specializations: [''],
       website: '',
-      frequently_asked_questions: [{}],
-      calendar_links: [''],          // start with one empty field
+      frequently_asked_questions: [{ question: '', answer: '' }],
+      calendar_links: [''],
       photo: '',
       tags: [],
-      certificationFiles: [],
     },
   });
 
-  const { control, handleSubmit, reset, watch } = methods;
+  const { control, handleSubmit, reset, watch, formState } = methods;
+  const { errors } = formState;
 
   // For dynamic list fields
   const diplomasArray = useFieldArray({ control, name: 'diplomas_and_training' });
   const specializationsArray = useFieldArray({ control, name: 'specializations' });
   const calendarLinksArray = useFieldArray({ control, name: 'calendar_links' });
-  const frequently_asked_questionsArray = useFieldArray({ control, name:'frequently_asked_questions'})
-  
+  const frequently_asked_questionsArray = useFieldArray({ control, name: 'frequently_asked_questions' });
+
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
+      console.log('Fetching team member with ID:', params.id);
       getTeamMemberById(params.id)
         .then((data) => {
+          console.log('Fetched data:', data);
           if (data) {
             const mapped: TeamsFormValues = {
               first_name: data.first_name,
@@ -150,32 +152,51 @@ const AddTeam = ({ params }: Props) => {
               specific_audience: data.specific_audience || '',
               specialization_1: data.specialization_1 || '',
               who_am_i: data.who_am_i || '',
-              consultations: data.consultations,
-              office_address: data.office_address,
-              contact_email: data.contact_email,
-              contact_phone: data.contact_phone,
-              schedule: data.schedule || {},
+              consultations: data.consultations || '',
+              office_address: data.office_address || '',
+              contact_email: data.contact_email || '',
+              contact_phone: data.contact_phone || '',
+              schedule: data.schedule && Object.keys(data.schedule).length
+                ? data.schedule
+                : { Monday: '9am-5pm', Tuesday: '9am-5pm' },
               about: data.about || '',
-              languages_spoken: data.languages_spoken || [],
+              languages_spoken: data.languages_spoken && data.languages_spoken.length ? data.languages_spoken : [''],
               payment_methods: data.payment_methods || [],
-              diplomas_and_training: data.diplomas_and_training.length ? data.diplomas_and_training : [''],
-              specializations: data.specializations.length ? data.specializations : [''],
-              website: data.website,
-              frequently_asked_questions: typeof data.frequently_asked_questions === 'object' && data.frequently_asked_questions !== null ? data.frequently_asked_questions : {},
-              calendar_links: data.calendar_links.length ? data.calendar_links : [''],
+              diplomas_and_training: data.diplomas_and_training && data.diplomas_and_training.length ? data.diplomas_and_training : [''],
+              specializations: data.specializations && data.specializations.length ? data.specializations : [''],
+              website: data.website || '',
+              frequently_asked_questions:
+                Array.isArray(data.frequently_asked_questions) && data.frequently_asked_questions.length > 0
+                  ? data.frequently_asked_questions
+                  : [{ question: '', answer: '' }],
+              calendar_links: data.calendar_links && data.calendar_links.length ? data.calendar_links : [''],
               photo: data.photo || '',
               tags: data.tags || [],
-              certificationFiles: [], // cannot preset files for security reasons
             };
+            console.log('Resetting form with mapped values:', mapped);
             reset(mapped);
           }
         })
-        .catch(console.error)
+        .catch((error) => {
+          console.error('Failed to fetch team member data:', error);
+        })
         .finally(() => setLoading(false));
     }
   }, [isEditMode, params?.id, reset]);
 
+  useEffect(() => {
+    const subscription = watch((value) => {
+      console.log('Form values changed:', value);
+    });
+    return () => subscription.unsubscribe();
+  }, [watch]);
+
+  useEffect(() => {
+    console.log('Form errors:', errors);
+  }, [errors]);
+
   const mapFormDataToCreatePayload = (formData: TeamsFormValues): TeamMemberCreatePayload => {
+    console.log('Mapping form data to create payload:', formData);
     return {
       team_id: formData.team_id || '',
       first_name: formData.first_name,
@@ -208,17 +229,24 @@ const AddTeam = ({ params }: Props) => {
   };
 
   const onSubmit = async (formData: TeamsFormValues) => {
+    console.log('Form submission triggered with data:', formData);
     try {
       if (isEditMode && params?.id) {
+        console.log('Updating team member with id:', params.id);
         const updatePayload: TeamMemberUpdatePayload = transformToBackendDto(formData);
         const success = await updateTeamMember(params.id, updatePayload);
-        if (success) alert('Team member updated successfully');
+        if (success) {
+          alert('Team member updated successfully');
+          console.log('Update successful');
+        }
       } else {
+        console.log('Creating a new team member');
         const createPayload = mapFormDataToCreatePayload(formData);
         const success = await createTeamMember(createPayload);
         if (success) {
           alert('Team member created successfully');
           reset();
+          console.log('Creation successful and form reset');
         }
       }
     } catch (error: any) {
@@ -330,12 +358,7 @@ const AddTeam = ({ params }: Props) => {
               control={control}
               name="payment_methods"
               render={({ field }) => (
-                <ChoicesFormInput
-                  className="form-control"
-                  multiple
-                  value={field.value || []}
-                  onChange={field.onChange}
-                >
+                <ChoicesFormInput className="form-control" multiple value={field.value || []} onChange={field.onChange}>
                   <option value="Cash">Cash</option>
                   <option value="Credit Card">Credit Card</option>
                   <option value="Bank Transfer">Bank Transfer</option>
@@ -343,7 +366,6 @@ const AddTeam = ({ params }: Props) => {
                 </ChoicesFormInput>
               )}
             />
-
           </CardBody>
         </Card>
 
@@ -405,28 +427,19 @@ const AddTeam = ({ params }: Props) => {
           </CardBody>
         </Card>
 
-        {/* FAQ (Frequently Asked Questions) */}
+        {/* Frequently Asked Questions */}
         <Card>
           <CardHeader>
             <CardTitle as="h4">Frequently Asked Questions</CardTitle>
           </CardHeader>
           <CardBody>
-            {/* Simple key-value FAQ input */}
-            {Object.entries(watch('frequently_asked_questions')).map(([question, answer], i) => (
+            {watch('frequently_asked_questions').map((_, i) => (
               <Row key={i} className="mb-2">
                 <Col lg={5}>
-                  <TextFormInput
-                    control={control}
-                    name={`frequently_asked_questions.${i}.question`}
-                    label="Question"
-                  />
+                  <TextFormInput control={control} name={`frequently_asked_questions.${i}.question`} label="Question" />
                 </Col>
                 <Col lg={6}>
-                  <TextFormInput
-                    control={control}
-                    name={`frequently_asked_questions.${i}.answer`}
-                    label="Answer"
-                  />
+                  <TextFormInput control={control} name={`frequently_asked_questions.${i}.answer`} label="Answer" />
                 </Col>
               </Row>
             ))}
@@ -457,27 +470,6 @@ const AddTeam = ({ params }: Props) => {
             <Button variant="link" onClick={() => calendarLinksArray.append('')}>
               + Add Calendar Link
             </Button>
-          </CardBody>
-        </Card>
-
-        {/* Certification Files */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Certifications / Licenses</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <Controller
-              control={control}
-              name="certificationFiles"
-              render={({ field }) => (
-                <DropzoneFormInput
-                  className="py-5"
-                  text="Drop your certification files here or click to browse"
-                  showPreview
-                  onFileUpload={(files) => field.onChange(files)}
-                />
-              )}
-            />
           </CardBody>
         </Card>
 
