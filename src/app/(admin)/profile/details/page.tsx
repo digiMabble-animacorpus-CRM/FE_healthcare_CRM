@@ -2,122 +2,62 @@
 
 import PageTitle from '@/components/PageTitle';
 import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import type { PatientType } from '@/types/data';
-import { getPatientById } from '@/helpers/patient';
-import PatientDetails from './components/ProfileDetails';
+import { useParams } from 'next/navigation';
+import { getProfileById } from '@/helpers/profile';
+import ProfileDetails from './[id]/components/ProfileDetails';
+import { useRouter } from 'next/router';
+import axios from 'axios';
 
-const PatientDetailsPage = () => {
-  const { id } = useParams();
-  const router = useRouter();
-  const [data, setData] = useState<PatientType | null>(null);
-  const [loading, setLoading] = useState(true);
+interface ProfileData {
+  ID_Pro: string;
+  Nom: string;
+  Prénom: string;
+  'Nom complet': string;
+  Fonction: string;
+  'Public spécial': string;
+  Spécialisations: string;
+  'Fonction 2': string;
+  'Fonction 3': string;
+  'Fonction 4': string;
+  'Qui suis je': string;
+  Consultation: string;
+  Adresse: string;
+  'contact email': string;
+  'Contact téléphonique': string;
+  Horaire: string;
+  'À propos': string;
+  'Langues parlées': string;
+  'Moyens de paiement': string;
+  'Diplômes / mes formations': string;
+  'Site web': string;
+  'Foire aux questions': string;
+}
 
-  // Default mock data
-  const defaultWeeklyInquiry = [
-    { week: 'Week 1', inquiries: 5 },
-    { week: 'Week 2', inquiries: 8 },
-    { week: 'Week 3', inquiries: 3 },
-  ];
+const ProfileDetailsPage = () => {
+//   const { id } = useParams();
+//   const [data, setData] = useState<ProfileData | null>(null);
+//   const [loading, setLoading] = useState(true);
 
-  const defaultTransactionStats = [
-    {
-      title: 'Total Appointments',
-      count: 12,
-      progress: 75,
-      icon: 'ri:calendar-line',
-      variant: 'primary',
-    },
-    {
-      title: 'Completed Visits',
-      count: 9,
-      progress: 60,
-      icon: 'ri:check-line',
-      variant: 'success',
-    },
-    { title: 'Pending Visits', count: 3, progress: 25, icon: 'ri:time-line', variant: 'warning' },
-  ];
-
-  const defaultTransactionHistory = [
-    { date: '2025-08-01', type: 'Consultation', amount: 120, status: 'Completed' },
-    { date: '2025-08-05', type: 'Lab Test', amount: 80, status: 'Pending' },
-    { date: '2025-08-07', type: 'Prescription', amount: 50, status: 'Completed' },
-  ];
-
-  const defaultFeedbacks = [
-    {
-      name: 'John Doe',
-      userName: 'jdoe',
-      country: 'USA',
-      day: 2,
-      description: 'Very satisfied with the service.',
-      rating: 5,
-    },
-    {
-      name: 'Jane Smith',
-      userName: 'jsmith',
-      country: 'UK',
-      day: 5,
-      description: 'Helpful and attentive.',
-      rating: 4,
-    },
-  ];
-
-  const defaultFiles = [
-    { name: 'Lab Report.pdf', size: 2, icon: 'ri:file-pdf-line', variant: 'danger' },
-    { name: 'Prescription.docx', size: 1.2, icon: 'ri:file-word-line', variant: 'primary' },
-    { name: 'X-Ray.png', size: 3.5, icon: 'ri:file-image-line', variant: 'success' },
-  ];
-
-  useEffect(() => {
-    if (!id) return;
-
-    const fetchPatient = async () => {
-      setLoading(true);
-      try {
-        const patient = await getPatientById(id);
-        if (!patient) throw new Error('Failed to fetch patient');
-        setData(patient);
-      } catch (error) {
-        console.error(error);
-        alert('Failed to load patient details');
-        router.push('/patients/patient-list');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPatient();
-  }, [id, router]);
-
-  if (loading) return <p>Loading...</p>;
-  if (!data) return <p>No User found.</p>;
 
   return (
     <>
-      <PageTitle subName="Healthcare" title="" />
-      <PatientDetails
-        name={`${data.firstname} ${data.lastname}`}
-        birthdate={data.birthdate}
-        gender={data.legalgender}
-        email={data.emails}
-        phones={Array.isArray(data.phones)
-          ? (data.phones.filter(Boolean) as string[])
-          : data.phones
-            ? [data.phones]
-            : []}
-        address={data.street}
-        city={data.city}
-        country={data.country}
-        status={data.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'}
-        note={data.note}
-        weeklyInquiry={defaultWeeklyInquiry}
-        transactionStats={defaultTransactionStats}
-        transactionHistory={defaultTransactionHistory}
-        feedbacks={defaultFeedbacks}
-        files={defaultFiles} id={''}      />
+      <PageTitle subName="Profile" title="Profile" />
+      <ProfileDetails
+        // id={data.ID_Pro}
+        // name={data['Nom complet']}
+        // fonction={data.Fonction}
+        // email={data['contact email']}
+        // phone={data['Contact téléphonique']}
+        // address={data.Adresse}
+        // apropos={data['À propos']}
+        // langues={data['Langues parlées']}
+        // paiement={data['Moyens de paiement']}
+        // diplomes={data['Diplômes / mes formations']}
+        // site={data['Site web']}
+        // faq={data['Foire aux questions']}
+      />
     </>
   );
 };
 
-export default PatientDetailsPage;
+export default ProfileDetailsPage;
