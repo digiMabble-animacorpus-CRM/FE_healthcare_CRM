@@ -20,9 +20,10 @@ import {
   Modal,
   Row,
   Spinner,
+  Alert,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
-import { getAllTherapists, getTherapistById } from '@/helpers/therapist';
+import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
@@ -36,6 +37,7 @@ const TherapistsListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTherapistId, setSelectedTherapistId] = useState<string | null>(null);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const router = useRouter();
 
@@ -97,7 +99,7 @@ const TherapistsListPage = () => {
     const range = getDateRange();
     if (range) {
       data = data.filter((t) => {
-        if (!t.appointmentEnd) return false;
+        if (!t.appointmentStart) return false;
         const created = dayjs(t.appointmentStart);
         return created.isAfter(range.from) && created.isBefore(range.to);
       });
@@ -113,24 +115,30 @@ const TherapistsListPage = () => {
     return filteredTherapists.slice(start, start + PAGE_SIZE);
   }, [filteredTherapists, currentPage]);
 
-  const handleView = (id: number) => {
+  const handleView = (id: any) => {
     router.push(`/therapists/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => router.push(`/therapists/edit-therapist/${id}`);
+  const handleEditClick = (id: any) => router.push(`/therapists/edit-therapist/${id}`);
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: any) => {
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
     if (!selectedTherapistId) return;
+
     try {
-      await fetch(`/api/therapists/${selectedTherapistId}`, { method: 'DELETE' });
-      setAllTherapists(allTherapists.filter((t) => t.idPro.toString() !== selectedTherapistId));
+      const success = await deleteTherapist(selectedTherapistId);
+      if (success) {
+        setAllTherapists((prev) => prev.filter((t) => t._id !== selectedTherapistId));
+        setShowSuccessMessage(true);
+      } else {
+        console.error('Failed to delete therapist');
+      }
     } catch (err) {
-      console.error(err);
+      console.error('Delete error:', err);
     } finally {
       setShowDeleteModal(false);
       setSelectedTherapistId(null);
@@ -152,6 +160,18 @@ const TherapistsListPage = () => {
   return (
     <>
       <PageTitle subName="Therapist" title="Therapists List" />
+
+      {showSuccessMessage && (
+        <Alert
+          variant="success"
+          dismissible
+          onClose={() => setShowSuccessMessage(false)}
+          className="mb-3"
+        >
+          Therapist deleted successfully!
+        </Alert>
+      )}
+
       <Row>
         <Col xl={12}>
           <Card>
@@ -226,14 +246,14 @@ const TherapistsListPage = () => {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Branch</th>
+                        <th>Address</th>
                         <th>Job Title</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {currentData.map((item) => (
-                        <tr key={item._key}>
+                        <tr key={item._id}>
                           <td>
                             <input type="checkbox" />
                           </td>
@@ -243,8 +263,8 @@ const TherapistsListPage = () => {
                                 <img
                                   src={item.imageUrl}
                                   alt={item.firstName}
-                                  className="w-10 h-10 rounded-full object-cover"
-                                  style={{ width: "100px", height: "100px" }}
+                                  className="rounded-circle object-cover"
+                                  style={{ width: "40px", height: "40px" }}
                                 />
                               ) : (
                                 <div
@@ -254,13 +274,14 @@ const TherapistsListPage = () => {
                                     height: "40px",
                                     backgroundColor: "#e7ddff",
                                     color: "#341539",
-                                    fontSize: "28px",
+                                    fontSize: "20px", // looks balanced in 40px circle
                                     fontWeight: "bold",
                                   }}
                                 >
                                   {item.firstName?.charAt(0).toUpperCase()}
                                 </div>
                               )}
+
                             </td>
 
                           </td>
@@ -283,14 +304,14 @@ const TherapistsListPage = () => {
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => handleEditClick(item.idPro.toString())}
+                                onClick={() => handleEditClick(item._key)}
                               >
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item.idPro.toString())}
+                                onClick={() => handleDeleteClick(item._key)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>

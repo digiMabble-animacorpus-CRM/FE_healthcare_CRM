@@ -34,28 +34,10 @@ interface ProfileData {
 }
 
 const ProfileDetailsPage = () => {
-//   const { id } = useParams();
-//   const [data, setData] = useState<ProfileData | null>(null);
-//   const [loading, setLoading] = useState(true);
-
-
   return (
     <>
       <PageTitle subName="Profile" title="Profile" />
-      <ProfileDetails
-        // id={data.ID_Pro}
-        // name={data['Nom complet']}
-        // fonction={data.Fonction}
-        // email={data['contact email']}
-        // phone={data['Contact téléphonique']}
-        // address={data.Adresse}
-        // apropos={data['À propos']}
-        // langues={data['Langues parlées']}
-        // paiement={data['Moyens de paiement']}
-        // diplomes={data['Diplômes / mes formations']}
-        // site={data['Site web']}
-        // faq={data['Foire aux questions']}
-      />
+      <ProfileDetails/>
     </>
   );
 };

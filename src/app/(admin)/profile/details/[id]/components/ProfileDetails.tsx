@@ -1,17 +1,13 @@
-'use client';
+"use client";
 
-import { useEffect, useState } from 'react';
-import avatar2 from '@/assets/images/users/avatar-2.jpg';
-import profileBannerImg from '@/assets/images/properties/p-12.jpg';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { Card, CardBody, Button, Col, Row } from 'react-bootstrap';
-import dynamic from 'next/dynamic';
-import axios from 'axios';
-
-const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
+import { useEffect, useState } from "react";
+import avatar2 from "@/assets/images/users/avatar-2.jpg";
+import IconifyIcon from "@/components/wrappers/IconifyIcon";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Card, CardBody, Button, Col, Row } from "react-bootstrap";
+import axios from "axios";
 
 type ProfileDetailsProps = {
   team_id: string;
@@ -41,45 +37,6 @@ type ProfileDetailsProps = {
   photo?: string;
 };
 
-const API_BASE_PATH = process.env.NEXT_PUBLIC_API_BASE_PATH;
-
-// fallback mock data
-const MOCK_DATA: ProfileDetailsProps = {
-  team_id: "3d52f4d9-9327-4b59-92e1-810d756ba3dd",
-  last_name: "Duhainaut",
-  first_name: "Chloé",
-  full_name: "Chloé Duhainaut",
-  job_1: "Neuropsychologue",
-  who_am_i:
-    "Je m’appelle Chloé et je suis diplômée d’un master en psychologie clinique avec une spécialisation en neuropsychologie à l’UCLouvain. Je suis passionnée par le fonctionnement cognitif et sur l’influence que celui-ci a sur les différentes sphères du comportement humain.",
-  consultations:
-    "Je reçois un public varié ; enfants, adolescents, adultes et personnes âgées. Je réalise des bilans de différents types en fonction de la demande.",
-  office_address:
-    "Anima Corpus Namur, Av. Cardinal Mercier, 46, 5000 Namur, namur@animacorpus.be, 0492/40.18.77",
-  contact_email: "Chloe.duhainaut@animacorpus.be",
-  contact_phone: "0487/35.26.78.",
-  schedule: {
-    text: "Je reçois au cabinet de Namur : mardi, mercredi, vendredi",
-  },
-  about:
-    "Je reçois enfants, ados et adultes pour la réalisation de bilans QI, neuropsy (attention, mémoire, fonctions exécutives) et suivis individuels en neuropsychologie.",
-  languages_spoken: ["Français (Français)"],
-  payment_methods: ["Cash", "Paiement mobile (QR code)"],
-  diplomas_and_training: [
-    "Master en sciences psychologiques à finalité neuropsychologie à l'UCLouvain",
-  ],
-  specializations: [
-    "Neuropsychologie Partiellement conventionné, en fonction de votre mutuelle",
-  ],
-  website: "https://chloeduhainautpsy.com/",
-  frequently_asked_questions:
-    "Les nouveaux patients sont-ils acceptés ? Oui. Où travaille Chloé ? À Anima Corpus Namur.",
-  calendar_links: [
-    "https://rosa.be/fr/booking/hp/chloe-duhainaut-1/is-new-patient/?site=65abbcafe53262516dd5529c",
-  ],
-  photo: "",
-};
-
 const ProfileDetails = () => {
   const router = useRouter();
   const [profileData, setProfileData] = useState<ProfileDetailsProps | null>(null);
@@ -87,27 +44,59 @@ const ProfileDetails = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const userString = localStorage.getItem("user");
-        if (!userString) {
-          console.warn("No user found in localStorage");
-          setProfileData(MOCK_DATA); // fallback if no user
+        const token = localStorage.getItem("access_token");
+        if (!token) {
+          console.warn("No access token found");
           return;
         }
 
-        const user = JSON.parse(userString);
-        const teamId = user?.team_id;
-        if (!teamId) {
-          console.warn("No team_id inside user object");
-          setProfileData(MOCK_DATA);
+        const res = await axios.get("http://localhost:8080/api/v1/profile", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        });
+
+        // console.log("Fetched profile data:", res.data);
+
+        // Extract nested team object
+        const apiProfile = res.data?.user?.team;
+        if (!apiProfile) {
+          console.error("No team object in API response");
           return;
         }
 
-        // try API
-        const res = await axios.get(`${API_BASE_PATH}/team-members/${teamId}`);
-        setProfileData(res.data);
+        const normalized: ProfileDetailsProps = {
+          team_id: apiProfile.team_id,
+          last_name: apiProfile.last_name,
+          first_name: apiProfile.first_name,
+          full_name: apiProfile.full_name,
+          job_1: apiProfile.job_1,
+          job_2: apiProfile.job_2,
+          job_3: apiProfile.job_3,
+          job_4: apiProfile.job_4,
+          specific_audience: apiProfile.specific_audience,
+          specialization_1: apiProfile.specialization_1,
+          who_am_i: apiProfile.who_am_i,
+          consultations: apiProfile.consultations,
+          office_address: apiProfile.office_address,
+          contact_email: apiProfile.contact_email,
+          contact_phone: apiProfile.contact_phone,
+          schedule: apiProfile.schedule,
+          about: apiProfile.about,
+          languages_spoken: apiProfile.languages_spoken || [],
+          payment_methods: apiProfile.payment_methods || [],
+          diplomas_and_training: apiProfile.diplomas_and_training || [],
+          specializations: apiProfile.specializations || [],
+          website: apiProfile.website,
+          frequently_asked_questions: apiProfile.frequently_asked_questions,
+          calendar_links: apiProfile.calendar_links || [],
+          photo: apiProfile.photo || "",
+        };
+
+        setProfileData(normalized);
       } catch (err) {
-        console.error("Error fetching profile, using mock data:", err);
-        setProfileData(MOCK_DATA);
+        console.error("Error fetching profile:", err);
       }
     };
 
@@ -119,30 +108,21 @@ const ProfileDetails = () => {
   }
 
   const {
-    team_id,
-    last_name,
-    first_name,
     full_name,
     job_1,
-    job_2,
-    job_3,
-    job_4,
-    specific_audience,
-    specialization_1,
-    who_am_i,
-    consultations,
-    office_address,
     contact_email,
     contact_phone,
-    schedule,
+    office_address,
+    consultations,
     about,
     languages_spoken = [],
     payment_methods = [],
     diplomas_and_training = [],
     specializations = [],
+    who_am_i,
     website,
     frequently_asked_questions,
-    calendar_links = [],
+    schedule,
     photo,
   } = profileData;
 
@@ -150,20 +130,10 @@ const ProfileDetails = () => {
     <div>
       {/* Back Button */}
       <div className="d-flex justify-content-between mb-3 gap-2 flex-wrap">
-        <Button
-          variant="outline-secondary"
-          onClick={() => router.push("/dashboards/agent")}
-        >
+        <Button variant="outline-secondary" onClick={() => router.push("/dashboards/agent")}>
           <IconifyIcon icon="ri:arrow-left-line" /> Back
         </Button>
       </div>
-
-      {/* Banner */}
-      <Card className="mb-4">
-        <CardBody className="p-0">
-          <Image src={profileBannerImg} alt="banner" className="img-fluid rounded-top" />
-        </CardBody>
-      </Card>
 
       {/* Profile Header */}
       <Card className="mb-4">
@@ -179,7 +149,6 @@ const ProfileDetails = () => {
             <div>
               <h3 className="fw-semibold mb-1">{full_name}</h3>
               <p className="link-primary fw-medium fs-14">{job_1}</p>
-              <p className="mb-0 text-muted">Team ID: {team_id}</p>
             </div>
           </div>
 
