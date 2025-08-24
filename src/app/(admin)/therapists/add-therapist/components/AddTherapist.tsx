@@ -91,11 +91,10 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
     .optional(),
   spoken_languages: yup.array().of(yup.string()).optional(),
   degrees_and_training: yup
-    .array()
-    .of(yup.string().optional())
-    .transform((value, originalValue) => {
-      if (originalValue === "" || originalValue === null) return [];
-      return value;
+    .mixed<string | string[]>()
+    .transform((value) => {
+      if (Array.isArray(value)) return value.join(", ");
+      return value || "";
     })
     .optional(),
   specializations: yup

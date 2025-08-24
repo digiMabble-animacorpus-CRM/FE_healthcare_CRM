@@ -181,6 +181,29 @@ export const updateTherapist = async (
   }
 };
 
+
+export const transformToBackendDto = (formData: any): TherapistUpdatePayload => {
+  return {
+    name: formData.name,
+    email: formData.email,
+    phoneNumber: formData.phoneNumber,
+    roleId: formData.roleId ? Number(formData.roleId) : undefined,
+    accessLevel: formData.accessLevelId,
+    branches: formData.branches.map((b: { id: any }) => Number(b.id)).filter(Boolean),
+    selectedBranch: formData.selectedBranch ? Number(formData.selectedBranch) : null,
+    permissions: formData.permissions.map((p: { _id: string; enabled: any }) => ({
+      action: p._id.split('-')[0],
+      resource: p._id.split('-')[1],
+      enabled: !!p.enabled,
+    })),
+    updatedBy: [
+      {
+        therapistId: String(localStorage.getItem('therapist_id') || ''),
+        updatedAt: new Date().toISOString(),
+      },
+    ],
+  };
+};
 export const deleteTherapist = async (id: string | number): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -206,29 +229,6 @@ export const deleteTherapist = async (id: string | number): Promise<boolean> => 
     console.error('Error deleting therapist:', error);
     return false;
   }
-};
-
-export const transformToBackendDto = (formData: any): TherapistUpdatePayload => {
-  return {
-    name: formData.name,
-    email: formData.email,
-    phoneNumber: formData.phoneNumber,
-    roleId: formData.roleId ? Number(formData.roleId) : undefined,
-    accessLevel: formData.accessLevelId,
-    branches: formData.branches.map((b: { id: any }) => Number(b.id)).filter(Boolean),
-    selectedBranch: formData.selectedBranch ? Number(formData.selectedBranch) : null,
-    permissions: formData.permissions.map((p: { _id: string; enabled: any }) => ({
-      action: p._id.split('-')[0],
-      resource: p._id.split('-')[1],
-      enabled: !!p.enabled,
-    })),
-    updatedBy: [
-      {
-        therapistId: String(localStorage.getItem('therapist_id') || ''),
-        updatedAt: new Date().toISOString(),
-      },
-    ],
-  };
 };
 
 export const getAllRoles = async (): Promise<any[]> => {
