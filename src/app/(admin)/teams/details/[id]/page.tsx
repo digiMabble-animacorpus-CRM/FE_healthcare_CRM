@@ -4,152 +4,66 @@ import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import TherapistDetails from './components/TeamDetails';
 import { getTherapistById } from '@/helpers/therapist';
-import type { TherapistType } from '@/types/data';
+import type { TeamMemberType, TherapistType } from '@/types/data';
+import { getTeamMemberById } from '@/helpers/team-members';
+import TeamDetails from './components/TeamDetails';
+import { paymentsresellersubscription } from 'googleapis/build/src/apis/paymentsresellersubscription';
 
 const TeamDetailsPage = () => {
   const { id } = useParams();
   const router = useRouter();
-  const [data, setData] = useState<TherapistType | null>(null);
+  const [data, setData] = useState<TeamMemberType | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Default mock data
-  const defaultWeeklySessions = [
-    { week: 'Week 1', sessions: 5 },
-    { week: 'Week 2', sessions: 3 },
-    { week: 'Week 3', sessions: 8 },
-  ];
-
-  const defaultStats = [
-    {
-      title: 'Total Appointments',
-      count: 12,
-      progress: 75,
-      icon: 'ri:calendar-line',
-      variant: 'primary',
-    },
-    {
-      title: 'Completed Visits',
-      count: 9,
-      progress: 60,
-      icon: 'ri:check-line',
-      variant: 'success',
-    },
-    { title: 'Pending Visits', count: 3, progress: 25, icon: 'ri:time-line', variant: 'warning' },
-  ];
-
-  const defaultFeedbacks = [
-    {
-      name: 'John Doe',
-      userName: 'jdoe',
-      country: 'USA',
-      day: 2,
-      description: 'Very satisfied.',
-      rating: 5,
-    },
-    {
-      name: 'Jane Smith',
-      userName: 'jsmith',
-      country: 'UK',
-      day: 5,
-      description: 'Helpful.',
-      rating: 4,
-    },
-  ];
-
-  const defaultFiles = [
-    { name: 'Report.pdf', size: 2, icon: 'ri:file-pdf-line', variant: 'danger' },
-    { name: 'Prescription.docx', size: 1.2, icon: 'ri:file-word-line', variant: 'primary' },
-  ];
-
-  const defaultTransactions = [
-    { date: '2025-08-01', type: 'Consultation', amount: 120, status: 'Completed' },
-    { date: '2025-08-03', type: 'Follow-up', amount: 80, status: 'Pending' },
-    { date: '2025-08-05', type: 'Therapy Session', amount: 150, status: 'Completed' },
-  ];
 
   useEffect(() => {
     if (!id) return;
 
-    const fetchTherapist = async () => {
+    const fetchTeamMembers = async () => {
       setLoading(true);
       try {
-        const therapist = await getTherapistById(id);
-        if (!therapist) throw new Error('Failed to fetch therapist');
-        setData(therapist);
+        const teams = await getTeamMemberById(id);
+        if (!teams) throw new Error('Failed to fetch teams');
+        setData(teams);
       } catch (error) {
         console.error(error);
-        alert('Failed to load therapist details');
-        router.push('/therapists');
+        alert('Failed to load teams details');
+        router.push('/teams');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchTherapist();
+    fetchTeamMembers();
   }, [id, router]);
 
   if (loading) return <p>Loading...</p>;
-  if (!data) return <p>No therapist found.</p>;
+  if (!data) return <p>No teams found.</p>;
 
   return (
-    <TherapistDetails
-      name={data.fullName}
-      jobTitle={data.jobTitle}
-      email={data.contactEmail}
-      phone={data.contactPhone}
-      cabinets={[
-        {
-          address: '15 Place de l’Orneau, Gembloux',
-          email: 'contact@animacorpus.be',
-          phone: '+32492401877',
-          hours: {
-            Monday: '08:00-20:30',
-            Tuesday: '08:00-20:30',
-            Wednesday: '08:00-20:30',
-            Thursday: '08:00-20:30',
-            Friday: '08:00-20:30',
-            Saturday: '08:00-20:30',
-            Sunday: 'Closed',
-          },
-          isPrimary: true,
-        },
-        {
-          address: '273 Grand route, Lillois',
-          hours: {
-            Monday: '09:00-18:00',
-            Tuesday: '09:00-18:00',
-            Wednesday: '09:00-18:00',
-            Thursday: '09:00-18:00',
-            Friday: '09:00-18:00',
-            Saturday: 'Closed',
-            Sunday: 'Closed',
-          },
-        },
-        {
-          address: '62 Rue Gustave Fiévet, Sombreffe',
-          hours: {
-            Monday: '10:00-16:00',
-            Tuesday: '10:00-16:00',
-            Wednesday: '10:00-16:00',
-            Thursday: '10:00-16:00',
-            Friday: '10:00-16:00',
-            Saturday: 'Closed',
-            Sunday: 'Closed',
-          },
-        },
-      ]}
-      about={data.aboutMe}
-      languages={data.spokenLanguages?.split(',') || []}
+    <TeamDetails
+      first_name={data.first_name}
+      last_name={data.last_name}
+      full_name={data.full_name}
+      job_1={data.job_1}
+      job_2={data.job_2}
+      job_3={data.job_3}
+      job_4={data.job_4}
+      specific_audience={data.specific_audience}
+      specializations={data.specializations}
+      who_am_i={data.who_am_i}
+      consultations={data.consultations}
+      office_address={data.office_address}
+      contact_email={data.contact_email}
+      contact_phone={data.contact_phone}
+      schedule={data.schedule}
+      about={data.about}
+      languages_spoken={data.languages_spoken}
+      payment_methods={data.payment_methods}
+      diplomas_and_training={data.diplomas_and_training}
       website={data.website}
-      education={data.degreesAndTraining?.split('\n') || []}
-      specializations={data.specializations?.split('\n') || []}
-      weeklySessions={defaultWeeklySessions}
-      stats={defaultStats}
-      transactions={defaultTransactions} // mock transactions if needed
-      feedbacks={defaultFeedbacks}
-      files={defaultFiles}
+      frequently_asked_questions={data.frequently_asked_questions}
+      calendar_links={data.calendar_links}
       photo={data.photo}
-      agendaLink={data.agendaLinks || undefined}
     />
   );
 };

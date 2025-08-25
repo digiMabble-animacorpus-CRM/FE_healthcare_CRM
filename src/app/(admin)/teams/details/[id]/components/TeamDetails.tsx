@@ -8,6 +8,15 @@ import { ApexOptions } from 'apexcharts';
 import ReactApexChart from 'react-apexcharts';
 import { FaClock, FaMapMarkerAlt, FaEnvelope, FaPhone } from 'react-icons/fa';
 
+type FAQItem = { question: string; answer: string };
+type CabinetType = {
+  address: string;
+  email?: string;
+  phone?: string;
+  hours?: Record<string, string>;
+  isPrimary?: boolean;
+};
+type FileType = { name: string; size: number; icon: string; variant: string };
 type WeeklySessionType = { week: string; sessions: number };
 type StatType = { title: string; count: number; progress: number; icon: string; variant: string };
 type TransactionType = { date: string; type: string; amount: number; status: string };
@@ -20,58 +29,71 @@ type FeedbackType = {
   rating: number;
   image?: string;
 };
-type FileType = { name: string; size: number; icon: string; variant: string };
-type CabinetType = {
-  address: string;
-  email?: string;
-  phone?: string;
-  hours?: Record<string, string>;
-  isPrimary?: boolean;
-};
 
 type TeamDetailsCardProps = {
-  name: string;
-  jobTitle?: string;
-  email?: string;
-  phone?: string;
+  team_id?: string;
+  first_name: string;
+  last_name: string;
+  full_name: string;
+  job_1?: string | null;
+  job_2?: string | null;
+  job_3?: string | null;
+  job_4?: string | null;
+  specific_audience?: string | null;
+  specialization?: string | null;
+  who_am_i: string;
+  consultations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: { text: string | null };
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
+  website: string;
+  frequently_asked_questions: FAQItem[];
+  calendar_links: string[];
+  photo: string;  
   cabinets?: CabinetType[];
-  about?: string;
-  languages?: string[];
-  paymentMethods?: string[];
-  website?: string;
-  education?: string[];
-  specializations?: string[];
   weeklySessions?: WeeklySessionType[];
   stats?: StatType[];
   transactions?: TransactionType[];
   feedbacks?: FeedbackType[];
   files?: FileType[];
-  photo?: string;
   agendaLink?: string | null;
 };
 
 const TeamDetails = ({
-  name,
-  jobTitle,
-  email,
-  phone,
-  cabinets = [],
+  first_name,
+  last_name,
+  full_name,
+  job_1,
+  job_2,
+  job_3,
+  job_4,
+  specific_audience,
+  who_am_i,
+  consultations,
+  office_address,
+  contact_email,
+  contact_phone,
+  schedule,
   about,
-  languages = [],
-  paymentMethods = [],
+  languages_spoken,
+  payment_methods,
+  diplomas_and_training,
+  specializations,
   website,
-  education = [],
-  specializations = [],
-  weeklySessions = [],
-  stats = [],
-  transactions = [],
-  feedbacks = [],
-  files = [],
+  frequently_asked_questions,
+  calendar_links,
   photo,
-  agendaLink = null,
 }: TeamDetailsCardProps) => {
   const [aboutOpen, setAboutOpen] = useState(true);
-  const [cabinetsOpen, setCabinetsOpen] = useState(true);
+  const [setWhoIAmOpen,WhoIAmOpen] = useState(true);
+  const [consultationOpen, setAConsultationOpen] = useState(true);
+  const [specificAudienceOpen, setSpecificAudienceOpen] = useState(true);
 
   const photoUrl = photo?.match(/^https?:\/\//) ? photo : '/placeholder-avatar.jpg';
 
@@ -81,6 +103,7 @@ const TeamDetails = ({
     colors: ['#0d6efd'],
   };
 
+
   return (
     <div>
       {/* Top Buttons */}
@@ -88,11 +111,6 @@ const TeamDetails = ({
         <Button variant="secondary" onClick={() => window.history.back()}>
           <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back
         </Button>
-        {agendaLink && (
-          <Button variant="primary" onClick={() => window.open(agendaLink, '_blank')}>
-            Book Appointment
-          </Button>
-        )}
       </div>
 
       {/* Profile / Avatar */}
@@ -111,23 +129,23 @@ const TeamDetails = ({
                   fontWeight: 'bold',
                 }}
               >
-                {name ? name[0].toUpperCase() : 'T'}
+                {full_name ? full_name[0].toUpperCase() : 'T'}
               </div>
             </Col>
             <Col lg={8}>
               <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
-                {name}
+                {full_name}
               </h2>
-              <p className="text-muted mb-2">{jobTitle || '-'}</p>
+              <p className="text-muted mb-2">{job_1 || '-'}</p>
               <div className="d-flex flex-column gap-2">
-                {email && (
+                {contact_email && (
                   <div className="d-flex align-items-center gap-2">
-                    <FaEnvelope className="text-primary" /> <span>{email}</span>
+                    <FaEnvelope className="text-primary" /> <span>{contact_email}</span>
                   </div>
                 )}
-                {phone && (
+                {contact_phone && (
                   <div className="d-flex align-items-center gap-2">
-                    <FaPhone className="text-success" /> <span>{phone}</span>
+                    <FaPhone className="text-success" /> <span>{contact_phone}</span>
                   </div>
                 )}
                 {website && (
@@ -149,74 +167,6 @@ const TeamDetails = ({
         </CardBody>
       </Card>
 
-      {/* Branches / Localisation */}
-      {cabinets.length > 0 && (
-        <Card className="mb-4">
-          <CardBody>
-            <div className="d-flex justify-content-between mb-2">
-              <h4>Localisation & Branches</h4>
-              <Button variant="link" size="sm" onClick={() => setCabinetsOpen(!cabinetsOpen)}>
-                {cabinetsOpen ? 'Hide' : 'Show'}
-              </Button>
-            </div>
-            <Collapse in={cabinetsOpen}>
-              <div className="d-flex gap-3 overflow-auto py-2">
-                {cabinets.map((cab, idx) => (
-                  <Card
-                    key={idx}
-                    className="p-3 flex-shrink-0 shadow-sm"
-                    style={{
-                      minWidth: '260px',
-                      border: cab.isPrimary ? '2px solid #0d6efd' : '1px solid #dee2e6',
-                    }}
-                  >
-                    <div className="d-flex align-items-center gap-2 mb-2">
-                      {cab.isPrimary && <Badge bg="primary">Primary</Badge>}
-                      <FaMapMarkerAlt className="text-danger" />
-                      <strong>{cab.address}</strong>
-                    </div>
-                    {cab.email && (
-                      <div className="d-flex align-items-center gap-2 mb-1">
-                        <FaEnvelope className="text-secondary" /> {cab.email}
-                      </div>
-                    )}
-                    {cab.phone && (
-                      <div className="d-flex align-items-center gap-2 mb-2">
-                        <FaPhone className="text-secondary" /> {cab.phone}
-                      </div>
-                    )}
-
-                    <p className="fw-semibold mb-1">Weekly Hours:</p>
-                    <div className="d-flex flex-column gap-1">
-                      {cab.hours
-                        ? Object.entries(cab.hours).map(([day, h]) => (
-                            <div
-                              key={day}
-                              className={`d-flex align-items-center gap-2 p-1 rounded ${
-                                h.toLowerCase() === 'closed'
-                                  ? 'bg-light text-muted'
-                                  : 'bg-primary bg-opacity-10'
-                              }`}
-                            >
-                              <FaClock
-                                className={
-                                  h.toLowerCase() === 'closed' ? 'text-muted' : 'text-primary'
-                                }
-                              />
-                              <strong style={{ width: '80px' }}>{day}:</strong>
-                              <span>{h}</span>
-                            </div>
-                          ))
-                        : 'No hours provided'}
-                    </div>
-                  </Card>
-                ))}
-              </div>
-            </Collapse>
-          </CardBody>
-        </Card>
-      )}
-
       {/* About */}
       <Card className="mb-4">
         <CardBody>
@@ -234,60 +184,13 @@ const TeamDetails = ({
         </CardBody>
       </Card>
 
-      {/* Weekly Sessions & Stats */}
-      <Card className="mb-4">
-        <CardBody>
-          <h4>Weekly Sessions & Stats</h4>
-          <Row className="g-3">
-            {weeklySessions.map((w, idx) => (
-              <Col lg={4} key={idx}>
-                <Card className="border p-3">
-                  <p className="fw-medium fs-15 mb-1">{w.week}</p>
-                  <p className="fw-semibold fs-20 mb-0">{w.sessions} sessions</p>
-                </Card>
-              </Col>
-            ))}
-            {stats.map((t, idx) => {
-              const options = {
-                series: [t.progress],
-                chart: { type: 'radialBar', height: 90, sparkline: { enabled: true } },
-                plotOptions: {
-                  radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } },
-                },
-                colors: [t.variant],
-              };
-              return (
-                <Col lg={4} key={idx}>
-                  <Card className="border p-3">
-                    <div className="d-flex align-items-center gap-3">
-                      <div className={`avatar bg-${t.variant} bg-opacity-10 rounded flex-centered`}>
-                        <IconifyIcon
-                          icon={t.icon}
-                          width={28}
-                          height={28}
-                          className={`fs-28 text-${t.variant}`}
-                        />
-                      </div>
-                      <div>
-                        <p className="fw-medium fs-15 mb-1">{t.title}</p>
-                        <p className="fw-semibold fs-20 mb-0">{t.count}</p>
-                      </div>
-                    </div>
-                  </Card>
-                </Col>
-              );
-            })}
-          </Row>
-        </CardBody>
-      </Card>
-
       {/* Education & Training */}
-      {education.length > 0 && (
+      {diplomas_and_training.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Education & Training</h4>
             <div className="d-flex flex-wrap gap-2">
-              {education.map((edu, i) => (
+              {diplomas_and_training.map((edu, i) => (
                 <Badge
                   key={i}
                   bg="info"
@@ -319,140 +222,98 @@ const TeamDetails = ({
         </Card>
       )}
 
-      {/* Transactions Section */}
-      {transactions.length > 0 && (
+      {/* Payment Methods */}
+      {payment_methods.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
+            <h4>Payment Methods</h4>
+            <div className="d-flex flex-wrap gap-2">
+              {payment_methods.map((spec, i) => (
+                <Badge key={i} bg="primary" className="fs-12">
+                  {spec}
+                </Badge>
+              ))}
+            </div>
+          </CardBody>
+        </Card>
+      )}
+
+      {/* Consultations */}
+      <Card className="mb-4">
+        <CardBody>
+          <div className="d-flex justify-content-between mb-2">
+            <h4>Consultation</h4>
+            <Button variant="link" size="sm" onClick={() => setAConsultationOpen(!consultationOpen)}>
+              {consultationOpen ? 'Hide' : 'Show'}
+            </Button>
+          </div>
+          <Collapse in={consultationOpen}>
+            <div>
+              <p>{consultations || '-'}</p>
+            </div>
+          </Collapse>
+        </CardBody>
+      </Card>
+
+      {/* Specific Audience */}
+      <Card className="mb-4">
+        <CardBody>
+          <div className="d-flex justify-content-between mb-2">
+            <h4>Specific Audience</h4>
+            <Button variant="link" size="sm" onClick={() => setSpecificAudienceOpen(!specificAudienceOpen)}>
+              {specificAudienceOpen ? 'Hide' : 'Show'}
+            </Button>
+          </div>
+          <Collapse in={specificAudienceOpen}>
+            <div>
+              <p>{specific_audience || '-'}</p>
+            </div>
+          </Collapse>
+        </CardBody>
+      </Card>
+
+      {/* Who I Am */}
+      <Card className="mb-4">
+        <CardBody>
+          <div className="d-flex justify-content-between mb-2">
+            <h4>Who I Am</h4>          
+          </div>
+            <div>
+              <p>{who_am_i || '-'}</p>
+            </div>
+        </CardBody>
+      </Card>
+
+      {/* Calendar Links */}
+      <Card className="mb-4">
+        <CardBody>
+          <div className="d-flex justify-content-between mb-2">
+            <h4>Calendar Links</h4>          
+          </div>
+            <div>
+              <p>{calendar_links || '-'}</p>
+            </div>
+        </CardBody>
+      </Card>
+
+      {/* FAQ */}
+      {frequently_asked_questions.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Transactions</h4>
             <Table responsive striped hover>
               <thead>
                 <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Status</th>
+                  <th>Question</th>
+                  <th>Answer</th>                  
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((tr, idx) => (
+                {frequently_asked_questions.map((tr, idx) => (
                   <tr key={idx}>
-                    <td>{tr.date}</td>
-                    <td>{tr.type}</td>
-                    <td>${tr.amount.toFixed(2)}</td>
-                    <td>
-                      <Badge bg={tr.status === 'Completed' ? 'success' : 'warning'}>
-                        {tr.status}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Files / Documents */}
-      {files.length > 0 && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>Files / Documents</h4>
-            <Row className="g-2">
-              {files.map((file, idx) => (
-                <Col lg={3} key={idx}>
-                  <Card className="p-2 d-flex align-items-center gap-2">
-                    <IconifyIcon icon={file.icon} className={`text-${file.variant} fs-24`} />
-                    <div>
-                      <p className="mb-1">{file.name}</p>
-                      <p className="mb-0 fs-12">{file.size} MB</p>
-                    </div>
-                    <IconifyIcon icon="ri:download-cloud-line" className="fs-20 text-muted" />
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Feedback / Reviews */}
-      {feedbacks.length > 0 && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>Reviews / Feedback</h4>
-            <Row>
-              {feedbacks.map((f, idx) => (
-                <Col lg={6} key={idx}>
-                  <Card className="bg-light-subtle mb-3">
-                    <CardBody>
-                      {f.image && (
-                        <Image
-                          src={f.image}
-                          alt="avatar"
-                          className="rounded-circle avatar-md mb-2"
-                          width={40}
-                          height={40}
-                        />
-                      )}
-                      <h5>{f.name}</h5>
-                      <p>
-                        @{f.userName} ({f.country})
-                      </p>
-                      <p>{f.description}</p>
-                      <p className="text-warning">
-                        {Array.from({ length: 5 }).map((_, i) => (
-                          <IconifyIcon
-                            key={i}
-                            icon={i < f.rating ? 'ri:star-fill' : 'ri:star-line'}
-                          />
-                        ))}
-                      </p>
-                      <p className="text-muted">{f.day} days ago</p>
-                    </CardBody>
-                  </Card>
-                </Col>
-              ))}
-            </Row>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Transaction / Appointment History */}
-      {transactions.length > 0 && (
-        <Card className="mb-4 shadow-sm">
-          <CardBody>
-            <h4 className="mb-3" style={{ color: '#0d6efd' }}>
-              Transactions / Appointments
-            </h4>
-            <Table responsive striped hover className="mb-0">
-              <thead className="table-primary">
-                <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((tr, idx) => (
-                  <tr key={idx}>
-                    <td>{tr.date}</td>
-                    <td>{tr.type}</td>
-                    <td>${tr.amount.toFixed(2)}</td>
-                    <td>
-                      <Badge
-                        bg={
-                          tr.status === 'Completed'
-                            ? 'success'
-                            : tr.status === 'Pending'
-                              ? 'warning'
-                              : 'secondary'
-                        }
-                        className="py-1 px-2"
-                      >
-                        {tr.status}
-                      </Badge>
-                    </td>
+                    <td>{tr.question}</td>
+                    <td>{tr.answer}</td>                 
+                    
                   </tr>
                 ))}
               </tbody>
