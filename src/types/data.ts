@@ -1,5 +1,6 @@
 import { StaticImageData } from 'next/image';
 import { BootstrapVariantType } from './component-props';
+import { file } from 'googleapis/build/src/apis/file';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -627,6 +628,16 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
+  about: string;
+  payment_methods: never[];
+  diplomas_and_training: any;
+  specializations: any;
+  website: string;
+  frequently_asked_questions: any;
+  calendar_links: any;
+  photo: string;
+  tags: never[];
+  languages_spoken: never[];
   team_id: string;
   last_name: string;
   first_name: string;
@@ -643,45 +654,36 @@ export type TeamMemberType = {
   contact_email: string;
   contact_phone: string;
   schedule: {
-    text: string;
-  };
-  about: string;
-  languages_spoken: string[];
-  payment_methods: string[];
-  diplomas_and_training: string[];
-  specializations: string[];
-  website: string;
-  frequently_asked_questions: string;
-  calendar_links: string[];
-  photo: string;
+  text: string | null;
 };
+}
 
 export type TeamMemberCreatePayload = {
   team_id: string;
   last_name: string;
   first_name: string;
   full_name: string;
-  job_1: string;
-  specific_audience: string;
-  specialization_1: string;
-  job_2: string;
-  job_3: string;
-  job_4: string;
+  job_1: string | null;
+  specific_audience: string | null;
+  specialization_1: string | null;
+  job_2: string | null;
+  job_3: string | null;
+  job_4: string | null;
   who_am_i: string;
   consultations: string;
   office_address: string;
   contact_email: string;
   contact_phone: string;
   schedule: {
-    text: string;
+    text: string | null;
   };
-  about: string;
+  about: string | null;
   languages_spoken: string[];
   payment_methods: string[];
   diplomas_and_training: string[];
   specializations: string[];
   website: string;
-  frequently_asked_questions: string;
+  frequently_asked_questions: string | null;
   calendar_links: string[];
   photo: string;
   branches?: (string | number)[];

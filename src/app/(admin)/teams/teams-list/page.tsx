@@ -35,8 +35,12 @@ const TeamsListPage = () => {
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+<<<<<<< HEAD
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+=======
+  const [selectedTherapistId, setSelectedTeamMemberId] = useState<string | null>(null);
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
 
   const router = useRouter();
 
@@ -117,7 +121,11 @@ const TeamsListPage = () => {
   const handleEditClick = (id: string) => router.push(`/teams/edit-team/${id}`);
 
   const handleDeleteClick = (id: string) => {
+<<<<<<< HEAD
     setSelectedTeamId(id);
+=======
+    setSelectedTeamMemberId(id);
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
     setShowDeleteModal(true);
   };
 
@@ -132,7 +140,11 @@ const TeamsListPage = () => {
       console.error(err);
     } finally {
       setShowDeleteModal(false);
+<<<<<<< HEAD
       setSelectedTeamId(null);
+=======
+      setSelectedTeamMemberId(null);
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
     }
   };
 
