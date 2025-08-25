@@ -1,16 +1,40 @@
 'use client';
+<<<<<<< HEAD
+=======
 
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
 import { useEffect, useState } from 'react';
 import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner, Form } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
-
 import TextFormInput from '@/components/from/TextFormInput';
 import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
 import DropzoneFormInput from '@/components/from/DropzoneFormInput';
+<<<<<<< HEAD
+import { getTherapistById } from '@/helpers/therapist';
+
+const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+type AvailabilitySlot = {
+  day: string;
+  from: string;
+  to: string;
+};
+
+type TherapistFormValues = {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo?: string;
+  jobTitle: string;
+  targetAudience?: string | null;
+  specialization1?: string | null;
+  specialization2?: string | null;
+  aboutMe: string;
+=======
 import { createTeamMember, getTeamMemberById, TeamMemberUpdatePayload, transformToBackendDto, updateTeamMember } from '@/helpers/team-members';
 import { TeamMemberCreatePayload } from '@/types/data';
 
@@ -26,6 +50,7 @@ type TeamsFormValues = {
   specific_audience?: string | null;
   specialization_1?: string | null;
   who_am_i: string;
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
   consultations: string;
   office_address: string;
   contact_email: string;
@@ -37,6 +62,59 @@ type TeamsFormValues = {
   diplomas_and_training: string[];
   specializations: string[];
   website: string;
+<<<<<<< HEAD
+  faq: string;
+  agendaLinks?: string | null;
+  rosaLink?: string | null;
+  googleAgendaLink?: string | null;
+  appointmentStart?: string | null;
+  appointmentEnd?: string | null;
+  appointmentAlert?: string | null;
+  availability?: AvailabilitySlot[];
+  tags?: string[];
+  certificationFiles: File[];
+};
+
+const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
+  firstName: yup.string().required('First name required'),
+  lastName: yup.string().required('Last name required'),
+  fullName: yup.string().required('Full name required'),
+  photo: yup.string().optional(),
+  jobTitle: yup.string().required('Job title required'),
+  targetAudience: yup.string().nullable().optional(),
+  specialization1: yup.string().nullable().optional(),
+  specialization2: yup.string().nullable().optional(),
+  aboutMe: yup.string().required('About me required'),
+  consultations: yup.string().required('Consultations required'),
+  centerAddress: yup.string().required('Center address required'),
+  centerEmail: yup.string().email('Invalid email').required('Center email required'),
+  centerPhoneNumber: yup.string().required('Center phone required'),
+  contactEmail: yup.string().email('Invalid email').required('Contact email required'),
+  contactPhone: yup.string().required('Contact phone required'),
+  schedule: yup.string().required('Schedule required'),
+  about: yup.string().nullable().optional(),
+  spokenLanguages: yup.string().required('Spoken languages required'),
+  paymentMethods: yup.string().optional(),
+  degreesAndTraining: yup.string().required('Degrees & training required'),
+  specializations: yup.string().required('Specializations required'),
+  website: yup.string().required('Website required'),
+  faq: yup.string().required('FAQ required'),
+  agendaLinks: yup.string().nullable().optional(),
+  rosaLink: yup.string().nullable().optional(),
+  googleAgendaLink: yup.string().nullable().optional(),
+  appointmentStart: yup.string().nullable().optional(),
+  appointmentEnd: yup.string().nullable().optional(),
+  appointmentAlert: yup.string().nullable().optional(),
+  availability: yup.array().of(
+    yup.object({
+      day: yup.string().required('Day is required'),
+      from: yup.string().required('Start time is required'),
+      to: yup.string().required('End time is required'),
+    }),
+  ),
+  tags: yup.array().of(yup.string().required()).min(1, 'Select at least one tag').required(),
+  certificationFiles: yup.array().of(yup.mixed<File>().required()).min(1, 'Upload at least one file').required(),
+=======
   frequently_asked_questions: { question: string; answer: string }[];
   calendar_links: string[];
   photo: string;
@@ -82,6 +160,7 @@ const schema: yup.ObjectSchema<TeamsFormValues> = yup.object({
   calendar_links: yup.array().of(yup.string().url()).optional(),
   photo: yup.string().optional(),
   tags: yup.array().of(yup.string()).optional(),
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
 });
 
 interface Props {
@@ -124,6 +203,11 @@ const AddTeam = ({ params }: Props) => {
     },
   });
 
+  const { control, handleSubmit, reset } = methods;
+  const { fields: availabilityFields, append, remove } = useFieldArray({
+    control,
+    name: 'availability',
+  });
   const { control, handleSubmit, reset, watch, formState } = methods;
   const { errors } = formState;
 
@@ -133,9 +217,53 @@ const AddTeam = ({ params }: Props) => {
   const calendarLinksArray = useFieldArray({ control, name: 'calendar_links' });
   const frequently_asked_questionsArray = useFieldArray({ control, name: 'frequently_asked_questions' });
 
+ // Fetch Team for edit mode
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
+      getTherapistById(params.id)
+        .then((data) => {
+          if (data) {
+            reset({
+              firstName: data.firstName || '',
+              lastName: data.lastName || '',
+              fullName: data.fullName || '',
+              photo: data.photo || '',
+              jobTitle: data.jobTitle || '',
+              targetAudience: data.targetAudience || '',
+              specialization1: data.specialization1 || '',
+              specialization2: data.specialization2 || '',
+              aboutMe: data.aboutMe || '',
+              consultations: data.consultations || '',
+              centerAddress: data.centerAddress || '',
+              centerEmail: data.centerEmail || data.contactEmail || '',
+              centerPhoneNumber: data.centerPhoneNumber || '',
+              contactEmail: data.contactEmail || '',
+              contactPhone: data.contactPhone || '',
+              schedule: typeof data.schedule === 'object'
+                ? Object.entries(data.schedule).map(([day, hours]) => `${day.charAt(0).toUpperCase() + day.slice(1)}: ${hours}`).join(', ')
+                : '',
+              about: data.about || '',
+              spokenLanguages: Array.isArray(data.languages_spoken)
+                ? data.languages_spoken.join(', ')
+                : typeof data.languages_spoken === 'function'
+                  ? ''
+                  : (typeof data.languages_spoken === 'string' ? data.languages_spoken : ''),
+              paymentMethods: Array.isArray(data.paymentMethods) ? data.paymentMethods.join(', ') : '',
+              degreesAndTraining: Array.isArray(data.degreesAndTraining) ? data.degreesAndTraining.join(', ') : '',
+              specializations: Array.isArray(data.specializations) ? data.specializations.join(', ') : '',
+              website: data.website || '',
+              faq: data.frequently_asked_questions ? JSON.stringify(data.frequently_asked_questions, null, 2) : '',
+              agendaLinks: Array.isArray(data.agendaLinks) ? data.agendaLinks.join(', ') : '',
+              rosaLink: data.rosaLink || '',
+              googleAgendaLink: data.googleAgendaLink || '',
+              appointmentStart: data.appointmentStart || '',
+              appointmentEnd: data.appointmentEnd || '',
+              appointmentAlert: data.appointmentAlert || '',
+              availability: data.availability || [],
+              tags: Array.isArray(data.tags) ? data.tags : [],
+              certificationFiles: [],
+            });
       console.log('Fetching team member with ID:', params.id);
       getTeamMemberById(params.id)
         .then((data) => {
@@ -184,6 +312,49 @@ const AddTeam = ({ params }: Props) => {
     }
   }, [isEditMode, params?.id, reset]);
 
+<<<<<<< HEAD
+  const parseDelimitedString = (input: string | undefined) =>
+    input?.split(',').map((v) => v.trim()).filter(Boolean) || [];
+
+  const parseFAQ = (input: string) => {
+    try {
+      return JSON.parse(input);
+    } catch {
+      return {};
+    }
+  };
+
+  const parseSchedule = (input: string) => {
+    const obj: Record<string, string> = {};
+    input.split(',').forEach((segment) => {
+      const [day, time] = segment.split(':').map((s) => s.trim());
+      if (day && time) {
+        obj[day.toLowerCase()] = time;
+      }
+    });
+    return obj;
+  };
+
+  const onSubmit = async (data: TherapistFormValues) => {
+    try {
+      setLoading(true);
+
+      // Upload certification files first
+      let certificationFileUrls: string[] = [];
+      if (data.certificationFiles && data.certificationFiles.length > 0) {
+        const formData = new FormData();
+        data.certificationFiles.forEach((file) => {
+          formData.append('certificationFiles', file);
+        });
+
+        const fileRes = await fetch('http://localhost:8080/api/v1/team-members/certifications', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!fileRes.ok) {
+          throw new Error('File upload failed');
+=======
   useEffect(() => {
     const subscription = watch((value) => {
       console.log('Form values changed:', value);
@@ -247,14 +418,84 @@ const AddTeam = ({ params }: Props) => {
           alert('Team member created successfully');
           reset();
           console.log('Creation successful and form reset');
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
         }
+        const fileUploadResponse = await fileRes.json();
+        certificationFileUrls = fileUploadResponse.files || [];
       }
+<<<<<<< HEAD
+
+      // Prepare payload
+      const payload: any = {
+        last_name: data.lastName,
+        first_name: data.firstName,
+        full_name: data.fullName,
+        job_1: data.jobTitle,
+        specific_audience: data.targetAudience || undefined,
+        specialization_1: data.specialization1 || undefined,
+        job_2: data.specialization2 || undefined,
+        who_am_i: data.aboutMe,
+        consultations: data.consultations,
+        office_address: data.centerAddress,
+        center_email: data.centerEmail,
+        center_phone_number: data.centerPhoneNumber,
+        contact_email: data.contactEmail,
+        contact_phone: data.contactPhone,
+        schedule: parseSchedule(data.schedule),
+        about: data.about || undefined,
+        languages_spoken: parseDelimitedString(data.spokenLanguages),
+        payment_methods: parseDelimitedString(data.paymentMethods),
+        diplomas_and_training: parseDelimitedString(data.degreesAndTraining),
+        specializations: parseDelimitedString(data.specializations),
+        website: data.website,
+        frequently_asked_questions: parseFAQ(data.faq),
+        calendar_links: parseDelimitedString(data.agendaLinks ?? undefined),
+        photo: data.photo || undefined,
+        rosaLink: data.rosaLink || undefined,
+        googleAgendaLink: data.googleAgendaLink || undefined,
+        appointmentStart: data.appointmentStart || undefined,
+        appointmentEnd: data.appointmentEnd || undefined,
+        appointmentAlert: data.appointmentAlert || undefined,
+        availability: data.availability || [],
+        tags: data.tags || [],
+        certificationFiles: certificationFileUrls,
+      };
+
+      // Choose method and endpoint based on mode
+      const url = isEditMode
+        ? `http://localhost:8080/api/v1/team-members/${params?.id}`
+        : 'http://localhost:8080/api/v1/team-members';
+      const method = isEditMode ? 'PUT' : 'POST';
+
+      const response = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errMsg = await response.text();
+        throw new Error(errMsg || 'Failed to submit');
+      }
+
+      alert(`Details ${isEditMode ? 'updated' : 'created'} successfully`);
+      reset();
+      router.back();
+    } catch (error: any) {
+      console.error(error);
+      alert(`Submit error: ${error.message || 'Unknown error'}`);
+    } finally {
+      setLoading(false);
+=======
     } catch (error: any) {
       console.error('Submit error:', error);
       if (error?.message) {
         console.error('Error message:', error.message);
       }
       alert('Operation failed');
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
     }
   };
 
@@ -266,7 +507,11 @@ const AddTeam = ({ params }: Props) => {
         {/* Basic Info Card */}
         <Card>
           <CardHeader>
+<<<<<<< HEAD
+            <CardTitle as="h4">{isEditMode ? 'Edit Details' : 'Add Details'}</CardTitle>
+=======
             <CardTitle as="h4">{isEditMode ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
           </CardHeader>
           <CardBody>
             <Row>
@@ -303,6 +548,8 @@ const AddTeam = ({ params }: Props) => {
             </Row>
           </CardBody>
         </Card>
+<<<<<<< HEAD
+=======
 
         {/* Consultations */}
         <Card>
@@ -314,6 +561,7 @@ const AddTeam = ({ params }: Props) => {
           </CardBody>
         </Card>
 
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
         {/* Contact Info Card */}
         <Card>
           <CardHeader>
@@ -331,6 +579,15 @@ const AddTeam = ({ params }: Props) => {
                 <TextFormInput control={control} name="contact_phone" label="Contact Phone" />
               </Col>
               <Col lg={6}>
+<<<<<<< HEAD
+                <TextFormInput control={control} name="contactEmail" label="Contact Email" />
+              </Col>
+              <Col lg={6}>
+                <TextFormInput control={control} name="contactPhone" label="Contact Phone" />
+              </Col>
+              <Col lg={6}>
+                <TextFormInput control={control} name="spokenLanguages" label="Spoken Languages (comma separated)" />
+=======
                 {/* Support multiple languages */}
                 {methods.watch('languages_spoken').map((_, index) => (
                   <TextFormInput
@@ -343,12 +600,17 @@ const AddTeam = ({ params }: Props) => {
                 <Button variant="link" onClick={() => methods.setValue('languages_spoken', [...methods.getValues('languages_spoken'), ''])}>
                   + Add Language
                 </Button>
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
               </Col>
             </Row>
           </CardBody>
         </Card>
+<<<<<<< HEAD
+        {/* Tags Card */}
+=======
 
         {/* Payment Methods */}
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
         <Card>
           <CardHeader>
             <CardTitle as="h4">Payment Methods</CardTitle>
@@ -368,17 +630,57 @@ const AddTeam = ({ params }: Props) => {
             />
           </CardBody>
         </Card>
+<<<<<<< HEAD
+        {/* Availability Card */}
+=======
 
         {/* Diplomas and Training */}
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
         <Card>
           <CardHeader>
             <CardTitle as="h4">Diplomas and Training</CardTitle>
           </CardHeader>
           <CardBody>
+<<<<<<< HEAD
+            {availabilityFields.map((item, index) => (
+              <Row key={item.id} className="mb-2 align-items-end">
+                <Col lg={4}>
+                  <Controller
+                    control={control}
+                    name={`availability.${index}.day`}
+                    render={({ field }) => (
+                      <select className="form-control" {...field}>
+                        <option value="" disabled>
+                          Select Day
+                        </option>
+                        {days.map((day) => (
+                          <option key={day} value={day}>
+                            {day}
+                          </option>
+                        ))}
+                      </select>
+                    )}
+                  />
+                </Col>
+                <Col lg={3}>
+                  <Controller
+                    control={control}
+                    name={`availability.${index}.from`}
+                    render={({ field }) => <input type="time" className="form-control" {...field} />}
+                  />
+                </Col>
+                <Col lg={3}>
+                  <Controller
+                    control={control}
+                    name={`availability.${index}.to`}
+                    render={({ field }) => <input type="time" className="form-control" {...field} />}
+                  />
+=======
             {diplomasArray.fields.map((field, index) => (
               <Row key={field.id} className="mb-2 align-items-center">
                 <Col lg={10}>
                   <TextFormInput control={control} name={`diplomas_and_training.${index}`} label={`Diploma/Training ${index + 1}`} />
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
                 </Col>
                 <Col lg={2}>
                   <Button variant="danger" onClick={() => diplomasArray.remove(index)}>
@@ -392,13 +694,33 @@ const AddTeam = ({ params }: Props) => {
             </Button>
           </CardBody>
         </Card>
+<<<<<<< HEAD
+        {/* Certification Files */}
+=======
 
         {/* Specializations */}
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
         <Card>
           <CardHeader>
             <CardTitle as="h4">Specializations</CardTitle>
           </CardHeader>
           <CardBody>
+<<<<<<< HEAD
+            <Controller
+              control={control}
+              name="certificationFiles"
+              render={({ field }) => (
+                <DropzoneFormInput
+                  className="py-5"
+                  text="Drop your certification files here or click to browse"
+                  showPreview
+                  onFileUpload={(files: any) => field.onChange(files)}
+                />
+              )}
+            />
+          </CardBody>
+        </Card>
+=======
             {specializationsArray.fields.map((field, index) => (
               <Row key={field.id} className="mb-2 align-items-center">
                 <Col lg={10}>
@@ -474,6 +796,7 @@ const AddTeam = ({ params }: Props) => {
         </Card>
 
         {/* Submit Buttons */}
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
         <div className="mb-3 rounded">
           <Row className="justify-content-end g-2 mt-2">
             <Col lg={2}>
@@ -492,5 +815,8 @@ const AddTeam = ({ params }: Props) => {
     </FormProvider>
   );
 };
+<<<<<<< HEAD
+=======
 
 export default AddTeam;
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756

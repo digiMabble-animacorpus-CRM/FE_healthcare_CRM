@@ -24,22 +24,31 @@ const TransactionHistory = async () => {
         <Card>
           <CardHeader className="d-flex justify-content-between align-items-center">
             <div>
+<<<<<<< HEAD:src/app/(admin)/staffs/staffs-details/[id]/components/upcomingAppointmrnt.tsx
+              <CardTitle as={'h4'}>Appointments</CardTitle>
+=======
               <CardTitle as={'h4'}>Transaction History</CardTitle>
+>>>>>>> 4f6f007003fe2a81e17c1bccf8b2b3e801825b74:src/app/(admin)/patients/details/[id]/components/TransactionHistory.tsx
             </div>
             <Dropdown>
               <DropdownToggle
                 as={'a'}
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
                 data-bs-toggle="dropdown"
+<<<<<<< HEAD:src/app/(admin)/staffs/staffs-details/[id]/components/upcomingAppointmrnt.tsx
+                aria-expanded="false">
+                Appointments <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+=======
                 aria-expanded="false"
               >
                 This Month{' '}
                 <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
+>>>>>>> 4f6f007003fe2a81e17c1bccf8b2b3e801825b74:src/app/(admin)/patients/details/[id]/components/TransactionHistory.tsx
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem>Download</DropdownItem>
-                <DropdownItem>Export</DropdownItem>
-                <DropdownItem>Import</DropdownItem>
+                <DropdownItem>Upcoming Appointments</DropdownItem>
+                <DropdownItem>Past Appointments</DropdownItem>
+                {/* <DropdownItem>Import</DropdownItem> */}
               </DropdownMenu>
             </Dropdown>
           </CardHeader>
