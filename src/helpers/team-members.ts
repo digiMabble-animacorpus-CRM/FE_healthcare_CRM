@@ -69,10 +69,10 @@ export const getAllTeamMembers = async (
     const jsonData = await response.json();
     console.log('Response from server:', jsonData);
 
-    const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
+    const teamData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
     return {
-      data: therapistData,
+      data: teamData,
       totalCount: jsonData?.totalCount || 0,
     };
   } catch (error) {
@@ -204,7 +204,7 @@ export const updateTeamMember = async (
 
 export const transformToBackendDto = (formData: TeamMemberType): TeamMemberUpdatePayload => {
   return {
-    id: String(formData.team_id),
+    id: String(formData.team_id || ''),
     full_name: formData.full_name,
     first_name: formData.first_name,
     last_name: formData.last_name,
