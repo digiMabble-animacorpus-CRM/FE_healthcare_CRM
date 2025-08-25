@@ -3,42 +3,28 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
 
-interface Address {
-  street: string;
-  line2?: string;
-  city: string;
-  zip_code: string;
-  country: string;
-}
-
 export interface BranchFormValues {
   name: string;
-  code: string;
+  phone: string;
   email: string;
-  phoneNumber: string;
-  address: Address;
+  address: string;
+  location?: string;
 }
 
 const schema = yup.object({
   name: yup.string().required('Branch name is required'),
-  code: yup.string().required('Branch code is required'),
+  phone: yup.string().required('Phone number is required'),
   email: yup.string().email('Invalid email').required('Email is required'),
-  phoneNumber: yup.string().required('Phone number is required'),
-  address: yup.object({
-    street: yup.string().required('Address Line 1 is required'),
-    line2: yup.string(),
-    city: yup.string().required('City is required'),
-    zip_code: yup.string().required('Zip Code is required'),
-    country: yup.string().required('Country is required'),
-  }),
+  address: yup.string().required('Address is required'),
+  location: yup.string().optional(),
 });
 
 interface Props {
-  defaultValues?: Partial<BranchFormValues>;
+  defaultValues?: Partial<BranchFormValues & { _id?: string }>;
   isEditMode?: boolean;
   onSubmitHandler: (data: BranchFormValues & { _id?: string }) => Promise<void>;
 }
@@ -50,20 +36,14 @@ const BranchForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Prop
     resolver: yupResolver(schema),
     defaultValues: {
       name: defaultValues?.name || '',
-      code: defaultValues?.code || '',
+      phone: defaultValues?.phone || '',
       email: defaultValues?.email || '',
-      phoneNumber: defaultValues?.phoneNumber || '',
-      address: defaultValues?.address || {
-        street: '',
-        line2: '',
-        city: '',
-        zip_code: '',
-        country: '',
-      },
+      address: defaultValues?.address || '',
+      location: defaultValues?.location || '',
     },
   });
 
-  const { handleSubmit, control } = methods;
+  const { handleSubmit, control, register } = methods;
 
   const handleFormSubmit = async (data: BranchFormValues) => {
     const payload =
@@ -92,16 +72,16 @@ const BranchForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Prop
                   control={control}
                   name="name"
                   label="Branch Name"
-                  placeholder="Ex: Bangalore Main Branch"
+                  placeholder="Ex: Main Clinic"
                 />
               </Col>
               <Col lg={6}>
                 <TextFormInput
                   required
                   control={control}
-                  name="code"
-                  label="Branch Code"
-                  placeholder="Ex: BLR-MAIN"
+                  name="phone"
+                  label="Phone"
+                  placeholder="Ex: +1234567890"
                 />
               </Col>
               <Col lg={6}>
@@ -113,57 +93,25 @@ const BranchForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Prop
                   placeholder="Ex: branch@example.com"
                 />
               </Col>
-              <Col lg={6}>
-                <TextFormInput
-                  required
-                  control={control}
-                  name="phoneNumber"
-                  label="Phone Number"
-                  placeholder="Ex: +91 9876543210"
-                />
+
+              <Col lg={12}>
+                <Form.Group>
+                  <Form.Label>Address</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    placeholder="Ex: 123 Health St, Wellness City"
+                    {...register('address')}
+                  />
+                </Form.Group>
               </Col>
-              <Col lg={6}>
-                <TextFormInput
-                  required
-                  control={control}
-                  name="address.street"
-                  label="Address Line 1"
-                  placeholder="Ex: 123 MG Road"
-                />
-              </Col>
-              <Col lg={6}>
+
+              <Col lg={12}>
                 <TextFormInput
                   control={control}
-                  name="address.line2"
-                  label="Address Line 2 (Optional)"
-                  placeholder="Ex: Near Park"
-                />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput
-                  required
-                  control={control}
-                  name="address.city"
-                  label="City"
-                  placeholder="Ex: Bangalore"
-                />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput
-                  required
-                  control={control}
-                  name="address.zip_code"
-                  label="Zip Code"
-                  placeholder="Ex: 560001"
-                />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput
-                  required
-                  control={control}
-                  name="address.country"
-                  label="Country"
-                  placeholder="Ex: India"
+                  name="location"
+                  label="Google Location (Optional)"
+                  placeholder="Ex: https://maps.google.com/?q=12.9716,77.5946"
                 />
               </Col>
             </Row>
