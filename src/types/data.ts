@@ -277,13 +277,10 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-<<<<<<< HEAD
   frequently_asked_questions: any;
   languages_spoken(languages_spoken: any): unknown;
-=======
   _id: string;
   id: string;
->>>>>>> f75ddf0a2b46eb458344aadaa3fad69cb461eab3
   _key: number;
   idPro: number;
   firstName: string;
