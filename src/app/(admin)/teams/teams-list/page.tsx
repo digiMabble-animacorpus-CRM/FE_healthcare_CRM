@@ -35,17 +35,27 @@ const TeamsListPage = () => {
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+<<<<<<< HEAD
+  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+=======
   const [selectedTherapistId, setSelectedTeamMemberId] = useState<string | null>(null);
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
 
   const router = useRouter();
 
   const fetchTeamMembers = async () => {
     setLoading(true);
+    setError(null);
     try {
       const response = await getAllTeamMembers(1, 10000); // fetch all
+      if (!response.data || response.data.length === 0) {
+        throw new Error('No data');
+      }
       console.log(response.data);
       setAllTeamMembers(response.data || []);
     } catch (err) {
+      setError('Failed to fetch data');
       console.error('Failed to fetch team members', err);
       setAllTeamMembers([]);
     } finally {
@@ -111,20 +121,30 @@ const TeamsListPage = () => {
   const handleEditClick = (id: string) => router.push(`/teams/edit-team/${id}`);
 
   const handleDeleteClick = (id: string) => {
+<<<<<<< HEAD
+    setSelectedTeamId(id);
+=======
     setSelectedTeamMemberId(id);
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedTherapistId) return;
+    if (!selectedTeamId) return;
     try {
-      await fetch(`/api/team-members/${selectedTherapistId}`, { method: 'DELETE' });
-      setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTherapistId));
+      await fetch(`http://localhost:8080/api/v1/team-members/${selectedTeamId}`, {
+        method: 'DELETE',
+      });
+      setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTeamId));
     } catch (err) {
       console.error(err);
     } finally {
       setShowDeleteModal(false);
+<<<<<<< HEAD
+      setSelectedTeamId(null);
+=======
       setSelectedTeamMemberId(null);
+>>>>>>> 858838c54e6b3c9535f397b23108a44952427756
     }
   };
 
@@ -149,7 +169,7 @@ const TeamsListPage = () => {
               <CardTitle as="h4" className="mb-0">
                 All Teams List
               </CardTitle>
-
+               {error && <div className="alert alert-danger text-center">{error}</div>}
               <div className="d-flex gap-2 align-items-center">
                 <input
                   type="text"
@@ -221,6 +241,7 @@ const TeamsListPage = () => {
                         <th>Action</th>
                       </tr>
                     </thead>
+                    
                     <tbody>
                       {currentData.map((item) => (
                         <tr key={item.team_id}>
