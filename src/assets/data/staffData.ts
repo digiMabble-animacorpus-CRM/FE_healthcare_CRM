@@ -75,6 +75,18 @@ export const staffData: StaffType[] = [
     },
     dob: '', // Not available
     description:
+<<<<<<< HEAD
+      "En tant que nutrithérapeute, je vous accompagne afin de vous aider à allier le plaisir de bien manger avec la satisfaction d’améliorer votre état de santé et de contrôler votre poids. Je vous propose un accompagnement sur-mesure basé sur une approche humaine et bienveillante.",
+    roleId: "Doctor", // Assumed as similar to "Doctor"
+    accessLevelId: "staff", // staff
+    branches: [{ id: "b2", isPrimary: true }],
+    selectedBranch: "b2",
+    specialization: "Nutritionniste, Naturopathe",
+    experience: "", // Not specified
+    education:
+      "Nutrithérapie, Naturopathie, Nutrition de l'enfant, Nutrition de la femme enceinte et allaitante",
+    registrationNumber: "RA20110080020031", // Not specified
+=======
       'En tant que nutrithérapeute, je vous accompagne afin de vous aider à allier le plaisir de bien manger avec la satisfaction d’améliorer votre état de santé et de contrôler votre poids. Je vous propose un accompagnement sur-mesure basé sur une approche humaine et bienveillante.',
     roleId: 'role-001', // Assumed as similar to "Doctor"
     accessLevelId: 'al-001', // staff
@@ -228,6 +240,7 @@ export const staffData: StaffType[] = [
     education:
       "Nutrithérapie, Naturopathie, Nutrition de l'enfant, Nutrition de la femme enceinte et allaitante",
     registrationNumber: '', // Not specified
+>>>>>>> 4f6f007003fe2a81e17c1bccf8b2b3e801825b74
     certificationFiles: [],
     availability: [], // Would need to parse schedule text into structured days
     tags: ['nutrition', 'naturopathie'],
