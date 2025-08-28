@@ -13,42 +13,50 @@ import {
 } from "react-bootstrap";
 import { API_BASE_PATH } from "@/context/constants";
 import type { CustomerEnquiriesType } from "@/types/data";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AppointmentFields from "./AppointmentFields";
 
-type AppointmentFormValues = {
+// ---------------- Types ----------------
+export type AppointmentFormValues = {
+  branchId: number;
+  departmentId: number;
+  specializationId: number;
+  therapistKey: number;
+  patientId?: string; // optional here because BookAppointmentForm injects
   date: string;
-  time: string;
+  time: string; // HH:mm
   purposeOfVisit: string;
-  therapistKey: number; // optional, used for edit mode
-  department: string;
   notes?: string;
 };
 
 const schema = yup.object({
+  branchId: yup.number().required("Select branch"),
+  departmentId: yup.number().required("Select department"),
+  specializationId: yup.number().required("Select specialization"),
+  therapistKey: yup.number().required("Select therapist"),
   date: yup.string().required("Select date"),
   time: yup.string().required("Select time"),
-  department: yup.string().required("Select department"),
   purposeOfVisit: yup.string().required("Select service"),
-  therapistKey: yup.number().required("Select therapist"),
   notes: yup.string().optional(),
 });
 
+// ---------------- Props ----------------
 interface Props {
   defaultValues?: Partial<AppointmentFormValues>;
   onSubmitHandler?: (data: AppointmentFormValues) => void;
   isEditMode?: boolean;
-  appointmentId?: number; // needed for edit
-  patientId: string; // mandatory for both create & edit
-  createdById: string; // mandatory for create
-  modifiedById?: string; // mandatory for edit
-  selectedCustomer?: CustomerEnquiriesType; // for context/prefill
+  appointmentId?: number;
+  patientId: string;
+  createdById: string;
+  modifiedById?: string;
+  selectedCustomer?: CustomerEnquiriesType;
 }
 
+// ---------------- Component ----------------
 const BookAppointmentForm = ({
   defaultValues,
   onSubmitHandler,
-  isEditMode,
+  isEditMode = false,
   appointmentId,
   patientId,
   createdById,
@@ -56,57 +64,77 @@ const BookAppointmentForm = ({
   selectedCustomer,
 }: Props) => {
   const [saving, setSaving] = useState(false);
-  const token = localStorage.getItem('access_token');
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
   const methods = useForm<AppointmentFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
-      date: "",
-      time: "",
-      purposeOfVisit: "",
-      department: "",
-      therapistKey: undefined,
-      notes: selectedCustomer?.name
-        ? `Booking for ${selectedCustomer.name}`
-        : "",
-      ...defaultValues,
+      branchId: defaultValues?.branchId ?? 0,
+      departmentId: defaultValues?.departmentId ?? 0,
+      specializationId: defaultValues?.specializationId ?? 0,
+      therapistKey: defaultValues?.therapistKey ?? 0,
+      date: defaultValues?.date ?? "",
+      time: defaultValues?.time ?? "",
+      purposeOfVisit: defaultValues?.purposeOfVisit ?? "",
+      notes:
+        defaultValues?.notes ??
+        (selectedCustomer?.name
+          ? `Booking for ${selectedCustomer.name}`
+          : ""),
     },
   });
 
-  const { handleSubmit } = methods;
+  const { handleSubmit, reset } = methods;
+
+  // Prefill on Edit Mode
+  useEffect(() => {
+    if (isEditMode && defaultValues) {
+      reset({
+        branchId: defaultValues.branchId ?? 0,
+        departmentId: defaultValues.departmentId ?? 0,
+        specializationId: defaultValues.specializationId ?? 0,
+        therapistKey: defaultValues.therapistKey ?? 0,
+        date: defaultValues.date ?? "",
+        time: defaultValues.time ?? "",
+        purposeOfVisit: defaultValues.purposeOfVisit ?? "",
+        notes: defaultValues.notes ?? "",
+      });
+    }
+  }, [isEditMode, defaultValues, reset]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
     const payload = {
       patientId,
+      branchId: data.branchId,
+      departmentId: data.departmentId,
+      specializationId: data.specializationId,
+      therapistKey: data.therapistKey,
       date: data.date,
       timeslot: `${data.time} - ${getEndTime(data.time)}`,
       purposeOfVisit: data.purposeOfVisit,
-      department: data.department,
-      therapistKey: data.therapistKey,
       description: data.notes || "",
       ...(isEditMode ? { modifiedById } : { createdById }),
     };
 
     try {
       setSaving(true);
-      console.log("Submitting appointment data:", payload);
-
       const res = await fetch(
         `${API_BASE_PATH}/appointments${
           isEditMode && appointmentId ? `/${appointmentId}` : ""
         }`,
         {
           method: isEditMode ? "PUT" : "POST",
-           headers: { 
+          headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
+            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify(payload),
         }
       );
 
       if (!res.ok) throw new Error("Failed to save appointment");
-      await res.json(); // if you need the created entity, keep it
+      await res.json();
 
       onSubmitHandler?.(data);
     } catch (error) {
@@ -127,12 +155,19 @@ const BookAppointmentForm = ({
             </CardTitle>
             {selectedCustomer && (
               <small className="text-muted">
-                Booking for: <strong>{selectedCustomer.name || selectedCustomer.email || selectedCustomer.number}</strong>
+                Booking for:{" "}
+                <strong>
+                  {selectedCustomer.name ||
+                    selectedCustomer.email ||
+                    selectedCustomer.number}
+                </strong>
               </small>
             )}
           </CardHeader>
           <CardBody>
+            {/* 🔹 All appointment fields here */}
             <AppointmentFields />
+
             <div className="d-flex justify-content-end mt-4">
               <Button type="submit" variant="primary" disabled={saving}>
                 {saving ? (
@@ -151,12 +186,13 @@ const BookAppointmentForm = ({
   );
 };
 
-/** Helper: generate end time (assumes +30min slot) */
+/** Helper: generate end time (+30min) */
 function getEndTime(startTime: string) {
   const [hour, minute] = startTime.split(":").map(Number);
   const date = new Date();
-  date.setHours(hour, minute + 30);
-  return date.toTimeString().slice(0, 5);
+  date.setHours(hour, minute);
+  date.setMinutes(date.getMinutes() + 30);
+  return date.toTimeString().slice(0, 5); // HH:mm
 }
 
 export default BookAppointmentForm;

@@ -1,84 +1,224 @@
-"use client";
+'use client';
 
-import { Controller, useFormContext } from "react-hook-form";
-import { Row, Col, Button, Form } from "react-bootstrap";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import TextAreaFormInput from "@/components/from/TextAreaFormInput";
-import ChoicesFormInput from "@/components/from/ChoicesFormInput";
-import { useEffect } from "react";
+import { useEffect, useState } from 'react';
+import { useFormContext, Controller } from 'react-hook-form';
+import { Form, Row, Col, Button } from 'react-bootstrap';
+import Calendar from 'react-calendar'; // 👈 install react-calendar
+import 'react-calendar/dist/Calendar.css';
+import dayjs from 'dayjs';
+import { API_BASE_PATH } from '@/context/constants';
 
-// Define your form options (not using enums)
-export const PurposeOfVisitOptions = [
-  { value: "Consultation", label: "Consultation" },
-  { value: "Follow-up", label: "Follow-up" },
-  { value: "Therapy Session", label: "Therapy Session" },
-  { value: "Initial Assessment", label: "Initial Assessment" },
-];
+interface Branch {
+  id: number;
+  name: string;
+}
 
-export const DepartmentOptions = [
-  { value: "Psychology", label: "Psychology" },
-  { value: "Physiotherapy", label: "Physiotherapy" },
-  { value: "Nutrition", label: "Nutrition" },
-  { value: "General Medicine", label: "General Medicine" },
-];
+interface Department {
+  id: number;
+  name: string;
+}
 
-// For therapist (static value as requested)
-export const TherapistOptions = [
-  { value: 1, label: "Dr. Smith" },
-  { value: 2, label: "Dr. Johnson" },
-  { value: 3, label: "Dr. Williams" },
-];
+interface Specialization {
+  id: number;
+  name: string;
+}
 
-const timeSlots = [
-  "09:00",
-  "09:30",
-  "10:00",
-  "10:30",
-  "11:00",
-  "11:30",
-  "12:00",
-  "12:30",
-  "14:00",
-  "14:30",
-  "15:00",
-  "15:30",
-  "16:00",
-  "16:30",
-  "17:00",
-];
+interface Therapist {
+  therapistKey: number;
+  firstName: string;
+  lastName: string;
+  availability?: {
+    dayOfWeek: string[];
+    startTime: string;
+    endTime: string;
+  };
+}
 
 const AppointmentFields = () => {
   const {
-    control,
+    register,
     setValue,
-    trigger,
     watch,
+    control,
+    trigger,
     formState: { errors },
   } = useFormContext();
 
-  const selectedDate = watch("date");
-  const selectedTime = watch("time");
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [specializations, setSpecializations] = useState<Specialization[]>([]);
+  const [therapists, setTherapists] = useState<Therapist[]>([]);
+  const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(
+    null
+  );
+  const [timeSlots, setTimeSlots] = useState<string[]>([]);
+  const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
+  const branchId = watch('branchId');
+  const departmentId = watch('departmentId');
+  const specializationId = watch('specializationId');
+
+  // helper to normalize API response
+  const safeArray = (res: any): any[] => {
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray(res.data)) return res.data;
+    return [];
+  };
+
+  // load initial dropdowns
   useEffect(() => {
-    // Set today's date if not already set (string format: YYYY-MM-DD)
-    if (!selectedDate) {
-      const today = new Date();
-      const yyyy = today.getFullYear();
-      const mm = String(today.getMonth() + 1).padStart(2, "0");
-      const dd = String(today.getDate()).padStart(2, "0");
-      const iso = `${yyyy}-${mm}-${dd}`;
-      setValue("date", iso);
-      trigger("date");
+    const token = localStorage.getItem('access_token');
+
+    async function loadInitialData() {
+      try {
+        const [branchesRes, departmentsRes, specsRes] = await Promise.all([
+          fetch(`${API_BASE_PATH}/branches`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_BASE_PATH}/departments`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch(`${API_BASE_PATH}/specializations`, {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
+
+        const [branchesJson, departmentsJson, specsJson] = await Promise.all([
+          branchesRes.json(),
+          departmentsRes.json(),
+          specsRes.json(),
+        ]);
+
+        setBranches(safeArray(branchesJson));
+        setDepartments(safeArray(departmentsJson));
+        setSpecializations(safeArray(specsJson));
+      } catch (err) {
+        console.error('Failed to load dropdown data', err);
+        setBranches([]);
+        setDepartments([]);
+        setSpecializations([]);
+      }
     }
-  }, [selectedDate, setValue, trigger]);
-  {
-    console.log("Errors:", errors);
-  }
+
+    loadInitialData();
+  }, []);
+
+  // fetch therapists
+  useEffect(() => {
+    if (!branchId || !departmentId || !specializationId) return;
+    const token = localStorage.getItem('access_token');
+
+    async function loadTherapists() {
+      try {
+        const res = await fetch(
+          `${API_BASE_PATH}/therapists?branchId=${branchId}&departmentId=${departmentId}&specializationId=${specializationId}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        const data = await res.json();
+        setTherapists(safeArray(data));
+      } catch (err) {
+        console.error('Failed to fetch therapists', err);
+        setTherapists([]);
+      }
+    }
+
+    loadTherapists();
+  }, [branchId, departmentId, specializationId]);
+
+  // therapist change
+  const handleTherapistChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const therapistKey = Number(e.target.value);
+    const therapist =
+      therapists.find((t) => t.therapistKey === therapistKey) || null;
+    setSelectedTherapist(therapist);
+    setValue('therapistKey', therapistKey);
+
+    if (therapist?.availability) {
+      const slots: string[] = [];
+      const start = dayjs(therapist.availability.startTime, 'HH:mm');
+      const end = dayjs(therapist.availability.endTime, 'HH:mm');
+
+      let current = start;
+      while (current.isBefore(end)) {
+        const slotStart = current.format('HH:mm');
+        const slotEnd = current.add(30, 'minute').format('HH:mm');
+        slots.push(`${slotStart} - ${slotEnd}`);
+        current = current.add(30, 'minute');
+      }
+      setTimeSlots(slots);
+    } else {
+      setTimeSlots([]);
+    }
+  };
 
   return (
     <Row>
-      {/* Appointment Date */}
+      {/* Branch */}
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Branch</Form.Label>
+          <Form.Select {...register('branchId')}>
+            <option value="">Select Branch</option>
+            {branches.map((b) => (
+              <option key={b.id} value={b.id}>
+                {b.name}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+      </Col>
+
+      {/* Department */}
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Department</Form.Label>
+          <Form.Select {...register('departmentId')}>
+            <option value="">Select Department</option>
+            {departments.map((d) => (
+              <option key={d.id} value={d.id}>
+                {d.name}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+      </Col>
+
+      {/* Specialization */}
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Specialization</Form.Label>
+          <Form.Select {...register('specializationId')}>
+            <option value="">Select Specialization</option>
+            {specializations.map((s) => (
+              <option key={s.id} value={s.id}>
+                {s.name}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+      </Col>
+
+      {/* Therapist */}
+      <Col md={6}>
+        <Form.Group className="mb-3">
+          <Form.Label>Therapist</Form.Label>
+          <Form.Select
+            {...register('therapistKey')}
+            onChange={handleTherapistChange}
+          >
+            <option value="">Select Therapist</option>
+            {therapists.map((t) => (
+              <option key={t.therapistKey} value={t.therapistKey}>
+                {t.firstName} {t.lastName}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+      </Col>
+
+      {/* Calendar Date Picker */}
       <Col lg={6}>
         <div className="mb-3">
           <Form.Label>Appointment Date</Form.Label>
@@ -93,13 +233,17 @@ const AppointmentFields = () => {
                 onChange={(date) => {
                   const formattedDate =
                     date instanceof Date && !isNaN(date.getTime())
-                      ? `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`
-                      : "";
+                      ? `${date.getFullYear()}-${String(
+                          date.getMonth() + 1
+                        ).padStart(2, '0')}-${String(date.getDate()).padStart(
+                          2,
+                          '0'
+                        )}`
+                      : '';
                   field.onChange(formattedDate);
-                  setValue("date", formattedDate);
-                  trigger("date");
+                  setValue('date', formattedDate);
+                  trigger('date');
                 }}
-                locale="en-GB"
               />
             )}
           />
@@ -111,7 +255,7 @@ const AppointmentFields = () => {
         </div>
       </Col>
 
-      {/* Time Slot */}
+      {/* Time Slots */}
       <Col lg={6}>
         <div className="mb-3">
           <Form.Label>Select Time</Form.Label>
@@ -119,11 +263,12 @@ const AppointmentFields = () => {
             {timeSlots.map((slot) => (
               <Button
                 key={slot}
-                variant={selectedTime === slot ? "primary" : "outline-primary"}
+                variant={selectedTime === slot ? 'primary' : 'outline-primary'}
                 size="sm"
                 onClick={() => {
-                  setValue("time", slot);
-                  trigger("time");
+                  setSelectedTime(slot);
+                  setValue('time', slot);
+                  trigger('time');
                 }}
               >
                 {slot}
@@ -138,99 +283,20 @@ const AppointmentFields = () => {
         </div>
       </Col>
 
-      {/* Service */}
-      <Col lg={6}>
-        <div className="mb-3">
-          <Form.Label>Service / Purpose</Form.Label>
-          <Controller
-            control={control}
-            name="purposeOfVisit"
-            render={({ field }) => (
-              <ChoicesFormInput className="form-control" {...field}>
-                <option value="" disabled hidden>
-                  Select Service
-                </option>
-                {PurposeOfVisitOptions.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </ChoicesFormInput>
-            )}
-          />
-          {errors.purposeOfVisit && (
-            <Form.Text className="text-danger">
-              {String(errors.purposeOfVisit?.message)}
-            </Form.Text>
-          )}
-        </div>
+      {/* Purpose */}
+      <Col md={12}>
+        <Form.Group className="mb-3">
+          <Form.Label>Purpose of Visit</Form.Label>
+          <Form.Control type="text" {...register('purposeOfVisit')} />
+        </Form.Group>
       </Col>
 
-      {/* Department */}
-      <Col lg={6}>
-        <div className="mb-3">
-          <Form.Label>Department</Form.Label>
-          <Controller
-            control={control}
-            name="department"
-            render={({ field }) => (
-              <ChoicesFormInput className="form-control" {...field}>
-                <option value="" disabled hidden>
-                  Select Department
-                </option>
-                {DepartmentOptions.map((d) => (
-                  <option key={d.value} value={d.value}>
-                    {d.label}
-                  </option>
-                ))}
-              </ChoicesFormInput>
-            )}
-          />
-          {errors.department && (
-            <Form.Text className="text-danger">
-              {String(errors.department?.message)}
-            </Form.Text>
-          )}
-        </div>
-      </Col>
-      <Col lg={6}>
-        <div className="mb-3">
-          <Form.Label>Therapist</Form.Label>
-          <Controller
-            control={control}
-            name="therapistKey"
-            render={({ field }) => (
-              <ChoicesFormInput className="form-control" {...field}>
-                <option value="" disabled hidden>
-                  Select Therapist
-                </option>
-                {TherapistOptions.map((s) => (
-                  <option key={s.value} value={s.value}>
-                    {s.label}
-                  </option>
-                ))}
-              </ChoicesFormInput>
-            )}
-          />
-          {errors.therapistKey && (
-            <Form.Text className="text-danger">
-              {String(errors.therapistKey?.message)}
-            </Form.Text>
-          )}
-        </div>
-      </Col>
-
-      {/* Notes */}
-      <Col lg={6}>
-        <div className="mb-3">
-          <TextAreaFormInput
-            control={control}
-            name="notes"
-            label="Notes"
-            rows={3}
-            placeholder="Additional Notes"
-          />
-        </div>
+      {/* Description */}
+      <Col md={12}>
+        <Form.Group className="mb-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control as="textarea" rows={3} {...register('description')} />
+        </Form.Group>
       </Col>
     </Row>
   );
