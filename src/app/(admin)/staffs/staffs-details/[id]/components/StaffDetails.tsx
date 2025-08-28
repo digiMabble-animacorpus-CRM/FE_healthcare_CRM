@@ -15,11 +15,11 @@ const languageMap: Record<string, string> = {
 const StaffDetails = ({ data }: { data: StaffType }) => {
   const router = useRouter();
 
-  const handleEditClick = (id: string) => {
+  const handleEditClick = (id: any) => {
     router.push(`/staffs/staffs-form/${id}/edit`);
   };
 
-  const handleEditPermissionClick = (id: string) => {
+  const handleEditPermissionClick = (id: any) => {
     router.push(`/staffs/staffs-form/${id}/permission`);
   };
 
@@ -86,7 +86,7 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
               {data?.address?.line1}{" "}
               {data?.address?.line2 ? `${data.address.line2}, ` : ""}
               {data?.address?.city}, {data?.address?.country} -{" "}
-              {data?.address?.zipCode}
+              {data?.address?.zip_code}
             </p>
           </Col>
           <Col lg={4}>

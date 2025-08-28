@@ -151,7 +151,7 @@ const TherapistDetailsPage = () => {
           },
         ]}
         about={data.aboutMe}
-        languages={data.spokenLanguages?.split(',') || []}
+        languages={data.spokenLanguages || []}
         website={data.website}
         education={data.degreesAndTraining?.split('\n') || []}
         specializations={data.specializations?.split('\n') || []}
