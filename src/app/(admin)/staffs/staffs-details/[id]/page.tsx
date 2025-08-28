@@ -1,13 +1,11 @@
 import PageTitle from "@/components/PageTitle";
 import { getAllProperty } from "@/helpers/data";
-import WeeklyInquiry from "./components/WeeklyInquiry";
-import TransactionHistory from "./components/TransactionHistory";
-import UpcomingAppointmrnt from "./components/upcomingAppointmrnt";
-import type { StaffType, TherapistType } from "@/types/data";
+import type { StaffType } from "@/types/data";
 import { Col, Row } from "react-bootstrap";
 import { Metadata } from "next";
 import StaffDetails from "./components/StaffDetails";
 import { getStaffById } from "@/helpers/staff";
+import WeeklyInquiry from "@/app/(admin)/therapists/details/[id]/components/WeeklyInquiry";
 
 export const metadata: Metadata = { title: "Staff Overview" };
 
@@ -19,6 +17,13 @@ const StaffDetailPage = async ({ params }: Props) => {
   const staffId = params.id;
   const propertyData = await getAllProperty();
   const response = await getStaffById(staffId);
+
+  if (!response || !response.data || response.data.length === 0) {
+    return (
+        <p>No staff found.</p>
+    );
+  }
+
   const staffs: StaffType[] = response.data;
 
   return (
@@ -32,8 +37,6 @@ const StaffDetailPage = async ({ params }: Props) => {
           <WeeklyInquiry />
         </Col>
       </Row>
-      <UpcomingAppointmrnt />
-      {/* <TransactionHistory /> */}
     </>
   );
 };

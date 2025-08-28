@@ -37,82 +37,79 @@ type AvailabilitySlot = {
   endTime: string;
 };
 
-type TherapistFormValues = {
+type Center = {
+  center_address: string;
+  center_email: string;
+  center_phone_number: string;
+  availability: AvailabilitySlot[];
+};
+
+export type TherapistFormValues = {
   id_pro?: string;
   first_name: string;
   last_name: string;
-  photo?: string;
+  photo: string;
   job_title: string;
   about_me: string;
-  consultations?: string;
-  centers: {
-    center_address: string;
-    center_email?: string;
-    center_phone_number?: string;
-    availability: AvailabilitySlot[];
-  }[];
+  consultations: string;
+  centers: Center[];
   contact_email: string;
   contact_phone: string;
   spoken_languages: string[];
-  degrees_and_training?: string[];
-  specializations?: string[];
-  website?: string;
-  faq?: string;
-  agenda_links?: string;
-  tags?: string[];
+  degrees_and_training: string[];
+  specializations: string[];
+  website: string;
+  faq: string;
+  agenda_links: string;
+  tags: string[];
   certificationFiles: File[];
 };
+
 const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
+  id_pro: yup.string().default(''),
   first_name: yup.string().required('First name is required'),
   last_name: yup.string().required('Last name is required'),
+  photo: yup.string().default(''),
   job_title: yup.string().required('Job title is required'),
-  about_me: yup.string().optional(),
-  contact_email: yup.string().email('Invalid email').required('Email is required'),
-  contact_phone: yup.string().required('Phone number is required'),
+  about_me: yup.string().default(''),
+  consultations: yup.string().default(''),
   centers: yup
     .array()
     .of(
       yup.object({
-        center_address: yup.string().optional(),
-        center_email: yup.string().email().optional(),
-        center_phone_number: yup.string().optional(),
+        center_address: yup.string().default(''),
+        center_email: yup.string().email('Invalid email').default(''),
+        center_phone_number: yup.string().default(''),
         availability: yup
           .array()
           .of(
             yup.object({
-              day: yup.string().optional(),
-              startTime: yup.string().optional(),
-              endTime: yup.string().optional(),
+              day: yup.string().default(''),
+              startTime: yup.string().default(''),
+              endTime: yup.string().default(''),
             })
           )
-          .optional(),
+          .default([]),
       })
     )
-    .optional(),
-  spoken_languages: yup.array().of(yup.string()).optional(),
-  degrees_and_training: yup
+    .required('At least one center is required')
+    .default([]),
+  contact_email: yup.string().email('Invalid email').required('Email is required'),
+  contact_phone: yup.string().required('Phone number is required'),
+  // ✅ Force string[] without undefined
+  spoken_languages: yup
     .array()
-    .of(yup.string().optional())
-    .transform((value, originalValue) => {
-      if (originalValue === "" || originalValue === null) return [];
-      return value;
-    })
-    .optional(),
-  specializations: yup
-    .mixed<string | string[]>()
-    .transform((value) => {
-      if (Array.isArray(value)) return value.join(", ");
-      return value || "";
-    })
-    .optional(),
-  website: yup.string().optional(),
-  faq: yup.string().optional(),
-  agenda_links: yup.string().optional(),
-  tags: yup.array().of(yup.string()).optional(),
-  certificationFiles: yup.array().of(yup.mixed<File>().optional()).optional(),
+    .of(yup.string().required())
+    .min(1, 'At least one language is required')
+    .default([]),
+  degrees_and_training: yup.array().of(yup.string().required()).default([]),
+  specializations: yup.array().of(yup.string().required()).default([]),
+  website: yup.string().default(''),
+  faq: yup.string().default(''),
+  agenda_links: yup.string().default(''),
+  tags: yup.array().of(yup.string().required()).default([]),
+  certificationFiles: yup.array().of(yup.mixed<File>().required()).default([]),
 });
-
-
 
 interface Props {
   params?: { id?: string };
@@ -161,7 +158,6 @@ const AddTherapist = ({ params }: Props) => {
     name: 'centers',
   });
 
-  // Load edit data
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
@@ -182,77 +178,72 @@ const AddTherapist = ({ params }: Props) => {
     }
   }, [isEditMode, params?.id, reset]);
 
-  // Submit handler
-  // Submit handler
-const onSubmit = async (data: TherapistFormValues) => {
-  try {
-    const firstCenter = data.centers?.[0] || { center_address: '', center_email: '', center_phone_number: '', availability: [] };
-    const payload: TherapistUpdatePayload = {
-  photo: data.photo || "",
-  consultations: data.consultations || "",
-  specializations: data.specializations || "",
-  website: data.website || "",
-  faq: data.faq || "",
-  firstName: data.first_name || "",
-  lastName: data.last_name || "",
-  jobTitle: data.job_title || "",
-  aboutMe: data.about_me || "",
-  contactEmail: data.contact_email || "",
-  contactPhone: data.contact_phone || "",
-  spokenLanguages: (data.spoken_languages || []).join(", "),  // convert array → string
-  degreesAndTraining: (data.degrees_and_training || []).join(", "),  // convert array → string
-  agendaLinks: data.agenda_links || "",
-  tags: (data.tags || []).join(", "), // if tags expected as string
-  centers: (data.centers || []).map((c) => ({
-    centerAddress: c.center_address || "",
-    centerEmail: c.center_email || "",
-    centerPhoneNumber: c.center_phone_number || "",
-    availability: (c.availability || []).map((slot) => ({
-      day: slot.day,
-      startTime: slot.startTime,
-      endTime: slot.endTime,
-    })),
-  })),
-};
+  const onSubmit = async (data: TherapistFormValues) => {
+    try {
+      const payload: TherapistUpdatePayload = {
+        photo: data.photo || "",
+        consultations: data.consultations || "",
+        specializations: data.specializations || [],
+        website: data.website || "",
+        faq: data.faq || "",
+        firstName: data.first_name || "",
+        lastName: data.last_name || "",
+        jobTitle: data.job_title || "",
+        aboutMe: data.about_me || "",
+        contactEmail: data.contact_email || "",
+        contactPhone: data.contact_phone || "",
+        spokenLanguages: (data.spoken_languages || []).join(", "),
+        degreesAndTraining: (data.degrees_and_training || []).join(", "),
+        agendaLinks: data.agenda_links || "",
+        tags: (data.tags || []).join(", "),
+        centers: (data.centers || []).map((c) => ({
+          centerAddress: c.center_address || "",
+          centerEmail: c.center_email || "",
+          centerPhoneNumber: c.center_phone_number || "",
+          availability: (c.availability || []).map((slot) => ({
+            day: slot.day,
+            startTime: slot.startTime,
+            endTime: slot.endTime,
+          })),
+        })),
+      };
 
+      let success = false;
 
-    let success = false;
+      if (data.certificationFiles?.length > 0) {
+        const formData = new FormData();
+        Object.entries(payload).forEach(([key, value]) => {
+          if (value !== null && value !== undefined) {
+            formData.append(key, JSON.stringify(value));
+          }
+        });
+        data.certificationFiles.forEach((file) =>
+          formData.append("certificationFiles", file)
+        );
 
-    if (data.certificationFiles?.length > 0) {
-      const formData = new FormData();
-      Object.entries(payload).forEach(([key, value]) => {
-        if (value !== null && value !== undefined) {
-          formData.append(key, JSON.stringify(value));
-        }
-      });
-      data.certificationFiles.forEach((file) =>
-        formData.append("certificationFiles", file)
-      );
+        success =
+          isEditMode && params?.id
+            ? await updateTherapist(params.id, formData)
+            : await createTherapist(formData);
+      } else {
+        success =
+          isEditMode && params?.id
+            ? await updateTherapist(params.id, payload)
+            : await createTherapist(payload);
+      }
 
-      success =
-        isEditMode && params?.id
-          ? await updateTherapist(params.id, formData)
-          : await createTherapist(formData);
-    } else {
-      success =
-        isEditMode && params?.id
-          ? await updateTherapist(params.id, payload)
-          : await createTherapist(payload);
+      if (success) {
+        alert(isEditMode ? "Therapist updated successfully" : "Therapist created successfully");
+        if (isEditMode) router.back();
+        else reset();
+      } else {
+        alert("Operation failed");
+      }
+    } catch (error) {
+      console.error("Submit error:", error);
+      alert("Operation failed");
     }
-
-    if (success) {
-      alert(isEditMode ? "Therapist updated successfully" : "Therapist created successfully");
-      if (isEditMode) router.back();
-      else reset();
-    } else {
-      alert("Therapist created successfully");
-    }
-  } catch (error) {
-    console.error("Submit error:", error);
-    alert("Operation failed");
-  }
-};
-
+  };
 
   if (loading)
     return <Spinner animation="border" className="my-5 d-block mx-auto" />;

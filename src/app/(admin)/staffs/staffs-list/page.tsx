@@ -107,9 +107,9 @@ const StaffListPage = () => {
     if (page !== currentPage) setCurrentPage(page);
   };
 
-  const handleView = (id: string) =>
+  const handleView = (id: any) =>
     router.push(`/staffs/staffs-details/${id}`);
-  const handleEdit = (id: string) =>
+  const handleEdit = (id: any) =>
     router.push(`/staffs/staffs-form/${id}/edit`);
   const handlePermission = (id: string) =>
     router.push(`/staffs/staffs-form/${id}/permission`);

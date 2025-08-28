@@ -95,6 +95,49 @@ export type PatientType = {
   branch?: string;
 };
 
+// src/types/data.ts
+
+export interface AppointmentDetails {
+  id?: string;
+  date?: string;
+  time?: string;
+  doctor?: string;
+  notes?: string;
+}
+
+export interface FamilyMember {
+  name: string;
+  relation: string;
+  age?: number;
+  gender?: string;
+}
+
+export type CustomerStatus = "new" | "active" | "inactive" | "closed";
+
+export interface CustomerEnquiriesType {
+  _id: string;
+  name: string;
+  email: string;
+  number: string;
+  gender: string;
+  language: string;
+  branch: string;
+  dob: string;
+  city: string;
+  country: string;
+  zip_code: string;
+  address: string;
+  tags: string[];
+  description: string;
+  status: CustomerStatus;
+  lastUpdated: string;
+  source: string;
+  appointmentDetails?: AppointmentDetails;
+  familyDetails?: FamilyMember[];
+  modeOfRegister: string;
+}
+
+
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';
 
 export type AppointmentSource = 'phone' | 'website' | 'walk_in' | 'referral' | 'other';
@@ -277,8 +320,6 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  frequently_asked_questions: any;
-  languages_spoken(languages_spoken: any): unknown;
   _id: string;
   id: string;
   _key: number;
@@ -292,6 +333,7 @@ export type TherapistType = {
   specialization1?: string | null;
   specialization2?: string | null;
   aboutMe: string;
+  about?: string | null;
   consultations: string;
   centerAddress: string;
   centerEmail: string;
@@ -299,13 +341,13 @@ export type TherapistType = {
   contactEmail: string;
   contactPhone: string;
   schedule: string;
-  about?: string | null;
-  spokenLanguages: string;
+  spokenLanguages: string[]; // ✅ fixed
   paymentMethods?: string;
   degreesAndTraining: string;
   specializations: string;
   website: string;
   faq: string;
+  frequently_asked_questions?: string;
   agendaLinks: string | null;
   rosaLink?: string | null;
   googleAgendaLink?: string | null;

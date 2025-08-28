@@ -62,47 +62,42 @@ export const customerEnquiriesData: any[] = [
 
 export const therapistData: TherapistType[] = [
   {
+    _id: '2',
     _key: 2,
     idPro: 2,
+    id: '2',
     firstName: 'Hajiba',
     lastName: 'Bounouch',
-    fullName:
-      'Bounouch Hajiba  457264826_478108485141765_7923440431478900254_n.jpg (https://dl.airtable.com/.directUploadAttachment/a39d6c1972672ca6d05a49c6d8b521c9/42516f3b/457264826_478108485141765_7923440431478900254_n.jpg)',
-    photo:
-      '457264826_478108485_478108485141765_7923440431478900254_n.jpg (https://v5.airtableusercontent.com/v3/u/43/43/1754150400000/WZh3D7B7m0s6b7avNHAu0w/oYA-w3XzAXEL-vPgHy2IK-H9GH8OItHpovmDxnhz4JaovVCqVUDFjV6YL7VP_eN-bTLRgk31TSrk_XX_VEk4UMlzmhRof8P69xgd-qlkrqFLtNbL6WhoCLUJ2NitIM8a29w3hU4XHH4B62oNMl350eqF2GD02IXJogih2-nQ5Z_Z8HU7AFrKDiK9KMoAWVmv-k7cX5AfsnJ42bMIi7Sm4Q/dobNMUy-6Hog0hpbQd5GUWHT3thJ2u_Qq8yLPpi-iOc)',
+    fullName: 'Bounouch Hajiba',
+    photo: '457264826_478108485_478108485141765_7923440431478900254_n.jpg',
     jobTitle:
       'Psychologue clinicienne,Psychothérapeute,Coordinateur du centre,Psychothérapeute systémique',
-    about:
-      'Je suis psychologue clinicienne et psychothérapeute familial. Le psychothérapeute systémique a pour but d’aborder la problématique au niveau individuel mais également avec le système social et familial du patient. Ainsi cela permet donc d’avoir une vision plus élargie du problème Je consulte avec les adolescents, les adultes, les couples et familles',
-    aboutMe:
-      "Je suis psychologue clinicienne, diplômée de l'Université Catholique de Louvain. Je me suis spécialisée pour devenir psychothérapeute systémicienne, diplômée de l'Université Libre de Bruxelles. Je suis également spécialisée en burnout parental. Je travaille essentiellement avec les adolescents, les adultes, les familles et les couples.\r\n\r\nJe suis également fondatrice et coordinatrice du Réseau Anima Corpus. L'idée d'ouvrir ce centre paramédical est survenue lorsque je suis devenue maman pour la première fois. J'ai souhaité me rapprocher de chez moi sans pour autant m'isoler dans un bureau seule. Travailler en équipe est essentiel dans le domaine de la santé mentale :  d'abord pour le patient car nous lui permettons d'avoir un suivi complet et interdisciplinaire ; ensuite pour soi car c'est un métier où l'humain est au centre du travail. Nous sommes donc très impliqué auprès de chaques patients. Se soutenir et collaborer est par conséquent essentiel à notre propre santé mentale.",
+    about: 'Je suis psychologue clinicienne et psychothérapeute familial...',
+    aboutMe: "Je suis psychologue clinicienne, diplômée de l'Université Catholique de Louvain...",
     agendaLinks: 'https://rosa.be/fr/booking/hp/hajiba-bounouch-1/site/',
     appointmentAlert: null,
     appointmentStart: null,
     appointmentEnd: null,
     availability: null,
-    centerAddress:
-      'Anima Corpus Gembloux - Orneau Place de l\'Orneau, 15 5030 Gembloux","Anima Corpus Gembloux - Tout Vent Chaussée de namur, 47 5030 Gembloux","Anima Corpus Namur - Av. Cardinal Mercier, 46 5000 Namur',
+    centerAddress: "Anima Corpus Gembloux - Orneau Place de l'Orneau, 15 5030 Gembloux, ...",
     centerEmail: 'gembloux@animacorpus.be, gembloux@animacorpus.be, namur@animacorpus.be',
     centerPhoneNumber: '0492/40.18.77',
-    consultations:
-      "Mon rôle à Anima Corpus\r\n\r\nMa fonction actuelle au sein du Réseau vise à : répondre à vos mails, réorienter les demandes, soutenir l'équipe actuelle, m'occuper de l'agenda en ligne ainsi que du site internet, fixer les rendez-vous, coordonner les réunions d'équipes et collaborer avec nos différents thérapeutes ainsi que les professionnels de la santé de la région.\r\n\r\nJe suis également présente au Centre le mardi, jeudi, vendredi et samedi (pour les thérapies familiales).",
+    consultations: 'Mon rôle à Anima Corpus...',
     contactEmail: 'hajiba.bounouch@animacorpus.be',
     contactPhone: '0488/45.89.44',
     degreesAndTraining:
-      'Diplôme en psychologie clinique, Louvain la Neuve\r\nDiplôme en psychothérapie systémique, ULB\r\nFormation en thérapie narrative\r\nCertificat en insomnie chronique',
-    faq: "Les nouveaux patients sont-ils acceptés par Hajiba Bounouch ?\r\nOui, Hajiba Bounouch accepte de nouveaux patients.\r\nOù travaille Hajiba Bounouch ?\r\nHajiba Bounouch exerce à : Anima Corpus GEMBLOUX (Site Orneau) (15, Place de l'ORNEAU 15, 5030 Gembloux); Anima Corpus Namur (Avenue Cardinal Mercier 46, 5000 Namur); Gembloux Tout Vent (Chaussée de Namur 47, 5030 Gembloux).\r\nDans quel cabinet travaille Hajiba Bounouch ?\r\nHajiba Bounouch exerce dans le cabinet suivant : Centre Anima Corpus",
-    specialization1: null,
-    specialization2: null,
+      'Diplôme en psychologie clinique, Louvain la Neuve\nDiplôme en psychothérapie systémique, ULB...',
+    frequently_asked_questions:
+      'Les nouveaux patients sont-ils acceptés ? Oui, Hajiba Bounouch accepte de nouveaux patients...',
     specializations:
-      'Psychologue clinicienne\r\nPsychothérapeute systémique\r\nThérapie familiale et de couple\r\nNuméro INAMI\r\n70101702000',
-    spokenLanguages: 'Arabe (العربية),Français (Français)',
-    targetAudience: null,
+      'Psychologue clinicienne\nPsychothérapeute systémique\nThérapie familiale et de couple\nNuméro INAMI\n70101702000',
+    spokenLanguages: ['Français', 'Anglais', 'Néerlandais'],
     website: 'https://www.animacorpus.be/equipe/hajiba-bounouch',
     rosaLink: null,
     googleAgendaLink: null,
-    schedule:
-      "Je consulte le lundi, jeudi, vendredi et samedi.\r\n\r\nToutes les plages ouvertes ne sont pas visibles sur mon agenda en ligne.\r\n\r\nSi vous souhaitez un rdv, vous pouvez prendre contact par tel : 0488/45.89.44 ou par mail : hajiba.bounouch@animacorpus.be      Anima Corpus GEMBLOUX (Site Orneau)\r\n15, Place de l'ORNEAU 15, 5030 Gembloux\r\nTéléphone • E-mail • Heures d'ouverture\r\nProfile picture of anima-corpus-gembloux-site-orneau\r\n\r\nAnima Corpus Namur\r\nAvenue Cardinal Mercier 46, 5000 Namur\r\nTéléphone • E-mail • Heures d'ouverture\r\nProfile picture of anima-corpus-namur\r\n\r\nGembloux Tout Vent\r\nChaussée de Namur 47, 5030 Gembloux\r\nTéléphone • E-mail • Heures d'ouverture\r\nProfile picture of gembloux-tout-vent",
+    schedule: 'Je consulte le lundi, jeudi, vendredi et samedi...',
+    faq: 'Les nouveaux patients sont-ils acceptés ? Oui, Hajiba Bounouch accepte de nouveaux patients...',
+    // add id since it's required in the type
   },
 ];
 

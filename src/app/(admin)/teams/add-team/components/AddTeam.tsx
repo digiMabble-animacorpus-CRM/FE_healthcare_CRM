@@ -1,47 +1,18 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
+import { useForm, Controller, FormProvider } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner, Form } from 'react-bootstrap';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
-import TextFormInput from '@/components/from/TextFormInput';
-import TextAreaFormInput from '@/components/from/TextAreaFormInput';
-import ChoicesFormInput from '@/components/from/ChoicesFormInput';
-import { createTeamMember, getTeamMemberById, TeamMemberUpdatePayload, transformToBackendDto, updateTeamMember } from '@/helpers/team-members';
+import { useEffect } from 'react';
+
+// Helpers
+import { createTeamMember, TeamMemberUpdatePayload, updateTeamMember } from '@/helpers/team-members';
 import { TeamMemberCreatePayload } from '@/types/data';
 
-type TeamsFormValues = {
-  team_id?: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
-  job_1?: string | null;
-  job_2?: string | null;
-  job_3?: string | null;
-  job_4?: string | null;
-  specific_audience?: string | null;
-  specialization_1?: string | null;
-  who_am_i: string;
-  consultations: string;
-  office_address: string;
-  contact_email: string;
-  contact_phone: string;
-  schedule: Record<string, string | null>;
-  about: string;
-  languages_spoken: string[];
-  payment_methods: string[];
-  diplomas_and_training: string[];
-  specializations: string[];
-  website: string;
-  frequently_asked_questions: { question: string; answer: string }[];
-  calendar_links: string[];
-  photo: string;
-  tags: string[];
-};
-
-const schema: yup.ObjectSchema<TeamsFormValues> = yup.object({
+// ✅ Validation schema
+const schema = yup.object({
   first_name: yup.string().required('First name required'),
   last_name: yup.string().required('Last name required'),
   full_name: yup.string().required('Full name required'),
@@ -49,130 +20,141 @@ const schema: yup.ObjectSchema<TeamsFormValues> = yup.object({
   who_am_i: yup.string().required('About me required'),
   contact_email: yup.string().email().required('Contact email required'),
   contact_phone: yup.string().required('Contact phone required'),
-  languages_spoken: yup.array().of(yup.string()).min(1, 'Select at least one language').required(),
-  specializations: yup.array().of(yup.string()).min(1, 'Add at least one specialization').required(),
-}).required();
+  languages_spoken: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'Select at least one language')
+    .required(),
+  specializations: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'Add at least one specialization')
+    .required(),
+});
+
+type TeamsFormValues = yup.InferType<typeof schema> &
+  Partial<Omit<TeamMemberUpdatePayload, keyof yup.InferType<typeof schema>>>;
 
 interface Props {
-  params?: { id?: string };
+  defaultValues?: Partial<TeamsFormValues>;
+  isEdit?: boolean;
 }
 
-const AddTeam = ({ params }: Props) => {
+const AddTeam = ({ defaultValues, isEdit }: Props) => {
   const router = useRouter();
-  const isEditMode = !!params?.id;
-  const [loading, setLoading] = useState<boolean>(isEditMode);
 
   const methods = useForm<TeamsFormValues>({
     resolver: yupResolver(schema),
-    defaultValues: {
+    defaultValues: defaultValues || {
       first_name: '',
       last_name: '',
       full_name: '',
       job_1: '',
-      job_2: '',
-      job_3: '',
-      job_4: '',
-      specific_audience: '',
-      specialization_1: '',
       who_am_i: '',
-      consultations: '',
-      office_address: '',
       contact_email: '',
       contact_phone: '',
-      schedule: {},
-      about: '',
-      languages_spoken: [''],
-      payment_methods: [],
-      diplomas_and_training: [''],
-      specializations: [''],
-      website: '',
-      frequently_asked_questions: [{ question: '', answer: '' }],
-      calendar_links: [''],
-      photo: '',
-      tags: [],
+      languages_spoken: [],
+      specializations: [],
     },
   });
 
-  const { control, handleSubmit, reset, watch, formState: { errors } } = methods;
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { errors },
+  } = methods;
 
-  // Dynamic arrays
-  const diplomasArray = useFieldArray({ control, name: 'diplomas_and_training' });
-  const specializationsArray = useFieldArray({ control, name: 'specializations' });
-  const calendarLinksArray = useFieldArray({ control, name: 'calendar_links' });
-  const faqArray = useFieldArray({ control, name: 'frequently_asked_questions' });
-
-  // Fetch for edit
   useEffect(() => {
-    if (isEditMode && params?.id) {
-      setLoading(true);
-      getTeamMemberById(params.id)
-        .then((data) => {
-          if (data) {
-            const mapped: TeamsFormValues = {
-              first_name: data.first_name || '',
-              last_name: data.last_name || '',
-              full_name: data.full_name || '',
-              job_1: data.job_1 || '',
-              job_2: data.job_2 || '',
-              job_3: data.job_3 || '',
-              job_4: data.job_4 || '',
-              specific_audience: data.specific_audience || '',
-              specialization_1: data.specialization_1 || '',
-              who_am_i: data.who_am_i || '',
-              consultations: data.consultations || '',
-              office_address: data.office_address || '',
-              contact_email: data.contact_email || '',
-              contact_phone: data.contact_phone || '',
-              schedule: data.schedule || {},
-              about: data.about || '',
-              languages_spoken: data.languages_spoken?.length ? data.languages_spoken : [''],
-              payment_methods: data.payment_methods || [],
-              diplomas_and_training: data.diplomas_and_training?.length ? data.diplomas_and_training : [''],
-              specializations: data.specializations?.length ? data.specializations : [''],
-              website: data.website || '',
-              frequently_asked_questions: data.frequently_asked_questions?.length
-                ? data.frequently_asked_questions
-                : [{ question: '', answer: '' }],
-              calendar_links: data.calendar_links?.length ? data.calendar_links : [''],
-              photo: data.photo || '',
-              tags: data.tags || [],
-            };
-            reset(mapped);
-          }
-        })
-        .catch((err) => console.error('Fetch error', err))
-        .finally(() => setLoading(false));
+    if (defaultValues) {
+      reset(defaultValues);
     }
-  }, [isEditMode, params?.id, reset]);
+  }, [defaultValues, reset]);
 
-  const onSubmit = async (formData: TeamsFormValues) => {
+  const onSubmit = async (data: TeamsFormValues) => {
     try {
-      if (isEditMode && params?.id) {
-        const updatePayload: TeamMemberUpdatePayload = transformToBackendDto(formData);
-        await updateTeamMember(params.id, updatePayload);
-        alert('Team member updated successfully');
+      if (isEdit && data.team_id) {
+        await updateTeamMember(data.team_id, data as TeamMemberUpdatePayload);
       } else {
-        const createPayload: TeamMemberCreatePayload = transformToBackendDto(formData);
-        await createTeamMember(createPayload);
-        alert('Team member created successfully');
-        reset();
+        await createTeamMember(data as TeamMemberCreatePayload);
       }
-      router.back();
-    } catch (err: any) {
-      console.error(err);
-      alert(err.message || 'Submit error');
-    } finally {
-      setLoading(false);
+      router.push('/(admin)/teams');
+    } catch (err) {
+      console.error('Error saving team member:', err);
     }
   };
 
-  if (loading) return <Spinner animation="border" className="my-5 d-block mx-auto" />;
-
   return (
     <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* form fields ... same as your existing render blocks */}
-      </form>
+      <Form onSubmit={handleSubmit(onSubmit)}>
+        <Card>
+          <CardHeader>
+            <CardTitle>{isEdit ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
+          </CardHeader>
+          <CardBody>
+            <Row>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>First Name</Form.Label>
+                  <Controller
+                    name="first_name"
+                    control={control}
+                    render={({ field }) => (
+                      <Form.Control {...field} isInvalid={!!errors.first_name} />
+                    )}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.first_name?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Last Name</Form.Label>
+                  <Controller
+                    name="last_name"
+                    control={control}
+                    render={({ field }) => (
+                      <Form.Control {...field} isInvalid={!!errors.last_name} />
+                    )}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.last_name?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            {/* About Me */}
+            <Row className="mt-3">
+              <Col md={12}>
+                <Form.Group>
+                  <Form.Label>About Me</Form.Label>
+                  <Controller
+                    name="who_am_i"
+                    control={control}
+                    render={({ field }) => (
+                      <Form.Control
+                        as="textarea"
+                        rows={3}
+                        {...field}
+                        isInvalid={!!errors.who_am_i}
+                      />
+                    )}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.who_am_i?.message}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
+          </CardBody>
+        </Card>
+
+        <Button type="submit" className="mt-3">
+          {isEdit ? 'Update' : 'Create'}
+        </Button>
+      </Form>
     </FormProvider>
   );
 };
