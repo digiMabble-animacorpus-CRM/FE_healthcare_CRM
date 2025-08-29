@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useFormContext, Controller } from 'react-hook-form';
 import { Form, Row, Col, Button } from 'react-bootstrap';
-import Calendar from 'react-calendar'; // 👈 install react-calendar
+import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import dayjs from 'dayjs';
 import { API_BASE_PATH } from '@/context/constants';
@@ -23,16 +23,19 @@ interface Specialization {
     specialization_type: string;
 }
 
+interface Availability {
+    day: string;       // e.g. "Monday"
+    startTime: string; // "09:00"
+    endTime: string;   // "17:00"
+}
+
 interface Therapist {
     therapistId: number;
     firstName: string;
     lastName: string;
     fullName: string;
-    availability?: {
-        dayOfWeek: string[];
-        startTime: string;
-        endTime: string;
-    };
+    photo: string;
+    availability: Availability[];
 }
 
 const AppointmentFields = () => {
@@ -49,16 +52,16 @@ const AppointmentFields = () => {
     const [departments, setDepartments] = useState<Department[]>([]);
     const [specializations, setSpecializations] = useState<Specialization[]>([]);
     const [therapists, setTherapists] = useState<Therapist[]>([]);
-    const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(
-        null
-    );
-    console.log(selectedTherapist,"sel")
+    const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
+    console.log(selectedTherapist, "sel")
     const [timeSlots, setTimeSlots] = useState<string[]>([]);
     const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
     const branchId = watch('branchId');
     const departmentId = watch('departmentId');
     const specializationId = watch('specializationId');
+    const selectedDate = watch('date');
+    console.log(selectedDate, "selected Time")
 
     const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
@@ -90,7 +93,14 @@ const AppointmentFields = () => {
     useEffect(() => {
         if (!branchId) {
             setDepartments([]);
+            setSpecializations([]);
+            setTherapists([]);
+            setSelectedTherapist(null);
             setValue('departmentId', '');
+            setValue('specializationId', '');
+            setValue('therapistId', '');
+            setValue('date', '');
+            setValue('time', '');
             return;
         }
 
@@ -115,13 +125,17 @@ const AppointmentFields = () => {
     useEffect(() => {
         if (!branchId || !departmentId) {
             setSpecializations([]);
+            setTherapists([]);
+            setSelectedTherapist(null);
             setValue('specializationId', '');
+            setValue('therapistId', '');
+            setValue('date', '');
+            setValue('time', '');
             return;
         }
 
         async function loadSpecializations() {
             try {
-                console.log(departmentId, "department")
                 const res = await fetch(
                     `${API_BASE_PATH}/specializations`,
                     // `${API_BASE_PATH}/specializations?branchId=${branchId}&departmentId=${departmentId}`,
@@ -138,11 +152,14 @@ const AppointmentFields = () => {
         loadSpecializations();
     }, [branchId, departmentId]);
 
-    // fetch therapists when all three selected
+    // fetch therapists when specialization is selected
     useEffect(() => {
         if (!branchId || !departmentId || !specializationId) {
             setTherapists([]);
+            setSelectedTherapist(null);
             setValue('therapistId', '');
+            setValue('date', '');
+            setValue('time', '');
             return;
         }
 
@@ -164,32 +181,67 @@ const AppointmentFields = () => {
         loadTherapists();
     }, [branchId, departmentId, specializationId]);
 
-    // therapist change → generate slots
-    const handleTherapistChange = (
-        e: React.ChangeEvent<HTMLSelectElement>
-    ) => {
+    // therapist change
+    const handleTherapistChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
         const therapistId = Number(e.target.value);
-        const therapist =
-            therapists.find((t) => t.therapistId === therapistId) || null;
+        const therapist = therapists.find((t) => t.therapistId === therapistId) || null;
         setSelectedTherapist(therapist);
         setValue('therapistId', therapistId);
+        setValue('date', '');
+        setValue('time', '');
+        setTimeSlots([]);
+    };
 
-        if (therapist?.availability) {
-            const slots: string[] = [];
-            const start = dayjs(therapist.availability.startTime, 'HH:mm');
-            const end = dayjs(therapist.availability.endTime, 'HH:mm');
+    // generate slots when date is selected
+    useEffect(() => {
+        if (!selectedTherapist || !selectedDate) return;
 
-            let current = start;
-            while (current.isBefore(end)) {
-                const slotStart = current.format('HH:mm');
-                const slotEnd = current.add(30, 'minute').format('HH:mm');
-                slots.push(`${slotStart} - ${slotEnd}`);
-                current = current.add(30, 'minute');
-            }
-            setTimeSlots(slots);
-        } else {
+        const dayName = dayjs(selectedDate).format('dddd'); // e.g. "Monday"
+        console.log(dayName, "day")
+        const dayAvailability = selectedTherapist.availability?.find(
+            (a) => a.day === dayName
+        );
+        console.log(dayAvailability, "aval")
+
+        if (!dayAvailability) {
             setTimeSlots([]);
+            return;
         }
+
+        const baseDate = dayjs(selectedDate);
+        let current = baseDate
+            .hour(Number(dayAvailability.startTime.split(':')[0]))
+            .minute(Number(dayAvailability.startTime.split(':')[1]))
+            .second(0);
+
+        const end = baseDate
+            .hour(Number(dayAvailability.endTime.split(':')[0]))
+            .minute(Number(dayAvailability.endTime.split(':')[1]))
+            .second(0);
+
+        const now = dayjs();
+
+        const slots: string[] = [];
+        while (current.isBefore(end)) {
+            const slotStart = current.format('HH:mm');
+            const slotEnd = current.add(30, 'minute').format('HH:mm');
+
+            // skip past slots if selected date is today
+            if (baseDate.isAfter(now, 'day') || current.isAfter(now)) {
+                slots.push(`${slotStart} - ${slotEnd}`);
+            }
+
+            current = current.add(30, 'minute');
+        }
+
+        setTimeSlots(slots);
+    }, [selectedDate, selectedTherapist]);
+
+    // disable calendar days not in therapist availability
+    const tileDisabled = ({ date }: { date: Date }) => {
+        if (!selectedTherapist?.availability) return false;
+        const dayName = dayjs(date).format('dddd');
+        return !selectedTherapist.availability.some((a) => a.day === dayName);
     };
 
     return (
@@ -269,15 +321,11 @@ const AppointmentFields = () => {
                                 {...field}
                                 value={field.value ? new Date(field.value) : new Date()}
                                 minDate={new Date()}
+                                tileDisabled={tileDisabled}
                                 onChange={(date) => {
                                     const formattedDate =
                                         date instanceof Date && !isNaN(date.getTime())
-                                            ? `${date.getFullYear()}-${String(
-                                                date.getMonth() + 1
-                                            ).padStart(2, '0')}-${String(date.getDate()).padStart(
-                                                2,
-                                                '0'
-                                            )}`
+                                            ? dayjs(date).format('YYYY-MM-DD')
                                             : '';
                                     field.onChange(formattedDate);
                                     setValue('date', formattedDate);

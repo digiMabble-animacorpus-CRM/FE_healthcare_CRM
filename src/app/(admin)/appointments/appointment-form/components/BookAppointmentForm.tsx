@@ -104,6 +104,9 @@ const BookAppointmentForm = ({
   }, [isEditMode, defaultValues, reset]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
+    // 👉 Console the raw form data
+    console.log("📝 Appointment Form Data:", data);
+
     const payload = {
       patientId,
       branchId: data.branchId,
@@ -117,12 +120,12 @@ const BookAppointmentForm = ({
       ...(isEditMode ? { modifiedById } : { createdById }),
     };
 
+    console.log("📦 API Payload:", payload);
+
     try {
       setSaving(true);
       const res = await fetch(
-        `${API_BASE_PATH}/appointments${
-          isEditMode && appointmentId ? `/${appointmentId}` : ""
-        }`,
+        `${API_BASE_PATH}/appointments${isEditMode && appointmentId ? `/${appointmentId}` : ""}`,
         {
           method: isEditMode ? "PUT" : "POST",
           headers: {
@@ -134,11 +137,13 @@ const BookAppointmentForm = ({
       );
 
       if (!res.ok) throw new Error("Failed to save appointment");
-      await res.json();
+      const responseData = await res.json();
+
+      console.log("✅ Appointment Saved Response:", responseData);
 
       onSubmitHandler?.(data);
     } catch (error) {
-      console.error("API Error:", error);
+      console.error("❌ API Error:", error);
       alert("Failed to save appointment. Please try again.");
     } finally {
       setSaving(false);
