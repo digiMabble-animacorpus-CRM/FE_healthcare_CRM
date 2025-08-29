@@ -21,23 +21,23 @@ export type AppointmentFormValues = {
   branchId: number;
   departmentId: number;
   specializationId: number;
-  therapistKey: number;
-  patientId?: string; // optional here because BookAppointmentForm injects
-  date: string;
-  time: string; // HH:mm
+  therapistId: number;
+  patientId?: string;
+  date: string;          // YYYY-MM-DD
+  time: string;          // HH:mm (start only)
   purposeOfVisit: string;
-  notes?: string;
+  description?: string;
 };
 
 const schema = yup.object({
   branchId: yup.number().required("Select branch"),
   departmentId: yup.number().required("Select department"),
   specializationId: yup.number().required("Select specialization"),
-  therapistKey: yup.number().required("Select therapist"),
+  therapistId: yup.number().required("Select therapist"),
   date: yup.string().required("Select date"),
   time: yup.string().required("Select time"),
-  purposeOfVisit: yup.string().required("Select service"),
-  notes: yup.string().optional(),
+  purposeOfVisit: yup.string().required("Enter purpose of visit"),
+  description: yup.string().optional(),
 });
 
 // ---------------- Props ----------------
@@ -73,15 +73,13 @@ const BookAppointmentForm = ({
       branchId: defaultValues?.branchId ?? 0,
       departmentId: defaultValues?.departmentId ?? 0,
       specializationId: defaultValues?.specializationId ?? 0,
-      therapistKey: defaultValues?.therapistKey ?? 0,
+      therapistId: defaultValues?.therapistId ?? 0,
       date: defaultValues?.date ?? "",
       time: defaultValues?.time ?? "",
       purposeOfVisit: defaultValues?.purposeOfVisit ?? "",
-      notes:
-        defaultValues?.notes ??
-        (selectedCustomer?.name
-          ? `Booking for ${selectedCustomer.name}`
-          : ""),
+      description: defaultValues?.description ?? (selectedCustomer?.name
+        ? `Booking for ${selectedCustomer.name}`
+        : ""),
     },
   });
 
@@ -94,17 +92,16 @@ const BookAppointmentForm = ({
         branchId: defaultValues.branchId ?? 0,
         departmentId: defaultValues.departmentId ?? 0,
         specializationId: defaultValues.specializationId ?? 0,
-        therapistKey: defaultValues.therapistKey ?? 0,
+        therapistId: defaultValues.therapistId ?? 0,
         date: defaultValues.date ?? "",
         time: defaultValues.time ?? "",
         purposeOfVisit: defaultValues.purposeOfVisit ?? "",
-        notes: defaultValues.notes ?? "",
+        description: defaultValues.description ?? "",
       });
     }
   }, [isEditMode, defaultValues, reset]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
-    // 👉 Console the raw form data
     console.log("📝 Appointment Form Data:", data);
 
     const payload = {
@@ -112,11 +109,13 @@ const BookAppointmentForm = ({
       branchId: data.branchId,
       departmentId: data.departmentId,
       specializationId: data.specializationId,
-      therapistKey: data.therapistKey,
+      therapistId: data.therapistId,
       date: data.date,
-      timeslot: `${data.time} - ${getEndTime(data.time)}`,
+      startTime: data.time,
+      endTime: getEndTime(data.time),
+      status: isEditMode ? undefined : "pending",
       purposeOfVisit: data.purposeOfVisit,
-      description: data.notes || "",
+      description: data.description || "",
       ...(isEditMode ? { modifiedById } : { createdById }),
     };
 
@@ -125,7 +124,9 @@ const BookAppointmentForm = ({
     try {
       setSaving(true);
       const res = await fetch(
-        `${API_BASE_PATH}/appointments${isEditMode && appointmentId ? `/${appointmentId}` : ""}`,
+        `${API_BASE_PATH}/appointments${
+          isEditMode && appointmentId ? `/${appointmentId}` : ""
+        }`,
         {
           method: isEditMode ? "PUT" : "POST",
           headers: {
