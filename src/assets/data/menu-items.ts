@@ -77,25 +77,6 @@ export const MENU_ITEMS: MenuItemType[] = [
       },
     ],
   },
-    {
-    key: 'Department',
-    label: 'Department',
-    icon: 'ri:contacts-book-3-line',
-    children: [
-      {
-        key: 'department-list',
-        label: 'Department List',
-        url: '/department/department-list',
-        parentKey: 'department',
-      },
-      {
-        key: 'add-department',
-        label: 'Add Department',
-        url: '/department/add-department/',
-        parentKey: 'department',
-      },
-    ],
-  },
 
   {
     key: 'settings',
@@ -125,5 +106,11 @@ export const MENU_ITEMS: MenuItemType[] = [
     label: 'Branches',
     icon: 'ri:chat-quote-line',
     url: '/branches',
+  },
+  {
+    key: 'department',
+    label: 'Department',
+    icon: 'ri:chat-quote-line',
+    url: '/department',
   },
 ];
