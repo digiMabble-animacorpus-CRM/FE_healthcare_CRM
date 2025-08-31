@@ -77,9 +77,7 @@ const BookAppointmentForm = ({
       date: defaultValues?.date ?? "",
       time: defaultValues?.time ?? "",
       purposeOfVisit: defaultValues?.purposeOfVisit ?? "",
-      description: defaultValues?.description ?? (selectedCustomer?.name
-        ? `Booking for ${selectedCustomer.name}`
-        : ""),
+      description: defaultValues?.description ?? "",
     },
   });
 
