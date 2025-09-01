@@ -69,7 +69,7 @@ const DepartmentForm = ({ defaultValues, isEditMode = false }: Props) => {
         });
       }
 
-      router.push('/departments'); // redirect after success
+      router.push('/department'); // redirect after success
     } catch (err) {
       console.error('Error saving department:', err);
     }
