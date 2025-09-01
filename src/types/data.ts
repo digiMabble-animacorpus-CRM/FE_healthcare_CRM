@@ -668,25 +668,24 @@ export type ProfileCreatePayload = {
 
 export type TeamMemberType = {
   about: string;
-  payment_methods: never[];
+  payment_methods: string[];
   diplomas_and_training: any;
   specializations: any;
   website: string;
   frequently_asked_questions: any;
   calendar_links: any;
   photo: string;
-  tags: never[];
-  languages_spoken: never[];
+  languages_spoken: string[];
   team_id: string;
   last_name: string;
   first_name: string;
   full_name: string;
-  job_1: string;
-  specific_audience: string;
-  specialization_1: string;
-  job_2: string;
-  job_3: string;
-  job_4: string;
+  job_1?: string | null;
+  specific_audience?: string | null;
+  specialization_1?: string | null;
+  job_2?: string | null;
+  job_3?: string | null;
+  job_4?: string | null;
   who_am_i: string;
   consultations: string;
   office_address: string;
@@ -698,33 +697,33 @@ export type TeamMemberType = {
 }
 
 export type TeamMemberCreatePayload = {
-  team_id: string;
-  last_name: string;
-  first_name: string;
-  full_name: string;
-  job_1: string | null;
-  specific_audience: string | null;
-  specialization_1: string | null;
-  job_2: string | null;
-  job_3: string | null;
-  job_4: string | null;
-  who_am_i: string;
+  teamId: string; // camelCase for consistency
+  lastName: string;
+  firstName: string;
+  fullName: string;
+  job1?: string | null;
+  specificAudience?: string | null;
+  specialization1?: string | null;
+  job2?: string | null;
+  job3?: string | null;
+  job4?: string | null;
+  whoAmI: string;
   consultations: string;
-  office_address: string;
-  contact_email: string;
-  contact_phone: string;
+  officeAddress: string;
+  contactEmail: string;
+  contactPhone: string;
   schedule: {
-    text: string | null;
+    text: string | null; // JSON stringified schedule
   };
-  about: string | null;
-  languages_spoken: string[];
-  payment_methods: string[];
-  diplomas_and_training: string[];
-  specializations: string[];
-  website: string;
-  frequently_asked_questions: string | null;
-  calendar_links: string[];
+  about?: string | null;
+  languagesSpoken: string[]; // always an array
+  paymentMethods: string[]; // always an array
+  diplomasAndTraining: string[]; // always an array
+  specializations: string[]; // always an array
+  website?: string;
+  frequentlyAskedQuestions?: string | null; // JSON string
+  calendarLinks: string[]; // always an array
   photo: string;
   branches?: (string | number)[];
-  selected_branch?: string | number | null;
+  selectedBranch?: string | number | null;
 };
