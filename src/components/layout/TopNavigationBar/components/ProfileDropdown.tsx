@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownToggle,
 } from 'react-bootstrap';
+import { API_BASE_PATH } from "@/context/constants";
 
 const ProfileDropdown = () => {
   const [fullName, setFullName] = useState<string>('User');
@@ -23,7 +24,7 @@ const ProfileDropdown = () => {
         const token = localStorage.getItem('access_token');
         if (!token) return;
 
-        const res = await axios.get('http://164.92.220.65/api/v1/profile', {
+        const res = await axios.get(`${API_BASE_PATH}/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',

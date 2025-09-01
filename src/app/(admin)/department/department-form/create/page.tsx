@@ -23,7 +23,7 @@ const CreateDepartmentPage = () => {
       if (!res.ok) throw new Error('Failed to create department');
 
       toast.success('Department created successfully!');
-      router.push('/departments');
+      router.push('/department');
     } catch (error) {
       console.error(error);
       toast.error('Failed to create Department.');
