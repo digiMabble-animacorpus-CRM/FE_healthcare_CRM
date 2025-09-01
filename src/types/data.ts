@@ -322,6 +322,8 @@ export type BranchDetails = {
 export type TherapistType = {
   _id: string;
   id: string;
+  frequently_asked_questions: any;
+  languages_spoken(languages_spoken: any): unknown;
   _key: number;
   idPro: number;
   firstName: string;
@@ -347,7 +349,6 @@ export type TherapistType = {
   specializations: string;
   website: string;
   faq: string;
-  frequently_asked_questions?: string;
   agendaLinks: string | null;
   rosaLink?: string | null;
   googleAgendaLink?: string | null;
@@ -728,3 +729,13 @@ export type TeamMemberCreatePayload = {
   branches?: (string | number)[];
   selected_branch?: string | number | null;
 };
+
+export interface DepartmentType {
+  _id: string;
+  name: string;
+  description?: string;
+  is_active: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+

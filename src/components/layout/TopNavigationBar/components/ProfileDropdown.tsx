@@ -23,7 +23,7 @@ const ProfileDropdown = () => {
         const token = localStorage.getItem('access_token');
         if (!token) return;
 
-        const res = await axios.get('http://localhost:8080/api/v1/profile', {
+        const res = await axios.get('http://164.92.220.65/api/v1/profile', {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
