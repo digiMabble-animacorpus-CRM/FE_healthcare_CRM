@@ -42,10 +42,11 @@ const DepartmentListPage = () => {
       // Use mock data if API fails
       setDepartments([
         {
-          id: 1,
+          _id: '1',
           name: 'Cardiology',
           is_active: true,
           description: 'Handles heart-related treatments',
+
         },
       ]);
       setTotalPages(1);

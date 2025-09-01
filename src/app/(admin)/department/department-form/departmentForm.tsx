@@ -6,6 +6,7 @@ import * as yup from 'yup';
 import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
+import axios from 'axios';
 
 export interface DepartmentFormValues {
   name: string;
@@ -22,10 +23,9 @@ const schema = yup.object({
 interface Props {
   defaultValues?: Partial<DepartmentFormValues & { _id?: string }>;
   isEditMode?: boolean;
-  onSubmitHandler: (data: DepartmentFormValues & { _id?: string }) => Promise<void>;
 }
 
-const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
+const DepartmentForm = ({ defaultValues, isEditMode = false }: Props) => {
   const router = useRouter();
 
   const methods = useForm<DepartmentFormValues>({
@@ -40,12 +40,39 @@ const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
   const { handleSubmit, control, register } = methods;
 
   const handleFormSubmit = async (data: DepartmentFormValues) => {
-    const payload =
-      isEditMode && (defaultValues as any)?._id
-        ? { ...data, _id: (defaultValues as any)._id }
-        : data;
+    try {
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        console.warn('No access token found');
+        return;
+      }
 
-    await onSubmitHandler(payload);
+      if (isEditMode && (defaultValues as any)?._id) {
+        // PUT request for update
+        await axios.put(
+          `http://164.92.220.65/api/v1/departments/${(defaultValues as any)._id}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+      } else {
+        // POST request for create
+        await axios.post('http://164.92.220.65/api/v1/departments', data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+      }
+
+      router.push('/departments'); // redirect after success
+    } catch (err) {
+      console.error('Error saving department:', err);
+    }
   };
 
   return (
