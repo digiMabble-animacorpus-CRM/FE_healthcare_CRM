@@ -164,7 +164,7 @@ const ProfileDetails = () => {
               </div>
             )}
             <div>
-              {/* <h3 className="fw-semibold mb-1">{full_name}</h3> */}
+              <h3 className="fw-semibold mb-1">{full_name}</h3>
               <p className="link-primary fw-medium fs-14">{job_1}</p>
             </div>
           </div>
