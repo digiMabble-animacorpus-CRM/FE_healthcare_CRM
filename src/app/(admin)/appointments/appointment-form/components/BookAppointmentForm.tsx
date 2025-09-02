@@ -12,7 +12,7 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { API_BASE_PATH } from "@/context/constants";
-import type { CustomerEnquiriesType } from "@/types/data";
+import type { PatientType } from "@/types/data";
 import { useEffect, useState } from "react";
 import AppointmentFields from "./AppointmentFields";
 
@@ -49,7 +49,7 @@ interface Props {
   patientId: string;
   createdById: string;
   modifiedById?: string;
-  selectedCustomer?: CustomerEnquiriesType;
+  selectedCustomer?: PatientType;
 }
 
 // ---------------- Component ----------------
@@ -109,8 +109,8 @@ const BookAppointmentForm = ({
       specializationId: data.specializationId,
       therapistId: data.therapistId,
       date: data.date,
-      startTime: data.time,
-      endTime: getEndTime(data.time),
+      startTime: toISODateTime(data.date, data.time),
+      endTime: toISODateTime(data.date, getEndTime(data.time)),
       status: isEditMode ? undefined : "pending",
       purposeOfVisit: data.purposeOfVisit,
       description: data.description || "",
@@ -161,9 +161,9 @@ const BookAppointmentForm = ({
               <small className="text-muted">
                 Booking for:{" "}
                 <strong>
-                  {selectedCustomer.name ||
-                    selectedCustomer.email ||
-                    selectedCustomer.number}
+                  {selectedCustomer.firstname ||
+                    selectedCustomer.emails ||
+                    selectedCustomer.phones}
                 </strong>
               </small>
             )}
@@ -197,6 +197,11 @@ function getEndTime(startTime: string) {
   date.setHours(hour, minute);
   date.setMinutes(date.getMinutes() + 30);
   return date.toTimeString().slice(0, 5); // HH:mm
+}
+
+/** Helper: combine date + time into ISO string */
+function toISODateTime(date: string, time: string) {
+  return new Date(`${date}T${time}:00`).toISOString();
 }
 
 export default BookAppointmentForm;
