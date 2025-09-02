@@ -156,7 +156,7 @@ const TherapistsListPage = () => {
     return match ? match[1] : '';
   };
 
-  console.log(currentData)
+  console.log(currentData);
   return (
     <>
       <PageTitle subName="Therapist" title="Therapists List" />
@@ -246,7 +246,6 @@ const TherapistsListPage = () => {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Address</th>
                         <th>Job Title</th>
                         <th>Action</th>
                       </tr>
@@ -259,39 +258,39 @@ const TherapistsListPage = () => {
                           </td>
                           <td>
                             <td>
-                              {item.imageUrl && item.imageUrl !== "null" && item.imageUrl.trim() !== "" ? (
+                              {item.imageUrl &&
+                              item.imageUrl !== 'null' &&
+                              item.imageUrl.trim() !== '' ? (
                                 <img
                                   src={item.imageUrl}
                                   alt={item.firstName}
                                   className="rounded-circle object-cover"
-                                  style={{ width: "40px", height: "40px" }}
+                                  style={{ width: '40px', height: '40px' }}
                                 />
                               ) : (
                                 <div
                                   className="rounded-circle d-flex align-items-center justify-content-center"
                                   style={{
-                                    width: "40px",
-                                    height: "40px",
-                                    backgroundColor: "#e7ddff",
-                                    color: "#341539",
-                                    fontSize: "20px", // looks balanced in 40px circle
-                                    fontWeight: "bold",
+                                    width: '40px',
+                                    height: '40px',
+                                    backgroundColor: '#e7ddff',
+                                    color: '#341539',
+                                    fontSize: '20px', // looks balanced in 40px circle
+                                    fontWeight: 'bold',
                                   }}
                                 >
                                   {item.firstName?.charAt(0).toUpperCase()}
                                 </div>
                               )}
-
                             </td>
-
                           </td>
                           <td>
                             {item.firstName} {item.lastName}
                           </td>
                           <td>{item.contactEmail}</td>
-                          <td>{item.centerPhoneNumber}</td>
-                          <td>{item.centerAddress}</td>
-                          <td>{item.jobTitle}</td>
+                          <td>{item.contactPhone}</td>
+
+                          <td>{item.jobTitle ||"-"}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
