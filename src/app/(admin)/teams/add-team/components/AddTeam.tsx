@@ -1,496 +1,588 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner, Form } from 'react-bootstrap';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 
-import TextFormInput from '@/components/from/TextFormInput';
-import TextAreaFormInput from '@/components/from/TextAreaFormInput';
-import ChoicesFormInput from '@/components/from/ChoicesFormInput';
-import DropzoneFormInput from '@/components/from/DropzoneFormInput';
-import { createTeamMember, getTeamMemberById, TeamMemberUpdatePayload, transformToBackendDto, updateTeamMember } from '@/helpers/team-members';
-import { TeamMemberCreatePayload } from '@/types/data';
+import { getAllBranch } from '@/helpers/branch';
+import type { TeamMemberCreatePayload } from '@/types/data';
+import { createTeamMember, getTeamMemberById, updateTeamMember } from '@/helpers/team-members';
 
-type TeamsFormValues = {
-  team_id: string;
-  first_name: string;
-  last_name: string;
-  full_name: string;
-  job_1?: string | null;
-  job_2?: string | null;
-  job_3?: string | null;
-  job_4?: string | null;
-  specific_audience?: string | null;
-  specialization_1?: string | null;
-  who_am_i: string;
+// --- Types ---
+
+export type Role = 'super_admin' | 'admin' | 'staff';
+
+export interface PermissionModuleAction {
+  view: boolean;
+  create: boolean;
+  edit: boolean;
+  delete: boolean;
+}
+
+export interface PermissionModules {
+  [module: string]: PermissionModuleAction;
+}
+
+export interface TeamsFormValues {
+  firstName: string;
+  lastName: string;
+  role: Role;
+  branchIds: number[]; // always number[]
+  primaryBranchId: number | ''; // use '' as empty for <select> compatibility
+  permissions: PermissionModules;
+  status: 'active' | 'inactive';
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe?: string;
+  // Add any additional required fields from TeamMemberCreatePayload here
+  whoAmI: string;
   consultations: string;
-  office_address: string;
-  contact_email: string;
-  contact_phone: string;
-  schedule: Record<string, string | null>;
-  about: string;
-  languages_spoken: string[];
-  payment_methods: string[];
-  diplomas_and_training: string[];
-  specializations: string[];
-  website: string;
-  frequently_asked_questions: { question: string; answer: string }[];
-  calendar_links: string[];
-  photo: string; 
+  officeAddress: string;
+  website?: string;
+  paymentMethods?: string[];
+  diplomasAndTraining?: string[];
+  specializations?: string[];
+  calendarLinks?: string[];
+  photo?: string;
+  teamId?: string;
+  // For branch & permissions integration:
+  selectedBranch?: number | string | null;
+}
+
+// --- Default Permission Template ---
+
+const defaultPermissionModules: PermissionModules = {
+  appointments: { view: false, create: false, edit: false, delete: false },
+  patients: { view: false, create: false, edit: false, delete: false },
+  billing: { view: false, create: false, edit: false, delete: false },
+  teams: { view: false, create: false, edit: false, delete: false },
 };
 
-const schema: yup.ObjectSchema<TeamsFormValues> = yup.object({
-  first_name: yup.string().required('First name required'),
-  last_name: yup.string().required('Last name required'),
-  full_name: yup.string().required('Full name required'),
-  job_1: yup.string().nullable().required('At least one job title required'),
-  job_2: yup.string().nullable().optional(),
-  job_3: yup.string().nullable().optional(),
-  job_4: yup.string().nullable().optional(),
-  specific_audience: yup.string().nullable().optional(),
-  specialization_1: yup.string().nullable().optional(),
-  who_am_i: yup.string().required('About me required'),
-  consultations: yup.string().optional(),
-  office_address: yup.string().optional(),
-  contact_email: yup.string().email().required('Contact email required'),
-  contact_phone: yup.string().required('Contact phone required'),
-  schedule: yup.object().optional(),
-  about: yup.string().nullable().optional(),
-  languages_spoken: yup
+// --- Validation Schema using function form of .when() ---
+
+const teamMemberSchema = yup.object({
+  firstName: yup.string().required('Please enter first name'),
+  lastName: yup.string().required('Please enter last name'),
+  role: yup
+    .mixed<Role>()
+    .oneOf(['super_admin', 'admin', 'staff'], 'Please select a valid role')
+    .required('Role is required'),
+  branchIds: yup
     .array()
-    .of(yup.string().required())
-    .min(1, 'Select at least one language')
-    .required('Languages spoken required')
-    .default([]),
-  payment_methods: yup.array().of(yup.string()).optional().default([]),
-  diplomas_and_training: yup.array().of(yup.string().required()).optional().default([]),
-  specializations: yup.array().of(yup.string().required()).min(1, 'Add at least one specialization').required().default([]),
-  website: yup.string().optional(),
-  frequently_asked_questions: yup
-    .array()
-    .of(
-      yup.object({
-        question: yup.string().optional(),
-        answer: yup.string().optional(),
-      })
-    )
-    .default([{ question: '', answer: '' }]),
-  calendar_links: yup.array().of(yup.string().url()).optional().default([]),
-  photo: yup.string().optional(),  
+    .of(yup.number().required())
+    .default([])
+    .when('role', (roleValue: Role, schema: any) => {
+      return roleValue !== 'super_admin'
+        ? schema.min(1, 'Select at least one branch')
+        : schema.max(0);
+    }),
+  primaryBranchId: yup
+  .mixed<number | ''>()
+  .nullable()
+  .default('')
+  .when('role', (roleValue: Role, schema) => {
+    if (typeof roleValue === 'string' && roleValue !== 'super_admin') {
+      return schema
+        .notOneOf([''], 'Primary branch is required')
+        .required('Primary branch is required');
+    }
+    return schema.notRequired().nullable();
+  }),
+
+  permissions: yup.object().when('role', (roleValue: Role, schema: any) => {
+    return roleValue === 'admin' || roleValue === 'staff'
+      ? schema.required('Permissions are required')
+      : schema.notRequired();
+  }),
+  status: yup.mixed<'active' | 'inactive'>().oneOf(['active', 'inactive']).required('Status is required'),
+  contactEmail: yup.string().email('Invalid email').required('Email required'),
+  contactPhone: yup.string().required('Phone number required'),
+  aboutMe: yup.string().optional(),
+  whoAmI: yup.string().required('Biography/About me is required'),
+  consultations: yup.string().required('Consultations info is required'),
+  officeAddress: yup.string().required('Office address is required'),
+  website: yup.string().url('Enter valid URL').optional(),
+  paymentMethods: yup.array().of(yup.string()).optional(),
+  diplomasAndTraining: yup.array().of(yup.string()).optional(),
+  specializations: yup.array().of(yup.string()).optional(),
+  calendarLinks: yup.array().of(yup.string().url('Enter valid URL')).optional(),
+  photo: yup.string().url('Enter valid URL').optional(),
+  teamId: yup.string().optional(),
 });
+
+// --- Payload Mapper (conforming with TeamMemberCreatePayload) ---
+
+function mapToPayload(form: TeamsFormValues): TeamMemberCreatePayload {
+  return {
+    teamId: form.teamId || '', // could be '' for new create or set for update
+    lastName: form.lastName,
+    firstName: form.firstName,
+    fullName: `${form.firstName} ${form.lastName}`,
+    job1: undefined,
+    specificAudience: undefined,
+    specialization1: undefined,
+    job2: undefined,
+    job3: undefined,
+    job4: undefined,
+    whoAmI: form.whoAmI,
+    consultations: form.consultations,
+    officeAddress: form.officeAddress,
+    contactEmail: form.contactEmail,
+    contactPhone: form.contactPhone,
+    schedule: { text: null },
+    about: form.aboutMe || null,
+    languagesSpoken: [], // Fill if needed
+    paymentMethods: form.paymentMethods || [],
+    diplomasAndTraining: form.diplomasAndTraining || [],
+    specializations: form.specializations || [],
+    website: form.website || '',
+    frequentlyAskedQuestions: null,
+    calendarLinks: form.calendarLinks || [],
+    photo: form.photo || '',
+    branches: form.branchIds,
+    selected_branch: typeof form.primaryBranchId === 'number' ? form.primaryBranchId : null,
+    permissions: form.permissions,
+    status: form.status,
+  };
+}
+
+// --- Form Component ---
 
 interface Props {
   params?: { id?: string };
+  onSubmitHandler?: (data: TeamMemberCreatePayload) => void;
 }
 
-// Convert [{question, answer}] to {question: answer}
-function faqArrayToObject(faqArr: { question: string; answer: string }[]) {
-  const result: Record<string, string> = {};
-  faqArr.forEach(({ question, answer }) => {
-    if (question) result[question] = answer || '';
-  });
-  return result;
-}
-
-const AddTeam = ({ params }: Props) => {
+const AddTeamMember = ({ params, onSubmitHandler }: Props) => {
   const router = useRouter();
   const isEditMode = !!params?.id;
   const [loading, setLoading] = useState<boolean>(isEditMode);
-
-  const methods = useForm<TeamsFormValues>({
-    resolver: yupResolver(schema),
-    defaultValues: {
-      first_name: '',
-      last_name: '',
-      full_name: '',
-      job_1: '',
-      job_2: '',
-      job_3: '',
-      job_4: '',
-      specific_audience: '',
-      specialization_1: '',
-      who_am_i: '',
-      consultations: '',
-      office_address: '',
-      contact_email: '',
-      contact_phone: '',
-      schedule: {},
-      about: '',
-      languages_spoken: [],
-      payment_methods: [],
-      diplomas_and_training: [],
-      specializations: [],
-      website: '',
-      frequently_asked_questions: [{ question: '', answer: '' }],
-      calendar_links: [],
-      photo: '',     
-    },
+  const [branches, setBranches] = useState<{ id: number; name: string }[]>([]);
+  const [defaultValues, setDefaultValues] = useState<TeamsFormValues>({
+    firstName: '',
+    lastName: '',
+    role: 'staff',
+    branchIds: [],
+    primaryBranchId: '',
+    permissions: defaultPermissionModules,
+    status: 'active',
+    contactEmail: '',
+    contactPhone: '',
+    aboutMe: '',
+    whoAmI: '',
+    consultations: '',
+    officeAddress: '',
+    website: '',
+    paymentMethods: [],
+    diplomasAndTraining: [],
+    specializations: [],
+    calendarLinks: [],
+    photo: '',
+    teamId: '',
   });
 
-  const { control, handleSubmit, reset, watch, formState } = methods;
-  const { errors } = formState;
+  // Fetch branches asynchronously (example below simulates API fetch)
+  useEffect(() => {
+    async function fetchBranches() {
+      const fetchedBranches = await Promise.resolve(getAllBranch());
+      setBranches(fetchedBranches);
+    }
+    fetchBranches();
+  }, []);
 
-  const diplomasArray = useFieldArray<TeamsFormValues, 'diplomas_and_training'>({ control, name: 'diplomas_and_training' });
-  const specializationsArray = useFieldArray<TeamsFormValues, 'specializations'>({ control, name: 'specializations' });
-  const calendarLinksArray = useFieldArray<TeamsFormValues, 'calendar_links'>({ control, name: 'calendar_links' });
-  const frequently_asked_questionsArray = useFieldArray<TeamsFormValues, 'frequently_asked_questions'>({ control, name: 'frequently_asked_questions' });
+  const {
+    handleSubmit,
+    control,
+    reset,
+    watch,
+    setValue,
+    formState: { errors },
+  } = useForm<TeamsFormValues>({
+    resolver: yupResolver(teamMemberSchema),
+    defaultValues,
+    mode: 'all',
+  });
 
+  const role = watch('role');
+  const branchIds = watch('branchIds');
+  const permissions = watch('permissions');
+
+  // Load existing data when editing
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
       getTeamMemberById(params.id)
-        .then((data) => {
-          if (data) {
-            const mapped: TeamsFormValues = {
-              first_name: data.first_name || '',
-              last_name: data.last_name || '',
-              full_name: data.full_name || '',
-              job_1: data.job_1 || '',
-              job_2: data.job_2 || '',
-              job_3: data.job_3 || '',
-              job_4: data.job_4 || '',
-              specific_audience: data.specific_audience || '',
-              specialization_1: data.specialization_1 || '',
-              who_am_i: data.who_am_i || '',
-              consultations: data.consultations || '',
-              office_address: data.office_address || '',
-              contact_email: data.contact_email || '',
-              contact_phone: data.contact_phone || '',
-              schedule: data.schedule && Object.keys(data.schedule).length ? data.schedule : { Monday: '9am-5pm', Tuesday: '9am-5pm' },
-              about: data.about || '',
-              languages_spoken: Array.isArray(data.languages_spoken) ? data.languages_spoken : [],
-              payment_methods: Array.isArray(data.payment_methods) ? data.payment_methods : [],
-              diplomas_and_training: Array.isArray(data.diplomas_and_training) ? data.diplomas_and_training : [],
-              specializations: Array.isArray(data.specializations) ? data.specializations : [],
-              website: data.website || '',
-              frequently_asked_questions:
-                data.frequently_asked_questions && typeof data.frequently_asked_questions === 'object'
-                  ? Object.entries(data.frequently_asked_questions).map(([question, answer]) => ({
-                      question,
-                      answer: typeof answer === 'string' ? answer : (answer ? String(answer) : ''),
-                    }))
-                  : [{ question: '', answer: '' }],
-              calendar_links: Array.isArray(data.calendar_links) ? data.calendar_links : [],
-              photo: data.photo || '',
-              team_id: data.team_id || '',
-            };
-            reset(mapped);
+        .then((tm) => {
+          if (tm) {
+            reset({
+              firstName: tm.first_name,
+              lastName: tm.last_name,
+              role: (tm.role as Role) || 'staff',
+              branchIds: tm.branch_ids === '*' ? [] : (tm.branch_ids as number[]),
+              primaryBranchId: tm.primary_branch_id ?? '',
+              permissions: tm.permissions || defaultPermissionModules,
+              status: tm.status === 'active' ? 'active' : 'inactive',
+              contactEmail: tm.contact_email,
+              contactPhone: tm.contact_téléphone,
+              aboutMe: tm.qui_suis_je || '',
+              whoAmI: tm.who_am_i || '',
+              consultations: tm.consultations || '',
+              officeAddress: tm.office_address || '',
+              website: tm.website || '',
+              paymentMethods: tm.payment_methods || [],
+              diplomasAndTraining: tm.diplomas_and_training || [],
+              specializations: tm.specializations || [],
+              calendarLinks: tm.calendar_links || [],
+              photo: tm.photo || '',
+              teamId: tm.team_id || '',
+            });
           }
-        })
-        .catch((error) => {
-          console.error('Failed to fetch team member data:', error);
         })
         .finally(() => setLoading(false));
     }
   }, [isEditMode, params?.id, reset]);
 
-  useEffect(() => {
-    const subscription = watch((value) => {
-      // Debug: Uncomment to log form value changes
-      // console.log('Form values changed:', value);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
-
-  useEffect(() => {
-    // Debug: Uncomment to log errors
-    // console.log('Form errors:', errors);
-  }, [errors]);
-
-  const mapFormDataToCreatePayload = (formData: TeamsFormValues): TeamMemberCreatePayload => {
-    const faqObj = faqArrayToObject(formData.frequently_asked_questions || []);
-    return {
-      teamId: formData.team_id || '',
-      firstName: formData.first_name,
-      lastName: formData.last_name,
-      fullName: formData.full_name,
-      job1: formData.job_1 || null,
-      job2: formData.job_2 || null,
-      job3: formData.job_3 || null,
-      job4: formData.job_4 || null,
-      specificAudience: formData.specific_audience || null,
-      specialization1: formData.specialization_1 || null,
-      whoAmI: formData.who_am_i,
-      consultations: formData.consultations,
-      officeAddress: formData.office_address,
-      contactEmail: formData.contact_email,
-      contactPhone: formData.contact_phone,
-      schedule: {
-        text: formData.schedule && Object.keys(formData.schedule).length ? JSON.stringify(formData.schedule) : null,
+  // Handle toggling permissions checkboxes
+  const togglePermission = (module: string, action: keyof PermissionModuleAction, value: boolean) => {
+    const current = permissions || {};
+    const updated = {
+      ...current,
+      [module]: {
+        ...current[module],
+        [action]: value,
       },
-      about: formData.about || null,
-      languagesSpoken: formData.languages_spoken,
-      paymentMethods: formData.payment_methods,
-      diplomasAndTraining: formData.diplomas_and_training,
-      specializations: formData.specializations,
-      website: formData.website,
-      frequentlyAskedQuestions: Object.keys(faqObj).length ? JSON.stringify(faqObj) : null,
-      calendarLinks: formData.calendar_links,
-      photo: formData.photo || '',
     };
+    setValue('permissions', updated);
   };
 
-  const onSubmit = async (formData: TeamsFormValues) => {
-    try {
-      if (isEditMode && params?.id) {
-        const updatePayload: TeamMemberUpdatePayload = transformToBackendDto(formData);
-        const success = await updateTeamMember(params.id, updatePayload);
-        if (success) {
-          alert('Team member updated successfully');
-        }
-      } else {
-        const createPayload = mapFormDataToCreatePayload(formData);
-        const success = await createTeamMember(createPayload);
-        if (success) {
-          alert('Team member created successfully');
-          reset();
-        }
+  // Clear primary branch if no longer selected
+  useEffect(() => {
+    if (branchIds.length === 0) {
+      setValue('primaryBranchId', '');
+    } else {
+      const primary = watch('primaryBranchId');
+      if (primary !== '' && !branchIds.includes(primary as number)) {
+        setValue('primaryBranchId', '');
       }
-    } catch (error: any) {
-      console.error('Submit error:', error);
-      if (error?.message) {
-        console.error('Error message:', error.message);
-      }
-      alert('Operation failed');
+    }
+  }, [branchIds, setValue, watch]);
+
+  const onSubmit: SubmitHandler<TeamsFormValues> = async (data) => {
+    const payload = mapToPayload(data);
+    let success = false;
+    if (isEditMode && params?.id) {
+      success = await updateTeamMember(params.id, payload);
+    } else {
+      success = await createTeamMember(payload);
+    }
+
+    if (success) {
+      alert(`Team member ${isEditMode ? 'updated' : 'created'} successfully!`);
+      router.back();
+      onSubmitHandler && onSubmitHandler(payload);
+    } else {
+      alert('Failed to save team member');
     }
   };
 
-  if (loading) return <Spinner animation="border" className="my-5 d-block mx-auto" />;
+  if (loading)
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
 
+  // Render
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Basic Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">{isEditMode ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <Row>
-              <Col lg={6}>
-                <TextFormInput control={control} name="first_name" label="First Name" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="last_name" label="Last Name" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="full_name" label="Full Name" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="job_1" label="Job Title 1" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="job_2" label="Job Title 2" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="job_3" label="Job Title 3" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="job_4" label="Job Title 4" />
-              </Col>
-              <Col lg={12}>
-                <TextFormInput control={control} name="specific_audience" label="Specific Audience" />
-              </Col>
-              <Col lg={12}>
-                <TextFormInput control={control} name="specialization_1" label="Primary Specialization" />
-              </Col>
-              <Col lg={12}>
-                <TextAreaFormInput control={control} name="who_am_i" label="About Me" rows={3} />
-              </Col>
-            </Row>
-          </CardBody>
-        </Card>
-
-        {/* Consultations */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Consultations</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <TextAreaFormInput control={control} name="consultations" label="Consultations" rows={3} />
-          </CardBody>
-        </Card>
-
-        {/* Contact Info Card */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Contact Information</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <Row>
-              <Col lg={6}>
-                <TextFormInput control={control} name="office_address" label="Center Address" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="contact_email" label="Contact Email" />
-              </Col>
-              <Col lg={6}>
-                <TextFormInput control={control} name="contact_phone" label="Contact Phone" />
-              </Col>
-              <Col lg={6}>
-                {/* Support multiple languages */}
-                {methods.watch('languages_spoken').map((_, index) => (
-                  <TextFormInput
-                    key={index}
-                    control={control}
-                    name={`languages_spoken.${index}`}
-                    label={`Spoken Language ${index + 1}`}
-                  />
-                ))}
-                <Button variant="link" onClick={() => methods.setValue('languages_spoken', [...methods.getValues('languages_spoken'), ''])}>
-                  + Add Language
-                </Button>
-              </Col>
-            </Row>
-          </CardBody>
-        </Card>
-
-        {/* Payment Methods */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Payment Methods</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <Controller
-              control={control}
-              name="payment_methods"
-              render={({ field }) => (
-                <ChoicesFormInput className="form-control" multiple value={field.value || []} onChange={field.onChange}>
-                  <option value="Cash">Cash</option>
-                  <option value="Credit Card">Credit Card</option>
-                  <option value="Bank Transfer">Bank Transfer</option>
-                  <option value="PayPal">PayPal</option>
-                </ChoicesFormInput>
-              )}
-            />
-          </CardBody>
-        </Card>
-
-        {/* Diplomas and Training */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Diplomas and Training</CardTitle>
-          </CardHeader>
-          <CardBody>
-            {diplomasArray.fields.map((field, index) => (
-              <Row key={field.id} className="mb-2 align-items-center">
-                <Col lg={10}>
-                  <TextFormInput control={control} name={`diplomas_and_training.${index}`} label={`Diploma/Training ${index + 1}`} />
-                </Col>
-                <Col lg={2}>
-                  <Button variant="danger" onClick={() => diplomasArray.remove(index)}>
-                    Remove
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button variant="link" onClick={() => diplomasArray.append('')}>
-              + Add Diploma/Training
-            </Button>
-          </CardBody>
-        </Card>
-
-        {/* Specializations */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Specializations</CardTitle>
-          </CardHeader>
-          <CardBody>
-            {specializationsArray.fields.map((field, index) => (
-              <Row key={field.id} className="mb-2 align-items-center">
-                <Col lg={10}>
-                  <TextFormInput control={control} name={`specializations.${index}`} label={`Specialization ${index + 1}`} />
-                </Col>
-                <Col lg={2}>
-                  <Button variant="danger" onClick={() => specializationsArray.remove(index)}>
-                    Remove
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button variant="link" onClick={() => specializationsArray.append('')}>
-              + Add Specialization
-            </Button>
-          </CardBody>
-        </Card>
-
-        {/* Website */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Website</CardTitle>
-          </CardHeader>
-          <CardBody>
-            <TextFormInput control={control} name="website" label="Website URL" />
-          </CardBody>
-        </Card>
-
-        {/* Frequently Asked Questions */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Frequently Asked Questions</CardTitle>
-          </CardHeader>
-          <CardBody>
-            {watch('frequently_asked_questions').map((_, i) => (
-              <Row key={i} className="mb-2">
-                <Col lg={5}>
-                  <TextFormInput control={control} name={`frequently_asked_questions.${i}.question`} label="Question" />
-                </Col>
-                <Col lg={6}>
-                  <TextFormInput control={control} name={`frequently_asked_questions.${i}.answer`} label="Answer" />
-                </Col>
-              </Row>
-            ))}
-            <Button variant="link" onClick={() => frequently_asked_questionsArray.append({ question: '', answer: '' })}>
-              + Add Frequently Asked Question
-            </Button>
-          </CardBody>
-        </Card>
-
-        {/* Calendar Links */}
-        <Card>
-          <CardHeader>
-            <CardTitle as="h4">Calendar Links</CardTitle>
-          </CardHeader>
-          <CardBody>
-            {calendarLinksArray.fields.map((field, index) => (
-              <Row key={field.id} className="mb-2 align-items-center">
-                <Col lg={10}>
-                  <TextFormInput control={control} name={`calendar_links.${index}`} label={`Calendar Link ${index + 1}`} />
-                </Col>
-                <Col lg={2}>
-                  <Button variant="danger" onClick={() => calendarLinksArray.remove(index)}>
-                    Remove
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button variant="link" onClick={() => calendarLinksArray.append('')}>
-              + Add Calendar Link
-            </Button>
-          </CardBody>
-        </Card>
-
-        {/* Submit Buttons */}
-        <div className="mb-3 rounded">
-          <Row className="justify-content-end g-2 mt-2">
-            <Col lg={2}>
-              <Button type="submit" variant="outline-primary" className="w-100">
-                {isEditMode ? 'Update' : 'Create'} Team Member
-              </Button>
+    <form onSubmit={handleSubmit(onSubmit)} noValidate>
+      <Card>
+        <CardHeader>
+          <CardTitle as="h4">{isEditMode ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
+        </CardHeader>
+        <CardBody>
+          <Row>
+            {/* First Name */}
+            <Col lg={6} className="mb-3">
+              <Controller
+                name="firstName"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="firstName" className="form-label">
+                      First Name *
+                    </label>
+                    <input id="firstName" className="form-control" {...field} placeholder="Enter First Name" />
+                    {errors.firstName && <small className="text-danger">{errors.firstName.message}</small>}
+                  </>
+                )}
+              />
             </Col>
-            <Col lg={2}>
-              <Button variant="danger" className="w-100" onClick={() => router.back()}>
-                Cancel
-              </Button>
+
+            {/* Last Name */}
+            <Col lg={6} className="mb-3">
+              <Controller
+                name="lastName"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="lastName" className="form-label">
+                      Last Name *
+                    </label>
+                    <input id="lastName" className="form-control" {...field} placeholder="Enter Last Name" />
+                    {errors.lastName && <small className="text-danger">{errors.lastName.message}</small>}
+                  </>
+                )}
+              />
+            </Col>
+
+            {/* Role */}
+            <Col lg={6} className="mb-3">
+              <Controller
+                name="role"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="role" className="form-label">
+                      Role *
+                    </label>
+                    <select id="role" className="form-select" {...field}>
+                      <option value="super_admin">Super Admin</option>
+                      <option value="admin">Admin</option>
+                      <option value="staff">Staff</option>
+                    </select>
+                    {errors.role && <small className="text-danger">{errors.role.message}</small>}
+                  </>
+                )}
+              />
+            </Col>
+
+            {/* Branches */}
+            {role !== 'super_admin' && (
+              <Col lg={6} className="mb-3">
+                <Controller
+                  name="branchIds"
+                  control={control}
+                  render={({ field }) => (
+                    <>
+                      <label htmlFor="branchIds" className="form-label">
+                        Branches *
+                      </label>
+                      <select
+                        multiple
+                        id="branchIds"
+                        className="form-select"
+                        size={branches.length}
+                        value={field.value?.map(String) || []}
+                        onChange={(e) => {
+                          const selected = Array.from(e.target.selectedOptions).map((o) => parseInt(o.value));
+                          field.onChange(selected);
+                        }}
+                      >
+                        {branches.map((b) => (
+                          <option key={b.id} value={b.id}>
+                            {b.name}
+                          </option>
+                        ))}
+                      </select>
+                      {errors.branchIds && <small className="text-danger">{errors.branchIds.message}</small>}
+                    </>
+                  )}
+                />
+              </Col>
+            )}
+
+            {/* Primary Branch */}
+            {role !== 'super_admin' && branchIds.length > 0 && (
+              <Col lg={6} className="mb-3">
+                <Controller
+                  name="primaryBranchId"
+                  control={control}
+                  render={({ field }) => {
+                    // Cast value to string for select compatibility — '' means no selection
+                    const val = field.value === '' ? '' : String(field.value);
+                    return (
+                      <>
+                        <label htmlFor="primaryBranchId" className="form-label">
+                          Primary Branch *
+                        </label>
+                        <select
+                          id="primaryBranchId"
+                          className="form-select"
+                          {...field}
+                          value={val}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            field.onChange(v === '' ? '' : Number(v));
+                          }}
+                        >
+                          <option value="">Select primary branch</option>
+                          {branchIds.map((id) => {
+                            const branch = branches.find((b) => b.id === id);
+                            if (!branch) return null;
+                            return (
+                              <option key={id} value={branch.id}>
+                                {branch.name}
+                              </option>
+                            );
+                          })}
+                        </select>
+                        {errors.primaryBranchId && <small className="text-danger">{errors.primaryBranchId.message}</small>}
+                      </>
+                    );
+                  }}
+                />
+              </Col>
+            )}
+
+            {/* Permissions */}
+            {(role === 'admin' || role === 'staff') && branchIds.length > 0 && (
+              <Col lg={12} className="mb-3">
+                <fieldset>
+                  <legend>Permissions</legend>
+                  {Object.entries(defaultPermissionModules).map(([module]) => (
+                    <div key={module} className="mb-2">
+                      <strong>{module.charAt(0).toUpperCase() + module.slice(1)}</strong>
+                      {(['view', 'create', 'edit', 'delete'] as (keyof PermissionModuleAction)[]).map((action) => (
+                        <label key={`${module}-${action}`} className="me-3 ms-2">
+                          <input
+                            type="checkbox"
+                            checked={permissions?.[module]?.[action] || false}
+                            onChange={(e) => togglePermission(module, action, e.target.checked)}
+                            disabled={role === 'admin' && action === 'delete'}
+                          />{' '}
+                          {action.charAt(0).toUpperCase() + action.slice(1)}
+                        </label>
+                      ))}
+                    </div>
+                  ))}
+                </fieldset>
+              </Col>
+            )}
+
+            {/* Contact Email */}
+            <Col lg={6} className="mb-3">
+              <Controller
+                name="contactEmail"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="contactEmail" className="form-label">
+                      Email *
+                    </label>
+                    <input id="contactEmail" type="email" className="form-control" placeholder="Enter Email" {...field} />
+                    {errors.contactEmail && <small className="text-danger">{errors.contactEmail.message}</small>}
+                  </>
+                )}
+              />
+            </Col>
+
+            {/* Contact Phone */}
+            <Col lg={6} className="mb-3">
+              <Controller
+                name="contactPhone"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="contactPhone" className="form-label">
+                      Phone *
+                    </label>
+                    <input id="contactPhone" className="form-control" placeholder="Enter Phone Number" {...field} />
+                    {errors.contactPhone && <small className="text-danger">{errors.contactPhone.message}</small>}
+                  </>
+                )}
+              />
+            </Col>
+
+            {/* About Me */}
+            <Col lg={12} className="mb-3">
+              <Controller
+                name="aboutMe"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="aboutMe" className="form-label">
+                      About Me
+                    </label>
+                    <textarea id="aboutMe" className="form-control" rows={3} placeholder="Describe the team member" {...field} />
+                  </>
+                )}
+              />
+            </Col>
+
+            {/* Who Am I (Biography) */}
+            <Col lg={12} className="mb-3">
+              <Controller
+                name="whoAmI"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="whoAmI" className="form-label">
+                      Biography / About Me *
+                    </label>
+                    <textarea id="whoAmI" className="form-control" rows={3} placeholder="Share biography or bio" {...field} />
+                    {errors.whoAmI && <small className="text-danger">{errors.whoAmI.message}</small>}
+                  </>
+                )}
+              />
+            </Col>
+
+            {/* Consultations */}
+            <Col lg={12} className="mb-3">
+              <Controller
+                name="consultations"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="consultations" className="form-label">
+                      Consultations *
+                    </label>
+                    <textarea id="consultations" className="form-control" rows={3} placeholder="Example issues handled" {...field} />
+                    {errors.consultations && <small className="text-danger">{errors.consultations.message}</small>}
+                  </>
+                )}
+              />
+            </Col>
+
+            {/* Status */}
+            <Col lg={6} className="mb-3">
+              <Controller
+                name="status"
+                control={control}
+                render={({ field }) => (
+                  <>
+                    <label htmlFor="status" className="form-label">
+                      Status *
+                    </label>
+                    <select id="status" className="form-select" {...field}>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                    {errors.status && <small className="text-danger">{errors.status.message}</small>}
+                  </>
+                )}
+              />
             </Col>
           </Row>
-        </div>
-      </form>
-    </FormProvider>
+        </CardBody>
+      </Card>
+
+      <Row className="mt-3 justify-content-end">
+        <Col lg={2}>
+          <Button type="submit" variant="primary" className="w-100">
+            {isEditMode ? 'Update' : 'Create'} Team Member
+          </Button>
+        </Col>
+        <Col lg={2}>
+          <Button variant="danger" className="w-100" onClick={() => router.back()}>
+            Cancel
+          </Button>
+        </Col>
+      </Row>
+    </form>
   );
 };
 
-export default AddTeam;
+export default AddTeamMember;

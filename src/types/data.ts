@@ -667,6 +667,13 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
+  role: Role;
+  branch_ids: string;
+  primary_branch_id: number | null | undefined;
+  permissions: import("c:/Users/myhrm/OneDrive/Desktop/Animacorpus/FE_healthcare_CRM/src/app/(admin)/teams/add-team/components/AddTeam").PermissionModules;
+  status: string;
+  contact_téléphone: string | undefined;
+  qui_suis_je: string;
   about: string;
   payment_methods: string[];
   diplomas_and_training: any;
