@@ -1,9 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { CustomerEnquiriesType } from "@/types/data";
-import CustomerInfoCard from "./components/CustomerInfoCard";
-import BookAppointmentForm from "./components/BookAppointmentForm";
+import dynamic from "next/dynamic";
+
+// Dynamically import client-only components
+const CustomerInfoCard = dynamic(() => import("./components/CustomerInfoCard"), {
+  ssr: false,
+});
+const BookAppointmentForm = dynamic(() => import("./components/BookAppointmentForm"), {
+  ssr: false,
+});
 
 interface UserType {
   id: string | number;
@@ -12,10 +19,22 @@ interface UserType {
 
 export default function AppointmentPage() {
   const [customer, setCustomer] = useState<CustomerEnquiriesType | null>(null);
-  
-  // Safely get and parse user from localStorage
-  const userString = localStorage.getItem('user');
-  const user: UserType | null = userString ? JSON.parse(userString) : null;
+  const [user, setUser] = useState<UserType | null>(null);
+  const [isClient, setIsClient] = useState(false);
+
+  // Only run on client
+  useEffect(() => {
+    setIsClient(true);
+
+    const userString = localStorage.getItem("user");
+    if (userString) {
+      try {
+        setUser(JSON.parse(userString));
+      } catch (err) {
+        console.error("Failed to parse user from localStorage", err);
+      }
+    }
+  }, []);
 
   const handleCustomerSave = (saved: CustomerEnquiriesType) => {
     setCustomer(saved);
@@ -25,6 +44,8 @@ export default function AppointmentPage() {
     console.log("Appointment Data:", appointmentData);
     alert("Appointment submitted successfully!");
   };
+
+  if (!isClient) return null; // Avoid SSR rendering
 
   return (
     <div className="p-3">
