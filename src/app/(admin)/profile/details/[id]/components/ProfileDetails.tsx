@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Card, CardBody, Button, Col, Row } from "react-bootstrap";
 import axios from "axios";
+import { API_BASE_PATH } from "@/context/constants";
 
 type ProfileDetailsProps = {
   team_id: string;
@@ -50,7 +51,7 @@ const ProfileDetails = () => {
           return;
         }
 
-        const res = await axios.get("http://localhost:8080/api/v1/profile", {
+        const res = await axios.get(`${API_BASE_PATH}/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
@@ -104,7 +105,7 @@ const ProfileDetails = () => {
   }, []);
 
   if (!profileData) {
-    return <p>Loading profile...</p>;
+    return <p> Check API - Loading profile...</p>;
   }
 
   const {
@@ -139,13 +140,29 @@ const ProfileDetails = () => {
       <Card className="mb-4">
         <CardBody>
           <div className="d-flex align-items-center gap-3">
-            <Image
-              src={photo || avatar2}
-              alt="avatar"
-              width={80}
-              height={80}
-              className="rounded-circle avatar-xl img-thumbnail"
-            />
+            {photo && photo !== "null" && photo.trim() !== "" ? (
+              <Image
+                src={photo}
+                alt={full_name}
+                width={80}
+                height={80}
+                className="rounded-circle avatar-xl img-thumbnail"
+              />
+            ) : (
+              <div
+                className="rounded-circle d-flex align-items-center justify-content-center"
+                style={{
+                  width: "80px",
+                  height: "80px",
+                  backgroundColor: "#e7ddff",
+                  color: "#341539",
+                  fontSize: "40px",
+                  fontWeight: "bold",
+                }}
+              >
+                {full_name?.charAt(0).toUpperCase()}
+              </div>
+            )}
             <div>
               <h3 className="fw-semibold mb-1">{full_name}</h3>
               <p className="link-primary fw-medium fs-14">{job_1}</p>

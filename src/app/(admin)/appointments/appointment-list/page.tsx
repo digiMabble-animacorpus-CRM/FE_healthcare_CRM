@@ -3,7 +3,7 @@
 import PageTitle from '@/components/PageTitle';
 import { useEffect, useRef, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
-import { Button, Col, Row, Spinner, Form, Dropdown, ButtonGroup, Modal } from 'react-bootstrap';
+import { Button, Col, Row, Spinner, Form, Dropdown, ButtonGroup, Modal, Card, CardHeader, CardTitle } from 'react-bootstrap';
 import '@toast-ui/calendar/dist/toastui-calendar.min.css';
 import { Icon } from '@iconify/react';
 import dynamic from 'next/dynamic';
@@ -14,6 +14,7 @@ const Calendar = dynamic(() => import('@toast-ui/react-calendar'), { ssr: false 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import { useRouter } from 'next/navigation';
 
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
@@ -40,6 +41,8 @@ const AppointmentCalendarPage = () => {
   const [showModal, setShowModal] = useState(false);
 
   const calendarRef = useRef<any>(null);
+  const router = useRouter();
+
 
   const dummyAppointments = [
     {
@@ -258,6 +261,20 @@ const AppointmentCalendarPage = () => {
       <PageTitle subName="Appointments" title="Appointment Calendar" />
 
       <Row style={{ height: '100%' }}>
+        <Card>
+          <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
+            <CardTitle as="h4" className="mb-0">
+              {calendarViewMode === 'calendar' ? "Appointment Calender" : "Appointment List"}
+            </CardTitle>
+
+            <Button
+              variant="primary"
+              onClick={() => router.push('/appointments/appointment-form')}
+            >
+              New Appointment
+            </Button>
+          </CardHeader>
+        </Card>
         {/* Sidebar */}
         <Col
           md={3}
@@ -268,6 +285,7 @@ const AppointmentCalendarPage = () => {
             minWidth: 0,
           }}
         >
+
           <div className="p-2 border rounded mb-3" style={{ background: 'white' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar

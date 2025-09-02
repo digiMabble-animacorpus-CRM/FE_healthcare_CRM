@@ -92,27 +92,23 @@ const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
           .default([]),
       })
     )
-    .optional(),
-  spoken_languages: yup.array().of(yup.string()).optional(),
-  degrees_and_training: yup
-    .mixed<string | string[]>()
-    .transform((value) => {
-      if (Array.isArray(value)) return value.join(", ");
-      return value || "";
-    })
-    .optional(),
-  specializations: yup
-    .mixed<string | string[]>()
-    .transform((value) => {
-      if (Array.isArray(value)) return value.join(", ");
-      return value || "";
-    })
-    .optional(),
-  website: yup.string().optional(),
-  faq: yup.string().optional(),
-  agenda_links: yup.string().optional(),
-  tags: yup.array().of(yup.string()).optional(),
-  certificationFiles: yup.array().of(yup.mixed<File>().optional()).optional(),
+    .required('At least one center is required')
+    .default([]),
+  contact_email: yup.string().email('Invalid email').required('Email is required'),
+  contact_phone: yup.string().required('Phone number is required'),
+  // ✅ Force string[] without undefined
+  spoken_languages: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'At least one language is required')
+    .default([]),
+  degrees_and_training: yup.array().of(yup.string().required()).default([]),
+  specializations: yup.array().of(yup.string().required()).default([]),
+  website: yup.string().default(''),
+  faq: yup.string().default(''),
+  agenda_links: yup.string().default(''),
+  tags: yup.array().of(yup.string().required()).default([]),
+  certificationFiles: yup.array().of(yup.mixed<File>().required()).default([]),
 });
 
 interface Props {
