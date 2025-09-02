@@ -1,28 +1,22 @@
-"use client";
+'use client';
 
 import { useState, useEffect } from "react";
-import type { CustomerEnquiriesType } from "@/types/data";
+import type { CustomerEnquiriesType, PatientType } from "@/types/data";
 import dynamic from "next/dynamic";
 
 // Dynamically import client-only components
-const CustomerInfoCard = dynamic(() => import("./components/CustomerInfoCard"), {
-  ssr: false,
-});
-const BookAppointmentForm = dynamic(() => import("./components/BookAppointmentForm"), {
-  ssr: false,
-});
+const CustomerInfoCard = dynamic(() => import("./components/CustomerInfoCard"), { ssr: false });
+const BookAppointmentForm = dynamic(() => import("./components/BookAppointmentForm"), { ssr: false });
 
 interface UserType {
-  id: string | number;
-  // Add other user properties you might need
+  team_id: string | number;
 }
 
 export default function AppointmentPage() {
-  const [customer, setCustomer] = useState<CustomerEnquiriesType | null>(null);
+  const [customer, setCustomer] = useState<PatientType | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
   const [isClient, setIsClient] = useState(false);
 
-  // Only run on client
   useEffect(() => {
     setIsClient(true);
 
@@ -36,7 +30,7 @@ export default function AppointmentPage() {
     }
   }, []);
 
-  const handleCustomerSave = (saved: CustomerEnquiriesType) => {
+  const handleCustomerSave = (saved: PatientType) => {
     setCustomer(saved);
   };
 
@@ -45,21 +39,18 @@ export default function AppointmentPage() {
     alert("Appointment submitted successfully!");
   };
 
-  if (!isClient) return null; // Avoid SSR rendering
+  if (!isClient) return null;
 
   return (
     <div className="p-3">
       <CustomerInfoCard onSave={handleCustomerSave} />
 
-      {(customer?._id || "cc3fa39e-8e2e-4c89-8911-667c3df7eb7d") && (
+      {customer?.id && (
         <BookAppointmentForm
-          patientId={customer?._id || "cc3fa39e-8e2e-4c89-8911-667c3df7eb7d"}
-          createdById={user?.id ? String(user.id) : ""}
+          patientId={customer.id}
+          createdById={user?.team_id ? String(user.team_id) : ""}
           onSubmitHandler={handleAppointmentSubmit}
-          selectedCustomer={customer || undefined}
-          defaultValues={{
-            notes: `Booking for ${customer?.name || "Customer"}`,
-          }}
+          selectedCustomer={customer}
         />
       )}
     </div>
