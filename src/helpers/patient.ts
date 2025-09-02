@@ -125,6 +125,40 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
     return null;
   }
 };
+export const findPatient = async (value: string): Promise<any | null> => {
+  const token = localStorage.getItem('access_token');
+  if (!token) {
+    console.warn('No access token found.');
+    return null;
+  }
+
+  const url = `${API_BASE_PATH}/patients/find/${encodeURIComponent(value)}`;
+  console.log('Finding patient:', url);
+
+  try {
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+    console.log('Find patient response:', result);
+
+    if (!response.ok) {
+      console.error('Failed to fetch patient:', result?.message || 'Unknown error');
+      return null;
+    }
+
+    return result?.data || null;
+  } catch (error) {
+    console.error('Exception during patient find:', error);
+    return null;
+  }
+};
+
 
 export const createPatient = async (payload: any): Promise<boolean> => {
   try {

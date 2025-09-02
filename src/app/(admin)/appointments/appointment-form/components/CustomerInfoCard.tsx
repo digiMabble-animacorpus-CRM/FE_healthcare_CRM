@@ -1,285 +1,383 @@
-"use client";
+'use client';
 
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Card,
-  CardBody,
   CardHeader,
+  CardBody,
+  CardFooter,
   CardTitle,
-  Col,
-  Row,
   Button,
   Form,
+  Row,
+  Col,
   Alert,
-} from "react-bootstrap";
-import type { CustomerEnquiriesType } from "@/types/data";
-import { customerEnquiriesData } from "@/assets/data/other";
+  Spinner,
+} from 'react-bootstrap';
+import { createPatient, updatePatient, findPatient } from '@/helpers/patient';
+import type { PatientType } from '@/types/data';
 
-interface Props {
-  customerInfo?: CustomerEnquiriesType;
-  onSave?: (updatedInfo: CustomerEnquiriesType) => void;
-}
-
-const emptyCustomer: CustomerEnquiriesType = {
-  _id: "",
-  name: "",
-  email: "",
-  number: "",
-  gender: "",
-  language: "",
-  branch: "",
-  dob: "",
-  city: "",
-  country: "",
-  zip_code: "",
-  address: "",
-  tags: [],
-  description: "",
-  status: "new",
-  lastUpdated: "",
-  source: "",
-  appointmentDetails: undefined,
-  familyDetails: undefined,
-  modeOfRegister: "",
+const emptyPatient: PatientType = {
+  id: '',
+  firstname: '',
+  lastname: '',
+  emails: '',
+  phones: [],
+  birthdate: '',
+  legalgender: '',
+  city: '',
+  status: 'ACTIVE',
+  language: '',
+  country: '',
+  zipcode: '',
+  note: '',
 };
 
-const CustomerInfoCard = ({
-  customerInfo = emptyCustomer,
-  onSave,
-}: Props) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [formState, setFormState] = useState<CustomerEnquiriesType>(
-    customerInfo
-  );
-  const [searchQuery, setSearchQuery] = useState("");
-  const [notFound, setNotFound] = useState(false);
-  const [errorMsg, setErrorMsg] = useState("");
-  const [showForm, setShowForm] = useState(false);
+const CustomerInfoCard = () => {
+  const [formData, setFormData] = useState<PatientType>(emptyPatient);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
-  const handleChange = (
-    field: keyof CustomerEnquiriesType,
-    value: string | string[]
-  ) => {
-    setFormState((prev: any) => ({ ...prev, [field]: value }));
-  };
+  const [mode, setMode] = useState<'search' | 'view' | 'edit' | 'new'>('search');
 
-  const handleSearch = () => {
-    if (!searchQuery.trim()) {
-      setErrorMsg("Please enter search text");
-      setNotFound(false);
+  // 🔍 Handle search
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) {
+      setErrorMsg('Please enter a search term');
       return;
     }
-
-    setErrorMsg("");
-    const q = searchQuery.trim().toLowerCase();
-
-    const results = customerEnquiriesData.filter((customer) => {
-      const combinedString = (
-        customer.name +
-        " " +
-        customer.email +
-        " " +
-        customer.number
-      ).toLowerCase();
-      return q.split(/\s+/).every((token) => combinedString.includes(token));
-    });
-
-    if (results.length > 0) {
-      setFormState(results[0]);
-      setNotFound(false);
-      setShowForm(true);
-      setIsEditing(false); // view mode first
-    } else {
-      setFormState(emptyCustomer);
-      setNotFound(true);
-      setShowForm(false);
+    setLoading(true);
+    try {
+      const result = await findPatient(searchTerm.trim());
+      if (result) {
+        setFormData(result);
+        setMode('view');
+        setErrorMsg(null);
+      } else {
+        setErrorMsg('No patient found. Try adding new.');
+        setFormData(emptyPatient);
+        setMode('search');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Search failed');
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleNewUser = () => {
-    setFormState(emptyCustomer);
-    setShowForm(true);
-    setIsEditing(true); // directly open in edit mode
-    setErrorMsg("");
-    setNotFound(false);
+  // 🔄 Handle form change
+  const handleChange = (field: keyof PatientType, value: any) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
-  const handleSave = () => {
-    setIsEditing(false);
-    if (onSave) onSave(formState);
+  // 💾 Save / Update
+  const handleSave = async () => {
+    setLoading(true);
+    try {
+      // Ensure birthdate ISO format
+      if (formData.birthdate) {
+        formData.birthdate = new Date(formData.birthdate).toISOString();
+      }
+
+      if (mode === 'edit' && formData.id) {
+        const ok = await updatePatient(formData.id, formData);
+        if (ok) {
+          setSuccessMsg('Patient updated successfully');
+          setMode('view');
+        } else {
+          setErrorMsg('Failed to update patient');
+        }
+      } else if (mode === 'new') {
+        const ok = await createPatient(formData);
+        if (ok) {
+          setSuccessMsg('Patient created successfully');
+          setMode('view');
+        } else {
+          setErrorMsg('Failed to create patient');
+        }
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Save failed');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <Card className="mb-4">
-      {/* Search & New User Section */}
+    <Card>
       <CardHeader>
-        <CardTitle as="h6">Find or Add Customer</CardTitle>
+        <CardTitle as="h4">Patient Details</CardTitle>
       </CardHeader>
       <CardBody>
-        <Row className="mb-3">
-          <Col md={8}>
-            <Form.Control
-              size="sm"
-              placeholder="Search by Name, Email, Phone or combination"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </Col>
-          <Col md={2}>
-            <Button
-              size="sm"
-              variant="primary"
-              onClick={handleSearch}
-              className="w-100"
-            >
-              Search
-            </Button>
-          </Col>
-          <Col md={2}>
-            <Button
-              size="sm"
-              variant="success"
-              onClick={handleNewUser}
-              className="w-100"
-            >
-              New User
-            </Button>
-          </Col>
-        </Row>
-
         {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-        {notFound && !errorMsg && (
-          <Alert variant="warning">No customer found.</Alert>
-        )}
-      </CardBody>
+        {successMsg && <Alert variant="success">{successMsg}</Alert>}
 
-      {/* Show Form/Card only after search success or new user */}
-      {showForm && (
-        <>
-          <CardHeader className="d-flex justify-content-between align-items-center">
-            <CardTitle as="h6">Customer Details</CardTitle>
-            {isEditing ? (
-              <div>
-                <Button
-                  variant="success"
-                  size="sm"
-                  onClick={handleSave}
-                  className="me-2"
-                >
-                  Save
-                </Button>
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setIsEditing(false)}
-                >
-                  Cancel
-                </Button>
-              </div>
-            ) : (
-              <Button
-                variant="primary"
-                size="sm"
-                onClick={() => setIsEditing(true)}
-              >
+        {/* 🔎 Search Section */}
+        {mode === 'search' && (
+          <div className="d-flex mb-3 gap-2">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search by Name, Email, Phone or combination"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <Button onClick={handleSearch} disabled={loading}>
+              {loading ? <Spinner size="sm" animation="border" /> : 'Search'}
+            </Button>
+            <Button
+              variant="success"
+              onClick={() => {
+                setFormData(emptyPatient);
+                setMode('new');
+              }}
+            >
+              New Patient
+            </Button>
+          </div>
+        )}
+
+        {/* 👁 View Mode */}
+        {mode === 'view' && (
+          <div className="border p-3 rounded">
+            <h6>
+              {formData.firstname} {formData.lastname}
+            </h6>
+            <p className="mb-1">
+              <b>Email:</b> {formData.emails}
+            </p>
+            <p className="mb-1">
+              <b>Phone:</b>{' '}
+              {Array.isArray(formData.phones) ? formData.phones.join(', ') : formData.phones}
+            </p>
+            <p className="mb-1">
+              <b>Gender:</b> {formData.legalgender}
+            </p>
+            <p className="mb-1">
+              <b>Language:</b> {formData.language}
+            </p>
+            <p className="mb-1">
+              <b>City:</b> {formData.city}
+            </p>
+            <p className="mb-1">
+              <b>Country:</b> {formData.country}
+            </p>
+            <p className="mb-1">
+              <b>Zip Code:</b> {formData.zipcode}
+            </p>
+            <p className="mb-1">
+              <b>Address:</b> {formData.street}
+            </p>
+            <p className="mb-1">
+              <b>Description:</b> {formData.note}
+            </p>
+            <p className="mb-1">
+              <b>DOB:</b>{' '}
+              {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : ''}
+            </p>
+            <div className="d-flex gap-2 mt-2">
+              <Button size="sm" onClick={() => setMode('edit')}>
                 Edit
               </Button>
-            )}
-          </CardHeader>
+              <Button
+                size="sm"
+                variant="secondary"
+                onClick={() => {
+                  setFormData(emptyPatient);
+                  setMode('search');
+                }}
+              >
+                Back
+              </Button>
+            </div>
+          </div>
+        )}
 
-          <CardBody>
-            <Row>
-              {Object.entries({
-                name: "Name",
-                email: "Email",
-                number: "Phone",
-                gender: "Gender",
-                language: "Preferred Language",
-                branch: "Branch",
-                dob: "Date of Birth",
-                city: "City",
-                country: "Country",
-                zip_code: "Zip Code",
-                address: "Address",
-                tags: "Tags",
-                description: "Description",
-              }).map(([key, label]) => (
-                <Col
-                  md={
-                    key === "address" || key === "tags" || key === "description"
-                      ? 12
-                      : 6
-                  }
-                  className="mt-2"
-                  key={key}
-                >
-                  <strong>{label}:</strong>{" "}
-                  {isEditing ? (
-                    key === "gender" ? (
-                      <Form.Select
-                        size="sm"
-                        value={
-                          formState[key as keyof CustomerEnquiriesType] as string
-                        }
-                        onChange={(e) =>
-                          handleChange(
-                            key as keyof CustomerEnquiriesType,
-                            e.target.value
-                          )
-                        }
-                      >
-                        <option value="">Select</option>
-                        <option value="male">Male</option>
-                        <option value="female">Female</option>
-                      </Form.Select>
-                    ) : (
-                      <Form.Control
-                        as={
-                          key === "address" || key === "description"
-                            ? "textarea"
-                            : "input"
-                        }
-                        size="sm"
-                        value={
-                          Array.isArray(
-                            formState[key as keyof CustomerEnquiriesType]
-                          )
-                            ? (
-                                formState[
-                                  key as keyof CustomerEnquiriesType
-                                ] as string[]
-                              ).join(", ")
-                            : (formState[
-                                key as keyof CustomerEnquiriesType
-                              ] as string)
-                        }
-                        onChange={(e) =>
-                          handleChange(
-                            key as keyof CustomerEnquiriesType,
-                            key === "tags"
-                              ? e.target.value
-                                  .split(",")
-                                  .map((tag) => tag.trim())
-                              : e.target.value
-                          )
-                        }
-                      />
-                    )
-                  ) : Array.isArray(
-                      formState[key as keyof CustomerEnquiriesType]
-                    ) ? (
-                    (formState[key as keyof CustomerEnquiriesType] as string[])
-                      .join(", ") || "-"
-                  ) : (
-                    (formState[key as keyof CustomerEnquiriesType] as string) ||
-                    "-"
-                  )}
-                </Col>
-              ))}
+        {/* 📝 Edit / New Patient Form */}
+        {(mode === 'edit' || mode === 'new') && (
+          <Form>
+            {/* Name + Email */}
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Name</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={`${formData.firstname} ${formData.lastname}`}
+                    onChange={(e) => {
+                      const [first, ...last] = e.target.value.split(' ');
+                      handleChange('firstname', first);
+                      handleChange('lastname', last.join(' '));
+                    }}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Email</Form.Label>
+                  <Form.Control
+                    type="email"
+                    value={formData.emails || ''}
+                    onChange={(e) => handleChange('emails', e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
             </Row>
-          </CardBody>
-        </>
-      )}
+
+            {/* Phone + Gender */}
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Phone</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={
+                      Array.isArray(formData.phones)
+                        ? formData.phones.join(', ')
+                        : formData.phones || ''
+                    }
+                    onChange={(e) =>
+                      handleChange(
+                        'phones',
+                        e.target.value.split(',').map((p) => p.trim()),
+                      )
+                    }
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Gender</Form.Label>
+                  <Form.Select
+                    value={formData.legalgender || ''}
+                    onChange={(e) => handleChange('legalgender', e.target.value)}
+                  >
+                    <option value="">Select</option>
+                    <option value="M">Male</option>
+                    <option value="F">Female</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            {/* Language + DOB */}
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Preferred Language</Form.Label>
+                  <Form.Select
+                    value={formData.language || ''}
+                    onChange={(e) => handleChange('language', e.target.value)}
+                  >
+                    <option value="">Select Language</option>
+                    <option value="en">English</option>
+                    <option value="fr">French</option>
+                    <option value="nl">Dutch</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Date of Birth</Form.Label>
+                  <Form.Control
+                    type="date"
+                    value={formData.birthdate ? formData.birthdate.split('T')[0] : ''}
+                    onChange={(e) => handleChange('birthdate', e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            {/* Country + City */}
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Country</Form.Label>
+                  <Form.Select
+                    value={formData.country || ''}
+                    onChange={(e) => handleChange('country', e.target.value)}
+                  >
+                    <option value="">Select Country</option>
+                    <option value="UK">United Kingdom</option>
+                    <option value="FR">France</option>
+                    <option value="IN">India</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>City</Form.Label>
+                  <Form.Select
+                    value={formData.city || ''}
+                    onChange={(e) => handleChange('city', e.target.value)}
+                  >
+                    <option value="">Select City</option>
+                    <option value="London">London</option>
+                    <option value="Paris">Paris</option>
+                    <option value="New York">New York</option>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+            </Row>
+
+            {/* Zip + Address */}
+            <Row className="mb-3">
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Zip Code</Form.Label>
+                  <Form.Control
+                    type="text"
+                    value={formData.zipcode || ''}
+                    onChange={(e) => handleChange('zipcode', e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={6}>
+                <Form.Group>
+                  <Form.Label>Address</Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={1}
+                    value={formData.street || ''}
+                    onChange={(e) => handleChange('street', e.target.value)}
+                  />
+                </Form.Group>
+              </Col>
+            </Row>
+
+            {/* Description */}
+            <Form.Group className="mb-3">
+              <Form.Label>Description</Form.Label>
+              <Form.Control
+                as="textarea"
+                rows={2}
+                value={formData.note || ''}
+                onChange={(e) => handleChange('note', e.target.value)}
+              />
+            </Form.Group>
+
+            <div className="d-flex justify-content-end gap-2">
+              <Button variant="secondary" onClick={() => setMode('view')}>
+                Cancel
+              </Button>
+              <Button variant="primary" onClick={handleSave} disabled={loading}>
+                {loading ? (
+                  <Spinner size="sm" animation="border" />
+                ) : mode === 'edit' ? (
+                  'Update'
+                ) : (
+                  'Save'
+                )}
+              </Button>
+            </div>
+          </Form>
+        )}
+      </CardBody>
     </Card>
   );
 };
