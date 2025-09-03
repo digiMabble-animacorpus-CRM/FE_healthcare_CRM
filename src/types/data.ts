@@ -733,4 +733,9 @@ export type TeamMemberCreatePayload = {
   photo: string;
   branches?: (string | number)[];
   selectedBranch?: string | number | null;
+  role: "super_admin" | "admin" | "staff";
+  status: "active" | "inactive";
+  primaryBranchId: number;
+  permissions: Record<string, any>;
+  createdByRole: string;
 };
