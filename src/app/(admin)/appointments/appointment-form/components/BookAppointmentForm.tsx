@@ -14,6 +14,7 @@ import {
 import { API_BASE_PATH } from "@/context/constants";
 import type { PatientType } from "@/types/data";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // ✅ for navigation
 import AppointmentFields from "./AppointmentFields";
 
 // ---------------- Types ----------------
@@ -23,8 +24,8 @@ export type AppointmentFormValues = {
   specializationId: number;
   therapistId: number;
   patientId?: string;
-  date: string;          // YYYY-MM-DD
-  time: string;          // HH:mm (start only)
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm (start only)
   purposeOfVisit: string;
   description?: string;
 };
@@ -64,6 +65,7 @@ const BookAppointmentForm = ({
   selectedCustomer,
 }: Props) => {
   const [saving, setSaving] = useState(false);
+  const router = useRouter(); // ✅ router for navigation
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
@@ -140,10 +142,16 @@ const BookAppointmentForm = ({
 
       console.log("✅ Appointment Saved Response:", responseData);
 
+      // ✅ reset form after successful submission
+      reset();
+
+      // ✅ navigate to list page
+      router.push("/appointments/appointment-list");
+
+      // Optional: run parent handler
       onSubmitHandler?.(data);
     } catch (error) {
       console.error("❌ API Error:", error);
-      alert("Failed to save appointment. Please try again.");
     } finally {
       setSaving(false);
     }

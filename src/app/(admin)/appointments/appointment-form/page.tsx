@@ -36,7 +36,6 @@ export default function AppointmentPage() {
 
   const handleAppointmentSubmit = (appointmentData: any) => {
     console.log("Appointment Data:", appointmentData);
-    alert("Appointment submitted successfully!");
   };
 
   if (!isClient) return null;

@@ -10,7 +10,6 @@ import {
   Form,
   Row,
   Col,
-  Alert,
   Spinner,
 } from 'react-bootstrap';
 import { createPatient, updatePatient, findPatient } from '@/helpers/patient';
@@ -121,8 +120,6 @@ const CustomerInfoCard = ({ onSave }: CustomerInfoCardProps) => {
         <CardTitle as="h4">Patient Details</CardTitle>
       </CardHeader>
       <CardBody>
-        {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-        {successMsg && <Alert variant="success">{successMsg}</Alert>}
 
         {/* 🔎 Search Section */}
         {mode === 'search' && (
