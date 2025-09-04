@@ -1,493 +1,534 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
+import { useEffect, useState } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Row,
-  Spinner,
-} from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
+import { Form, Row, Col, Button } from 'react-bootstrap';
+import { API_BASE_PATH } from '@/context/constants';
 
-import TextFormInput from '@/components/from/TextFormInput';
-import TextAreaFormInput from '@/components/from/TextAreaFormInput';
-import ChoicesFormInput from '@/components/from/ChoicesFormInput';
-import DropzoneFormInput from '@/components/from/DropzoneFormInput';
-import {
-  getTherapistById,
-  createTherapist,
-  updateTherapist,
-} from '@/helpers/therapist';
-import { getAllLanguages } from '@/helpers/languages';
-import type { LanguageType } from '@/types/data';
-import { TherapistUpdatePayload } from '@/helpers/therapist';
+interface Branch {
+  branch_id: number;
+  name: string;
+}
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+interface Department {
+  id: number;
+  name: string;
+}
 
-type AvailabilitySlot = {
+interface Specialization {
+  specialization_id: number;
+  specialization_type: string;
+}
+
+interface Language {
+  id: number;
+  name: string;
+}
+
+interface Availability {
   day: string;
   startTime: string;
   endTime: string;
-};
+}
 
-type Center = {
-  center_address: string;
-  center_email: string;
-  center_phone_number: string;
-  availability: AvailabilitySlot[];
-};
+interface BranchWithAvailability {
+  branch_id: number;
+  branch_name: string;
+  availability: Availability[];
+}
 
-export type TherapistFormValues = {
-  id_pro?: string;
-  first_name: string;
-  last_name: string;
+interface TherapistFormInputs {
+  // 1️⃣ Basic Info
+  firstName: string;
+  lastName: string;
+  fullName: string;
   photo: string;
-  job_title: string;
-  about_me: string;
-  consultations: string;
-  centers: Center[];
-  contact_email: string;
-  contact_phone: string;
-  spoken_languages: string[];
-  degrees_and_training: string[];
-  specializations: string[];
-  website: string;
-  faq: string;
-  agenda_links: string;
-  tags: string[];
-  certificationFiles: File[];
-};
+  contactEmail: string;
+  contactPhone: string;
 
-const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
-  id_pro: yup.string().default(''),
-  first_name: yup.string().required('First name is required'),
-  last_name: yup.string().required('Last name is required'),
-  photo: yup.string().default(''),
-  job_title: yup.string().required('Job title is required'),
-  about_me: yup.string().default(''),
-  consultations: yup.string().default(''),
-  centers: yup
+  // 2️⃣ Professional Details
+  inamiNumber: string;
+  aboutMe: string;
+  consultations: string;
+  degreesTraining: string;
+  departmentId: string;
+  specializationIds: number[];
+
+  // 3️⃣ Branch & Availability
+  branches: BranchWithAvailability[];
+
+  // 4️⃣ Additional Info
+  languages: number[];
+  faq: string;
+  paymentMethods: string[];
+}
+
+// ✅ Validation schema
+const schema = yup.object({
+  firstName: yup.string().required('First Name is required'),
+  lastName: yup.string().required('Last Name is required'),
+  fullName: yup.string().required('Full Name is required'),
+  photo: yup.string().url('Must be a valid URL').nullable(),
+  contactEmail: yup.string().email('Invalid email').required('Email is required'),
+  contactPhone: yup
+    .string()
+    .matches(/^[0-9]{10}$/, 'Must be a valid 10-digit phone number')
+    .required('Phone number is required'),
+  inamiNumber: yup.string().required('INAMI Number is required'),
+  aboutMe: yup.string().nullable(),
+  consultations: yup.string().nullable(),
+  degreesTraining: yup.string().nullable(),
+  departmentId: yup.string().required('Department is required'),
+  specializationIds: yup
+    .array()
+    .of(yup.number().required())
+    .min(1, 'At least one specialization is required'),
+  branches: yup
     .array()
     .of(
       yup.object({
-        center_address: yup.string().default(''),
-        center_email: yup.string().email('Invalid email').default(''),
-        center_phone_number: yup.string().default(''),
+        branch_id: yup.number().required('Branch is required'),
+        branch_name: yup.string().nullable(),
         availability: yup
           .array()
           .of(
             yup.object({
-              day: yup.string().default(''),
-              startTime: yup.string().default(''),
-              endTime: yup.string().default(''),
-            })
+              day: yup.string().required('Day is required'),
+              startTime: yup.string().required('Start time is required'),
+              endTime: yup.string().required('End time is required'),
+            }),
           )
-          .default([]),
-      })
+          .min(1, 'At least one availability slot is required'),
+      }),
     )
-    .required('At least one center is required')
-    .default([]),
-  contact_email: yup.string().email('Invalid email').required('Email is required'),
-  contact_phone: yup.string().required('Phone number is required'),
-  // ✅ Force string[] without undefined
-  spoken_languages: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'At least one language is required')
-    .default([]),
-  degrees_and_training: yup.array().of(yup.string().required()).default([]),
-  specializations: yup.array().of(yup.string().required()).default([]),
-  website: yup.string().default(''),
-  faq: yup.string().default(''),
-  agenda_links: yup.string().default(''),
-  tags: yup.array().of(yup.string().required()).default([]),
-  certificationFiles: yup.array().of(yup.mixed<File>().required()).default([]),
+    .min(1, 'At least one branch is required'),
+  languages: yup.string().required('Languages is required'),
+  faq: yup.string().nullable(),
+  paymentMethods: yup.string().required('Payments is required'),
 });
 
-interface Props {
-  params?: { id?: string };
-}
-
-const AddTherapist = ({ params }: Props) => {
-  const router = useRouter();
-  const isEditMode = !!params?.id;
-  const [loading, setLoading] = useState<boolean>(isEditMode);
-
-  const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
-
-  const methods = useForm<TherapistFormValues>({
+const TherapistForm = () => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    formState: { errors },
+  } = useForm<TherapistFormInputs>({
     resolver: yupResolver(schema),
     defaultValues: {
-      first_name: '',
-      last_name: '',
+      firstName: '',
+      lastName: '',
+      fullName: '',
       photo: '',
-      job_title: '',
-      about_me: '',
+      contactEmail: '',
+      contactPhone: '',
+      inamiNumber: '',
+      aboutMe: '',
       consultations: '',
-      centers: [
-        {
-          center_address: '',
-          center_email: '',
-          center_phone_number: '',
-          availability: [],
-        },
-      ],
-      contact_email: '',
-      contact_phone: '',
-      spoken_languages: [],
-      degrees_and_training: [],
-      specializations: [],
-      website: '',
+      degreesTraining: '',
+      departmentId: '',
+      specializationIds: [],
+      branches: [],
+      languages: [],
       faq: '',
-      agenda_links: '',
-      tags: [],
-      certificationFiles: [],
+      paymentMethods: [],
     },
   });
 
-  const { control, handleSubmit, reset } = methods;
-  const { fields: centerFields, append: addCenter, remove: removeCenter } = useFieldArray({
-    control,
-    name: 'centers',
-  });
+  const {
+    fields: branchFields,
+    append: appendBranch,
+    remove: removeBranch,
+  } = useFieldArray({ control, name: 'branches' });
+
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [specializations, setSpecializations] = useState<Specialization[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
+
+  const departmentId = watch('departmentId');
+  const firstName = watch('firstName');
+  const lastName = watch('lastName');
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+
+  // ✅ Auto update fullName
+  useEffect(() => {
+    setValue('fullName', `${firstName || ''} ${lastName || ''}`.trim());
+  }, [firstName, lastName, setValue]);
+
+  const safeArray = (res: any): any[] => {
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray(res.data)) return res.data;
+    return [];
+  };
+
+  // ✅ Load Data APIs
+  useEffect(() => {
+    async function loadBranches() {
+      try {
+        const res = await fetch(`${API_BASE_PATH}/branches`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setBranches(safeArray(await res.json()));
+      } catch {
+        setBranches([]);
+      }
+    }
+    if (token) loadBranches();
+  }, [token]);
 
   useEffect(() => {
-    if (isEditMode && params?.id) {
-      setLoading(true);
-      getTherapistById(params.id)
-        .then((data) => {
-          if (data) {
-            const mapped: TherapistFormValues = {
-              ...data,
-              tags: data.tags || [],
-              certificationFiles: [],
-              centers: data.centers || [],
-            };
-            reset(mapped);
-          }
-        })
-        .catch(console.error)
-        .finally(() => setLoading(false));
-    }
-  }, [isEditMode, params?.id, reset]);
-
-  const onSubmit = async (data: TherapistFormValues) => {
-    try {
-      const payload: TherapistUpdatePayload = {
-        photo: data.photo || "",
-        consultations: data.consultations || "",
-        specializations: data.specializations || [],
-        website: data.website || "",
-        faq: data.faq || "",
-        firstName: data.first_name || "",
-        lastName: data.last_name || "",
-        jobTitle: data.job_title || "",
-        aboutMe: data.about_me || "",
-        contactEmail: data.contact_email || "",
-        contactPhone: data.contact_phone || "",
-        spokenLanguages: (data.spoken_languages || []).join(", "),
-        degreesAndTraining: (data.degrees_and_training || []).join(", "),
-        agendaLinks: data.agenda_links || "",
-        tags: (data.tags || []).join(", "),
-        centers: (data.centers || []).map((c) => ({
-          centerAddress: c.center_address || "",
-          centerEmail: c.center_email || "",
-          centerPhoneNumber: c.center_phone_number || "",
-          availability: (c.availability || []).map((slot) => ({
-            day: slot.day,
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-          })),
-        })),
-      };
-
-      let success = false;
-
-      if (data.certificationFiles?.length > 0) {
-        const formData = new FormData();
-        Object.entries(payload).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            formData.append(key, JSON.stringify(value));
-          }
+    async function loadDepartments() {
+      try {
+        const res = await fetch(`${API_BASE_PATH}/departments`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        data.certificationFiles.forEach((file) =>
-          formData.append("certificationFiles", file)
-        );
-
-        success =
-          isEditMode && params?.id
-            ? await updateTherapist(params.id, formData)
-            : await createTherapist(formData);
-      } else {
-        success =
-          isEditMode && params?.id
-            ? await updateTherapist(params.id, payload)
-            : await createTherapist(payload);
+        setDepartments(safeArray(await res.json()));
+      } catch {
+        setDepartments([]);
       }
+    }
+    if (token) loadDepartments();
+  }, [token]);
 
-      if (success) {
-        alert(isEditMode ? "Therapist updated successfully" : "Therapist created successfully");
-        if (isEditMode) router.back();
-        else reset();
-      } else {
-        alert("Operation failed");
+  useEffect(() => {
+    if (!departmentId) {
+      setSpecializations([]);
+      setValue('specializationIds', []);
+      return;
+    }
+    async function loadSpecializations() {
+      try {
+        const res = await fetch(`${API_BASE_PATH}/specializations?departmentId=${departmentId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setSpecializations(safeArray(await res.json()));
+      } catch {
+        setSpecializations([]);
       }
-    } catch (error) {
-      console.error("Submit error:", error);
-      alert("Operation failed");
+    }
+    loadSpecializations();
+  }, [departmentId]);
+
+  useEffect(() => {
+    async function loadLanguages() {
+      try {
+        const res = await fetch(`${API_BASE_PATH}/languages`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setLanguages(safeArray(await res.json()));
+      } catch {
+        setLanguages([]);
+      }
+    }
+    if (token) loadLanguages();
+  }, [token]);
+
+  // ✅ Submit Handler
+  const onSubmit = async (data: TherapistFormInputs) => {
+    try {
+      
+      const res = await fetch(`${API_BASE_PATH}/therapists`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error('Failed to save therapist');
+      alert('Therapist saved successfully ✅');
+    } catch (err: any) {
+      alert(err.message || 'Error saving therapist ❌');
     }
   };
 
-  if (loading)
-    return <Spinner animation="border" className="my-5 d-block mx-auto" />;
-
   return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Basic Info */}
-         {/* Basic Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">{isEditMode ? 'Edit Therapist' : 'Basic Information'}</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <Row>
-            <Col lg={6}>
-              <TextFormInput control={control} name="first_name" label="First Name" />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput control={control} name="last_name" label="Last Name" />
-            </Col>
-            
-          </Row>
-        
-          <Row>
-            <Col lg={6}>
-              <TextFormInput control={control} name="contact_email" label="Contact Email" />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput control={control} name="contact_phone" label="Contact Phone" />
-            </Col>
-            <Col lg={12}>
-              <label className="form-label">Spoken Languages</label>
-              <Controller
-                control={control}
-                name="spoken_languages"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" multiple {...field}>
-                    {allLanguages.map((lang) => (
-                      <option key={lang.key} value={lang.key}>
-                        {lang.label}
+    <Form onSubmit={handleSubmit(onSubmit)}>
+      <Row>
+        {/* 1️⃣ Basic Information */}
+        <Col md={12}>
+          <h5 className="mt-3 mb-3">1️⃣ Basic Information</h5>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>First Name</Form.Label>
+            <Form.Control type="text" {...register('firstName')} />
+            {errors.firstName && (
+              <Form.Text className="text-danger">{errors.firstName.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control type="text" {...register('lastName')} />
+            {errors.lastName && (
+              <Form.Text className="text-danger">{errors.lastName.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Full Name</Form.Label>
+            <Form.Control type="text" {...register('fullName')} readOnly />
+          </Form.Group>
+        </Col>
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Photo (URL)</Form.Label>
+            <Form.Control type="url" {...register('photo')} />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control type="email" {...register('contactEmail')} />
+            {errors.contactEmail && (
+              <Form.Text className="text-danger">{errors.contactEmail.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control type="text" {...register('contactPhone')} />
+            {errors.contactPhone && (
+              <Form.Text className="text-danger">{errors.contactPhone.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        {/* 2️⃣ Professional Details */}
+        <Col md={12}>
+          <h5 className="mt-4 mb-3">2️⃣ Professional Details</h5>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>INAMI Number</Form.Label>
+            <Form.Control type="text" {...register('inamiNumber')} />
+            {errors.inamiNumber && (
+              <Form.Text className="text-danger">{errors.inamiNumber.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>About Me</Form.Label>
+            <Form.Control as="textarea" rows={3} {...register('aboutMe')} />
+          </Form.Group>
+        </Col>
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Consultations</Form.Label>
+            <Form.Control as="textarea" rows={3} {...register('consultations')} />
+          </Form.Group>
+        </Col>
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Degrees & Training</Form.Label>
+            <Form.Control as="textarea" rows={3} {...register('degreesTraining')} />
+          </Form.Group>
+        </Col>
+         <Col md={6}>
+                <Form.Group className="mb-3">
+                  <Form.Label>Department</Form.Label>
+                  <Form.Select {...register("departmentId")}>
+                    <option value="">Select Department</option>
+                    {departments.map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.name}
                       </option>
                     ))}
-                  </ChoicesFormInput>
-                )}
-              />
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
+                  </Form.Select>
+                </Form.Group>
+              </Col>
+        <Col md={6}>
+          {' '}
+          <Form.Group className="mb-3">
+            {' '}
+            <Form.Label>Specialization</Form.Label>{' '}
+            <Form.Select {...register('specializationIds.0')}>
+              {' '}
+              <option value="">Select Specialization</option>{' '}
+              {specializations.map((s) => (
+                <option key={s.specialization_id} value={s.specialization_id}>
+                  {' '}
+                  {s.specialization_type}{' '}
+                </option>
+              ))}{' '}
+            </Form.Select>{' '}
+            {errors.specializationIds && (
+              <Form.Text className="text-danger">
+                {' '}
+                {errors.specializationIds.message as string}{' '}
+              </Form.Text>
+            )}{' '}
+          </Form.Group>{' '}
+        </Col>
 
-      {/* Professional Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Professional Details</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <Row>
-            <Col lg={6}>
-              <TextFormInput control={control} name="job_title" label="Job Title" />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="about_me" label="About Me" rows={3} />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="consultations" label="Consultations" rows={2} />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="degrees_and_training" label="Degrees & Training" rows={2} />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="specializations" label="Specializations" rows={2} />
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
-
-      {/* Centers */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Centers & Availability</CardTitle>
-        </CardHeader>
-        <CardBody>
-          {centerFields.map((center, cIndex) => (
-            <div key={center.id} className="mb-3 p-3 border rounded">
-              <Row>
-                <Col lg={6}>
-                  <TextFormInput control={control} name={`centers.${cIndex}.center_address`} label="Center Address" />
-                </Col>
-                <Col lg={6}>
-                  <TextFormInput control={control} name={`centers.${cIndex}.center_email`} label="Center Email" />
-                </Col>
-                <Col lg={6}>
-                  <TextFormInput
-                    control={control}
-                    name={`centers.${cIndex}.center_phone_number`}
-                    label="Center Phone"
-                  />
-                </Col>
-              </Row>
-              <h6 className="mt-3">Availability</h6>
-              <Controller
+        {/* 3️⃣ Branch & Availability */}
+        <Col md={12}>
+          <h5 className="mt-4 mb-3">3️⃣ Branch & Availability</h5>
+        </Col>
+        <Col md={12}>
+          {branchFields.map((branch, index) => (
+            <div key={branch.id} className="border p-3 mb-3 rounded">
+              <Form.Group className="mb-2">
+                <Form.Label>Select Branch</Form.Label>
+                <Form.Select {...register(`branches.${index}.branch_id` as const)}>
+                  <option value="">Select Branch</option>
+                  {branches.map((b) => (
+                    <option key={b.branch_id} value={b.branch_id}>
+                      {b.name}
+                    </option>
+                  ))}
+                </Form.Select>
+              </Form.Group>
+              <h6 className="mt-2">Availability</h6>
+              <AvailabilitySlots
+                nestIndex={index}
                 control={control}
-                name={`centers.${cIndex}.availability`}
-                render={({ field }) => (
-                  <div>
-                    {(field.value || []).map((slot: AvailabilitySlot, i: number) => (
-                      <Row key={i} className="mb-2">
-                        <Col lg={4}>
-                          <select
-                            className="form-control"
-                            value={slot.day}
-                            onChange={(e) => {
-                              const newSlots = [...field.value];
-                              newSlots[i].day = e.target.value;
-                              field.onChange(newSlots);
-                            }}
-                          >
-                            <option value="">Select Day</option>
-                            {days.map((d) => (
-                              <option key={d} value={d}>
-                                {d}
-                              </option>
-                            ))}
-                          </select>
-                        </Col>
-                        <Col lg={3}>
-                          <input
-                            type="time"
-                            className="form-control"
-                            value={slot.startTime}
-                            onChange={(e) => {
-                              const newSlots = [...field.value];
-                              newSlots[i].startTime = e.target.value;
-                              field.onChange(newSlots);
-                            }}
-                          />
-                        </Col>
-                        <Col lg={3}>
-                          <input
-                            type="time"
-                            className="form-control"
-                            value={slot.endTime}
-                            onChange={(e) => {
-                              const newSlots = [...field.value];
-                              newSlots[i].endTime = e.target.value;
-                              field.onChange(newSlots);
-                            }}
-                          />
-                        </Col>
-                        <Col lg={2}>
-                          <Button
-                            variant="danger"
-                            onClick={() => {
-                              const newSlots = [...field.value];
-                              newSlots.splice(i, 1);
-                              field.onChange(newSlots);
-                            }}
-                          >
-                            Remove
-                          </Button>
-                        </Col>
-                      </Row>
-                    ))}
-                    <Button
-                      variant="outline-primary"
-                      onClick={() =>
-                        field.onChange([...(field.value || []), { day: '', startTime: '', endTime: '' }])
-                      }
-                    >
-                      Add Slot
-                    </Button>
-                  </div>
-                )}
+                register={register}
+                errors={errors}
               />
-              <Button variant="danger" className="mt-2" onClick={() => removeCenter(cIndex)}>
-                Remove Center
+              <Button
+                variant="danger"
+                size="sm"
+                className="mt-2"
+                onClick={() => removeBranch(index)}
+              >
+                Remove Branch
               </Button>
             </div>
           ))}
           <Button
-            variant="outline-success"
-            onClick={() => addCenter({ center_address: '', center_email: '', center_phone_number: '', availability: [] })}
+            className="mt-2"
+            onClick={() => appendBranch({ branch_id: 0, branch_name: '', availability: [] })}
           >
-            Add Center 
+            Add Branch
           </Button>
-          
-        </CardBody>
-      </Card>
+          {errors.branches && (
+            <Form.Text className="text-danger">{errors.branches.message as string}</Form.Text>
+          )}
+        </Col>
+        {/* 4️⃣ Additional Info */}
+        <Col md={12}>
+          <h5 className="mt-4 mb-3">4️⃣ Additional Info</h5>
+        </Col>
+        <Col md={6}>
+          {' '}
+          <Form.Group className="mb-3">
+            {' '}
+            <Form.Label>Languages</Form.Label>{' '}
+            <Form.Select {...register('languages')}>
+              {' '}
+              <option value="">Select Language</option> <option value="1">English</option>{' '}
+              <option value="2">French</option> <option value="3">German</option>{' '}
+            </Form.Select>{' '}
+            {errors.languages && (
+              <Form.Text className="text-danger">{errors.languages.message as string}</Form.Text>
+            )}{' '}
+          </Form.Group>{' '}
+        </Col>
 
-      {/* Additional Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Additional Information</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <TextAreaFormInput control={control} name="faq" label="FAQ (Frequently Asked Questions)" rows={3} />
-        </CardBody>
-      </Card>
-
-      {/* Certifications */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Photo</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <Controller
-            control={control}
-            name="certificationFiles"
-            render={({ field }) => (
-              <DropzoneFormInput
-                className="py-5"
-                text="Drop your Photo files here or click to browse"
-                showPreview
-                onFileUpload={(files) => field.onChange(files)}
-              />
-            )}
-          />
-        </CardBody>
-      </Card>
-
-        {/* Buttons */}
-        <div className="mb-3 rounded">
-          <Row className="justify-content-end g-2 mt-2">
-            <Col lg={2}>
-              <Button type="submit" variant="outline-primary" className="w-100">
-                {isEditMode ? 'Update' : 'Create'} Therapist
-              </Button>
-            </Col>
-            <Col lg={2}>
-              <Button
-                type="button"
-                variant="danger"
-                className="w-100"
-                onClick={() => router.back()}
-              >
-                Cancel
-              </Button>
-            </Col>
-          </Row>
-        </div>
-      </form>
-    </FormProvider>
+        <Col md={6}>
+          {' '}
+          <Form.Group className="mb-3">
+            {' '}
+            <Form.Label>Payment Method</Form.Label>{' '}
+            <Form.Select {...register('paymentMethods')}>
+              {' '}
+              <option value="">Select Payment Method</option> <option value="cash">Cash</option>{' '}
+              <option value="card">Card</option> <option value="upi">UPI</option>{' '}
+              <option value="bank">Bank Transfer</option>{' '}
+            </Form.Select>{' '}
+            {errors.paymentMethods && (
+              <Form.Text className="text-danger">{errors.paymentMethods.message}</Form.Text>
+            )}{' '}
+          </Form.Group>{' '}
+        </Col>
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>FAQ</Form.Label>
+            <Form.Control as="textarea" rows={3} {...register('faq')} />
+          </Form.Group>
+        </Col>
+        <Col md={12} className="text-end">
+          <Button type="submit" variant="primary">
+            Save Therapist
+          </Button>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 
-export default AddTherapist;
+const AvailabilitySlots = ({ nestIndex, control, register, errors }: any) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `branches.${nestIndex}.availability`,
+  });
+  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  return (
+    <div>
+      {fields.map((field, k) => (
+        <Row key={field.id} className="align-items-end mb-2">
+          <Col md={4}>
+            <Form.Select {...register(`branches.${nestIndex}.availability.${k}.day` as const)}>
+              <option value="">Select Day</option>
+              {days.map((d) => (
+                <option key={d} value={d}>
+                  {d}
+                </option>
+              ))}
+            </Form.Select>
+            {errors?.branches?.[nestIndex]?.availability?.[k]?.day && (
+              <Form.Text className="text-danger">
+                {errors.branches[nestIndex].availability[k].day.message}
+              </Form.Text>
+            )}
+          </Col>
+          <Col md={3}>
+            <Form.Control
+              type="time"
+              {...register(`branches.${nestIndex}.availability.${k}.startTime` as const)}
+            />
+            {errors?.branches?.[nestIndex]?.availability?.[k]?.startTime && (
+              <Form.Text className="text-danger">
+                {errors.branches[nestIndex].availability[k].startTime.message}
+              </Form.Text>
+            )}
+          </Col>
+          <Col md={3}>
+            <Form.Control
+              type="time"
+              {...register(`branches.${nestIndex}.availability.${k}.endTime` as const)}
+            />
+            {errors?.branches?.[nestIndex]?.availability?.[k]?.endTime && (
+              <Form.Text className="text-danger">
+                {errors.branches[nestIndex].availability[k].endTime.message}
+              </Form.Text>
+            )}
+          </Col>
+          <Col md={2}>
+            <Button variant="danger" size="sm" onClick={() => remove(k)}>
+              Remove
+            </Button>
+          </Col>
+        </Row>
+      ))}
+      <Button
+        variant="secondary"
+        size="sm"
+        className="mt-2"
+        onClick={() => append({ day: '', startTime: '', endTime: '' })}
+      >
+        Add Slot
+      </Button>
+    </div>
+  );
+};
+
+export default TherapistForm;
