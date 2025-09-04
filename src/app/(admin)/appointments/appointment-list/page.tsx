@@ -579,6 +579,20 @@ const AppointmentCalendarPage = () => {
                 onChange={handleDateChange}
                 showDaysOutsideCurrentMonth
                 fixedWeekNumber={6}
+                sx={{
+                  width: "100%",
+                  maxWidth: "100%",
+                  minWidth: 0,
+                  overflow: "hidden",
+                  "& .MuiPickersCalendarHeader-root": { px: 1, mb: 0.5 },
+                  "& .MuiPickersCalendarHeader-label": { fontSize: "0.9rem" },
+                  "& .MuiPickersArrowSwitcher-root .MuiIconButton-root": {
+                    p: 0.5,
+                  },
+                  "& .MuiDayCalendar-weekDayLabel": { fontSize: "0.75rem" },
+                  "& .MuiPickersDay-root": { fontSize: "0.75rem" },
+                  "& .MuiDayCalendar-monthContainer": { mx: 0.5 },
+                }}
               />
             </LocalizationProvider>
           </div>
