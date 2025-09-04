@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Form, Row, Spinner } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 
 import type { BranchType, LanguageType, PatientType } from '@/types/data';
@@ -160,7 +160,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     );
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <Form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
           <CardTitle as="h4">{isEditMode ? 'Edit Patient' : 'Add Patient'}</CardTitle>
@@ -388,7 +388,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
           </Col>
         </Row>
       </div>
-    </form>
+    </Form>
   );
 };
 
