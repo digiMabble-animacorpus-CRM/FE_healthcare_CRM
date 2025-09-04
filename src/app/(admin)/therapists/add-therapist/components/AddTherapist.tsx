@@ -69,7 +69,10 @@ interface TherapistFormInputs {
 const schema = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
-  fullName: yup.string().required('Full Name is required'),
+  fullName: yup
+    .string()
+    .transform((_, obj) => `${obj.firstName || ''} ${obj.lastName || ''}`.trim())
+    .required('Full Name is required'),
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
   contactPhone: yup
@@ -80,7 +83,7 @@ const schema = yup.object({
   aboutMe: yup.string().nullable(),
   consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
-  departmentId: yup.string().required('Department is required'),
+  departmentId: yup.number().required('Department is required'), // changed to number
   specializationIds: yup
     .array()
     .of(yup.number().required())
@@ -98,16 +101,23 @@ const schema = yup.object({
               day: yup.string().required('Day is required'),
               startTime: yup.string().required('Start time is required'),
               endTime: yup.string().required('End time is required'),
-            }),
+            })
           )
           .min(1, 'At least one availability slot is required'),
-      }),
+      })
     )
     .min(1, 'At least one branch is required'),
-  languages: yup.string().required('Languages is required'),
+  languages: yup
+    .array()
+    .of(yup.number().required())
+    .min(1, 'At least one language is required'), // changed to array of numbers
   faq: yup.string().nullable(),
-  paymentMethods: yup.string().required('Payments is required'),
+  paymentMethods: yup
+    .array()
+    .of(yup.number().required())
+    .min(1, 'At least one payment method is required'), // changed to array of numbers
 });
+
 
 const TherapistForm = () => {
   const {
@@ -239,9 +249,9 @@ const TherapistForm = () => {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Failed to save therapist');
-      alert('Therapist saved successfully ✅');
+      alert('Therapist saved successfully ');
     } catch (err: any) {
-      alert(err.message || 'Error saving therapist ❌');
+      alert(err.message || 'Error saving therapist ');
     }
   };
 
@@ -250,7 +260,7 @@ const TherapistForm = () => {
       <Row>
         {/* 1️⃣ Basic Information */}
         <Col md={12}>
-          <h5 className="mt-3 mb-3">1️⃣ Basic Information</h5>
+          <h5 className="mt-3 mb-3"> Basic Information</h5>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
@@ -302,7 +312,7 @@ const TherapistForm = () => {
         </Col>
         {/* 2️⃣ Professional Details */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3">2️⃣ Professional Details</h5>
+          <h5 className="mt-4 mb-3"> Professional Details</h5>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
@@ -370,7 +380,7 @@ const TherapistForm = () => {
 
         {/* 3️⃣ Branch & Availability */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3">3️⃣ Branch & Availability</h5>
+          <h5 className="mt-4 mb-3"> Branch & Availability</h5>
         </Col>
         <Col md={12}>
           {branchFields.map((branch, index) => (
@@ -415,7 +425,7 @@ const TherapistForm = () => {
         </Col>
         {/* 4️⃣ Additional Info */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3">4️⃣ Additional Info</h5>
+          <h5 className="mt-4 mb-3"> Additional Info</h5>
         </Col>
         <Col md={6}>
           {' '}
