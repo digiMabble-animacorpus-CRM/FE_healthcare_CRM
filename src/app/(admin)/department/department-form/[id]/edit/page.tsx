@@ -40,11 +40,12 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
 
         const department = res.data;
 
-        if (department?.department_id) {
+        if (department?.id) {
           setDefaultValues({
             name: department.name || '',
             description: department.description || '',
             is_active: department.is_active ?? true,
+            _id: department.id, // If your form expects _id
           });
         }
       } catch (err) {
@@ -67,7 +68,11 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No access token found');
 
-      await axios.patch(`${API_BASE_PATH}/departments/${params.id}`, data, {
+      await axios.patch(`${API_BASE_PATH}/departments/${params.id}`, {
+        name: data.name,
+        description: data.description,
+        is_active: data.is_active,
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

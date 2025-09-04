@@ -37,7 +37,11 @@ const DepartmentListPage = () => {
     try {
       const token = localStorage.getItem('access_token');
       const response = await axios.get(`${API_BASE_PATH}/departments`, {
-        // params: { page, limit: PAGE_LIMIT, search: searchTerm },
+        params: {
+          page,
+          limit: PAGE_LIMIT,
+          search: searchTerm, // Pass search term to API
+        },
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -47,11 +51,10 @@ const DepartmentListPage = () => {
       setDepartments(
         (response.data || []).map((dept: any) => ({
           ...dept,
-          _id: dept.id, // Map id to _id for UI compatibility
+          _id: dept.id,
         }))
       );
-      console.log('Response data: ', response.data);
-      setTotalPages(Math.ceil((response.data.totalCount || 0) / PAGE_LIMIT));
+      setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
       console.log('Failed to fetch departments data:', error);
       // fallback mock data
@@ -104,6 +107,37 @@ const DepartmentListPage = () => {
     } finally {
       setShowDeleteModal(false);
       setSelectedDepartmentId(null);
+    }
+  };
+
+  const handleToggleStatus = async (id: string, newStatus: boolean) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      await axios.patch(
+        `${API_BASE_PATH}/departments/${id}`,
+        { is_active: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // update UI immediately
+      setDepartments((prev) =>
+        prev.map((dept) =>
+          dept._id === id ? { ...dept, is_active: newStatus } : dept
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      // rollback UI if API fails
+      setDepartments((prev) =>
+        prev.map((dept) =>
+          dept._id === id ? { ...dept, is_active: !newStatus } : dept
+        )
+      );
     }
   };
 
@@ -171,7 +205,21 @@ const DepartmentListPage = () => {
                           </td>
                           <td>{department.name}</td>
                           <td>{department.description}</td>
-                          <td>{department.is_active ? 'Active' : 'Inactive'}</td>
+                          <td>
+                            <div className="form-check form-switch">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={department.is_active}
+                                onChange={(e) =>
+                                  handleToggleStatus(department._id, e.target.checked)
+                                }
+                              />
+                              <label className="form-check-label">
+                                {department.is_active ? 'Active' : 'Inactive'}
+                              </label>
+                            </div>
+                          </td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
