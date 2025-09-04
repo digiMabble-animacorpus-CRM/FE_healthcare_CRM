@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import avatar2 from "@/assets/images/users/avatar-2.jpg";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { Card, CardBody, Button, Col, Row } from "react-bootstrap";
-import axios from "axios";
-import { API_BASE_PATH } from "@/context/constants";
+import { useEffect, useState } from 'react';
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Card, CardBody, Button, Col, Row } from 'react-bootstrap';
+import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
 
 type ProfileDetailsProps = {
   team_id: string;
@@ -45,16 +45,16 @@ const ProfileDetails = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const token = localStorage.getItem("access_token");
+        const token = localStorage.getItem('access_token');
         if (!token) {
-          console.warn("No access token found");
+          console.warn('No access token found');
           return;
         }
 
         const res = await axios.get(`${API_BASE_PATH}/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
           },
         });
 
@@ -63,7 +63,7 @@ const ProfileDetails = () => {
         // Extract nested team object
         const apiProfile = res.data?.user?.team;
         if (!apiProfile) {
-          console.error("No team object in API response");
+          console.error('No team object in API response');
           return;
         }
 
@@ -92,12 +92,12 @@ const ProfileDetails = () => {
           website: apiProfile.website,
           frequently_asked_questions: apiProfile.frequently_asked_questions,
           calendar_links: apiProfile.calendar_links || [],
-          photo: apiProfile.photo || "",
+          photo: apiProfile.photo || '',
         };
 
         setProfileData(normalized);
       } catch (err) {
-        console.error("Error fetching profile:", err);
+        console.error('Error fetching profile:', err);
       }
     };
 
@@ -105,7 +105,7 @@ const ProfileDetails = () => {
   }, []);
 
   if (!profileData) {
-    return <p> Check API - Loading profile...</p>;
+    return <p>Loading profile...</p>;
   }
 
   const {
@@ -129,18 +129,11 @@ const ProfileDetails = () => {
 
   return (
     <div>
-      {/* Back Button */}
-      <div className="d-flex justify-content-between mb-3 gap-2 flex-wrap">
-        <Button variant="outline-secondary" onClick={() => router.push("/dashboards/agent")}>
-          <IconifyIcon icon="ri:arrow-left-line" /> Back
-        </Button>
-      </div>
-
       {/* Profile Header */}
       <Card className="mb-4">
         <CardBody>
           <div className="d-flex align-items-center gap-3">
-            {photo && photo !== "null" && photo.trim() !== "" ? (
+            {photo && photo !== 'null' && photo.trim() !== '' ? (
               <Image
                 src={photo}
                 alt={full_name}
@@ -152,12 +145,12 @@ const ProfileDetails = () => {
               <div
                 className="rounded-circle d-flex align-items-center justify-content-center"
                 style={{
-                  width: "80px",
-                  height: "80px",
-                  backgroundColor: "#e7ddff",
-                  color: "#341539",
-                  fontSize: "40px",
-                  fontWeight: "bold",
+                  width: '80px',
+                  height: '80px',
+                  backgroundColor: '#e7ddff',
+                  color: '#341539',
+                  fontSize: '40px',
+                  fontWeight: 'bold',
                 }}
               >
                 {full_name?.charAt(0).toUpperCase()}
@@ -172,65 +165,65 @@ const ProfileDetails = () => {
           <Row className="my-4">
             <Col lg={6}>
               <p className="fw-semibold mb-1">Email:</p>
-              <p>{contact_email || "-"}</p>
+              <p>{contact_email || '-'}</p>
             </Col>
             <Col lg={6}>
               <p className="fw-semibold mb-1">Phone:</p>
-              <p>{contact_phone || "-"}</p>
+              <p>{contact_phone || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={6}>
               <p className="fw-semibold mb-1">Office Address:</p>
-              <p>{office_address || "-"}</p>
+              <p>{office_address || '-'}</p>
             </Col>
             <Col lg={6}>
               <p className="fw-semibold mb-1">Consultations:</p>
-              <p>{consultations || "-"}</p>
+              <p>{consultations || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">About:</p>
-              <p>{about || "-"}</p>
+              <p>{about || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={4}>
               <p className="fw-semibold mb-1">Languages Spoken:</p>
-              <p>{languages_spoken.join(", ") || "-"}</p>
+              <p>{languages_spoken.join(', ') || '-'}</p>
             </Col>
             <Col lg={4}>
               <p className="fw-semibold mb-1">Payment Methods:</p>
-              <p>{payment_methods.join(", ") || "-"}</p>
+              <p>{payment_methods.join(', ') || '-'}</p>
             </Col>
             <Col lg={4}>
               <p className="fw-semibold mb-1">Schedule:</p>
-              <p>{schedule?.text || "-"}</p>
+              <p>{schedule?.text || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Diplomas / Training:</p>
-              <p>{diplomas_and_training.join(", ") || "-"}</p>
+              <p>{diplomas_and_training.join(', ') || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Specializations:</p>
-              <p>{specializations.join(", ") || "-"}</p>
+              <p>{specializations.join(', ') || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Who Am I:</p>
-              <p>{who_am_i || "-"}</p>
+              <p>{who_am_i || '-'}</p>
             </Col>
           </Row>
 
@@ -250,7 +243,31 @@ const ProfileDetails = () => {
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Frequently Asked Questions:</p>
-              <p>{frequently_asked_questions || "-"}</p>
+              {frequently_asked_questions ? (
+                <ul>
+                  {(() => {
+                    // Split by '?', then reconstruct question/answer pairs
+                    const parts = frequently_asked_questions.split('?');
+                    const faqs = [];
+                    for (let i = 0; i < parts.length - 1; i++) {
+                      const question = parts[i].trim() + '?';
+                      // Answer is the start of the next part, up to the next question or end
+                      const answerMatch = parts[i + 1].match(/^(.*?)(?=[A-ZÀ-ÿ][^?]*\?|$)/s);
+                      const answer = answerMatch ? answerMatch[1].trim() : parts[i + 1].trim();
+                      faqs.push({ question, answer });
+                    }
+                    return faqs.map((faq, idx) => (
+                      <li key={idx}>
+                        <strong>Q:</strong> {faq.question}
+                        <br />
+                        <strong>A:</strong> {faq.answer}
+                      </li>
+                    ));
+                  })()}
+                </ul>
+              ) : (
+                <span>-</span>
+              )}
             </Col>
           </Row>
         </CardBody>

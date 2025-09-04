@@ -63,7 +63,10 @@ const ProfileDropdown = () => {
           Welcome {fullName}!
         </DropdownHeader>
         <DropdownItem as={Link} href="/profile/details">
-          <IconifyIcon icon="solar:calendar-broken" className="align-middle me-2 fs-18" />
+          {/* <IconifyIcon icon="solar:user-broken" className="align-middle me-2 fs-18" /> */}
+          <IconifyIcon icon="mdi:account" className="align-middle me-2 fs-18" />
+
+
           <span className="align-middle">My Profile</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/pages/pricing">
