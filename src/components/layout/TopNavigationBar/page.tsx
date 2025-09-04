@@ -24,7 +24,7 @@ const page = () => {
               </form>
             </div>
             <div className="d-flex align-items-center gap-1">
-              {/* <ThemeModeToggle /> */}
+              <ThemeModeToggle />
 
               {/* <MaximizeScreen /> */}
 
