@@ -7,6 +7,7 @@ import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'r
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
 import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
 
 export interface DepartmentFormValues {
   name: string;
@@ -50,7 +51,7 @@ const DepartmentForm = ({ defaultValues, isEditMode = false }: Props) => {
       if (isEditMode && (defaultValues as any)?._id) {
         // PUT request for update
         await axios.put(
-          `http://164.92.220.65/api/v1/departments/${(defaultValues as any)._id}`,
+          `${API_BASE_PATH}/departments/${(defaultValues as any)._id}`,
           data,
           {
             headers: {
@@ -61,7 +62,7 @@ const DepartmentForm = ({ defaultValues, isEditMode = false }: Props) => {
         );
       } else {
         // POST request for create
-        await axios.post('http://164.92.220.65/api/v1/departments', data, {
+        await axios.post(`${API_BASE_PATH}/departments`, data, {
           headers: {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
