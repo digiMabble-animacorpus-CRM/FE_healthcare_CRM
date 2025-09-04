@@ -51,7 +51,7 @@ export interface AddTeamFormValues {
   frequently_asked_questions: Record<string, string>;
   calendar_links: string[];
   photo: string;
-  role: 'super_admin' | 'admin' | 'staff';
+  role: string;
   status: 'active' | 'inactive';
   branches: number[];
   primary_branch_id: number;
