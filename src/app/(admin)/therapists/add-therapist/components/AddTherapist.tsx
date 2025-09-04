@@ -7,7 +7,7 @@ import * as yup from 'yup';
 import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
-import { useParams } from 'next/navigation';
+import axios from 'axios';
 
 interface Branch {
   branch_id: number;
@@ -109,7 +109,10 @@ const schema = yup.object({
     .min(1, 'At least one payment method is required'),
 });
 
-const AddTherapist = () => {
+import { useParams } from 'next/navigation';
+
+const TherapistForm = () => {
+  const params = useParams();
   const {
     register,
     handleSubmit,
@@ -175,7 +178,8 @@ const AddTherapist = () => {
         const res = await fetch(`${API_BASE_PATH}/branches`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setBranches(safeArray(await res.json()));
+        setBranches(safeArray(await res.json()));+3
+        
       } catch {
         setBranches([]);
       }
@@ -208,42 +212,23 @@ const AddTherapist = () => {
     loadLanguages();
   }, [token]);
 
+  // Load therapist data for editing
   useEffect(() => {
-    if (!departmentId) {
-      setSpecializations([]);
-      setValue('specializationIds', []);
-      return;
-    }
-    const loadSpecializations = async () => {
-      try {
-        const res = await fetch(`${API_BASE_PATH}/specializations?departmentId=${departmentId}`, {
+    if (params?.id) {
+      // Fetch therapist details by ID
+      const fetchTherapist = async () => {
+        const token = localStorage.getItem('access_token');
+        const res = await axios.get(`${API_BASE_PATH}/therapists/${params.id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setSpecializations(safeArray(await res.json()));
-      } catch {
-        setSpecializations([]);
-      }
-    };
-    loadSpecializations();
-  }, [departmentId, token, setValue]);
-
-  useEffect(() => {
-    // Load therapist data for editing if ID exists
-    if (params?.id) {
-      const fetchTherapist = async () => {
-        try {
-          const res = await axios.get(`${API_BASE_PATH}/therapists/${params.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          reset(res.data);
-        } catch (error) {
-          // Handle error if needed
-        }
+        // Set form default values with fetched data
+        reset(res.data); // If using react-hook-form
       };
       fetchTherapist();
     }
-  }, [params?.id, reset, token]);
+  }, [params?.id]);
 
+  // ✅ Submit Handler
   const onSubmit = async (data: TherapistFormInputs) => {
     try {
       const res = await fetch(`${API_BASE_PATH}/therapists`, {
@@ -261,11 +246,130 @@ const AddTherapist = () => {
     }
   };
 
-  const AvailabilitySlots = ({ nestIndex }: { nestIndex: number }) => {
-    const { fields, append, remove } = useFieldArray({
-      control,
-      name: `branches.${nestIndex}.availability`,
-    });
+  return (
+    <form onSubmit={handleSubmit(onSubmit)}>
+      <Row>
+        {/* 1️⃣ Basic Information */}
+        <Col md={12}>
+          <h5 className="mt-3 mb-3">Basic Information</h5>
+        </Col>
+       <Card>
+         <CardBody>
+        <Col lg={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>First Name</Form.Label>
+            <Form.Control type="text" {...register('firstName')} />
+            {errors.firstName && (
+              <Form.Text className="text-danger">{errors.firstName.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col lg={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Last Name</Form.Label>
+            <Form.Control type="text" {...register('lastName')} />
+            {errors.lastName && (
+              <Form.Text className="text-danger">{errors.lastName.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Full Name</Form.Label>
+            <Form.Control type="text" {...register('fullName')} readOnly />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Photo (URL)</Form.Label>
+            <Form.Control type="url" {...register('photo')} />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Email</Form.Label>
+            <Form.Control type="email" {...register('contactEmail')} />
+            {errors.contactEmail && (
+              <Form.Text className="text-danger">{errors.contactEmail.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Phone Number</Form.Label>
+            <Form.Control type="text" {...register('contactPhone')} />
+            {errors.contactPhone && (
+              <Form.Text className="text-danger">{errors.contactPhone.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        {/* 2️⃣ Professional Details */}
+        <Col md={12}>
+          <h5 className="mt-4 mb-3">Professional Details</h5>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>INAMI Number</Form.Label>
+            <Form.Control type="text" {...register('inamiNumber')} />
+            {errors.inamiNumber && (
+              <Form.Text className="text-danger">{errors.inamiNumber.message}</Form.Text>
+            )}
+          </Form.Group>
+        </Col>
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>About Me</Form.Label>
+            <Form.Control as="textarea" rows={3} {...register('aboutMe')} />
+          </Form.Group>
+        </Col>
+        {/* <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Consultations</Form.Label>
+            <Form.Control as="textarea" rows={3} {...register('consultations')} />
+          </Form.Group>
+        </Col> */}
+        <Col md={12}>
+          <Form.Group className="mb-3">
+            <Form.Label>Degrees & Training</Form.Label>
+            <Form.Control as="textarea" rows={3} {...register('degreesTraining')} />
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Department</Form.Label>
+            <Form.Select {...register('departmentId')}>
+              <option value="">Select Department</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
+        <Col md={6}>
+          {' '}
+          <Form.Group className="mb-3">
+            {' '}
+            <Form.Label>Specialization</Form.Label>{' '}
+            <Form.Select {...register('specializationIds.0')}>
+              {' '}
+              <option value="">Select Specialization</option>{' '}
+              {specializations.map((s) => (
+                <option key={s.specialization_id} value={s.specialization_id}>
+                  {' '}
+                  {s.specialization_type}{' '}
+                </option>
+              ))}{' '}
+            </Form.Select>{' '}
+            {errors.specializationIds && (
+              <Form.Text className="text-danger">
+                {' '}
+                {errors.specializationIds.message as string}{' '}
+              </Form.Text>
+            )}{' '}
+          </Form.Group>{' '}
+        </Col>
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
