@@ -320,7 +320,11 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  _id: string;
+  agendaLink: any;
+  email: any;
+  phoneNumber: any;
+  education: string[];
+  therapistId: string;
   id: string;
   frequently_asked_questions: any;
   languages_spoken(languages_spoken: any): unknown;
@@ -346,7 +350,7 @@ export type TherapistType = {
   spokenLanguages: string[]; // ✅ fixed
   paymentMethods?: string;
   degreesAndTraining: string;
-  specializations: string;
+  specializations: string[];
   website: string;
   faq: string;
   agendaLinks: string | null;
@@ -668,6 +672,13 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
+  role: string;
+  branch_ids: string;
+  primary_branch_id: number | null | undefined;
+  permissions: string;
+  status: string;
+  contact_téléphone: string | undefined;
+  qui_suis_je: string;
   about: string;
   payment_methods: string[];
   diplomas_and_training: any;
@@ -727,6 +738,11 @@ export type TeamMemberCreatePayload = {
   photo: string;
   branches?: (string | number)[];
   selectedBranch?: string | number | null;
+  role: string;
+  status: "active" | "inactive";
+  primaryBranchId: number;
+  permissions: Record<string, any>;
+  createdByRole: string;
 };
 
 export interface DepartmentType {
