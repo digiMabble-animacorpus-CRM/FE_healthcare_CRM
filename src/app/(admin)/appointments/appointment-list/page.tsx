@@ -196,26 +196,26 @@ const AppointmentCalendarPage = () => {
     fetchFilterData();
   }, [token]);
 
-  // 🔹 Fetch appointments
+  // 🔹 Fetch appointments - UPDATED MAPPING LOGIC
   useEffect(() => {
     console.log('Fetching appointments...');
     console.log('Token exists:', !!token);
-    
+
     const fetchAppointments = async () => {
       if (!token) {
         console.log('No token, skipping appointment fetch');
         return;
       }
-      
+
       try {
         setLoading(true);
         console.log('Making API call to fetch appointments...');
         const res = await fetch(`${API_BASE_PATH}/appointments?pageNo=1&limit=200`, {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
-        
+
         console.log('Appointments API response status:', res.status);
-        
+
         if (!res.ok) {
           console.warn('Failed to fetch appointments, status:', res.status);
           setAllAppointments([]);
@@ -224,19 +224,21 @@ const AppointmentCalendarPage = () => {
 
         const json = await res.json();
         console.log('Appointments API raw response:', json);
-        
+
         const fetched = normalizeApiResponse(json);
         console.log('Normalized appointments:', fetched);
 
         const mapped = fetched.map((appt: any) => {
           console.log('Processing appointment raw data:', appt);
-          
-          const branch = allBranches.find(b => b.branch_id === appt.branch_id);
-          const department = allDepartments.find(d => d.id === appt.department_id);
-          const specialization = allSpecializations.find(s => s.specialization_id === appt.specialization_id);
 
-          console.log('Appointment IDs - branch:', appt.branch_id, 'dept:', appt.department_id, 'spec:', appt.specialization_id);
-          console.log('Found matches - branch:', branch, 'dept:', department, 'spec:', specialization);
+          // Use the nested objects directly from the API response
+          const branch = appt.branch;
+          const department = appt.department;
+          const specialization = appt.specialization;
+
+          console.log('Branch from API:', branch);
+          console.log('Department from API:', department);
+          console.log('Specialization from API:', specialization);
 
           const start = appt.startTime ? new Date(appt.startTime) : null;
           const end = appt.endTime ? new Date(appt.endTime) : null;
@@ -257,9 +259,21 @@ const AppointmentCalendarPage = () => {
             bgColor = '#fff3cd';
           }
 
+          // Extract participant names
+          const participants = [];
+          if (appt.patient?.firstname || appt.patient?.lastname) {
+            participants.push(`${appt.patient.firstname || ''} ${appt.patient.lastname || ''}`.trim());
+          }
+          if (appt.therapist?.fullName) {
+            participants.push(appt.therapist.fullName);
+          }
+          if (appt.doctor?.name) {
+            participants.push(appt.doctor.name);
+          }
+
           const result = {
             id: String(appt.id),
-            calendarId: String(appt.specialization_id || 'unknown'),
+            calendarId: String(specialization?.specialization_id || appt.specialization_id || 'unknown'),
             title: `${specialization?.specialization_type || 'Unknown'} - ${appt.patient?.firstname || ''} ${appt.patient?.lastname || ''}`.trim(),
             category: 'time',
             start: start?.toISOString() || '',
@@ -271,13 +285,13 @@ const AppointmentCalendarPage = () => {
             borderColor,
             raw: {
               status: appt.status,
-              location: branch?.address || '',
-              participants: [appt.patient?.firstname, appt.therapist?.fullName].filter(Boolean),
-              notes: appt.description,
+              location: branch?.address || appt.location || '',
+              participants: participants.length > 0 ? participants : ['Unknown Participant'],
+              notes: appt.description || appt.notes || appt.purposeOfVisit || '',
               original: appt,
             },
           };
-          
+
           console.log('Mapped appointment:', result);
           return result;
         });
@@ -305,7 +319,7 @@ const AppointmentCalendarPage = () => {
     console.log('Selected departments:', selectedDepartments);
     console.log('Selected date:', selectedDate.format());
     console.log('View:', view);
-    
+
     if (!allAppointments?.length) {
       console.log('No appointments to filter');
       setAppointments([]);
@@ -341,17 +355,17 @@ const AppointmentCalendarPage = () => {
       const branchId = appt.raw.original.branch_id;
       const specId = appt.raw.original.specialization_id;
       const deptId = appt.raw.original.department_id;
-      
+
       console.log(`Appt ${appt.id} - branchId: ${branchId}, specId: ${specId}, deptId: ${deptId}`);
-      
+
       // If IDs are missing (undefined), include them in all filters
       // If IDs are present, check if they match the selected filters
       const branchMatch = branchId === undefined || selectedBranches.includes(branchId);
       const specMatch = specId === undefined || selectedSpecializations.includes(specId);
       const deptMatch = deptId === undefined || selectedDepartments.includes(deptId);
-      
+
       console.log(`Appt ${appt.id} - branch: ${branchMatch}, spec: ${specMatch}, dept: ${deptMatch}`);
-      
+
       return branchMatch && specMatch && deptMatch;
     });
 
@@ -609,12 +623,13 @@ const AppointmentCalendarPage = () => {
           <Modal.Title>Appointment Details</Modal.Title>
         </Modal.Header>
         <Modal.Body>
+          {console.log(selectedEvent, "event")}
           {selectedEvent ? (
             <>
               <h5>{selectedEvent.title}</h5>
               <p><strong>Date:</strong> {dayjs(selectedEvent.start).format('MMMM D, YYYY')}</p>
               <p><strong>Time:</strong> {dayjs(selectedEvent.start).format('h:mm A')} - {dayjs(selectedEvent.end).format('h:mm A')}</p>
-              <p><strong>Branch:</strong> {selectedEvent.branch}</p>
+              <p><strong>Branch:</strong> {selectedEvent.raw.original?.branch.name}</p>
               <p><strong>Department:</strong> {selectedEvent.department}</p>
               <p><strong>Specialization:</strong> {selectedEvent.specialization}</p>
               <p><strong>Status:</strong> {selectedEvent.raw.status}</p>
