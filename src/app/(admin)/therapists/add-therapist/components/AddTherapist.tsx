@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Form, Row, Col, Button } from 'react-bootstrap';
+import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
 import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
 
 interface Branch {
   branch_id: number;
@@ -118,14 +119,17 @@ const schema = yup.object({
     .min(1, 'At least one payment method is required'), // changed to array of numbers
 });
 
+import { useParams } from 'next/navigation';
 
 const TherapistForm = () => {
+  const params = useParams();
   const {
     register,
     handleSubmit,
     setValue,
     watch,
     control,
+    reset,
     formState: { errors },
   } = useForm<TherapistFormInputs>({
     resolver: yupResolver(schema),
@@ -184,7 +188,8 @@ const TherapistForm = () => {
         const res = await fetch(`${API_BASE_PATH}/branches`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setBranches(safeArray(await res.json()));
+        setBranches(safeArray(await res.json()));+3
+        
       } catch {
         setBranches([]);
       }
@@ -239,30 +244,50 @@ const TherapistForm = () => {
     if (token) loadLanguages();
   }, [token]);
 
+  // Load therapist data for editing
+  useEffect(() => {
+    if (params?.id) {
+      // Fetch therapist details by ID
+      const fetchTherapist = async () => {
+        const token = localStorage.getItem('access_token');
+        const res = await axios.get(`${API_BASE_PATH}/therapists/${params.id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        // Set form default values with fetched data
+        reset(res.data); // If using react-hook-form
+      };
+      fetchTherapist();
+    }
+  }, [params?.id]);
+
   // ✅ Submit Handler
   const onSubmit = async (data: TherapistFormInputs) => {
     try {
-      
       const res = await fetch(`${API_BASE_PATH}/therapists`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify(data),
       });
-      if (!res.ok) throw new Error('Failed to save therapist');
-      alert('Therapist saved successfully ');
+      if (res.status === 200) {
+        alert('Therapist saved successfully ✅');
+      } else {
+        throw new Error(`Unexpected status: ${res.status}`);
+      }
     } catch (err: any) {
       alert(err.message || 'Error saving therapist ');
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit(onSubmit)}>
       <Row>
         {/* 1️⃣ Basic Information */}
         <Col md={12}>
-          <h5 className="mt-3 mb-3"> Basic Information</h5>
+          <h5 className="mt-3 mb-3">Basic Information</h5>
         </Col>
-        <Col md={6}>
+       <Card>
+         <CardBody>
+        <Col lg={6}>
           <Form.Group className="mb-3">
             <Form.Label>First Name</Form.Label>
             <Form.Control type="text" {...register('firstName')} />
@@ -271,7 +296,7 @@ const TherapistForm = () => {
             )}
           </Form.Group>
         </Col>
-        <Col md={6}>
+        <Col lg={6}>
           <Form.Group className="mb-3">
             <Form.Label>Last Name</Form.Label>
             <Form.Control type="text" {...register('lastName')} />
@@ -280,13 +305,13 @@ const TherapistForm = () => {
             )}
           </Form.Group>
         </Col>
-        <Col md={12}>
+        <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Full Name</Form.Label>
             <Form.Control type="text" {...register('fullName')} readOnly />
           </Form.Group>
         </Col>
-        <Col md={12}>
+        <Col md={6}>
           <Form.Group className="mb-3">
             <Form.Label>Photo (URL)</Form.Label>
             <Form.Control type="url" {...register('photo')} />
@@ -312,7 +337,7 @@ const TherapistForm = () => {
         </Col>
         {/* 2️⃣ Professional Details */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3"> Professional Details</h5>
+          <h5 className="mt-4 mb-3">Professional Details</h5>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
@@ -329,31 +354,31 @@ const TherapistForm = () => {
             <Form.Control as="textarea" rows={3} {...register('aboutMe')} />
           </Form.Group>
         </Col>
-        <Col md={12}>
+        {/* <Col md={12}>
           <Form.Group className="mb-3">
             <Form.Label>Consultations</Form.Label>
             <Form.Control as="textarea" rows={3} {...register('consultations')} />
           </Form.Group>
-        </Col>
+        </Col> */}
         <Col md={12}>
           <Form.Group className="mb-3">
             <Form.Label>Degrees & Training</Form.Label>
             <Form.Control as="textarea" rows={3} {...register('degreesTraining')} />
           </Form.Group>
         </Col>
-         <Col md={6}>
-                <Form.Group className="mb-3">
-                  <Form.Label>Department</Form.Label>
-                  <Form.Select {...register("departmentId")}>
-                    <option value="">Select Department</option>
-                    {departments.map((d) => (
-                      <option key={d.id} value={d.id}>
-                        {d.name}
-                      </option>
-                    ))}
-                  </Form.Select>
-                </Form.Group>
-              </Col>
+        <Col md={6}>
+          <Form.Group className="mb-3">
+            <Form.Label>Department</Form.Label>
+            <Form.Select {...register('departmentId')}>
+              <option value="">Select Department</option>
+              {departments.map((d) => (
+                <option key={d.id} value={d.id}>
+                  {d.name}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+        </Col>
         <Col md={6}>
           {' '}
           <Form.Group className="mb-3">
@@ -380,7 +405,7 @@ const TherapistForm = () => {
 
         {/* 3️⃣ Branch & Availability */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3"> Branch & Availability</h5>
+          <h5 className="mt-4 mb-3">Branch & Availability</h5>
         </Col>
         <Col md={12}>
           {branchFields.map((branch, index) => (
@@ -425,7 +450,7 @@ const TherapistForm = () => {
         </Col>
         {/* 4️⃣ Additional Info */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3"> Additional Info</h5>
+          <h5 className="mt-4 mb-3">Additional Info</h5>
         </Col>
         <Col md={6}>
           {' '}
@@ -470,8 +495,11 @@ const TherapistForm = () => {
             Save Therapist
           </Button>
         </Col>
-      </Row>
-    </Form>
+     
+        </CardBody>
+      </Card>
+       </Row>
+    </form>
   );
 };
 

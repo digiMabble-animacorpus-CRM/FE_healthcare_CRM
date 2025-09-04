@@ -7,25 +7,28 @@ import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'r
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
 import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
 
 export interface DepartmentFormValues {
   name: string;
+  _id?: string;
   description?: string;
   is_active: boolean;
 }
 
 const schema = yup.object({
   name: yup.string().required('Department name is required'),
-  description: yup.string(),
+  description: yup.string().optional(),
   is_active: yup.boolean().default(true),
 });
 
 interface Props {
   defaultValues?: Partial<DepartmentFormValues & { _id?: string }>;
   isEditMode?: boolean;
+  onSubmitHandler?: (data: DepartmentFormValues) => void;
 }
 
-const DepartmentForm = ({ defaultValues, isEditMode = false }: Props) => {
+const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
   const router = useRouter();
 
   const methods = useForm<DepartmentFormValues>({
@@ -39,41 +42,44 @@ const DepartmentForm = ({ defaultValues, isEditMode = false }: Props) => {
 
   const { handleSubmit, control, register } = methods;
 
-  const handleFormSubmit = async (data: DepartmentFormValues) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (!token) {
-        console.warn('No access token found');
-        return;
-      }
-
-      if (isEditMode && (defaultValues as any)?._id) {
-        // PUT request for update
-        await axios.put(
-          `http://164.92.220.65/api/v1/departments/${(defaultValues as any)._id}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
+  // Use the passed onSubmitHandler if provided, otherwise use the internal one
+  const handleFormSubmit = onSubmitHandler
+    ? onSubmitHandler
+    : async (data: DepartmentFormValues) => {
+        try {
+          const token = localStorage.getItem('access_token');
+          if (!token) {
+            console.warn('No access token found');
+            return;
           }
-        );
-      } else {
-        // POST request for create
-        await axios.post('http://164.92.220.65/api/v1/departments', data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-      }
 
-      router.push('/department'); // redirect after success
-    } catch (err) {
-      console.error('Error saving department:', err);
-    }
-  };
+          if (isEditMode && (defaultValues as any)?._id) {
+            // PUT request for update
+            await axios.put(
+              `${API_BASE_PATH}/departments/${(defaultValues as any)._id}`,
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+              }
+            );
+          } else {
+            // POST request for create
+            await axios.post(`${API_BASE_PATH}/departments`, data, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+          }
+
+          router.push('/department'); // redirect after success
+        } catch (err) {
+          console.error('Error saving department:', err);
+        }
+      };
 
   return (
     <FormProvider {...methods}>

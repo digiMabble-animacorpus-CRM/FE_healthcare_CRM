@@ -5,13 +5,11 @@ import {
   Card,
   CardHeader,
   CardBody,
-  CardFooter,
   CardTitle,
   Button,
   Form,
   Row,
   Col,
-  Alert,
   Spinner,
 } from 'react-bootstrap';
 import { createPatient, updatePatient, findPatient } from '@/helpers/patient';
@@ -19,6 +17,7 @@ import type { PatientType } from '@/types/data';
 
 const emptyPatient: PatientType = {
   id: '',
+  number: '',        // required field
   firstname: '',
   lastname: '',
   emails: '',
@@ -30,10 +29,15 @@ const emptyPatient: PatientType = {
   language: '',
   country: '',
   zipcode: '',
+  street: '',        // required field
   note: '',
 };
 
-const CustomerInfoCard = () => {
+interface CustomerInfoCardProps {
+  onSave?: (patient: PatientType) => void;
+}
+
+const CustomerInfoCard = ({ onSave }: CustomerInfoCardProps) => {
   const [formData, setFormData] = useState<PatientType>(emptyPatient);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -55,6 +59,7 @@ const CustomerInfoCard = () => {
         setFormData(result);
         setMode('view');
         setErrorMsg(null);
+        onSave?.(result); // also send to parent
       } else {
         setErrorMsg('No patient found. Try adding new.');
         setFormData(emptyPatient);
@@ -79,28 +84,29 @@ const CustomerInfoCard = () => {
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Ensure birthdate ISO format
       if (formData.birthdate) {
         formData.birthdate = new Date(formData.birthdate).toISOString();
       }
 
+      let ok = false;
+
       if (mode === 'edit' && formData.id) {
-        const ok = await updatePatient(formData.id, formData);
+        ok = await updatePatient(formData.id, formData);
         if (ok) {
           setSuccessMsg('Patient updated successfully');
           setMode('view');
-        } else {
-          setErrorMsg('Failed to update patient');
+          onSave?.(formData);
         }
       } else if (mode === 'new') {
-        const ok = await createPatient(formData);
+        ok = await createPatient(formData);
         if (ok) {
           setSuccessMsg('Patient created successfully');
           setMode('view');
-        } else {
-          setErrorMsg('Failed to create patient');
+          onSave?.(formData);
         }
       }
+
+      if (!ok) setErrorMsg('Failed to save patient');
     } catch (err: any) {
       setErrorMsg(err.message || 'Save failed');
     } finally {
@@ -114,8 +120,6 @@ const CustomerInfoCard = () => {
         <CardTitle as="h4">Patient Details</CardTitle>
       </CardHeader>
       <CardBody>
-        {errorMsg && <Alert variant="danger">{errorMsg}</Alert>}
-        {successMsg && <Alert variant="success">{successMsg}</Alert>}
 
         {/* 🔎 Search Section */}
         {mode === 'search' && (
@@ -148,42 +152,18 @@ const CustomerInfoCard = () => {
             <h6>
               {formData.firstname} {formData.lastname}
             </h6>
-            <p className="mb-1">
-              <b>Email:</b> {formData.emails}
-            </p>
-            <p className="mb-1">
-              <b>Phone:</b>{' '}
-              {Array.isArray(formData.phones) ? formData.phones.join(', ') : formData.phones}
-            </p>
-            <p className="mb-1">
-              <b>Gender:</b> {formData.legalgender}
-            </p>
-            <p className="mb-1">
-              <b>Language:</b> {formData.language}
-            </p>
-            <p className="mb-1">
-              <b>City:</b> {formData.city}
-            </p>
-            <p className="mb-1">
-              <b>Country:</b> {formData.country}
-            </p>
-            <p className="mb-1">
-              <b>Zip Code:</b> {formData.zipcode}
-            </p>
-            <p className="mb-1">
-              <b>Address:</b> {formData.street}
-            </p>
-            <p className="mb-1">
-              <b>Description:</b> {formData.note}
-            </p>
-            <p className="mb-1">
-              <b>DOB:</b>{' '}
-              {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : ''}
-            </p>
+            <p className="mb-1"><b>Email:</b> {formData.emails}</p>
+            <p className="mb-1"><b>Phone:</b> {Array.isArray(formData.phones) ? formData.phones.join(', ') : formData.phones}</p>
+            <p className="mb-1"><b>Gender:</b> {formData.legalgender}</p>
+            <p className="mb-1"><b>Language:</b> {formData.language}</p>
+            <p className="mb-1"><b>City:</b> {formData.city}</p>
+            <p className="mb-1"><b>Country:</b> {formData.country}</p>
+            <p className="mb-1"><b>Zip Code:</b> {formData.zipcode}</p>
+            <p className="mb-1"><b>Address:</b> {formData.street}</p>
+            <p className="mb-1"><b>Description:</b> {formData.note}</p>
+            <p className="mb-1"><b>DOB:</b> {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : ''}</p>
             <div className="d-flex gap-2 mt-2">
-              <Button size="sm" onClick={() => setMode('edit')}>
-                Edit
-              </Button>
+              <Button size="sm" onClick={() => setMode('edit')}>Edit</Button>
               <Button
                 size="sm"
                 variant="secondary"
@@ -236,15 +216,11 @@ const CustomerInfoCard = () => {
                   <Form.Label>Phone</Form.Label>
                   <Form.Control
                     type="text"
-                    value={
-                      Array.isArray(formData.phones)
-                        ? formData.phones.join(', ')
-                        : formData.phones || ''
-                    }
+                    value={Array.isArray(formData.phones) ? formData.phones.join(', ') : formData.phones || ''}
                     onChange={(e) =>
                       handleChange(
                         'phones',
-                        e.target.value.split(',').map((p) => p.trim()),
+                        e.target.value.split(',').map((p) => p.trim())
                       )
                     }
                   />
@@ -366,13 +342,7 @@ const CustomerInfoCard = () => {
                 Cancel
               </Button>
               <Button variant="primary" onClick={handleSave} disabled={loading}>
-                {loading ? (
-                  <Spinner size="sm" animation="border" />
-                ) : mode === 'edit' ? (
-                  'Update'
-                ) : (
-                  'Save'
-                )}
+                {loading ? <Spinner size="sm" animation="border" /> : mode === 'edit' ? 'Update' : 'Save'}
               </Button>
             </div>
           </Form>

@@ -12,8 +12,9 @@ import {
   Spinner,
 } from "react-bootstrap";
 import { API_BASE_PATH } from "@/context/constants";
-import type { CustomerEnquiriesType } from "@/types/data";
+import type { PatientType } from "@/types/data";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation"; // ✅ for navigation
 import AppointmentFields from "./AppointmentFields";
 
 // ---------------- Types ----------------
@@ -23,8 +24,8 @@ export type AppointmentFormValues = {
   specializationId: number;
   therapistId: number;
   patientId?: string;
-  date: string;          // YYYY-MM-DD
-  time: string;          // HH:mm (start only)
+  date: string; // YYYY-MM-DD
+  time: string; // HH:mm (start only)
   purposeOfVisit: string;
   description?: string;
 };
@@ -49,7 +50,7 @@ interface Props {
   patientId: string;
   createdById: string;
   modifiedById?: string;
-  selectedCustomer?: CustomerEnquiriesType;
+  selectedCustomer?: PatientType;
 }
 
 // ---------------- Component ----------------
@@ -64,6 +65,7 @@ const BookAppointmentForm = ({
   selectedCustomer,
 }: Props) => {
   const [saving, setSaving] = useState(false);
+  const router = useRouter(); // ✅ router for navigation
   const token =
     typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
 
@@ -109,8 +111,8 @@ const BookAppointmentForm = ({
       specializationId: data.specializationId,
       therapistId: data.therapistId,
       date: data.date,
-      startTime: data.time,
-      endTime: getEndTime(data.time),
+      startTime: toISODateTime(data.date, data.time),
+      endTime: toISODateTime(data.date, getEndTime(data.time)),
       status: isEditMode ? undefined : "pending",
       purposeOfVisit: data.purposeOfVisit,
       description: data.description || "",
@@ -140,10 +142,16 @@ const BookAppointmentForm = ({
 
       console.log("✅ Appointment Saved Response:", responseData);
 
+      // ✅ reset form after successful submission
+      reset();
+
+      // ✅ navigate to list page
+      router.push("/appointments/appointment-list");
+
+      // Optional: run parent handler
       onSubmitHandler?.(data);
     } catch (error) {
       console.error("❌ API Error:", error);
-      alert("Failed to save appointment. Please try again.");
     } finally {
       setSaving(false);
     }
@@ -161,9 +169,9 @@ const BookAppointmentForm = ({
               <small className="text-muted">
                 Booking for:{" "}
                 <strong>
-                  {selectedCustomer.name ||
-                    selectedCustomer.email ||
-                    selectedCustomer.number}
+                  {selectedCustomer.firstname ||
+                    selectedCustomer.emails ||
+                    selectedCustomer.phones}
                 </strong>
               </small>
             )}
@@ -197,6 +205,11 @@ function getEndTime(startTime: string) {
   date.setHours(hour, minute);
   date.setMinutes(date.getMinutes() + 30);
   return date.toTimeString().slice(0, 5); // HH:mm
+}
+
+/** Helper: combine date + time into ISO string */
+function toISODateTime(date: string, time: string) {
+  return new Date(`${date}T${time}:00`).toISOString();
 }
 
 export default BookAppointmentForm;

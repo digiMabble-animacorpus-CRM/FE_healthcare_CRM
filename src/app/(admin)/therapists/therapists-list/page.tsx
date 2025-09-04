@@ -20,7 +20,8 @@ import {
   Modal,
   Row,
   Spinner,
-  Alert,
+  Toast,
+  ToastContainer,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
@@ -37,7 +38,7 @@ const TherapistsListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTherapistId, setSelectedTherapistId] = useState<string | null>(null);
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -46,6 +47,12 @@ const TherapistsListPage = () => {
     try {
       const response = await getAllTherapists(1, 10000); // fetch all
       console.log(response.data);
+      setAllTherapists(
+        (response.data || []).map((t: any) => ({
+          ...t,
+          therapistId: t.id, // Map id to therapistId for UI compatibility
+        })),
+      );
       setAllTherapists(response.data || []);
     } catch (err) {
       console.error('Failed to fetch therapists', err);
@@ -57,7 +64,7 @@ const TherapistsListPage = () => {
 
   useEffect(() => {
     fetchTherapists();
-  }, []);
+  }, [showDeleteModal]);
 
   const getDateRange = () => {
     const now = dayjs();
@@ -115,13 +122,15 @@ const TherapistsListPage = () => {
     return filteredTherapists.slice(start, start + PAGE_SIZE);
   }, [filteredTherapists, currentPage]);
 
-  const handleView = (id: any) => {
-    router.push(`/therapists/details/${id}`);
-  };
+  const handleView = (id: any) => router.push(`/therapists/details/${id}`);
 
-  const handleEditClick = (id: any) => router.push(`/therapists/edit-therapist/${id}`);
+  const handleEditClick = (id: any) => {
+    console.log('Edit clicked for ID:', id);
+    router.push(`/therapists/edit-therapist/${id}`);
+  }
 
   const handleDeleteClick = (id: any) => {
+    console.log('Delete clicked for ID:', id);
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
@@ -132,13 +141,19 @@ const TherapistsListPage = () => {
     try {
       const success = await deleteTherapist(selectedTherapistId);
       if (success) {
-        setAllTherapists((prev) => prev.filter((t) => t._id !== selectedTherapistId));
+        setAllTherapists((prev) => prev.filter((t) => t.therapistId !== selectedTherapistId));
         setShowSuccessMessage(true);
+        console.log('Therapist ID :', selectedTherapistId );
+        await fetchTherapists(); // 🔥 Refetch after delete
+        setToastMessage('Therapist deleted successfully!');
       } else {
-        console.error('Failed to delete therapist');
+        console.log('Fail to delete')
+        setToastMessage('Failed to delete therapist');
       }
     } catch (err) {
+      console.log('Delete error:', err);
       console.error('Delete error:', err);
+      // setToastMessage('Error occurred while deleting therapist');
     } finally {
       setShowDeleteModal(false);
       setSelectedTherapistId(null);
@@ -150,27 +165,9 @@ const TherapistsListPage = () => {
     setCurrentPage(page);
   };
 
-  const getPhotoUrl = (photo: string) => {
-    // Regex to extract URL from markdown style "filename (url)"
-    const match = photo.match(/\((https?:\/\/[^\s)]+)\)/);
-    return match ? match[1] : '';
-  };
-
-  console.log(currentData);
   return (
     <>
       <PageTitle subName="Therapist" title="Therapists List" />
-
-      {showSuccessMessage && (
-        <Alert
-          variant="success"
-          dismissible
-          onClose={() => setShowSuccessMessage(false)}
-          className="mb-3"
-        >
-          Therapist deleted successfully!
-        </Alert>
-      )}
 
       <Row>
         <Col xl={12}>
@@ -252,69 +249,62 @@ const TherapistsListPage = () => {
                     </thead>
                     <tbody>
                       {currentData.map((item) => (
-                        <tr key={item._id}>
+                        <tr key={item.therapistId}>
                           <td>
                             <input type="checkbox" />
                           </td>
                           <td>
-                            <td>
-                              {item.imageUrl &&
-                              item.imageUrl !== 'null' &&
-                              item.imageUrl.trim() !== '' ? (
-                                <img
-                                  src={item.imageUrl}
-                                  alt={item.firstName}
-                                  className="rounded-circle object-cover"
-                                  style={{ width: '40px', height: '40px' }}
-                                />
-                              ) : (
-                                <div
-                                  className="rounded-circle d-flex align-items-center justify-content-center"
-                                  style={{
-                                    width: '40px',
-                                    height: '40px',
-                                    backgroundColor: '#e7ddff',
-                                    color: '#341539',
-                                    fontSize: '20px', // looks balanced in 40px circle
-                                    fontWeight: 'bold',
-                                  }}
-                                >
-                                  {item.firstName?.charAt(0).toUpperCase()}
-                                </div>
-                              )}
-                            </td>
+                            {item.imageUrl &&
+                            item.imageUrl !== 'null' &&
+                            item.imageUrl.trim() !== '' ? (
+                              <img
+                                src={item.imageUrl}
+                                alt={item.firstName}
+                                className="rounded-circle object-cover"
+                                style={{ width: '40px', height: '40px' }}
+                              />
+                            ) : (
+                              <div
+                                className="rounded-circle d-flex align-items-center justify-content-center"
+                                style={{
+                                  width: '40px',
+                                  height: '40px',
+                                  backgroundColor: '#e7ddff',
+                                  color: '#341539',
+                                  fontSize: '20px',
+                                  fontWeight: 'bold',
+                                }}
+                              >
+                                {item.firstName?.charAt(0).toUpperCase()}
+                              </div>
+                            )}
                           </td>
                           <td>
                             {item.firstName} {item.lastName}
                           </td>
                           <td>{item.contactEmail}</td>
                           <td>{item.contactPhone}</td>
-
-                          <td>{item.jobTitle ||"-"}</td>
+                          <td>{item.jobTitle || '-'}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(item._id)}
+                                onClick={() => handleView(item.therapistId)}
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => handleEditClick(item._id)}
-                                
+                                onClick={() => handleEditClick(item.therapistId)}
                               >
-                                
-
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
-                              
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
+                                onClick={() => handleDeleteClick(item.therapistId)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>
@@ -365,6 +355,7 @@ const TherapistsListPage = () => {
         </Col>
       </Row>
 
+      {/* Delete Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Deletion</Modal.Title>
@@ -379,8 +370,24 @@ const TherapistsListPage = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* Toast Notification */}
+      <ToastContainer position="top-end" className="p-3">
+        <Toast
+          bg="success"
+          show={!!toastMessage}
+          autohide
+          delay={3000}
+          onClose={() => setToastMessage(null)}
+        >
+          <Toast.Body className="text-white">{toastMessage}</Toast.Body>
+        </Toast>
+      </ToastContainer>
     </>
   );
 };
 
 export default TherapistsListPage;
+function setShowSuccessMessage(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}

@@ -4,10 +4,11 @@ import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
 import { Card, CardBody, Col, Row, Button, Badge, Collapse, Table } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { ApexOptions } from 'apexcharts';
 import { FaClock, FaMapMarkerAlt, FaEnvelope, FaPhone, FaEdit, FaGlobe } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
+import type { TherapistType } from '@/types/data';
 
+// Extra data types for dummy props
 type WeeklySessionType = { week: string; sessions: number };
 type StatType = { title: string; count: number; progress: number; icon: string; variant: string };
 type TransactionType = { date: string; type: string; amount: number; status: string };
@@ -29,49 +30,27 @@ type CabinetType = {
   isPrimary?: boolean;
 };
 
-type TherapistDetailsCardProps = {
-  id: string;
-  name: string;
-  jobTitle?: string;
-  email?: string;
-  phone?: string;
-  cabinets?: CabinetType[];
-  about?: string;
-  languages?: string[];
-  paymentMethods?: string[];
-  website?: string;
-  education?: string[];
-  specializations?: string[];
-  weeklySessions?: WeeklySessionType[];
-  stats?: StatType[];
-  transactions?: TransactionType[];
-  feedbacks?: FeedbackType[];
-  files?: FileType[];
-  photo?: string;
-  agendaLink?: string | null;
+// Props
+type TherapistDetailsProps = {
+  data: TherapistType;
+  weeklySessions: WeeklySessionType[];
+  stats: StatType[];
+  transactions: TransactionType[];
+  feedbacks: FeedbackType[];
+  files: FileType[];
+  cabinets: CabinetType[];
 };
 
 const TherapistDetails = ({
-  id,
-  name,
-  jobTitle,
-  email,
-  phone,
-  cabinets = [],
-  about,
-  languages = [],
-  paymentMethods = [],
-  website,
-  education = [],
-  specializations = [],
-  weeklySessions = [],
-  stats = [],
-  transactions = [],
-  feedbacks = [],
-  files = [],
-  photo,
-  agendaLink = null,
-}: TherapistDetailsCardProps) => {
+  data,
+  weeklySessions,
+  stats,
+  transactions,
+  feedbacks,
+  files,
+  cabinets,
+}: TherapistDetailsProps) => {
+  console.log(data, "data")
   const [aboutOpen, setAboutOpen] = useState(true);
   const [cabinetsOpen, setCabinetsOpen] = useState(true);
   const router = useRouter();
@@ -81,7 +60,8 @@ const TherapistDetails = ({
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, []);
 
-  const handleEditClick = (id: string) => router.push(`/therapists/edit-therapist/${id}`);
+  const handleEditClick = (id: string | number) =>
+    router.push(`/therapists/edit-therapist/${id}`);
 
   return (
     <div>
@@ -90,8 +70,8 @@ const TherapistDetails = ({
         <Button variant="link" onClick={() => window.history.back()}>
           <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back
         </Button>
-        {agendaLink && (
-          <Button variant="primary" onClick={() => window.open(agendaLink, '_blank')}>
+        {data.agendaLink && (
+          <Button variant="primary" onClick={() => window.open(data.agendaLink, '_blank')}>
             Book Appointment
           </Button>
         )}
@@ -102,10 +82,10 @@ const TherapistDetails = ({
         <CardBody>
           <Row className="align-items-center">
             <Col lg={2} className="d-flex justify-content-center">
-              {photo && photo !== "null" && photo.trim() !== "" ? (
+              {data.photo && data.photo !== "null" && data.photo.trim() !== "" ? (
                 <img
-                  src={photo}
-                  alt={name}
+                  src={data.photo}
+                  alt={`${data.firstName} ${data.lastName}`}
                   className="rounded-circle object-cover"
                   style={{ width: "140px", height: "140px" }}
                 />
@@ -121,46 +101,32 @@ const TherapistDetails = ({
                     fontWeight: 'bold',
                   }}
                 >
-                  {name[0].toUpperCase()}
+                  {data.firstName[0].toUpperCase()}
                 </div>
               )}
             </Col>
             <Col lg={10}>
               <div className='d-flex justify-content-between'>
                 <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
-                  {name}
+                  {data.firstName} {data.lastName}
                 </h2>
                 <Button
                   variant="outline-primary"
                   size="sm"
-                  onClick={() => handleEditClick(id)}
+                  onClick={() => handleEditClick(data.therapistId)}
                 >
                   <FaEdit className="me-1" /> Edit
                 </Button>
               </div>
-              <p className="text-muted mb-2">{jobTitle || '-'}</p>
               <div className="d-flex flex-column gap-2">
-                {email && (
+                {data.contactEmail && (
                   <div className="d-flex align-items-center gap-2">
-                    <FaEnvelope className="text-primary" /> <span>{email}</span>
+                    <FaEnvelope className="text-primary" /> <span>{data.contactEmail}</span>
                   </div>
                 )}
-                {phone && (
+                {data.contactPhone && (
                   <div className="d-flex align-items-center gap-2">
-                    <FaPhone className="text-success" /> <span>{phone}</span>
-                  </div>
-                )}
-                {website && (
-                  <div className="d-flex align-items-center gap-2">
-                    <FaGlobe className="text-info" />
-                    <a
-                      href={website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-decoration-none"
-                    >
-                      {website}
-                    </a>
+                    <FaPhone className="text-success" /> <span>{data.contactPhone}</span>
                   </div>
                 )}
               </div>
@@ -185,7 +151,6 @@ const TherapistDetails = ({
             </div>
 
             <Collapse in={cabinetsOpen}>
-              {/* 👇 Wrap inside a div so Collapse can animate height properly */}
               <div>
                 <div className="d-flex gap-3 overflow-auto py-2">
                   {cabinets.map((cab, idx) => (
@@ -262,7 +227,7 @@ const TherapistDetails = ({
           </div>
           <Collapse in={aboutOpen}>
             <div>
-              <p>{about || '-'}</p>
+              <p>{data.aboutMe || '-'}</p>
             </div>
           </Collapse>
         </CardBody>
@@ -281,52 +246,41 @@ const TherapistDetails = ({
                 </Card>
               </Col>
             ))}
-            {stats.map((t, idx) => {
-              const options = {
-                series: [t.progress],
-                chart: { type: 'radialBar', height: 90, sparkline: { enabled: true } },
-                plotOptions: {
-                  radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } },
-                },
-                colors: [t.variant],
-              };
-              return (
-                <Col lg={4} key={idx}>
-                  <Card className="border p-3">
-                    <div className="d-flex align-items-center gap-3">
-                      <div className={`avatar bg-${t.variant} bg-opacity-10 rounded flex-centered`}>
-                        <IconifyIcon
-                          icon={t.icon}
-                          width={28}
-                          height={28}
-                          className={`fs-28 text-${t.variant}`}
-                        />
-                      </div>
-                      <div>
-                        <p className="fw-medium fs-15 mb-1">{t.title}</p>
-                        <p className="fw-semibold fs-20 mb-0">{t.count}</p>
-                      </div>
+            {stats.map((t, idx) => (
+              <Col lg={4} key={idx}>
+                <Card className="border p-3">
+                  <div className="d-flex align-items-center gap-3">
+                    <div className={`avatar bg-${t.variant} bg-opacity-10 rounded flex-centered`}>
+                      <IconifyIcon
+                        icon={t.icon}
+                        width={28}
+                        height={28}
+                        className={`fs-28 text-${t.variant}`}
+                      />
                     </div>
-                  </Card>
-                </Col>
-              );
-            })}
+                    <div>
+                      <p className="fw-medium fs-15 mb-1">{t.title}</p>
+                      <p className="fw-semibold fs-20 mb-0">{t.count}</p>
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            ))}
           </Row>
         </CardBody>
       </Card>
 
       {/* Education & Training */}
-      {education.length > 0 && (
+      {data.education && data.education.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Education & Training</h4>
             <div className="d-flex flex-wrap gap-2">
-              {education.map((edu, i) => (
+              {data.education.map((edu, i) => (
                 <Badge
                   key={i}
                   bg="info"
                   className="fs-13 text-dark d-flex align-items-center px-2 py-1"
-                  style={{ cursor: 'pointer' }}
                   title={edu}
                 >
                   <IconifyIcon icon="ri:book-line" className="me-1" /> {edu}
@@ -338,12 +292,12 @@ const TherapistDetails = ({
       )}
 
       {/* Specializations */}
-      {specializations.length > 0 && (
+      {data.specializations && data.specializations.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Specializations</h4>
             <div className="d-flex flex-wrap gap-2">
-              {specializations.map((spec, i) => (
+              {data.specializations.map((spec, i) => (
                 <Badge key={i} bg="primary" className="fs-12">
                   {spec}
                 </Badge>
@@ -429,9 +383,7 @@ const TherapistDetails = ({
                         />
                       )}
                       <h5>{f.name}</h5>
-                      <p>
-                        @{f.userName} ({f.country})
-                      </p>
+                      <p>@{f.userName} ({f.country})</p>
                       <p>{f.description}</p>
                       <p className="text-warning">
                         {Array.from({ length: 5 }).map((_, i) => (
@@ -447,50 +399,6 @@ const TherapistDetails = ({
                 </Col>
               ))}
             </Row>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Transaction / Appointment History */}
-      {transactions.length > 0 && (
-        <Card className="mb-4 shadow-sm">
-          <CardBody>
-            <h4 className="mb-3" style={{ color: '#0d6efd' }}>
-              Transactions / Appointments
-            </h4>
-            <Table responsive striped hover className="mb-0">
-              <thead className="table-primary">
-                <tr>
-                  <th>Date</th>
-                  <th>Type</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {transactions.map((tr, idx) => (
-                  <tr key={idx}>
-                    <td>{tr.date}</td>
-                    <td>{tr.type}</td>
-                    <td>${tr.amount.toFixed(2)}</td>
-                    <td>
-                      <Badge
-                        bg={
-                          tr.status === 'Completed'
-                            ? 'success'
-                            : tr.status === 'Pending'
-                              ? 'warning'
-                              : 'secondary'
-                        }
-                        className="py-1 px-2"
-                      >
-                        {tr.status}
-                      </Badge>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
           </CardBody>
         </Card>
       )}

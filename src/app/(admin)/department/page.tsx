@@ -17,7 +17,8 @@ import {
   Spinner,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
-import { getDepartments } from '@/helpers/department';
+import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
 
 const PAGE_LIMIT = 10;
 
@@ -34,19 +35,35 @@ const DepartmentListPage = () => {
   const fetchDepartments = async (page: number) => {
     setLoading(true);
     try {
-      const response = await getDepartments(page, PAGE_LIMIT, searchTerm);
-      setDepartments(response.data);
-      setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
+      const token = localStorage.getItem('access_token');
+      const response = await axios.get(`${API_BASE_PATH}/departments`, {
+        params: {
+          page,
+          limit: PAGE_LIMIT,
+          search: searchTerm, // Pass search term to API
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      setDepartments(
+        (response.data || []).map((dept: any) => ({
+          ...dept,
+          _id: dept.id,
+        }))
+      );
+      setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
-      console.error('Failed to fetch departments data:', error);
-      // Use mock data if API fails
+      console.log('Failed to fetch departments data:', error);
+      // fallback mock data
       setDepartments([
         {
           _id: '1',
           name: 'Cardiology',
           is_active: true,
           description: 'Handles heart-related treatments',
-
         },
       ]);
       setTotalPages(1);
@@ -77,8 +94,12 @@ const DepartmentListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedDepartmentId) return;
     try {
-      await fetch(`/api/departments/${selectedDepartmentId}`, {
-        method: 'DELETE',
+      const token = localStorage.getItem('access_token');
+      await axios.delete(`${API_BASE_PATH}/departments/${selectedDepartmentId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
       fetchDepartments(currentPage);
     } catch (error) {
@@ -86,6 +107,37 @@ const DepartmentListPage = () => {
     } finally {
       setShowDeleteModal(false);
       setSelectedDepartmentId(null);
+    }
+  };
+
+  const handleToggleStatus = async (id: string, newStatus: boolean) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      await axios.patch(
+        `${API_BASE_PATH}/departments/${id}`,
+        { is_active: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+
+      // update UI immediately
+      setDepartments((prev) =>
+        prev.map((dept) =>
+          dept._id === id ? { ...dept, is_active: newStatus } : dept
+        )
+      );
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      // rollback UI if API fails
+      setDepartments((prev) =>
+        prev.map((dept) =>
+          dept._id === id ? { ...dept, is_active: !newStatus } : dept
+        )
+      );
     }
   };
 
@@ -153,7 +205,21 @@ const DepartmentListPage = () => {
                           </td>
                           <td>{department.name}</td>
                           <td>{department.description}</td>
-                          <td>{department.is_active ? 'Active' : 'Inactive'}</td>
+                          <td>
+                            <div className="form-check form-switch">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={department.is_active}
+                                onChange={(e) =>
+                                  handleToggleStatus(department._id, e.target.checked)
+                                }
+                              />
+                              <label className="form-check-label">
+                                {department.is_active ? 'Active' : 'Inactive'}
+                              </label>
+                            </div>
+                          </td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
@@ -233,7 +299,7 @@ const DepartmentListPage = () => {
           <Modal.Title>Confirm Deletion</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this department? This action cannot be undone.
+          Are you sure you want to delete this department?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>

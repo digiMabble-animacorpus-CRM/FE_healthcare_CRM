@@ -5,15 +5,20 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import DepartmentForm, { DepartmentFormValues } from '../../departmentForm';
 import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
 
-interface Props {
-  params: { id?: string };
+export interface Props {
+  defaultValues?: Partial<DepartmentFormValues>;
+  isEditMode?: boolean;
+  onSubmitHandler?: (data: DepartmentFormValues & { department_id?: string }) => void;
 }
 
-const EditDepartmentPage = ({ params }: Props) => {
+const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [defaultValues, setDefaultValues] = useState<Partial<DepartmentFormValues & { department_id?: string }>>({});
+  const [defaultValues, setDefaultValues] = useState<
+    Partial<DepartmentFormValues & { department_id?: string }>
+  >({});
   const isEditMode = Boolean(params.id);
 
   useEffect(() => {
@@ -27,22 +32,20 @@ const EditDepartmentPage = ({ params }: Props) => {
         const token = localStorage.getItem('access_token');
         if (!token) throw new Error('No access token found');
 
-        const res = await fetch(`${API_BASE_PATH}/departments/${params.id}`, {
+        const res = await axios.get(`${API_BASE_PATH}/departments/${params.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
           },
         });
 
-        if (!res.ok) throw new Error('Failed to fetch department');
+        const department = res.data;
 
-        const department = await res.json();
-
-        if (department?.department_id) {
+        if (department?.id) {
           setDefaultValues({
             name: department.name || '',
             description: department.description || '',
             is_active: department.is_active ?? true,
+            _id: department.id, // If your form expects _id
           });
         }
       } catch (err) {
@@ -56,26 +59,27 @@ const EditDepartmentPage = ({ params }: Props) => {
     fetchData();
   }, [params.id]);
 
-  const onSubmitHandler = async (data: DepartmentFormValues & { department_id?: string }) => {
+  const onSubmitHandler = async (
+    data: DepartmentFormValues & { department_id?: string }
+  ) => {
     if (!params.id) return;
 
     try {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No access token found');
 
-      const res = await fetch(`${API_BASE_PATH}/departments/${params.id}`, {
-        method: 'PATCH',
+      await axios.patch(`${API_BASE_PATH}/departments/${params.id}`, {
+        name: data.name,
+        description: data.description,
+        is_active: data.is_active,
+      }, {
         headers: {
           Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
       });
 
-      if (!res.ok) throw new Error('Failed to update department');
-
-      toast.success('Department updated successfully!');
-      router.push('/departments');
+      // toast.success('Department updated successfully!');
+      router.push('/department');
     } catch (error) {
       console.error(error);
       toast.error('Error updating department');
