@@ -4,12 +4,12 @@ import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
 import AddTherapist from '../../add-therapist/components/AddTherapist';
 
-export const metadata: Metadata = { title: 'Customers Add' };
+export const metadata: Metadata = { title: 'Therpaist Add' };
 
 const TherapistEditPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
-      <PageTitle title="Edit Customer" subName="" />
+      <PageTitle title="Edit Therpaist" subName="" />
       <AddTherapist params={params} />
     </>
   );

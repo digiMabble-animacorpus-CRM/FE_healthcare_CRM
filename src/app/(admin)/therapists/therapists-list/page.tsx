@@ -296,21 +296,25 @@ const TherapistsListPage = () => {
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(item._key)}
+                                onClick={() => handleView(item._id)}
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => handleEditClick(item._key)}
+                                onClick={() => handleEditClick(item._id)}
+                                
                               >
+                                
+
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
+                              
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item._key)}
+                                onClick={() => handleDeleteClick(item._id)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>

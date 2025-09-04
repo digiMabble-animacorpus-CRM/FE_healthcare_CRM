@@ -9,6 +9,7 @@ import type { TherapistType } from '@/types/data';
 
 const TherapistDetailsPage = () => {
   const params = useParams();
+  // Accept both string and number for therapistId (could be _key)
   const therapistId = Array.isArray(params?.id) ? params.id[0] : params?.id;
 
   const [data, setData] = useState<TherapistType | null>(null);
@@ -80,7 +81,7 @@ const TherapistDetailsPage = () => {
     setLoading(true);
     try {
       if (!therapistId) return;
-      const therapist = await getTherapistById(therapistId);
+  const therapist = await getTherapistById(therapistId);
       console.log("Full therapist object:", therapist);
       setData(therapist);
     } catch (error) {
@@ -103,7 +104,17 @@ const TherapistDetailsPage = () => {
     <>
       <PageTitle subName="Healthcare" title="Therapist Overview" />
       <TherapistDetails
-        id={data.idPro.toString()}
+        id={
+          data._key !== undefined && data._key !== null
+            ? data._key.toString()
+            : data.idPro !== undefined && data.idPro !== null
+              ? data.idPro.toString()
+              : data._id
+                ? data._id.toString()
+                : data.id
+                  ? data.id.toString()
+                  : ''
+        }
         photo={data.imageUrl}
         name={`${data.firstName} ${data.lastName}`}
         jobTitle={data.jobTitle}
