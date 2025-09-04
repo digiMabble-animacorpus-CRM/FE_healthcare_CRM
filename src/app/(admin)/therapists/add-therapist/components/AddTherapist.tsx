@@ -239,9 +239,9 @@ const TherapistForm = () => {
         body: JSON.stringify(data),
       });
       if (!res.ok) throw new Error('Failed to save therapist');
-      alert('Therapist saved successfully ✅');
+      alert('Therapist saved successfully ');
     } catch (err: any) {
-      alert(err.message || 'Error saving therapist ❌');
+      alert(err.message || 'Error saving therapist ');
     }
   };
 
@@ -250,7 +250,7 @@ const TherapistForm = () => {
       <Row>
         {/* 1️⃣ Basic Information */}
         <Col md={12}>
-          <h5 className="mt-3 mb-3">1️⃣ Basic Information</h5>
+          <h5 className="mt-3 mb-3">Basic Information</h5>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
@@ -302,7 +302,7 @@ const TherapistForm = () => {
         </Col>
         {/* 2️⃣ Professional Details */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3">2️⃣ Professional Details</h5>
+          <h5 className="mt-4 mb-3">Professional Details</h5>
         </Col>
         <Col md={6}>
           <Form.Group className="mb-3">
@@ -370,7 +370,7 @@ const TherapistForm = () => {
 
         {/* 3️⃣ Branch & Availability */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3">3️⃣ Branch & Availability</h5>
+          <h5 className="mt-4 mb-3">Branch & Availability</h5>
         </Col>
         <Col md={12}>
           {branchFields.map((branch, index) => (
@@ -415,7 +415,7 @@ const TherapistForm = () => {
         </Col>
         {/* 4️⃣ Additional Info */}
         <Col md={12}>
-          <h5 className="mt-4 mb-3">4️⃣ Additional Info</h5>
+          <h5 className="mt-4 mb-3">Additional Info</h5>
         </Col>
         <Col md={6}>
           {' '}

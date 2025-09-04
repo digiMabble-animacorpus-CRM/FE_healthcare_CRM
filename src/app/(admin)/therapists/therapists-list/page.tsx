@@ -46,7 +46,12 @@ const TherapistsListPage = () => {
     try {
       const response = await getAllTherapists(1, 10000); // fetch all
       console.log(response.data);
-      setAllTherapists(response.data || []);
+      setAllTherapists(
+        (response.data || []).map((t: any) => ({
+          ...t,
+          therapistId: t.id, // Map id to therapistId for UI compatibility
+        })),
+      );
     } catch (err) {
       console.error('Failed to fetch therapists', err);
       setAllTherapists([]);
@@ -122,6 +127,7 @@ const TherapistsListPage = () => {
   const handleEditClick = (id: any) => router.push(`/therapists/edit-therapist/${id}`);
 
   const handleDeleteClick = (id: any) => {
+    console.log('Delete clicked for ID:', id);
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
@@ -132,7 +138,7 @@ const TherapistsListPage = () => {
     try {
       const success = await deleteTherapist(selectedTherapistId);
       if (success) {
-        setAllTherapists((prev) => prev.filter((t) => t._id !== selectedTherapistId));
+        setAllTherapists((prev) => prev.filter((t) => t.therapistId !== selectedTherapistId));
         setShowSuccessMessage(true);
       } else {
         console.error('Failed to delete therapist');
@@ -252,7 +258,7 @@ const TherapistsListPage = () => {
                     </thead>
                     <tbody>
                       {currentData.map((item) => (
-                        <tr key={item._id}>
+                        <tr key={item.therapistId}>
                           <td>
                             <input type="checkbox" />
                           </td>
@@ -296,25 +302,21 @@ const TherapistsListPage = () => {
                               <Button
                                 variant="light"
                                 size="sm"
-                                onClick={() => handleView(item._id)}
+                                onClick={() => handleView(item.therapistId)}
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
                               <Button
                                 variant="secondary"
                                 size="sm"
-                                onClick={() => handleEditClick(item._id)}
-                                
+                                onClick={() => handleEditClick(item.therapistId)}
                               >
-                                
-
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
-                              
                               <Button
                                 variant="danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
+                                onClick={() => handleDeleteClick(item.therapistId)}
                               >
                                 <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                               </Button>

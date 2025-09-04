@@ -320,6 +320,10 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
+  therapistId: Key | null | undefined;
+  therapistId: string;
+  name: ReactNode;
+  branches: any;
   _id: string;
   id: string;
   frequently_asked_questions: any;
