@@ -212,7 +212,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by Name, Email, Phone or combination"
+                placeholder="Search by Email, Phone"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -310,7 +310,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>First Name *</Form.Label>
+                  <Form.Label>First Name <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.firstname}
@@ -324,7 +324,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Last Name *</Form.Label>
+                  <Form.Label>Last Name <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.lastname}
@@ -341,7 +341,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Email *</Form.Label>
+                  <Form.Label>Email <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="email"
                     value={formData.emails || ''}
@@ -355,7 +355,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Phone Numbers (comma separated) *</Form.Label>
+                  <Form.Label>Phone Numbers (comma separated) <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     value={Array.isArray(formData.phones) ? formData.phones.join(', ') : formData.phones || ''}
@@ -378,7 +378,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Gender *</Form.Label>
+                  <Form.Label>Gender <span className="text-danger">*</span></Form.Label>
                   <Form.Select
                     value={formData.legalgender || ''}
                     onChange={(e) => handleChange('legalgender', e.target.value)}
@@ -410,7 +410,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Preferred Language *</Form.Label>
+                  <Form.Label>Preferred Language <span className="text-danger">*</span></Form.Label>
                   <Form.Select
                     value={formData.language || ''}
                     onChange={(e) => handleChange('language', e.target.value)}
@@ -428,7 +428,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Status *</Form.Label>
+                  <Form.Label>Status <span className="text-danger">*</span></Form.Label>
                   <Form.Select
                     value={formData.status || ''}
                     onChange={(e) => handleChange('status', e.target.value)}
@@ -448,7 +448,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Country *</Form.Label>
+                  <Form.Label>Country <span className="text-danger">*</span></Form.Label>
                   <Form.Select
                     value={formData.country || ''}
                     onChange={(e) => handleChange('country', e.target.value)}
@@ -467,7 +467,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>City *</Form.Label>
+                  <Form.Label>City <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.city || ''}
@@ -485,7 +485,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Zip Code *</Form.Label>
+                  <Form.Label>Zip Code <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.zipcode || ''}
@@ -499,7 +499,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Address *</Form.Label>
+                  <Form.Label>Address <span className="text-danger">*</span></Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={2}
@@ -533,7 +533,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
                 Cancel
               </Button>
               <Button variant="primary" onClick={handleSave} disabled={loading}>
-                {loading ? <Spinner size="sm" animation="border" /> : mode === 'edit' ? 'Update' : 'Save'}
+                {loading ? <Spinner size="sm" animation="border" /> : mode === 'edit' ? 'Update' : 'Add Patient'}
               </Button>
             </div>
           </Form>
