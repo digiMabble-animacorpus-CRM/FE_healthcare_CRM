@@ -453,37 +453,78 @@ const TherapistForm = () => {
           <h5 className="mt-4 mb-3">Additional Info</h5>
         </Col>
         <Col md={6}>
-          {' '}
-          <Form.Group className="mb-3">
-            {' '}
-            <Form.Label>Languages</Form.Label>{' '}
-            <Form.Select {...register('languages')}>
-              {' '}
-              <option value="">Select Language</option> <option value="1">English</option>{' '}
-              <option value="2">French</option> <option value="3">German</option>{' '}
-            </Form.Select>{' '}
-            {errors.languages && (
-              <Form.Text className="text-danger">{errors.languages.message as string}</Form.Text>
-            )}{' '}
-          </Form.Group>{' '}
-        </Col>
+  <Form.Group className="mb-3">
+    <Form.Label>Languages</Form.Label>
+    <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+      {[
+        { id: 1, name: 'English' },
+        { id: 2, name: 'French' },
+        { id: 3, name: 'German' },
+      ].map((lang) => (
+        <Form.Check
+          key={lang.id}
+          type="checkbox"
+          label={lang.name}
+          checked={watch('languages')?.includes(lang.id)}
+          onChange={(e) => {
+            const current = watch('languages') || [];
+            if (e.target.checked) {
+              setValue('languages', [...current, lang.id]);
+            } else {
+              setValue(
+                'languages',
+                current.filter((l: number) => l !== lang.id)
+              );
+            }
+          }}
+        />
+      ))}
+    </div>
+    {errors.languages && (
+      <Form.Text className="text-danger">
+        {errors.languages.message as string}
+      </Form.Text>
+    )}
+  </Form.Group>
+</Col>
 
         <Col md={6}>
-          {' '}
-          <Form.Group className="mb-3">
-            {' '}
-            <Form.Label>Payment Method</Form.Label>{' '}
-            <Form.Select {...register('paymentMethods')}>
-              {' '}
-              <option value="">Select Payment Method</option> <option value="cash">Cash</option>{' '}
-              <option value="card">Card</option> <option value="upi">UPI</option>{' '}
-              <option value="bank">Bank Transfer</option>{' '}
-            </Form.Select>{' '}
-            {errors.paymentMethods && (
-              <Form.Text className="text-danger">{errors.paymentMethods.message}</Form.Text>
-            )}{' '}
-          </Form.Group>{' '}
-        </Col>
+  <Form.Group className="mb-3">
+    <Form.Label>Payment Methods</Form.Label>
+    <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+      {[
+        { id: 'cash', name: 'Cash' },
+        { id: 'card', name: 'Card' },
+        { id: 'upi', name: 'UPI' },
+        { id: 'bank', name: 'Bank Transfer' },
+      ].map((pm) => (
+        <Form.Check
+          key={pm.id}
+          type="checkbox"
+          label={pm.name}
+          checked={watch('paymentMethods')?.includes(pm.id)}
+          onChange={(e) => {
+            const current = watch('paymentMethods') || [];
+            if (e.target.checked) {
+              setValue('paymentMethods', [...current, pm.id]);
+            } else {
+              setValue(
+                'paymentMethods',
+                current.filter((p: string) => p !== pm.id)
+              );
+            }
+          }}
+        />
+      ))}
+    </div>
+    {errors.paymentMethods && (
+      <Form.Text className="text-danger">
+        {errors.paymentMethods.message as string}
+      </Form.Text>
+    )}
+  </Form.Group>
+</Col>
+
         <Col md={12}>
           <Form.Group className="mb-3">
             <Form.Label>FAQ</Form.Label>
