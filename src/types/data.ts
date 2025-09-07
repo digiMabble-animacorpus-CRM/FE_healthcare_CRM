@@ -672,22 +672,6 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
-  role: string;
-  branch_ids: string;
-  primary_branch_id: number | null | undefined;
-  permissions: string;
-  status: string;
-  contact_téléphone: string | undefined;
-  qui_suis_je: string;
-  about: string;
-  payment_methods: string[];
-  diplomas_and_training: any;
-  specializations: any;
-  website: string;
-  frequently_asked_questions: any;
-  calendar_links: any;
-  photo: string;
-  languages_spoken: string[];
   team_id: string;
   last_name: string;
   first_name: string;
@@ -704,9 +688,25 @@ export type TeamMemberType = {
   contact_email: string;
   contact_phone: string;
   schedule: {
-  text: string | null;
+    text: string | null;
+  };
+  about?: string | null;
+  languages_spoken: string[]; // always an array
+  payment_methods: string[]; // always an array
+  diplomas_and_training: string[]; // always an array
+  specializations: string[]; // always an array
+  website?: string;
+  frequently_asked_questions?: string | Record<string, any> | null; // JSON string or object
+  calendar_links: string[]; // always an array
+  photo: string;
+  branch_ids?: (string | number)[]; // array of strings or numbers
+  primary_branch_id: number;
+  permissions: Record<string, any>; // object for permissions
+  role: string;
+  status: "active" | "inactive" | string;
+  created_by_role?: string;
 };
-}
+
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency
@@ -737,7 +737,7 @@ export type TeamMemberCreatePayload = {
   calendarLinks: string[]; // always an array
   photo: string;
   branches?: (string | number)[];
-  selectedBranch?: string | number | null;
+  selected_branch?: string | number | null;
   role: string;
   status: "active" | "inactive";
   primaryBranchId: number;

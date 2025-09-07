@@ -1,20 +1,17 @@
-import FileUpload from '@/components/FileUpload';
+import React from 'react';
 import PageTitle from '@/components/PageTitle';
-import { Col, Row } from 'react-bootstrap';
-import { Metadata } from 'next';
-import AddTeam from '../../add-team/components/AddTeam';
-// import { getTeamMember } from '@/helpers/team-members';
+import AddTeamPage from '../../add-team/components/AddTeam';
+import { getAllTeamMembers } from '@/helpers/team-members';
 
-export const metadata: Metadata = { title: 'Customers Edit' };
-
-// Next.js App Router lets us use async server components
 const TeamEditPage = async ({ params }: { params: { id: string } }) => {
-  // const teamMember = await getTeamMember(params.id);
+  const id = Number(params.id);
+  const response = await getAllTeamMembers(id);
+  const teamMember = response?.data?.[0] ?? null;
 
   return (
     <>
-      <PageTitle title="Edit Customer" subName="" />
-      {/* <AddTeam defaultValues={teamMember} isEdit /> */}
+      <PageTitle title="Edit Team Member" subName="" />
+      <AddTeamPage defaultValues={teamMember} isEdit />
     </>
   );
 };

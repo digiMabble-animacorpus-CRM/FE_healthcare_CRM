@@ -4,26 +4,6 @@ import { API_BASE_PATH } from '@/context/constants';
 import { encryptAES, decryptAES } from '@/utils/encryption';
 import type { TeamMemberCreatePayload, TeamMemberType } from '@/types/data';
 
-export interface TeamMemberUpdatePayload {
-  name?: string;
-  email?: string;
-  phoneNumber?: string;
-  roleId?: number;
-  accessLevel?: 'staff' | 'branch-admin' | 'super-admin';
-  branches?: number[];
-  selectedBranch?: number | null;
-  permissions?: {
-    action: string;
-    resource: string;
-    enabled: boolean;
-  }[];
-  updatedBy?: {
-    staffId: string;
-    updatedAt: string;
-  }[];
-  [key: string]: any;
-}
-
 export const getAllTeamMembers = async (
   page: number = 1,
   limit: number = 10,
@@ -130,11 +110,9 @@ export const createTeamMember = async (payload: TeamMemberCreatePayload): Promis
 
     const safePayload = {
       ...payload,
-      branches: (payload.branches || []).map((b: any) => Number(b)),
+      branches: (payload.branches || []).map((b: string | number) => Number(b)),
       selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
-
-    const encryptedPayload = encryptAES(safePayload);
 
     const response = await fetch(`${API_BASE_PATH}/team-members`, {
       method: 'POST',
@@ -142,26 +120,26 @@ export const createTeamMember = async (payload: TeamMemberCreatePayload): Promis
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ data: encryptedPayload }),
+      body: JSON.stringify(safePayload), // send plain JSON payload
     });
 
     const result = await response.json();
 
     if (!response.ok || !result.status) {
-      console.error('Create failed:', result.message || 'Unknown error');
+      console.error('Create team member failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error('Error creating team members:', error);
+    console.error('Error creating team member:', error);
     return false;
   }
 };
 
 export const updateTeamMember = async (
   id: string | number,
-  payload: TeamMemberUpdatePayload,
+  payload: TeamMemberCreatePayload,
 ): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -202,38 +180,73 @@ export const updateTeamMember = async (
   }
 };
 
-export const transformToBackendDto = (formData: TeamMemberType): TeamMemberUpdatePayload => {
+
+export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreatePayload => {
+
+  console.log('Input formData to transformToBackendDto:', formData);
+
+  const BRANCHES = [
+  { id: 1, name: 'Central London' },
+  { id: 2, name: 'East Side' },
+  { id: 3, name: 'North Branch' },
+  ];
+  
+  const status: "active" | "inactive" = 
+  formData.status && (formData.status === "active" || formData.status === "inactive")
+    ? formData.status
+    : "active"; // or some default
+
+  const primaryBranchId = (typeof formData.primary_branch_id === 'number') 
+  ? formData.primary_branch_id 
+  : BRANCHES[0].id;
+
+  const parsedPermissions: Record<string, any> = 
+  typeof formData.permissions === 'string'
+    ? JSON.parse(formData.permissions)
+    : formData.permissions || {};
+  
   return {
-    id: String(formData.team_id || ''),
-    full_name: formData.full_name,
-    first_name: formData.first_name,
-    last_name: formData.last_name,
-    job_titles: [formData.job_1, formData.job_2, formData.job_3, formData.job_4].filter(Boolean), // only keep non-empty jobs
-    specific_audience: formData.specific_audience,
-    about_me: formData.who_am_i || formData.about,
-    specializations: [formData.specialization_1, ...formData.specializations].filter(Boolean),
+    teamId: String(formData.team_id || ''),
+    fullName: formData.full_name,
+    firstName: formData.first_name,
+    lastName: formData.last_name,
+    job1: formData.job_1,
+    job2: formData.job_2,
+    job3: formData.job_3, 
+    job4: formData.job_4,
+    specificAudience: formData.specific_audience,
+    whoAmI: formData.who_am_i ?? '',
+    specialization1: formData.specialization_1,
+    specializations: Array.isArray(formData.specializations)
+      ? formData.specializations.filter((s): s is string => typeof s === 'string')
+      : [],
     consultations: formData.consultations,
-    contact: {
-      email: formData.contact_email,
-      phone: formData.contact_phone,
-    },
-    center: {
-      address: formData.office_address,
-    },
+    officeAddress: formData.office_address,
+    contactEmail: formData.contact_email,
+    contactPhone: formData.contact_phone,
     schedule: formData.schedule,
+    about: formData.about,
     website: formData.website,
-    languages: formData.languages_spoken,
-    payment_methods: formData.payment_methods,
-    diplomas_and_training: formData.diplomas_and_training,
-    faq: formData.frequently_asked_questions,
-    agenda_links: formData.calendar_links,
+    languagesSpoken: formData.languages_spoken,
+    paymentMethods: formData.payment_methods,
+    diplomasAndTraining: formData.diplomas_and_training,
+    frequentlyAskedQuestions:
+      typeof formData.frequently_asked_questions === 'string'
+        ? formData.frequently_asked_questions
+        : formData.frequently_asked_questions
+          ? JSON.stringify(formData.frequently_asked_questions)
+          : null,
+    calendarLinks: formData.calendar_links,
     photo: formData.photo,
-    updatedBy: [
-      {
-        staffId: String(localStorage.getItem('staff_id') || ''),
-        updatedAt: new Date().toISOString(),
-      },
-    ],
+    branches: Array.isArray(formData.branch_ids)
+      ? formData.branch_ids.map(b => (typeof b === 'string' ? Number(b) : b))
+      : [],
+    selected_branch: formData.primary_branch_id,
+    role: formData.role || '',
+    status: status,
+    primaryBranchId: primaryBranchId,
+    permissions: parsedPermissions,
+    createdByRole: formData.created_by_role || 'admin',
   };
 };
 
