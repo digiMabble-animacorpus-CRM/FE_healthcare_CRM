@@ -15,22 +15,44 @@ import {
   Spinner,
   Form,
 } from 'react-bootstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+  Spinner,
+  Form,
+} from 'react-bootstrap';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 import {
   getTeamMemberById,
   createTeamMember,
   updateTeamMember,
+  updateTeamMember,
 } from '@/helpers/team-members';
+import { TeamMemberType } from '@/types/data';
 import { TeamMemberType } from '@/types/data';
 
 export interface AddTeamProps {
-  teamMemberId?: string;
+  defaultValues?: TeamMemberType;
   isEdit?: boolean;
 }
 
 const PERMISSIONS_MODULES = ['appointments', 'patients', 'billing', 'teams'];
 const ACTIONS = ['view', 'create', 'edit', 'delete'];
+const SCHEDULE_DAYS = [
+  'monday',
+  'tuesday',
+  'wednesday',
+  'thursday',
+  'friday',
+  'saturday',
+  'sunday',
+];
 const SCHEDULE_DAYS = [
   'monday',
   'tuesday',
@@ -95,6 +117,7 @@ function renderPermissions(
   );
 }
 
+
 function renderDynamicArrayField<
   K extends 'diplomas_and_training' | 'specializations'
 >(
@@ -152,7 +175,41 @@ function renderDynamicArrayField<
   );
 }
 
-const schema: yup.ObjectSchema<any> = yup.object({
+// Backend uses snake_case naming here
+export interface AddTeamFormValues {
+  last_name: string;
+  first_name: string;
+  full_name: string;
+  job_1: string;
+  specific_audience: string;
+  specialization_1: string;
+  job_2?: string;
+  job_3?: string;
+  job_4?: string;
+  who_am_i: string;
+  consultations: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: Record<string, string>;
+  about: string;
+  languages_spoken: string[];
+  payment_methods: string[];
+  diplomas_and_training: string[];
+  specializations: string[];
+  website: string;
+  frequently_asked_questions: Record<string, string>;
+  calendar_links: string[];
+  photo: string;
+  role: 'super_admin' | 'admin' | 'staff';
+  status: 'active' | 'inactive';
+  branches: number[];
+  primary_branch_id: number;
+  permissions: Record<string, any>;
+  created_by_role: string;
+}
+
+const schema: yup.ObjectSchema<AddTeamFormValues> = yup.object({
   last_name: yup.string().required('Last name is required'),
   first_name: yup.string().required('First name is required'),
   full_name: yup.string().required(),
@@ -233,7 +290,7 @@ const schema: yup.ObjectSchema<any> = yup.object({
   created_by_role: yup.string().required('Creator role required'),
 });
 
-function toCreatePayload(values: any): any {
+function toCreatePayload(values: AddTeamFormValues): any {
   const scheduleText = Object.entries(values.schedule)
     .filter(([_, v]) => v && v.trim())
     .map(([day, v]) => `${day}: ${v}`)
@@ -277,7 +334,7 @@ function toCreatePayload(values: any): any {
   };
 }
 
-function toUpdatePayload(values: any, source: any): any {
+function toUpdatePayload(values: AddTeamFormValues, source: any): any {
   const payload = toCreatePayload(values);
   const branchesAsNumbers: number[] | undefined = Array.isArray(payload.branches)
     ? payload.branches
@@ -299,15 +356,15 @@ function toUpdatePayload(values: any, source: any): any {
   };
 }
 
-const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
+const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const id = teamMemberId ?? searchParams.get('id');
-  const isEditMode = isEdit ?? Boolean(id);
+  const id = searchParams.get('id');
+  const isEditMode = Boolean(id);
 
   const [faqs, setFaqs] = useState<Record<string, string>>({});
   const [loadedMember, setLoadedMember] = useState<any | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
   const {
     control,
@@ -352,6 +409,10 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
         (acc, module) => ({ ...acc, [module]: {} }),
         {} as Record<string, any>
       ),
+      permissions: PERMISSIONS_MODULES.reduce(
+        (acc, module) => ({ ...acc, [module]: {} }),
+        {} as Record<string, any>
+      ),
       created_by_role: 'admin',
     },
   });
@@ -363,7 +424,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
 
   useEffect(() => {
     if (!isEditMode || !id) {
-      reset(); // clear form on add mode
+      reset();
       setLoadedMember(null);
       setLoading(false);
       return;
@@ -374,9 +435,17 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
       .then((data) => {
         if (!data) {
           setLoadedMember(null);
+          setLoading(false);
           return;
         }
 
+        const allowedStatuses = ['active', 'inactive'] as const;
+        const incomingStatus =
+          typeof data.status === 'string' ? data.status.toLowerCase() : undefined;
+        const safeStatus: 'active' | 'inactive' = allowedStatuses.includes(
+          incomingStatus as any
+        )
+          ? (incomingStatus as 'active' | 'inactive')
         const allowedStatuses = ['active', 'inactive'] as const;
         const incomingStatus =
           typeof data.status === 'string' ? data.status.toLowerCase() : undefined;
@@ -430,7 +499,9 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           diplomas_and_training: Array.isArray(data.diplomas_and_training)
             ? data.diplomas_and_training
             : [''],
-          specializations: Array.isArray(data.specializations) ? data.specializations : [''],
+          specializations: Array.isArray(data.specializations)
+            ? data.specializations
+            : [''],
           website: data.website ?? '',
           frequently_asked_questions:
             typeof data.frequently_asked_questions === 'object' &&
@@ -445,11 +516,12 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             ? data.branch_ids.map((b: any) => (typeof b === 'string' ? Number(b) : b))
             : [],
           primary_branch_id:
-            typeof data.primary_branch_id === 'number' ? data.primary_branch_id : BRANCHES[0].id,
+            typeof data.primary_branch_id === 'number'
+              ? data.primary_branch_id
+              : BRANCHES[0].id,
           permissions: parsedPermissions,
           created_by_role: data.created_by_role ?? 'admin',
         });
-
         setFaqs(
           typeof data.frequently_asked_questions === 'string'
             ? JSON.parse(data.frequently_asked_questions)
@@ -465,8 +537,10 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
   }, [faqs, setValue]);
 
   useEffect(() => {
-    const firstName = typeof watch('first_name') === 'string' ? watch('first_name').trim() : '';
-    const lastName = typeof watch('last_name') === 'string' ? watch('last_name').trim() : '';
+    const firstName =
+      typeof watch('first_name') === 'string' ? watch('first_name').trim() : '';
+    const lastName =
+      typeof watch('last_name') === 'string' ? watch('last_name').trim() : '';
     setValue('full_name', `${firstName} ${lastName}`.trim());
   }, [watch('first_name'), watch('last_name'), setValue]);
 
@@ -484,15 +558,28 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
       };
       console.log('Update payload:', safeUpdatePayload);
       success = await updateTeamMember(id, safeUpdatePayload);
+      const payload = toUpdatePayload(formData, loadedMember);
+
+      const safeUpdatePayload = {
+        ...payload,
+        branches:
+          payload.branches?.map((b: any) => (typeof b === 'string' ? Number(b) : b)) || [],
+      };
+      console.log('Update payload:', safeUpdatePayload);
+      success = await updateTeamMember(id, safeUpdatePayload);
     } else {
+      const payload = toCreatePayload(formData);
+      console.log('Create payload:', payload);
       const payload = toCreatePayload(formData);
       console.log('Create payload:', payload);
       success = await createTeamMember(payload);
     }
 
+
     setLoading(false);
     if (success) {
       alert(isEditMode ? 'Team member updated!' : 'Team member added!');
+      // router.push('/teams');
       // router.push('/teams');
     } else {
       alert('Something went wrong!');
@@ -505,16 +592,85 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
         <Spinner animation="border" variant="primary" />
       </div>
     );
+  if (loading)
+    return (
+      <div className="text-center my-5">
+        <Spinner animation="border" variant="primary" />
+      </div>
+    );
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card className="mb-4">
         <CardHeader>
           <CardTitle as="h4">{isEditMode ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
+          <CardTitle as="h4">{isEditMode ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
         </CardHeader>
         <CardBody>
           {/* Personal & Job Details */}
           <Row>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>First Name</Form.Label>
+                <Form.Control {...register('first_name')} isInvalid={!!errors.first_name} />
+                <Form.Control.Feedback type="invalid">{errors.first_name?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Last Name</Form.Label>
+                <Form.Control {...register('last_name')} isInvalid={!!errors.last_name} />
+                <Form.Control.Feedback type="invalid">{errors.last_name?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Full Name</Form.Label>
+                <Form.Control {...register('full_name')} disabled />
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Primary Job</Form.Label>
+                <Form.Control {...register('job_1')} isInvalid={!!errors.job_1} />
+                <Form.Control.Feedback type="invalid">{errors.job_1?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Audience</Form.Label>
+                <Form.Control {...register('specific_audience')} isInvalid={!!errors.specific_audience} />
+                <Form.Control.Feedback type="invalid">{errors.specific_audience?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Primary Specialization</Form.Label>
+                <Form.Control {...register('specialization_1')} isInvalid={!!errors.specialization_1} />
+                <Form.Control.Feedback type="invalid">{errors.specialization_1?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Job 2</Form.Label>
+                <Form.Control {...register('job_2')} isInvalid={!!errors.job_2} />
+                <Form.Control.Feedback type="invalid">{typeof errors.job_2?.message === 'string' ? errors.job_2?.message : ''}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Job 3</Form.Label>
+                <Form.Control {...register('job_3')} isInvalid={!!errors.job_3} />
+                <Form.Control.Feedback type="invalid">{typeof errors.job_3?.message === 'string' ? errors.job_3?.message : ''}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={3} className="mb-3">
+              <Form.Group>
+                <Form.Label>Job 4</Form.Label>
+                <Form.Control {...register('job_4')} isInvalid={!!errors.job_4} />
+                <Form.Control.Feedback type="invalid">{typeof errors.job_4?.message === 'string' ? errors.job_4?.message : ''}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>First Name</Form.Label>
@@ -602,10 +758,52 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                 <Form.Control.Feedback type="invalid">{errors.office_address?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
+            <Col md={6} lg={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>Email</Form.Label>
+                <Form.Control {...register('contact_email')} isInvalid={!!errors.contact_email} />
+                <Form.Control.Feedback type="invalid">{errors.contact_email?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6} lg={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>Phone</Form.Label>
+                <Form.Control {...register('contact_phone')} isInvalid={!!errors.contact_phone} />
+                <Form.Control.Feedback type="invalid">{errors.contact_phone?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={12} lg={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>Office Address</Form.Label>
+                <Form.Control {...register('office_address')} isInvalid={!!errors.office_address} />
+                <Form.Control.Feedback type="invalid">{errors.office_address?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
           </Row>
 
           {/* About, Consultations, Biography */}
           <Row>
+            <Col md={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>About</Form.Label>
+                <Form.Control as="textarea" rows={3} {...register('about')} isInvalid={!!errors.about} />
+                <Form.Control.Feedback type="invalid">{errors.about?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>Consultations</Form.Label>
+                <Form.Control as="textarea" rows={3} {...register('consultations')} isInvalid={!!errors.consultations} />
+                <Form.Control.Feedback type="invalid">{errors.consultations?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>Biography</Form.Label>
+                <Form.Control as="textarea" rows={3} {...register('who_am_i')} isInvalid={!!errors.who_am_i} />
+                <Form.Control.Feedback type="invalid">{errors.who_am_i?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
                 <Form.Label>About</Form.Label>
@@ -634,14 +832,19 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             <CardHeader>
               <CardTitle as="h6">Schedule</CardTitle>
             </CardHeader>
+            <CardHeader>
+              <CardTitle as="h6">Schedule</CardTitle>
+            </CardHeader>
             <CardBody>
               <Row>
+                {SCHEDULE_DAYS.map((day) => (
                 {SCHEDULE_DAYS.map((day) => (
                   <Col md={6} key={day} className="mb-3">
                     <Form.Group>
                       <Form.Label>{day.charAt(0).toUpperCase() + day.slice(1)}</Form.Label>
                       <Form.Control
                         value={schedule[day] || ''}
+                        onChange={(e) => setValue('schedule', { ...schedule, [day]: e.target.value })}
                         onChange={(e) => setValue('schedule', { ...schedule, [day]: e.target.value })}
                         placeholder="e.g. 9am-5pm"
                       />
@@ -705,7 +908,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                 </Form.Group>
               </Col>
             </div>
-          </Row>
+            </Row>
+
 
           {/* Dynamic text arrays for diplomas and specializations */}
           <Row>
@@ -713,9 +917,15 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
               <Form.Group>
                 <Form.Label>Diplomas & Training</Form.Label>
                 {renderDynamicArrayField('diplomas_and_training', diplomas, setValue, errors)}
+              <Form.Group>
+                <Form.Label>Diplomas & Training</Form.Label>
+                {renderDynamicArrayField('diplomas_and_training', diplomas, setValue, errors)}
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
+              <Form.Group>
+                <Form.Label>Specializations</Form.Label>
+                {renderDynamicArrayField('specializations', specializations, setValue, errors)}
               <Form.Group>
                 <Form.Label>Specializations</Form.Label>
                 {renderDynamicArrayField('specializations', specializations, setValue, errors)}
@@ -734,6 +944,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                   render={({ field }) => (
                     <Form.Control
                       value={field.value.join(',')}
+                      onChange={(e) => field.onChange(e.target.value.split(',').map((v) => v.trim()).filter(Boolean))}
                       onChange={(e) => field.onChange(e.target.value.split(',').map((v) => v.trim()).filter(Boolean))}
                     />
                   )}
@@ -762,8 +973,27 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                     />
                   ))}
                 </div>
+                <div style={{ display: 'flex', gap: '5rem', flexWrap: 'wrap' }}>
+                  {BRANCHES.map((branch) => (
+                    <Form.Check
+                      key={branch.id}
+                      type="checkbox"
+                      label={branch.name}
+                      checked={watch('branches').includes(branch.id)}
+                      onChange={(e) => {
+                        const current = watch('branches');
+                        if (e.target.checked) {
+                          setValue('branches', [...current, branch.id]);
+                        } else {
+                          setValue('branches', current.filter((b) => b !== branch.id));
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
                 <Form.Text className="text-danger">{errors.branches?.message}</Form.Text>
               </Form.Group>
+
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
@@ -777,6 +1007,10 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                         <option key={br.id} value={br.id}>
                           {br.name}
                         </option>
+                      {BRANCHES.map((br) => (
+                        <option key={br.id} value={br.id}>
+                          {br.name}
+                        </option>
                       ))}
                     </Form.Control>
                   )}
@@ -785,12 +1019,10 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
-
           {/* Permissions */}
           <Row>
             <Col md={12}>{renderPermissions(permissions, setValue, errors)}</Col>
           </Row>
-
           {/* Created By Role and other fields */}
           <Row>
             <Col md={6} className="mb-3">
@@ -809,6 +1041,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
           </Row>
           <Row>
+          </Row>
+          <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Photo URL</Form.Label>
@@ -823,6 +1057,9 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             <CardHeader>
               <CardTitle as="h6">Frequently Asked Questions</CardTitle>
             </CardHeader>
+            <CardHeader>
+              <CardTitle as="h6">Frequently Asked Questions</CardTitle>
+            </CardHeader>
             <CardBody>
               {Object.entries(faqs).map(([question, answer], idx) => (
                 <Row key={idx} className="mb-2">
@@ -831,7 +1068,9 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                       className="form-control"
                       value={question}
                       onChange={(e) => {
+                      onChange={(e) => {
                         const newKey = e.target.value;
+                        setFaqs((prev) => {
                         setFaqs((prev) => {
                           const updated = { ...prev };
                           delete updated[question];
@@ -848,6 +1087,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                       value={answer}
                       onChange={(e) => {
                         setFaqs((prev) => ({ ...prev, [question]: e.target.value }));
+                      onChange={(e) => {
+                        setFaqs((prev) => ({ ...prev, [question]: e.target.value }));
                       }}
                       placeholder="Answer"
                     />
@@ -856,6 +1097,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                     <Button
                       variant="outline-danger"
                       onClick={() =>
+                        setFaqs((prev) => {
                         setFaqs((prev) => {
                           const updated = { ...prev };
                           delete updated[question];
@@ -872,6 +1114,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                 variant="outline-primary"
                 onClick={() =>
                   setFaqs((prev) => ({ ...prev, [`Question ${Object.keys(prev).length + 1}`]: '' }))
+                  setFaqs((prev) => ({ ...prev, [`Question ${Object.keys(prev).length + 1}`]: '' }))
                 }
                 className="mt-2"
               >
@@ -879,7 +1122,9 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
               </Button>
               <Form.Text className="text-danger">
                 {typeof errors.frequently_asked_questions?.message === 'string'
+                {typeof errors.frequently_asked_questions?.message === 'string'
                   ? errors.frequently_asked_questions.message
+                  : ''}
                   : ''}
               </Form.Text>
             </CardBody>
@@ -939,7 +1184,13 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                 {Array.isArray(v)
                   ? v.map((e: any) => e.message).filter(Boolean).join(', ')
                   : (v as any)?.message}
+            {Object.entries(errors).map(([k, v]) => (
+              <li key={k}>
+                {Array.isArray(v)
+                  ? v.map((e: any) => e.message).filter(Boolean).join(', ')
+                  : (v as any)?.message}
               </li>
+            ))}
             ))}
           </ul>
         </div>

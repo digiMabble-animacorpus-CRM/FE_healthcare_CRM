@@ -1,15 +1,17 @@
+import React from 'react';
 import PageTitle from '@/components/PageTitle';
-import { Col, Row } from 'react-bootstrap';
-import { Metadata } from 'next';
 import AddTeamPage from '../../add-team/components/AddTeam';
+import { getAllTeamMembers } from '@/helpers/team-members';
 
-export const metadata: Metadata = { title: 'Edit Team Member' };
+const TeamEditPage = async ({ params }: { params: { id: string } }) => {
+  const id = Number(params.id);
+  const response = await getAllTeamMembers(id);
+  const teamMember = response?.data?.[0] ?? null;
 
-const EditTeam = ({ params }: { params: { id: string } }) => {
   return (
     <>
-      <PageTitle title="Edit Team" subName="" />
-      <AddTeamPage teamMemberId={params.id} isEdit />
+      <PageTitle title="Edit Team Member" subName="" />
+      <AddTeamPage defaultValues={teamMember} isEdit />
     </>
   );
 };
