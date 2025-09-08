@@ -35,7 +35,7 @@ import {
   updateTeamMember,
 } from '@/helpers/team-members';
 import { TeamMemberType } from '@/types/data';
-import { TeamMemberType } from '@/types/data';
+import { useNotificationContext } from '@/context/useNotificationContext';
 
 export interface AddTeamProps {
   defaultValues?: TeamMemberType;
@@ -292,9 +292,10 @@ const schema: yup.ObjectSchema<AddTeamFormValues> = yup.object({
 
 function toCreatePayload(values: AddTeamFormValues): any {
   const scheduleText = Object.entries(values.schedule)
-    .filter(([_, v]) => v && v.trim())
-    .map(([day, v]) => `${day}: ${v}`)
-    .join('\n');
+  .filter(([_, v]) => typeof v === 'string' && v.trim() !== '')
+  .map(([day, v]) => `${day}: ${v}`)
+  .join('\n');
+
 
   return {
     team_id: '',
@@ -364,7 +365,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
 
   const [faqs, setFaqs] = useState<Record<string, string>>({});
   const [loadedMember, setLoadedMember] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+   const { showNotification } = useNotificationContext();
 
   const {
     control,
@@ -548,24 +550,38 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
     setLoading(true);
     let success = false;
 
+    function isValidUUID(uuid: string): boolean {
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      return uuidRegex.test(uuid);
+    }
+
+
     if (isEditMode && id && loadedMember) {
       const payload = toUpdatePayload(formData, loadedMember);
 
       const safeUpdatePayload = {
         ...payload,
+        team_id: isValidUUID(payload.team_id) ? payload.team_id : null,
+        primary_branch: isValidUUID(String(payload.primary_branch)) ? payload.primary_branch : null,
+        selected_branch: isValidUUID(String(payload.selected_branch)) ? payload.selected_branch : null,
         branches:
           payload.branches?.map((b: any) => (typeof b === 'string' ? Number(b) : b)) || [],
       };
       console.log('Update payload:', safeUpdatePayload);
+      console.log('Sanitized payload before sending:', safeUpdatePayload);
       success = await updateTeamMember(id, safeUpdatePayload);
       const payload = toUpdatePayload(formData, loadedMember);
 
       const safeUpdatePayload = {
         ...payload,
+        team_id: isValidUUID(payload.team_id) ? payload.team_id : null,
+        primary_branch: isValidUUID(String(payload.primary_branch)) ? payload.primary_branch : null,
+        selected_branch: isValidUUID(String(payload.selected_branch)) ? payload.selected_branch : null,
         branches:
           payload.branches?.map((b: any) => (typeof b === 'string' ? Number(b) : b)) || [],
       };
       console.log('Update payload:', safeUpdatePayload);
+      console.log('Sanitized payload before sending:', safeUpdatePayload);
       success = await updateTeamMember(id, safeUpdatePayload);
     } else {
       const payload = toCreatePayload(formData);
@@ -578,11 +594,10 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
 
     setLoading(false);
     if (success) {
-      alert(isEditMode ? 'Team member updated!' : 'Team member added!');
-      // router.push('/teams');
-      // router.push('/teams');
+      showNotification({ message: 'Team Member Added Successfully', variant: 'success' });
+      router.push('/teams/teams-list');
     } else {
-      alert('Something went wrong!');
+      showNotification({ message: 'Something Went Wrong', variant: 'danger' });
     }
   };
 
@@ -613,14 +628,14 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>First Name</Form.Label>
                 <Form.Control {...register('first_name')} isInvalid={!!errors.first_name} />
-                <Form.Control.Feedback type="invalid">{errors.first_name?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.first_name?.message === 'string' ? errors.first_name.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control {...register('last_name')} isInvalid={!!errors.last_name} />
-                <Form.Control.Feedback type="invalid">{errors.last_name?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.last_name?.message === 'string' ? errors.last_name.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
@@ -633,21 +648,21 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>Primary Job</Form.Label>
                 <Form.Control {...register('job_1')} isInvalid={!!errors.job_1} />
-                <Form.Control.Feedback type="invalid">{errors.job_1?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.job_1?.message === 'string' ? errors.job_1.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>Audience</Form.Label>
                 <Form.Control {...register('specific_audience')} isInvalid={!!errors.specific_audience} />
-                <Form.Control.Feedback type="invalid">{errors.specific_audience?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.specific_audience?.message === 'string' ? errors.specific_audience.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>Primary Specialization</Form.Label>
                 <Form.Control {...register('specialization_1')} isInvalid={!!errors.specialization_1} />
-                <Form.Control.Feedback type="invalid">{errors.specialization_1?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.specialization_1?.message === 'string' ? errors.specialization_1.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
@@ -668,21 +683,21 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>Job 4</Form.Label>
                 <Form.Control {...register('job_4')} isInvalid={!!errors.job_4} />
-                <Form.Control.Feedback type="invalid">{typeof errors.job_4?.message === 'string' ? errors.job_4?.message : ''}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.job_4?.message === 'string' ? errors.job_4.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>First Name</Form.Label>
                 <Form.Control {...register('first_name')} isInvalid={!!errors.first_name} />
-                <Form.Control.Feedback type="invalid">{errors.first_name?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.first_name?.message === 'string' ? errors.first_name.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>Last Name</Form.Label>
                 <Form.Control {...register('last_name')} isInvalid={!!errors.last_name} />
-                <Form.Control.Feedback type="invalid">{errors.last_name?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.last_name?.message === 'string' ? errors.last_name.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
@@ -695,21 +710,21 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>Primary Job</Form.Label>
                 <Form.Control {...register('job_1')} isInvalid={!!errors.job_1} />
-                <Form.Control.Feedback type="invalid">{errors.job_1?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.job_1?.message === 'string' ? errors.job_1.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>Audience</Form.Label>
                 <Form.Control {...register('specific_audience')} isInvalid={!!errors.specific_audience} />
-                <Form.Control.Feedback type="invalid">{errors.specific_audience?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.specific_audience?.message === 'string' ? errors.specific_audience.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
                 <Form.Label>Primary Specialization</Form.Label>
                 <Form.Control {...register('specialization_1')} isInvalid={!!errors.specialization_1} />
-                <Form.Control.Feedback type="invalid">{errors.specialization_1?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.specialization_1?.message === 'string' ? errors.specialization_1.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={3} className="mb-3">
@@ -730,7 +745,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>Job 4</Form.Label>
                 <Form.Control {...register('job_4')} isInvalid={!!errors.job_4} />
-                <Form.Control.Feedback type="invalid">{typeof errors.job_4?.message === 'string' ? errors.job_4?.message : ''}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.job_4?.message === 'string' ? errors.job_4.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -741,42 +756,42 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>Email</Form.Label>
                 <Form.Control {...register('contact_email')} isInvalid={!!errors.contact_email} />
-                <Form.Control.Feedback type="invalid">{errors.contact_email?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.contact_email?.message === 'string' ? errors.contact_email.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Phone</Form.Label>
                 <Form.Control {...register('contact_phone')} isInvalid={!!errors.contact_phone} />
-                <Form.Control.Feedback type="invalid">{errors.contact_phone?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.contact_phone?.message === 'string' ? errors.contact_phone.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={12} lg={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Office Address</Form.Label>
                 <Form.Control {...register('office_address')} isInvalid={!!errors.office_address} />
-                <Form.Control.Feedback type="invalid">{errors.office_address?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.office_address?.message === 'string' ? errors.office_address.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Email</Form.Label>
                 <Form.Control {...register('contact_email')} isInvalid={!!errors.contact_email} />
-                <Form.Control.Feedback type="invalid">{errors.contact_email?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.contact_email?.message === 'string' ? errors.contact_email.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} lg={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Phone</Form.Label>
                 <Form.Control {...register('contact_phone')} isInvalid={!!errors.contact_phone} />
-                <Form.Control.Feedback type="invalid">{errors.contact_phone?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.contact_phone?.message === 'string' ? errors.contact_phone.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={12} lg={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Office Address</Form.Label>
                 <Form.Control {...register('office_address')} isInvalid={!!errors.office_address} />
-                <Form.Control.Feedback type="invalid">{errors.office_address?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.office_address?.message === 'string' ? errors.office_address.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -787,42 +802,42 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>About</Form.Label>
                 <Form.Control as="textarea" rows={3} {...register('about')} isInvalid={!!errors.about} />
-                <Form.Control.Feedback type="invalid">{errors.about?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.about?.message === 'string' ? errors.about.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Consultations</Form.Label>
                 <Form.Control as="textarea" rows={3} {...register('consultations')} isInvalid={!!errors.consultations} />
-                <Form.Control.Feedback type="invalid">{errors.consultations?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.consultations?.message === 'string' ? errors.consultations.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Biography</Form.Label>
                 <Form.Control as="textarea" rows={3} {...register('who_am_i')} isInvalid={!!errors.who_am_i} />
-                <Form.Control.Feedback type="invalid">{errors.who_am_i?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.who_am_i?.message === 'string' ? errors.who_am_i.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
                 <Form.Label>About</Form.Label>
                 <Form.Control as="textarea" rows={3} {...register('about')} isInvalid={!!errors.about} />
-                <Form.Control.Feedback type="invalid">{errors.about?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.about?.message === 'string' ? errors.about.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Consultations</Form.Label>
                 <Form.Control as="textarea" rows={3} {...register('consultations')} isInvalid={!!errors.consultations} />
-                <Form.Control.Feedback type="invalid">{errors.consultations?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.consultations?.message === 'string' ? errors.consultations.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
                 <Form.Label>Biography</Form.Label>
                 <Form.Control as="textarea" rows={3} {...register('who_am_i')} isInvalid={!!errors.who_am_i} />
-                <Form.Control.Feedback type="invalid">{errors.who_am_i?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.who_am_i?.message === 'string' ? errors.who_am_i.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -874,13 +889,15 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                           if (e.target.checked) {
                             setValue('languages_spoken', [...current, lang]);
                           } else {
-                            setValue('languages_spoken', current.filter((l) => l !== lang));
+                            setValue('languages_spoken', current.filter((l: string) => l !== lang));
                           }
                         }}
                       />
                     ))}
                   </div>
-                  <Form.Text className="text-danger">{errors.languages_spoken?.message}</Form.Text>
+                  <Form.Text className="text-danger">{typeof errors.languages_spoken?.message === 'string'
+                    ? errors.languages_spoken.message
+                    : ''}</Form.Text>
                 </Form.Group>
               </Col>
               <Col md="auto">
@@ -898,13 +915,15 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                           if (e.target.checked) {
                             setValue('payment_methods', [...current, pm]);
                           } else {
-                            setValue('payment_methods', current.filter((p) => p !== pm));
+                            setValue('payment_methods', current.filter((p: string) => p !== pm));
                           }
                         }}
                       />
                     ))}
                   </div>
-                  <Form.Text className="text-danger">{errors.payment_methods?.message}</Form.Text>
+                  <Form.Text className="text-danger">{typeof errors.payment_methods?.message === 'string'
+                      ? errors.payment_methods.message
+                      : ''}</Form.Text>
                 </Form.Group>
               </Col>
             </div>
@@ -949,7 +968,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                     />
                   )}
                 />
-                <Form.Text className="text-danger">{errors.calendar_links?.message}</Form.Text>
+                <Form.Text className="text-danger">{typeof errors.calendar_links?.message === 'string' ? errors.calendar_links.message : ''}</Form.Text>
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
@@ -967,31 +986,13 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                         if (e.target.checked) {
                           setValue('branches', [...current, branch.id]);
                         } else {
-                          setValue('branches', current.filter((b) => b !== branch.id));
+                          setValue('branches', current.filter((b: number) => b !== branch.id));
                         }
                       }}
                     />
                   ))}
                 </div>
-                <div style={{ display: 'flex', gap: '5rem', flexWrap: 'wrap' }}>
-                  {BRANCHES.map((branch) => (
-                    <Form.Check
-                      key={branch.id}
-                      type="checkbox"
-                      label={branch.name}
-                      checked={watch('branches').includes(branch.id)}
-                      onChange={(e) => {
-                        const current = watch('branches');
-                        if (e.target.checked) {
-                          setValue('branches', [...current, branch.id]);
-                        } else {
-                          setValue('branches', current.filter((b) => b !== branch.id));
-                        }
-                      }}
-                    />
-                  ))}
-                </div>
-                <Form.Text className="text-danger">{errors.branches?.message}</Form.Text>
+                <Form.Text className="text-danger">{typeof errors.branches?.message === 'string' ? errors.branches.message : ''}</Form.Text>
               </Form.Group>
 
             </Col>
@@ -1015,7 +1016,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                     </Form.Control>
                   )}
                 />
-                <Form.Text className="text-danger">{errors.primary_branch_id?.message}</Form.Text>
+                <Form.Text className="text-danger">{typeof errors.primary_branch_id?.message === 'string' ? errors.primary_branch_id.message : ''}</Form.Text>
               </Form.Group>
             </Col>
           </Row>
@@ -1029,14 +1030,14 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>Created By Role</Form.Label>
                 <Form.Control {...register('created_by_role')} isInvalid={!!errors.created_by_role} />
-                <Form.Control.Feedback type="invalid">{errors.created_by_role?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.created_by_role?.message === 'string' ? errors.created_by_role.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Website URL</Form.Label>
                 <Form.Control {...register('website')} isInvalid={!!errors.website} />
-                <Form.Control.Feedback type="invalid">{errors.website?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.website?.message === 'string' ? errors.website.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -1047,7 +1048,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               <Form.Group>
                 <Form.Label>Photo URL</Form.Label>
                 <Form.Control {...register('photo')} isInvalid={!!errors.photo} />
-                <Form.Control.Feedback type="invalid">{errors.photo?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{typeof errors.photo?.message === 'string' ? errors.photo.message : ''}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -1146,7 +1147,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                     </Form.Control>
                   )}
                 />
-                <Form.Text className="text-danger">{errors.role?.message}</Form.Text>
+                <Form.Text className="text-danger">{typeof errors.role?.message === 'string' ? errors.role.message : ''}</Form.Text>
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
@@ -1162,7 +1163,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                     </Form.Control>
                   )}
                 />
-                <Form.Text className="text-danger">{errors.status?.message}</Form.Text>
+                <Form.Text className="text-danger">{typeof errors.status?.message === 'string'
+                  ? errors.status.message: ''}</Form.Text>
               </Form.Group>
             </Col>
           </Row>
