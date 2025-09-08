@@ -1,15 +1,15 @@
 import FileUpload from '@/components/FileUpload';
 import PageTitle from '@/components/PageTitle';
-import AddTeam from './components/AddTeam';
 import { Metadata } from 'next';
+import AddTeamPage from './components/AddTeam';
 
-export const metadata: Metadata = { title: 'Customers Add' };
+export const metadata: Metadata = { title: 'Add Team Members' };
 
 const TeamAddPage = () => {
   return (
     <>
       <PageTitle title="Add Team" subName="" />
-      <AddTeam isEdit={false} />
+      <AddTeamPage isEdit={false} />
     </>
   );
 };

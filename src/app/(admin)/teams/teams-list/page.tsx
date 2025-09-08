@@ -1,6 +1,7 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
+import { Badge } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useEffect, useState, useMemo } from 'react';
 import type { TeamMemberType } from '@/types/data';
@@ -229,6 +230,8 @@ const TeamsListPage = () => {
                         <th>Phone</th>
                         <th>Branch</th>
                         <th>Job Title</th>
+                        <th>Role</th>
+                        <th>Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -250,6 +253,14 @@ const TeamsListPage = () => {
                           <td>{item.office_address}</td>
                           <td>{item.job_1}</td>
                           <td>
+                            {item.role === 'super_admin' ? 'Super Admin' : item.role === 'staff' ? 'Staff' : item.role === 'admin' ? 'Admin' : item.role}
+                          </td>
+                          <td>
+                            <Badge bg={item.status === 'active' ? 'success' : 'danger'} text="light" style={{ textTransform: 'capitalize' }}>
+                              {item.status}
+                            </Badge>
+                          </td>
+                          <td>
                             <div className="d-flex gap-2">
                               <Button
                                 variant="light"
@@ -258,18 +269,13 @@ const TeamsListPage = () => {
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
-                              <Dropdown>
-                                <DropdownToggle className="editToggleBtn" size="sm">
-                                  <IconifyIcon icon="solar:pen-2-broken" />
-                                </DropdownToggle>
-                                <DropdownMenu>
-                                  <DropdownItem
-                                    onClick={() => handleEditClick(item.team_id.toString())}
-                                  >
-                                    Edit
-                                  </DropdownItem>
-                                </DropdownMenu>
-                              </Dropdown>
+                              <Button
+                                variant="light"
+                                size="sm"
+                                onClick={() => handleEditClick(item.team_id.toString())}
+                              >
+                                <IconifyIcon icon="solar:pen-2-broken" />
+                              </Button>                      
                               <Button
                                 variant="danger"
                                 size="sm"
