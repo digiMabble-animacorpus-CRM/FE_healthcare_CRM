@@ -1,6 +1,7 @@
 import { StaticImageData } from 'next/image';
 import { BootstrapVariantType } from './component-props';
 import { file } from 'googleapis/build/src/apis/file';
+import { Key, ReactNode } from 'react';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -320,11 +321,16 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
+  therapistId: Key | null | undefined;
+  // therapistId: string;
+  name: ReactNode;
+  branches: any;
+  _id: string;
   agendaLink: any;
   email: any;
   phoneNumber: any;
   education: string[];
-  therapistId: string;
+  // therapistId: string;
   id: string;
   frequently_asked_questions: any;
   languages_spoken(languages_spoken: any): unknown;
