@@ -46,6 +46,13 @@ const TherapistsListPage = () => {
     setLoading(true);
     try {
       const response = await getAllTherapists(1, 10000); // fetch all
+      console.log(response.data);
+      setAllTherapists(
+        (response.data || []).map((t: any) => ({
+          ...t,
+          therapistId: t.id, // Map id to therapistId for UI compatibility
+        })),
+      );
       setAllTherapists(response.data || []);
     } catch (err) {
       console.error('Failed to fetch therapists', err);
@@ -117,9 +124,13 @@ const TherapistsListPage = () => {
 
   const handleView = (id: any) => router.push(`/therapists/details/${id}`);
 
-  const handleEditClick = (id: any) => router.push(`/therapists/edit-therapist/${id}`);
+  const handleEditClick = (id: any) => {
+    console.log('Edit clicked for ID:', id);
+    router.push(`/therapists/edit-therapist/${id}`);
+  }
 
   const handleDeleteClick = (id: any) => {
+    console.log('Delete clicked for ID:', id);
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
@@ -130,14 +141,19 @@ const TherapistsListPage = () => {
     try {
       const success = await deleteTherapist(selectedTherapistId);
       if (success) {
+        setAllTherapists((prev) => prev.filter((t) => t.therapistId !== selectedTherapistId));
+        setShowSuccessMessage(true);
+        console.log('Therapist ID :', selectedTherapistId );
         await fetchTherapists(); // 🔥 Refetch after delete
         setToastMessage('Therapist deleted successfully!');
       } else {
+        console.log('Fail to delete')
         setToastMessage('Failed to delete therapist');
       }
     } catch (err) {
+      console.log('Delete error:', err);
       console.error('Delete error:', err);
-      setToastMessage('Error occurred while deleting therapist');
+      // setToastMessage('Error occurred while deleting therapist');
     } finally {
       setShowDeleteModal(false);
       setSelectedTherapistId(null);
@@ -372,3 +388,6 @@ const TherapistsListPage = () => {
 };
 
 export default TherapistsListPage;
+function setShowSuccessMessage(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}
