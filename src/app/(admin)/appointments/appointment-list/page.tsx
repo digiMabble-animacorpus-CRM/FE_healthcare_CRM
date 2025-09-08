@@ -1,7 +1,7 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback, SetStateAction } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
@@ -27,11 +27,14 @@ import { useRouter } from 'next/navigation';
 
 const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
   ssr: false,
+  loading: () => <div>Loading calendar...</div>
 });
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import TuiCalendar from '@/components/TuiCalendarWrapper';
 
 interface Branch {
   branch_id: number;
@@ -86,13 +89,11 @@ interface Appointment {
   };
 }
 
-// 🔹 helper: normalize API response (handles array | {data:[]} | {data:{data:[]}})
+// Helper: normalize API response (handles array | {data:[]} | {data:{data:[]}})
 const normalizeApiResponse = (data: any): any[] => {
-  console.log('Normalizing API response:', data);
   if (Array.isArray(data)) return data;
   if (Array.isArray(data?.data)) return data.data;
   if (Array.isArray(data?.data?.data)) return data.data.data;
-  console.log('API response format not recognized, returning empty array');
   return [];
 };
 
@@ -106,6 +107,7 @@ const AppointmentCalendarPage = () => {
   const [allDepartments, setAllDepartments] = useState<Department[]>([]);
   const [selectedDepartments, setSelectedDepartments] = useState<number[]>([]);
   const [selectedDate, setSelectedDate] = useState<Dayjs>(dayjs());
+  const [calendarDate, setCalendarDate] = useState<Dayjs>(dayjs()); // For sync with Toast UI Calendar
   const [loading, setLoading] = useState(false);
   const [loadingFilters, setLoadingFilters] = useState(false);
   const [view, setView] = useState<'month' | 'week' | 'day'>('month');
@@ -113,8 +115,14 @@ const AppointmentCalendarPage = () => {
   const [calendarHeight] = useState('750px');
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showMoreModal, setShowMoreModal] = useState(false);
+  const [moreEvents, setMoreEvents] = useState<any[]>([]);
+  const [calendarInstance, setCalendarInstance] = useState<any | null>(null);
 
-  const calendarRef = useRef<any>(null);
+  const calendarRef = useRef<{ setDate: (date: Date) => void }>(null);
+
+
+
   const router = useRouter();
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
@@ -145,71 +153,120 @@ const AppointmentCalendarPage = () => {
       color: colors[index % colors.length],
     }));
 
-  // 🔹 Fetch filters with color assignment
+  // Calendar instance getter
+  const getCalInstance = useCallback(() => {
+    if (!calendarRef.current) {
+      console.error('Calendar ref is not initialized');
+      return null;
+    }
+    return calendarRef.current.getInstance();
+  }, []);
+
+  const handleSetDate = useCallback(() => {
+    if (calendarRef.current) {
+      // Example: Set the date to January 1, 2026
+      calendarRef.current.setDate(new Date(2026, 0, 1));
+    }
+  }, []);
+
+
+  // Handle calendar navigation
+  // const handleCalendarNav = (action: 'today' | 'prev' | 'next') => {
+  //   const calendarInstance = getCalInstance();
+  //   if (calendarInstance) {
+  //     switch (action) {
+  //       case 'today':
+  //         calendarInstance.today();
+  //         break;
+  //       case 'prev':
+  //         calendarInstance.prev();
+  //         break;
+  //       case 'next':
+  //         calendarInstance.next();
+  //         break;
+  //     }
+
+  //     // Update our state to match the calendar's new date
+  //     const newDate = dayjs(calendarInstance.getDate());
+  //     setSelectedDate(newDate);
+  //     setCalendarDate(newDate);
+  //   }
+  // };
+
+  const handleDateChange = useCallback((newDate: Dayjs | null) => {
+    if (newDate) {
+      setSelectedDate(newDate);
+      setCalendarDate(newDate);
+
+      // Sync with Toast UI Calendar
+      if (calendarRef.current) {
+        calendarRef.current.setDate(newDate.toDate()); // Call setDate on the child component
+      }
+
+      // Auto-switch to day view when clicking on a specific date
+      if (view === 'month') {
+        setView('day');
+      }
+    }
+  }, [view]);
+
+  // Sync calendar on navigation and view changes
+  // useEffect(() => {
+  //   const calendarInstance = calendarRef.current?.getInstance?.();
+  //   if (calendarInstance && selectedDate) {
+  //     calendarInstance.setDate(selectedDate.toDate());
+  //     calendarInstance.changeView(view);
+  //     calendarInstance.render();
+  //   }
+  // }, [selectedDate, view, getCalInstance]);
+
+  // Fetch filters with color assignment
   useEffect(() => {
-    console.log('Fetching filter data...');
     const fetchFilterData = async () => {
       if (!token) {
-        console.log('No token found, skipping filter fetch');
         return;
       }
       try {
         setLoadingFilters(true);
 
         // Branches
-        console.log('Fetching branches...');
         const branchesRes = await fetch(`${API_BASE_PATH}/branches`, {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         if (branchesRes.ok) {
           const data = await branchesRes.json();
-          console.log('Branches API response:', data);
           const branches: Branch[] = normalizeApiResponse(data);
           const branchesWithColors = assignColorsToItems(branches, BRANCH_COLORS, 'branch_id');
-          console.log('Normalized branches with colors:', branchesWithColors);
           setAllBranches(branchesWithColors);
           setSelectedBranches(branchesWithColors.map(b => b.branch_id));
-        } else {
-          console.warn('Failed to fetch branches, status:', branchesRes.status);
         }
 
         // Departments
-        console.log('Fetching departments...');
         const departmentsRes = await fetch(`${API_BASE_PATH}/departments`, {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         if (departmentsRes.ok) {
           const data = await departmentsRes.json();
-          console.log('Departments API response:', data);
           const departments: Department[] = normalizeApiResponse(data);
           const departmentsWithColors = assignColorsToItems(departments, DEPARTMENT_COLORS, 'id');
-          console.log('Normalized departments with colors:', departmentsWithColors);
           setAllDepartments(departmentsWithColors);
           setSelectedDepartments(departmentsWithColors.map(d => d.id));
-        } else {
-          console.warn('Failed to fetch departments, status:', departmentsRes.status);
         }
 
         // Specializations
-        console.log('Fetching specializations...');
         const specializationsRes = await fetch(`${API_BASE_PATH}/specializations`, {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
         if (specializationsRes.ok) {
           const data = await specializationsRes.json();
-          console.log('Specializations API response:', data);
           const specializations: Specialization[] = normalizeApiResponse(data);
           const specializationsWithColors = assignColorsToItems(specializations, SPECIALIZATION_COLORS, 'specialization_id');
-          console.log('Normalized specializations with colors:', specializationsWithColors);
           setAllSpecializations(specializationsWithColors);
           setSelectedSpecializations(specializationsWithColors.map(s => s.specialization_id));
-        } else {
-          console.warn('Failed to fetch specializations, status:', specializationsRes.status);
         }
       } catch (err) {
-        console.error('[Filters] fetch error:', err);
+        // Handle error silently or add proper error handling
       } finally {
-        console.log('Finished fetching filter data');
         setLoadingFilters(false);
       }
     };
@@ -217,57 +274,40 @@ const AppointmentCalendarPage = () => {
     fetchFilterData();
   }, [token]);
 
-  // 🔹 Fetch appointments with enhanced color logic and status handling
+  // Fetch appointments with enhanced color logic and status handling
   useEffect(() => {
-    console.log('Fetching appointments...');
-    console.log('Token exists:', !!token);
-
     const fetchAppointments = async () => {
       if (!token) {
-        console.log('No token, skipping appointment fetch');
         return;
       }
 
       try {
         setLoading(true);
-        console.log('Making API call to fetch appointments...');
         const res = await fetch(`${API_BASE_PATH}/appointments?pageNo=1&limit=200`, {
           headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         });
 
-        console.log('Appointments API response status:', res.status);
-
         if (!res.ok) {
-          console.warn('Failed to fetch appointments, status:', res.status);
           setAllAppointments([]);
           return;
         }
 
         const json = await res.json();
-        console.log('Appointments API raw response:', json);
-
         const fetched = normalizeApiResponse(json);
-        console.log('Normalized appointments:', fetched);
 
         const mapped = fetched.map((appt: any) => {
-          console.log('Processing appointment raw data:', appt);
-
           const branch = appt.branch;
           const department = appt.department;
           const specialization = appt.specialization;
-
-          console.log('Branch from API:', branch);
-          console.log('Department from API:', department);
-          console.log('Specialization from API:', specialization);
 
           const start = appt.startTime ? new Date(appt.startTime) : null;
           const end = appt.endTime ? new Date(appt.endTime) : null;
 
           if (!start || isNaN(start.getTime())) {
-            console.warn(`[Appointments] invalid start for appt id=${appt.id}`, appt.startTime);
+            // Handle invalid start time
           }
           if (!end || isNaN(end.getTime())) {
-            console.warn(`[Appointments] invalid end for appt id=${appt.id}`, appt.endTime);
+            // Handle invalid end time
           }
 
           // Enhanced color logic with status and timing considerations
@@ -354,17 +394,13 @@ const AppointmentCalendarPage = () => {
             },
           };
 
-          console.log('Mapped appointment:', result);
           return result;
         });
 
-        console.log('All mapped appointments:', mapped);
         setAllAppointments(mapped);
       } catch (err) {
-        console.error('[Appointments] fetch error:', err);
         setAllAppointments([]);
       } finally {
-        console.log('Finished fetching appointments');
         setLoading(false);
       }
     };
@@ -375,18 +411,9 @@ const AppointmentCalendarPage = () => {
     }
   }, [token, allBranches, allDepartments, allSpecializations]);
 
-  // 🔹 Enhanced filtering pipeline with proper date range syncing
+  // Enhanced filtering pipeline with proper date range syncing
   useEffect(() => {
-    console.log('Running filtering pipeline...');
-    console.log('All appointments:', allAppointments);
-    console.log('Selected branches:', selectedBranches);
-    console.log('Selected specializations:', selectedSpecializations);
-    console.log('Selected departments:', selectedDepartments);
-    console.log('Selected date:', selectedDate.format());
-    console.log('View:', view);
-
     if (!allAppointments?.length) {
-      console.log('No appointments to filter');
       setAppointments([]);
       return;
     }
@@ -396,25 +423,20 @@ const AppointmentCalendarPage = () => {
     if (view === 'month') {
       const start = selectedDate.startOf('month');
       const end = selectedDate.endOf('month');
-      console.log('Month view - filtering between:', start.format(), 'and', end.format());
       dateFiltered = allAppointments.filter(appt =>
         appt.start && dayjs(appt.start).isBetween(start, end, null, '[]')
       );
     } else if (view === 'week') {
       const start = selectedDate.startOf('week');
       const end = selectedDate.endOf('week');
-      console.log('Week view - filtering between:', start.format(), 'and', end.format());
       dateFiltered = allAppointments.filter(appt =>
         appt.start && dayjs(appt.start).isBetween(start, end, null, '[]')
       );
     } else if (view === 'day') {
-      console.log('Day view - filtering for:', selectedDate.format());
       dateFiltered = allAppointments.filter(appt =>
         appt.start && dayjs(appt.start).isSame(selectedDate, 'day')
       );
     }
-
-    console.log('Date filtered appointments:', dateFiltered);
 
     // Enhanced filtering logic with null safety
     const finalFiltered = dateFiltered.filter(appt => {
@@ -422,20 +444,15 @@ const AppointmentCalendarPage = () => {
       const specId = appt.raw.original?.specialization_id || appt.raw.original?.specialization?.specialization_id;
       const deptId = appt.raw.original?.department_id || appt.raw.original?.department?.id;
 
-      console.log(`Appt ${appt.id} - branchId: ${branchId}, specId: ${specId}, deptId: ${deptId}`);
-
       // If IDs are missing (undefined), include them in all filters
       // If IDs are present, check if they match the selected filters
       const branchMatch = branchId === undefined || selectedBranches.includes(branchId);
       const specMatch = specId === undefined || selectedSpecializations.includes(specId);
       const deptMatch = deptId === undefined || selectedDepartments.includes(deptId);
 
-      console.log(`Appt ${appt.id} - branch: ${branchMatch}, spec: ${specMatch}, dept: ${deptMatch}`);
-
       return branchMatch && specMatch && deptMatch;
     });
 
-    console.log('Final filtered appointments:', finalFiltered);
     setAppointments(finalFiltered);
   }, [
     allAppointments,
@@ -445,20 +462,6 @@ const AppointmentCalendarPage = () => {
     selectedSpecializations,
     selectedDepartments,
   ]);
-
-  // 🔹 Sync calendar view with selected date and view mode
-  useEffect(() => {
-    if (calendarRef.current && selectedDate) {
-      const calendarInstance = calendarRef.current.getInstance();
-      if (calendarInstance) {
-        // Set the calendar to the selected date
-        calendarInstance.setDate(selectedDate.toDate());
-        // Change view if needed
-        calendarInstance.changeView(view);
-        console.log('Calendar synced to:', selectedDate.format(), 'view:', view);
-      }
-    }
-  }, [selectedDate, view]);
 
   // Enhanced calendars configuration with proper colors
   const calendars = allSpecializations.map(spec => ({
@@ -490,27 +493,19 @@ const AppointmentCalendarPage = () => {
 
   const handleEventClick = (e: any) => {
     const event = e?.event ?? e;
-    console.log('Event clicked:', event);
     setSelectedEvent(event);
     setShowModal(true);
   };
 
-  // Enhanced date change handler
-  const handleDateChange = (newDate: Dayjs | null) => {
-    if (newDate) {
-      console.log('Date changed to:', newDate.format());
-      setSelectedDate(newDate);
-
-      // Auto-switch to day view when clicking on a specific date
-      if (view === 'month') {
-        setView('day');
-      }
-    }
+  // Handle "more" events click in month view
+  const handleMoreEventsClick = (e: any) => {
+    const events = e.events || [];
+    setMoreEvents(events);
+    setShowMoreModal(true);
   };
 
   // Enhanced view change handler
   const handleViewChange = (newView: 'month' | 'week' | 'day') => {
-    console.log('View changed to:', newView);
     setView(newView);
   };
 
@@ -519,7 +514,15 @@ const AppointmentCalendarPage = () => {
     setSelectedSpecializations(allSpecializations.map(s => s.specialization_id));
     setSelectedDepartments(allDepartments.map(d => d.id));
     setSelectedDate(dayjs());
+    setCalendarDate(dayjs());
     setView('month');
+
+    // Sync with Toast UI Calendar
+    const calendarInstance = getCalInstance();
+    if (calendarInstance) {
+      calendarInstance.today();
+      calendarInstance.changeView('month');
+    }
   };
 
   const toggleAllSelection = (type: 'branches' | 'specializations' | 'departments') => {
@@ -549,14 +552,10 @@ const AppointmentCalendarPage = () => {
     }
   };
 
-  console.log('Rendering with appointments:', appointments);
-  console.log('Calendar view mode:', calendarViewMode);
-
   return (
     <>
       <PageTitle subName="Appointments" title="Appointment Calendar" />
-
-      <Row style={{ height: '100%' }}>
+      <Row style={{ height: '100%' }} >
         <Card>
           <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
             <CardTitle as="h4" className="mb-0">
@@ -572,7 +571,7 @@ const AppointmentCalendarPage = () => {
 
         {/* Enhanced Sidebar */}
         <Col md={3} style={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }}>
-          <div className="p-2 border rounded mb-3" style={{ background: 'white' }}>
+          <div className="p-2 border rounded mb-3" style={{ background: 'white' }} >
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
                 value={selectedDate}
@@ -735,7 +734,7 @@ const AppointmentCalendarPage = () => {
                 <Icon icon={`mdi:calendar-${view}`} className="me-1" />
                 {view.charAt(0).toUpperCase() + view.slice(1)}
               </Button>
-              <Dropdown.Toggle split variant="outline-primary" size="sm" />
+              <Dropdown.Toggle split variant="outline-primary" size="sm" ><IconifyIcon icon="ri:arrow-down-s-line" className="fs-18" /></Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => handleViewChange('day')}>
                   <Icon icon="mdi:calendar-today" className="me-2 d-none d-sm-inline" />
@@ -779,8 +778,6 @@ const AppointmentCalendarPage = () => {
             </ButtonGroup>
           </div>
 
-
-
           {loading ? (
             <div className="d-flex justify-content-center align-items-center flex-grow-1">
               <Spinner animation="border" />
@@ -788,7 +785,9 @@ const AppointmentCalendarPage = () => {
             </div>
           ) : calendarViewMode === 'calendar' ? (
             <div className="flex-grow-1 border rounded overflow-hidden">
-              <Calendar
+              {/* <button onClick={handleSetDate}>Set Date to Jan 2026</button>
+              <TuiCalendar ref={calendarRef} /> */}
+              <TuiCalendar
                 ref={calendarRef}
                 height={calendarHeight}
                 view={view}
@@ -798,10 +797,23 @@ const AppointmentCalendarPage = () => {
                 events={appointments}
                 isReadOnly
                 onClickEvent={handleEventClick}
+                onClickMore={(e: { event: { stop: () => void; }; events: SetStateAction<any[]>; }) => {
+                  // ✅ Prevent Toast UI’s built-in popup
+                  e.event.stop();
+
+                  // ✅ Open your own modal instead
+                  setMoreEvents(e.events);
+                  setShowMoreModal(true);
+                }}
+
                 month={{
                   startDayOfWeek: 0,
                   daynames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                   visibleWeeksCount: 6,
+                  moreLayerSize: {
+                    width: '300px',
+                    height: 'auto'
+                  }
                 }}
                 week={{
                   startDayOfWeek: 0,
@@ -1071,6 +1083,80 @@ const AppointmentCalendarPage = () => {
         </Modal.Body>
         <Modal.Footer>
           <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
+            <Icon icon="mdi:close" className="me-1" />
+            Close
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Modal for "More" events in month view */}
+      <Modal show={showMoreModal} onHide={() => setShowMoreModal(false)} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <Icon icon="mdi:calendar-multiple" className="me-2" />
+            More Appointments
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div className="mb-3">
+            <h6 className="text-muted">All appointments for this day:</h6>
+          </div>
+          {moreEvents.length === 0 ? (
+            <div className="text-center py-4">
+              <Icon icon="mdi:calendar-remove" className="text-muted mb-3" />
+              <p>No additional appointments found.</p>
+            </div>
+          ) : (
+            <div className="list-group">
+              {moreEvents.map((event: any, index: number) => (
+                <div
+                  key={`${event.id}-${index}`}
+                  className="list-group-item list-group-item-action"
+                  style={{ cursor: 'pointer' }}
+                  onClick={() => {
+                    setShowMoreModal(false);
+                    handleEventClick(event);
+                  }}
+                >
+                  <div className="d-flex align-items-start justify-content-between">
+                    <div className="d-flex align-items-center">
+                      <span
+                        style={{
+                          display: 'inline-block',
+                          width: 12,
+                          height: 12,
+                          backgroundColor: event.bgColor,
+                          marginRight: 8,
+                          borderRadius: '2px'
+                        }}
+                      />
+                      <div>
+                        <h6 className="mb-1">{event.title}</h6>
+                        <small className="text-muted">
+                          <Icon icon="mdi:clock-outline" className="me-1" />
+                          {dayjs(event.start).format('h:mm A')} - {dayjs(event.end).format('h:mm A')}
+                        </small>
+                      </div>
+                    </div>
+                    <span className={`badge bg-${getStatusBadgeColor(event.raw?.status)}`}>
+                      {event.raw?.status || 'Unknown'}
+                    </span>
+                  </div>
+                  <div className="mt-2">
+                    <small className="text-muted">
+                      <Icon icon="mdi:office-building" className="me-1" />
+                      {event.branch} •
+                      <Icon icon="mdi:medical-bag" className="me-1 ms-2" />
+                      {event.specialization}
+                    </small>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="outline-secondary" onClick={() => setShowMoreModal(false)}>
             <Icon icon="mdi:close" className="me-1" />
             Close
           </Button>
