@@ -7,7 +7,6 @@ import * as yup from 'yup';
 import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
-import axios from 'axios';
 
 interface Branch {
   branch_id: number;
@@ -71,7 +70,7 @@ const schema = yup.object({
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
   contactPhone: yup
     .string()
-    .matches(/^[0-9]{10}$/, 'Must be a valid 10-digit phone number')
+    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
     .required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
@@ -244,6 +243,10 @@ const TherapistForm = () => {
     } catch (err: any) {
       alert(err.message || 'Error saving therapist');
     }
+  } catch (err: any) {
+    console.error('Submit error:', err);
+    alert(err.message || 'Error saving therapist');
+  }
   };
 
   return (
@@ -378,10 +381,7 @@ const TherapistForm = () => {
         {fields.map((field, k) => (
           <Row key={field.id} className="align-items-center">
             <Col md={4}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.day`}
-                className="mb-3"
-              >
+              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.day`} className="mb-3">
                 <Form.Label>Day</Form.Label>
                 <Form.Select
                   {...register(`branches.${nestIndex}.availability.${k}.day` as const)}
@@ -400,10 +400,7 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.startTime`}
-                className="mb-3"
-              >
+              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.startTime`} className="mb-3">
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -416,10 +413,7 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.endTime`}
-                className="mb-3"
-              >
+              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.endTime`} className="mb-3">
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -432,13 +426,14 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={2}>
-              <Button variant="danger" onClick={() => remove(k)} style={{ marginTop: '1.7rem' }}>
+              <Button type="button" variant="danger" onClick={() => remove(k)} style={{ marginTop: '1.7rem' }}>
                 Remove
               </Button>
             </Col>
           </Row>
         ))}
         <Button
+          type="button"
           variant="secondary"
           size="sm"
           onClick={() => append({ day: '', startTime: '', endTime: '' })}
@@ -464,9 +459,7 @@ const TherapistForm = () => {
                   placeholder="Enter First Name"
                   isInvalid={!!errors.firstName}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.firstName?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.firstName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -478,9 +471,7 @@ const TherapistForm = () => {
                   placeholder="Enter Last Name"
                   isInvalid={!!errors.lastName}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.lastName?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.lastName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -489,12 +480,7 @@ const TherapistForm = () => {
             <Col md={6}>
               <Form.Group controlId="fullName" className="mb-3">
                 <Form.Label>Full Name</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Full Name"
-                  {...register('fullName')}
-                  readOnly
-                />
+                <Form.Control type="text" placeholder="Full Name" {...register('fullName')} readOnly />
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -506,9 +492,7 @@ const TherapistForm = () => {
                   {...register('photo')}
                   isInvalid={!!errors.photo}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.photo?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.photo?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -523,9 +507,7 @@ const TherapistForm = () => {
                   placeholder="Enter Email"
                   isInvalid={!!errors.contactEmail}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.contactEmail?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.contactEmail?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -537,9 +519,7 @@ const TherapistForm = () => {
                   placeholder="Enter Phone Number"
                   isInvalid={!!errors.contactPhone}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.contactPhone?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.contactPhone?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -554,9 +534,7 @@ const TherapistForm = () => {
                   placeholder="Enter INAMI Number"
                   isInvalid={!!errors.inamiNumber}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.inamiNumber?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.inamiNumber?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -569,9 +547,7 @@ const TherapistForm = () => {
                   rows={3}
                   isInvalid={!!errors.aboutMe}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.aboutMe?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.aboutMe?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -587,9 +563,7 @@ const TherapistForm = () => {
                   rows={3}
                   isInvalid={!!errors.degreesTraining}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.degreesTraining?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.degreesTraining?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -602,9 +576,7 @@ const TherapistForm = () => {
                   rows={3}
                   isInvalid={!!errors.consultations}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.consultations?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.consultations?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -621,46 +593,39 @@ const TherapistForm = () => {
                     </option>
                   ))}
                 </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.departmentId?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.departmentId?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
-           <Col md={6}>
-  <Form.Group className="mb-3">
-    <Form.Label>Specialization</Form.Label>
-    <div>
-      {specializations.map((s) => (
-        <Form.Check
-          inline
-          key={s.specialization_id}
-          type="checkbox"
-          label={s.specialization_type}
-          checked={watch('specializationIds')?.includes(s.specialization_id)}
-          onChange={(e) => {
-            const current = watch('specializationIds') || [];
-            if (e.target.checked) {
-              setValue('specializationIds', [...current, s.specialization_id]);
-            } else {
-              setValue(
-                'specializationIds',
-                current.filter((id: number) => id !== s.specialization_id)
-              );
-            }
-          }}
-        />
-      ))}
-    </div>
-    {errors.specializationIds && (
-      <Form.Text className="text-danger">
-        {errors.specializationIds.message as string}
-      </Form.Text>
-    )}
-  </Form.Group>
-</Col>
-
-
-
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Specialization</Form.Label>
+                <div>
+                  {specializations.map((s) => (
+                    <Form.Check
+                      inline
+                      key={s.specialization_id}
+                      type="checkbox"
+                      label={s.specialization_type}
+                      checked={watch('specializationIds')?.includes(s.specialization_id)}
+                      onChange={(e) => {
+                        const current = watch('specializationIds') || [];
+                        if (e.target.checked) {
+                          setValue('specializationIds', [...current, s.specialization_id]);
+                        } else {
+                          setValue(
+                            'specializationIds',
+                            current.filter((id: number) => id !== s.specialization_id),
+                          );
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                {errors.specializationIds && (
+                  <Form.Text className="text-danger">{errors.specializationIds.message as string}</Form.Text>
+                )}
+              </Form.Group>
+            </Col>
           </Row>
 
           <h6>Branch & Availability</h6>
@@ -687,7 +652,7 @@ const TherapistForm = () => {
                   </Form.Group>
                 </Col>
                 <Col md={4}>
-                  <Button variant="danger" className="mt-4" onClick={() => removeBranch(index)}>
+                  <Button type="button" variant="danger" className="mt-4" onClick={() => removeBranch(index)}>
                     Remove Branch
                   </Button>
                 </Col>
@@ -696,6 +661,7 @@ const TherapistForm = () => {
             </Card>
           ))}
           <Button
+            type="button"
             variant="secondary"
             onClick={() => appendBranch({ branch_id: 0, branch_name: '', availability: [] })}
             className="mb-3"
@@ -733,9 +699,7 @@ const TherapistForm = () => {
                   ))}
                 </div>
                 {errors.languages && (
-                  <Form.Text className="text-danger">
-                    {errors.languages.message as string}
-                  </Form.Text>
+                  <Form.Text className="text-danger">{errors.languages.message as string}</Form.Text>
                 )}
               </Form.Group>
             </Col>
@@ -769,9 +733,7 @@ const TherapistForm = () => {
                     />
                   );
                 })}
-                {errors.paymentMethods && (
-                  <div className="text-danger">{errors.paymentMethods.message}</div>
-                )}
+                {errors.paymentMethods && <div className="text-danger">{errors.paymentMethods.message}</div>}
               </Form.Group>
             </Col>
           </Row>
