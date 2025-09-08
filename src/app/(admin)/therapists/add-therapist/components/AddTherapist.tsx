@@ -303,6 +303,10 @@ const TherapistForm = () => {
     } catch (err: any) {
       alert(err.message || 'Error saving therapist');
     }
+  } catch (err: any) {
+    console.error('Submit error:', err);
+    alert(err.message || 'Error saving therapist');
+  }
   };
 
   return (
@@ -445,10 +449,7 @@ const TherapistForm = () => {
         {fields.map((field, k) => (
           <Row key={field.id} className="align-items-center">
             <Col md={4}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.day`}
-                className="mb-3"
-              >
+              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.day`} className="mb-3">
                 <Form.Label>Day</Form.Label>
                 <Form.Select
                   {...register(
@@ -474,10 +475,7 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.startTime`}
-                className="mb-3"
-              >
+              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.startTime`} className="mb-3">
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -498,10 +496,7 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.endTime`}
-                className="mb-3"
-              >
+              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.endTime`} className="mb-3">
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -568,9 +563,7 @@ const TherapistForm = () => {
                   placeholder="Enter First Name"
                   isInvalid={!!errors.firstName}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.firstName?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.firstName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -582,9 +575,7 @@ const TherapistForm = () => {
                   placeholder="Enter Last Name"
                   isInvalid={!!errors.lastName}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.lastName?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.lastName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -611,9 +602,7 @@ const TherapistForm = () => {
                   {...register('photo')}
                   isInvalid={!!errors.photo}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.photo?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.photo?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -629,9 +618,7 @@ const TherapistForm = () => {
                   placeholder="Enter Email"
                   isInvalid={!!errors.contactEmail}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.contactEmail?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.contactEmail?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -643,9 +630,7 @@ const TherapistForm = () => {
                   placeholder="Enter Phone Number"
                   isInvalid={!!errors.contactPhone}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.contactPhone?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.contactPhone?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -661,9 +646,7 @@ const TherapistForm = () => {
                   placeholder="Enter INAMI Number"
                   isInvalid={!!errors.inamiNumber}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.inamiNumber?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.inamiNumber?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -676,9 +659,7 @@ const TherapistForm = () => {
                   rows={3}
                   isInvalid={!!errors.degreesTraining}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.degreesTraining?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.degreesTraining?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -714,9 +695,37 @@ const TherapistForm = () => {
                     </option>
                   ))}
                 </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.departmentId?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.departmentId?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Specialization</Form.Label>
+                <div>
+                  {specializations.map((s) => (
+                    <Form.Check
+                      inline
+                      key={s.specialization_id}
+                      type="checkbox"
+                      label={s.specialization_type}
+                      checked={watch('specializationIds')?.includes(s.specialization_id)}
+                      onChange={(e) => {
+                        const current = watch('specializationIds') || [];
+                        if (e.target.checked) {
+                          setValue('specializationIds', [...current, s.specialization_id]);
+                        } else {
+                          setValue(
+                            'specializationIds',
+                            current.filter((id: number) => id !== s.specialization_id),
+                          );
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                {errors.specializationIds && (
+                  <Form.Text className="text-danger">{errors.specializationIds.message as string}</Form.Text>
+                )}
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -878,9 +887,7 @@ const TherapistForm = () => {
                   ))}
                 </div>
                 {errors.languages && (
-                  <Form.Text className="text-danger">
-                    {errors.languages.message as string}
-                  </Form.Text>
+                  <Form.Text className="text-danger">{errors.languages.message as string}</Form.Text>
                 )}
               </Form.Group>
             </Col>
