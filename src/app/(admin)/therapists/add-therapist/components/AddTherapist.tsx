@@ -1,12 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
-import { API_BASE_PATH } from '@/context/constants';
 import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
+import { useParams } from 'next/navigation';
 
 interface Branch {
   branch_id: number;
@@ -41,32 +42,24 @@ interface BranchWithAvailability {
 }
 
 interface TherapistFormInputs {
-  // 1️⃣ Basic Info
   firstName: string;
   lastName: string;
   fullName: string;
   photo: string;
   contactEmail: string;
   contactPhone: string;
-
-  // 2️⃣ Professional Details
   inamiNumber: string;
   aboutMe: string;
   consultations: string;
   degreesTraining: string;
-  departmentId: string;
+  departmentId: number | '';
   specializationIds: number[];
-
-  // 3️⃣ Branch & Availability
   branches: BranchWithAvailability[];
-
-  // 4️⃣ Additional Info
   languages: number[];
   faq: string;
   paymentMethods: string[];
 }
 
-// ✅ Validation schema
 const schema = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
@@ -84,7 +77,7 @@ const schema = yup.object({
   aboutMe: yup.string().nullable(),
   consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
-  departmentId: yup.number().required('Department is required'), // changed to number
+  departmentId: yup.number().required('Department is required'),
   specializationIds: yup
     .array()
     .of(yup.number().required())
@@ -102,27 +95,21 @@ const schema = yup.object({
               day: yup.string().required('Day is required'),
               startTime: yup.string().required('Start time is required'),
               endTime: yup.string().required('End time is required'),
-            })
+            }),
           )
           .min(1, 'At least one availability slot is required'),
-      })
+      }),
     )
     .min(1, 'At least one branch is required'),
-  languages: yup
-    .array()
-    .of(yup.number().required())
-    .min(1, 'At least one language is required'), // changed to array of numbers
+  languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
   paymentMethods: yup
     .array()
-    .of(yup.number().required())
-    .min(1, 'At least one payment method is required'), // changed to array of numbers
+    .of(yup.string().required())
+    .min(1, 'At least one payment method is required'),
 });
 
-import { useParams } from 'next/navigation';
-
-const TherapistForm = () => {
-  const params = useParams();
+const AddTherapist = () => {
   const {
     register,
     handleSubmit,
@@ -144,7 +131,7 @@ const TherapistForm = () => {
       aboutMe: '',
       consultations: '',
       degreesTraining: '',
-      departmentId: '',
+      departmentId: '' as unknown as number, // Ensure departmentId is typed as number or ''
       specializationIds: [],
       branches: [],
       languages: [],
@@ -158,19 +145,17 @@ const TherapistForm = () => {
     append: appendBranch,
     remove: removeBranch,
   } = useFieldArray({ control, name: 'branches' });
-
   const [branches, setBranches] = useState<Branch[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
-
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const params = useParams();
   const departmentId = watch('departmentId');
   const firstName = watch('firstName');
   const lastName = watch('lastName');
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-
-  // ✅ Auto update fullName
+  // Update fullName automatically
   useEffect(() => {
     setValue('fullName', `${firstName || ''} ${lastName || ''}`.trim());
   }, [firstName, lastName, setValue]);
@@ -181,24 +166,22 @@ const TherapistForm = () => {
     return [];
   };
 
-  // ✅ Load Data APIs
+  // Load lists for selects
   useEffect(() => {
-    async function loadBranches() {
+    if (!token) return;
+
+    const loadBranches = async () => {
       try {
         const res = await fetch(`${API_BASE_PATH}/branches`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        setBranches(safeArray(await res.json()));+3
-        
+        setBranches(safeArray(await res.json()));
       } catch {
         setBranches([]);
       }
-    }
-    if (token) loadBranches();
-  }, [token]);
+    };
 
-  useEffect(() => {
-    async function loadDepartments() {
+    const loadDepartments = async () => {
       try {
         const res = await fetch(`${API_BASE_PATH}/departments`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -207,31 +190,9 @@ const TherapistForm = () => {
       } catch {
         setDepartments([]);
       }
-    }
-    if (token) loadDepartments();
-  }, [token]);
+    };
 
-  useEffect(() => {
-    if (!departmentId) {
-      setSpecializations([]);
-      setValue('specializationIds', []);
-      return;
-    }
-    async function loadSpecializations() {
-      try {
-        const res = await fetch(`${API_BASE_PATH}/specializations?departmentId=${departmentId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSpecializations(safeArray(await res.json()));
-      } catch {
-        setSpecializations([]);
-      }
-    }
-    loadSpecializations();
-  }, [departmentId]);
-
-  useEffect(() => {
-    async function loadLanguages() {
+    const loadLanguages = async () => {
       try {
         const res = await fetch(`${API_BASE_PATH}/languages`, {
           headers: { Authorization: `Bearer ${token}` },
@@ -240,32 +201,54 @@ const TherapistForm = () => {
       } catch {
         setLanguages([]);
       }
-    }
-    if (token) loadLanguages();
+    };
+
+    loadBranches();
+    loadDepartments();
+    loadLanguages();
   }, [token]);
 
-  // Load therapist data for editing
   useEffect(() => {
-    if (params?.id) {
-      // Fetch therapist details by ID
-      const fetchTherapist = async () => {
-        const token = localStorage.getItem('access_token');
-        const res = await axios.get(`${API_BASE_PATH}/therapists/${params.id}`, {
+    if (!departmentId) {
+      setSpecializations([]);
+      setValue('specializationIds', []);
+      return;
+    }
+    const loadSpecializations = async () => {
+      try {
+        const res = await fetch(`${API_BASE_PATH}/specializations?departmentId=${departmentId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        // Set form default values with fetched data
-        reset(res.data); // If using react-hook-form
+        setSpecializations(safeArray(await res.json()));
+      } catch {
+        setSpecializations([]);
+      }
+    };
+    loadSpecializations();
+  }, [departmentId, token, setValue]);
+
+  useEffect(() => {
+    // Load therapist data for editing if ID exists
+    if (params?.id) {
+      const fetchTherapist = async () => {
+        try {
+          const res = await axios.get(`${API_BASE_PATH}/therapists/${params.id}`, {
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          reset(res.data);
+        } catch (error) {
+          // Handle error if needed
+        }
       };
       fetchTherapist();
     }
-  }, [params?.id]);
+  }, [params?.id, reset, token]);
 
-  // ✅ Submit Handler
   const onSubmit = async (data: TherapistFormInputs) => {
     try {
       const res = await fetch(`${API_BASE_PATH}/therapists`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` || '' },
         body: JSON.stringify(data),
       });
       if (res.status === 200) {
@@ -274,340 +257,440 @@ const TherapistForm = () => {
         throw new Error(`Unexpected status: ${res.status}`);
       }
     } catch (err: any) {
-      alert(err.message || 'Error saving therapist ');
+      alert(err.message || 'Error saving therapist');
     }
   };
 
-  return (
-    <form onSubmit={handleSubmit(onSubmit)}>
-      <Row>
-        {/* 1️⃣ Basic Information */}
-        <Col md={12}>
-          <h5 className="mt-3 mb-3">Basic Information</h5>
-        </Col>
-       <Card>
-         <CardBody>
-        <Col lg={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>First Name</Form.Label>
-            <Form.Control type="text" {...register('firstName')} />
-            {errors.firstName && (
-              <Form.Text className="text-danger">{errors.firstName.message}</Form.Text>
-            )}
-          </Form.Group>
-        </Col>
-        <Col lg={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Last Name</Form.Label>
-            <Form.Control type="text" {...register('lastName')} />
-            {errors.lastName && (
-              <Form.Text className="text-danger">{errors.lastName.message}</Form.Text>
-            )}
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Full Name</Form.Label>
-            <Form.Control type="text" {...register('fullName')} readOnly />
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Photo (URL)</Form.Label>
-            <Form.Control type="url" {...register('photo')} />
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Email</Form.Label>
-            <Form.Control type="email" {...register('contactEmail')} />
-            {errors.contactEmail && (
-              <Form.Text className="text-danger">{errors.contactEmail.message}</Form.Text>
-            )}
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Phone Number</Form.Label>
-            <Form.Control type="text" {...register('contactPhone')} />
-            {errors.contactPhone && (
-              <Form.Text className="text-danger">{errors.contactPhone.message}</Form.Text>
-            )}
-          </Form.Group>
-        </Col>
-        {/* 2️⃣ Professional Details */}
-        <Col md={12}>
-          <h5 className="mt-4 mb-3">Professional Details</h5>
-        </Col>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>INAMI Number</Form.Label>
-            <Form.Control type="text" {...register('inamiNumber')} />
-            {errors.inamiNumber && (
-              <Form.Text className="text-danger">{errors.inamiNumber.message}</Form.Text>
-            )}
-          </Form.Group>
-        </Col>
-        <Col md={12}>
-          <Form.Group className="mb-3">
-            <Form.Label>About Me</Form.Label>
-            <Form.Control as="textarea" rows={3} {...register('aboutMe')} />
-          </Form.Group>
-        </Col>
-        {/* <Col md={12}>
-          <Form.Group className="mb-3">
-            <Form.Label>Consultations</Form.Label>
-            <Form.Control as="textarea" rows={3} {...register('consultations')} />
-          </Form.Group>
-        </Col> */}
-        <Col md={12}>
-          <Form.Group className="mb-3">
-            <Form.Label>Degrees & Training</Form.Label>
-            <Form.Control as="textarea" rows={3} {...register('degreesTraining')} />
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          <Form.Group className="mb-3">
-            <Form.Label>Department</Form.Label>
-            <Form.Select {...register('departmentId')}>
-              <option value="">Select Department</option>
-              {departments.map((d) => (
-                <option key={d.id} value={d.id}>
-                  {d.name}
-                </option>
-              ))}
-            </Form.Select>
-          </Form.Group>
-        </Col>
-        <Col md={6}>
-          {' '}
-          <Form.Group className="mb-3">
-            {' '}
-            <Form.Label>Specialization</Form.Label>{' '}
-            <Form.Select {...register('specializationIds.0')}>
-              {' '}
-              <option value="">Select Specialization</option>{' '}
-              {specializations.map((s) => (
-                <option key={s.specialization_id} value={s.specialization_id}>
-                  {' '}
-                  {s.specialization_type}{' '}
-                </option>
-              ))}{' '}
-            </Form.Select>{' '}
-            {errors.specializationIds && (
-              <Form.Text className="text-danger">
-                {' '}
-                {errors.specializationIds.message as string}{' '}
-              </Form.Text>
-            )}{' '}
-          </Form.Group>{' '}
-        </Col>
+  const AvailabilitySlots = ({ nestIndex }: { nestIndex: number }) => {
+    const { fields, append, remove } = useFieldArray({
+      control,
+      name: `branches.${nestIndex}.availability`,
+    });
 
-        {/* 3️⃣ Branch & Availability */}
-        <Col md={12}>
-          <h5 className="mt-4 mb-3">Branch & Availability</h5>
-        </Col>
-        <Col md={12}>
-          {branchFields.map((branch, index) => (
-            <div key={branch.id} className="border p-3 mb-3 rounded">
-              <Form.Group className="mb-2">
-                <Form.Label>Select Branch</Form.Label>
-                <Form.Select {...register(`branches.${index}.branch_id` as const)}>
-                  <option value="">Select Branch</option>
-                  {branches.map((b) => (
-                    <option key={b.branch_id} value={b.branch_id}>
-                      {b.name}
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+    return (
+      <>
+        {fields.map((field, k) => (
+          <Row key={field.id} className="align-items-center">
+            <Col md={4}>
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.day`}
+                className="mb-3"
+              >
+                <Form.Label>Day</Form.Label>
+                <Form.Select
+                  {...register(`branches.${nestIndex}.availability.${k}.day` as const)}
+                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.day}
+                >
+                  <option value="">Select Day</option>
+                  {days.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
                     </option>
                   ))}
                 </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.branches?.[nestIndex]?.availability?.[k]?.day?.message}
+                </Form.Control.Feedback>
               </Form.Group>
-              <h6 className="mt-2">Availability</h6>
-              <AvailabilitySlots
-                nestIndex={index}
-                control={control}
-                register={register}
-                errors={errors}
-              />
-              <Button
-                variant="danger"
-                size="sm"
-                className="mt-2"
-                onClick={() => removeBranch(index)}
+            </Col>
+            <Col md={3}>
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.startTime`}
+                className="mb-3"
               >
-                Remove Branch
+                <Form.Label>Start Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  {...register(`branches.${nestIndex}.availability.${k}.startTime` as const)}
+                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.startTime}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.branches?.[nestIndex]?.availability?.[k]?.startTime?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={3}>
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.endTime`}
+                className="mb-3"
+              >
+                <Form.Label>End Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  {...register(`branches.${nestIndex}.availability.${k}.endTime` as const)}
+                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.endTime}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.branches?.[nestIndex]?.availability?.[k]?.endTime?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={2}>
+              <Button variant="danger" onClick={() => remove(k)} style={{ marginTop: '1.7rem' }}>
+                Remove
               </Button>
-            </div>
+            </Col>
+          </Row>
+        ))}
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={() => append({ day: '', startTime: '', endTime: '' })}
+        >
+          Add Slot
+        </Button>
+      </>
+    );
+  };
+
+  return (
+    <Card className="p-3 shadow-sm rounded">
+      <CardBody>
+        <h5 className="mb-4">Add Therapist</h5>
+        <Form onSubmit={handleSubmit(onSubmit)}>
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="firstName" className="mb-3">
+                <Form.Label>First Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('firstName')}
+                  placeholder="Enter First Name"
+                  isInvalid={!!errors.firstName}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.firstName?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="lastName" className="mb-3">
+                <Form.Label>Last Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('lastName')}
+                  placeholder="Enter Last Name"
+                  isInvalid={!!errors.lastName}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.lastName?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="fullName" className="mb-3">
+                <Form.Label>Full Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Full Name"
+                  {...register('fullName')}
+                  readOnly
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="photo" className="mb-3">
+                <Form.Label>Photo (URL)</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Photo URL"
+                  {...register('photo')}
+                  isInvalid={!!errors.photo}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.photo?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="contactEmail" className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  {...register('contactEmail')}
+                  placeholder="Enter Email"
+                  isInvalid={!!errors.contactEmail}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactEmail?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="contactPhone" className="mb-3">
+                <Form.Label>Phone Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('contactPhone')}
+                  placeholder="Enter Phone Number"
+                  isInvalid={!!errors.contactPhone}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactPhone?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="inamiNumber" className="mb-3">
+                <Form.Label>INAMI Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('inamiNumber')}
+                  placeholder="Enter INAMI Number"
+                  isInvalid={!!errors.inamiNumber}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.inamiNumber?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="aboutMe" className="mb-3">
+                <Form.Label>About Me</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  {...register('aboutMe')}
+                  placeholder="Enter Description"
+                  rows={3}
+                  isInvalid={!!errors.aboutMe}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.aboutMe?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="degreesTraining" className="mb-3">
+                <Form.Label>Degrees & Training</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  {...register('degreesTraining')}
+                  placeholder="Enter Degrees & Training"
+                  rows={3}
+                  isInvalid={!!errors.degreesTraining}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.degreesTraining?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="consultations" className="mb-3">
+                <Form.Label>Consultations</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  {...register('consultations')}
+                  placeholder="Enter Consultations Details"
+                  rows={3}
+                  isInvalid={!!errors.consultations}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.consultations?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="departmentId" className="mb-3">
+                <Form.Label>Department</Form.Label>
+                <Form.Select {...register('departmentId')} isInvalid={!!errors.departmentId}>
+                  <option value="">Select Department</option>
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.departmentId?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+           <Col md={6}>
+  <Form.Group className="mb-3">
+    <Form.Label>Specialization</Form.Label>
+    <div>
+      {specializations.map((s) => (
+        <Form.Check
+          inline
+          key={s.specialization_id}
+          type="checkbox"
+          label={s.specialization_type}
+          checked={watch('specializationIds')?.includes(s.specialization_id)}
+          onChange={(e) => {
+            const current = watch('specializationIds') || [];
+            if (e.target.checked) {
+              setValue('specializationIds', [...current, s.specialization_id]);
+            } else {
+              setValue(
+                'specializationIds',
+                current.filter((id: number) => id !== s.specialization_id)
+              );
+            }
+          }}
+        />
+      ))}
+    </div>
+    {errors.specializationIds && (
+      <Form.Text className="text-danger">
+        {errors.specializationIds.message as string}
+      </Form.Text>
+    )}
+  </Form.Group>
+</Col>
+
+
+
+          </Row>
+
+          <h6>Branch & Availability</h6>
+          {branchFields.map((branch, index) => (
+            <Card key={branch.id} className="mb-3 p-3">
+              <Row className="align-items-center">
+                <Col md={8}>
+                  <Form.Group controlId={`branches.${index}.branch_id`} className="mb-3">
+                    <Form.Label>Branch</Form.Label>
+                    <Form.Select
+                      {...register(`branches.${index}.branch_id` as const)}
+                      isInvalid={!!errors.branches?.[index]?.branch_id}
+                    >
+                      <option value="">Select Branch</option>
+                      {branches.map((b) => (
+                        <option key={b.branch_id} value={b.branch_id}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.branches?.[index]?.branch_id?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Button variant="danger" className="mt-4" onClick={() => removeBranch(index)}>
+                    Remove Branch
+                  </Button>
+                </Col>
+              </Row>
+              <AvailabilitySlots nestIndex={index} />
+            </Card>
           ))}
           <Button
-            className="mt-2"
+            variant="secondary"
             onClick={() => appendBranch({ branch_id: 0, branch_name: '', availability: [] })}
+            className="mb-3"
           >
             Add Branch
           </Button>
-          {errors.branches && (
-            <Form.Text className="text-danger">{errors.branches.message as string}</Form.Text>
-          )}
-        </Col>
-        {/* 4️⃣ Additional Info */}
-        <Col md={12}>
-          <h5 className="mt-4 mb-3">Additional Info</h5>
-        </Col>
-        <Col md={6}>
-  <Form.Group className="mb-3">
-    <Form.Label>Languages</Form.Label>
-    <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-      {[
-        { id: 1, name: 'English' },
-        { id: 2, name: 'French' },
-        { id: 3, name: 'German' },
-      ].map((lang) => (
-        <Form.Check
-          key={lang.id}
-          type="checkbox"
-          label={lang.name}
-          checked={watch('languages')?.includes(lang.id)}
-          onChange={(e) => {
-            const current = watch('languages') || [];
-            if (e.target.checked) {
-              setValue('languages', [...current, lang.id]);
-            } else {
-              setValue(
-                'languages',
-                current.filter((l: number) => l !== lang.id)
-              );
-            }
-          }}
-        />
-      ))}
-    </div>
-    {errors.languages && (
-      <Form.Text className="text-danger">
-        {errors.languages.message as string}
-      </Form.Text>
-    )}
-  </Form.Group>
-</Col>
 
-        <Col md={6}>
-  <Form.Group className="mb-3">
-    <Form.Label>Payment Methods</Form.Label>
-    <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
-      {[
-        { id: 'cash', name: 'Cash' },
-        { id: 'card', name: 'Card' },
-        { id: 'upi', name: 'UPI' },
-        { id: 'bank', name: 'Bank Transfer' },
-      ].map((pm) => (
-        <Form.Check
-          key={pm.id}
-          type="checkbox"
-          label={pm.name}
-          checked={watch('paymentMethods')?.includes(pm.id)}
-          onChange={(e) => {
-            const current = watch('paymentMethods') || [];
-            if (e.target.checked) {
-              setValue('paymentMethods', [...current, pm.id]);
-            } else {
-              setValue(
-                'paymentMethods',
-                current.filter((p: string) => p !== pm.id)
-              );
-            }
-          }}
-        />
-      ))}
-    </div>
-    {errors.paymentMethods && (
-      <Form.Text className="text-danger">
-        {errors.paymentMethods.message as string}
-      </Form.Text>
-    )}
-  </Form.Group>
-</Col>
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Languages</Form.Label>
+                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                  {[
+                    { id: 1, name: 'English' },
+                    { id: 2, name: 'French' },
+                    { id: 3, name: 'German' },
+                  ].map((lang) => (
+                    <Form.Check
+                      key={lang.id}
+                      type="checkbox"
+                      label={lang.name}
+                      checked={watch('languages')?.includes(lang.id)}
+                      onChange={(e) => {
+                        const current = watch('languages') || [];
+                        if (e.target.checked) {
+                          setValue('languages', [...current, lang.id]);
+                        } else {
+                          setValue(
+                            'languages',
+                            current.filter((l: number) => l !== lang.id),
+                          );
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                {errors.languages && (
+                  <Form.Text className="text-danger">
+                    {errors.languages.message as string}
+                  </Form.Text>
+                )}
+              </Form.Group>
+            </Col>
 
-        <Col md={12}>
-          <Form.Group className="mb-3">
+            <Col md={6}>
+              <Form.Group controlId="paymentMethods" className="mb-3">
+                <Form.Label>Payment Methods</Form.Label>
+                {[
+                  { id: 'cash', name: 'Cash' },
+                  { id: 'card', name: 'Card' },
+                  { id: 'upi', name: 'UPI' },
+                  { id: 'bank', name: 'Bank Transfer' },
+                ].map((pm) => {
+                  const current = watch('paymentMethods') || [];
+                  return (
+                    <Form.Check
+                      key={pm.id}
+                      type="checkbox"
+                      label={pm.name}
+                      checked={current.includes(pm.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setValue('paymentMethods', [...current, pm.id]);
+                        } else {
+                          setValue(
+                            'paymentMethods',
+                            current.filter((p: string) => p !== pm.id),
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })}
+                {errors.paymentMethods && (
+                  <div className="text-danger">{errors.paymentMethods.message}</div>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+
+          <Form.Group controlId="faq" className="mb-3">
             <Form.Label>FAQ</Form.Label>
-            <Form.Control as="textarea" rows={3} {...register('faq')} />
+            <Form.Control
+              as="textarea"
+              rows={3}
+              {...register('faq')}
+              placeholder="Enter FAQs"
+              isInvalid={!!errors.faq}
+            />
+            <Form.Control.Feedback type="invalid">{errors.faq?.message}</Form.Control.Feedback>
           </Form.Group>
-        </Col>
-        <Col md={12} className="text-end">
-          <Button type="submit" variant="primary">
+
+          <Button variant="primary" type="submit">
             Save Therapist
           </Button>
-        </Col>
-     
-        </CardBody>
-      </Card>
-       </Row>
-    </form>
+        </Form>
+      </CardBody>
+    </Card>
   );
 };
 
-const AvailabilitySlots = ({ nestIndex, control, register, errors }: any) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: `branches.${nestIndex}.availability`,
-  });
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  return (
-    <div>
-      {fields.map((field, k) => (
-        <Row key={field.id} className="align-items-end mb-2">
-          <Col md={4}>
-            <Form.Select {...register(`branches.${nestIndex}.availability.${k}.day` as const)}>
-              <option value="">Select Day</option>
-              {days.map((d) => (
-                <option key={d} value={d}>
-                  {d}
-                </option>
-              ))}
-            </Form.Select>
-            {errors?.branches?.[nestIndex]?.availability?.[k]?.day && (
-              <Form.Text className="text-danger">
-                {errors.branches[nestIndex].availability[k].day.message}
-              </Form.Text>
-            )}
-          </Col>
-          <Col md={3}>
-            <Form.Control
-              type="time"
-              {...register(`branches.${nestIndex}.availability.${k}.startTime` as const)}
-            />
-            {errors?.branches?.[nestIndex]?.availability?.[k]?.startTime && (
-              <Form.Text className="text-danger">
-                {errors.branches[nestIndex].availability[k].startTime.message}
-              </Form.Text>
-            )}
-          </Col>
-          <Col md={3}>
-            <Form.Control
-              type="time"
-              {...register(`branches.${nestIndex}.availability.${k}.endTime` as const)}
-            />
-            {errors?.branches?.[nestIndex]?.availability?.[k]?.endTime && (
-              <Form.Text className="text-danger">
-                {errors.branches[nestIndex].availability[k].endTime.message}
-              </Form.Text>
-            )}
-          </Col>
-          <Col md={2}>
-            <Button variant="danger" size="sm" onClick={() => remove(k)}>
-              Remove
-            </Button>
-          </Col>
-        </Row>
-      ))}
-      <Button
-        variant="secondary"
-        size="sm"
-        className="mt-2"
-        onClick={() => append({ day: '', startTime: '', endTime: '' })}
-      >
-        Add Slot
-      </Button>
-    </div>
-  );
-};
-
-export default TherapistForm;
+export default AddTherapist;
