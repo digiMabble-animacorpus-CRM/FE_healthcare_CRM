@@ -25,7 +25,7 @@ import {
 import { TeamMemberType } from '@/types/data';
 
 export interface AddTeamProps {
-  defaultValues?: TeamMemberType;
+  teamMemberId?: string;
   isEdit?: boolean;
 }
 
@@ -95,7 +95,6 @@ function renderPermissions(
   );
 }
 
-
 function renderDynamicArrayField<
   K extends 'diplomas_and_training' | 'specializations'
 >(
@@ -153,41 +152,7 @@ function renderDynamicArrayField<
   );
 }
 
-// Backend uses snake_case naming here
-export interface AddTeamFormValues {
-  last_name: string;
-  first_name: string;
-  full_name: string;
-  job_1: string;
-  specific_audience: string;
-  specialization_1: string;
-  job_2?: string;
-  job_3?: string;
-  job_4?: string;
-  who_am_i: string;
-  consultations: string;
-  office_address: string;
-  contact_email: string;
-  contact_phone: string;
-  schedule: Record<string, string>;
-  about: string;
-  languages_spoken: string[];
-  payment_methods: string[];
-  diplomas_and_training: string[];
-  specializations: string[];
-  website: string;
-  frequently_asked_questions: Record<string, string>;
-  calendar_links: string[];
-  photo: string;
-  role: 'super_admin' | 'admin' | 'staff';
-  status: 'active' | 'inactive';
-  branches: number[];
-  primary_branch_id: number;
-  permissions: Record<string, any>;
-  created_by_role: string;
-}
-
-const schema: yup.ObjectSchema<AddTeamFormValues> = yup.object({
+const schema: yup.ObjectSchema<any> = yup.object({
   last_name: yup.string().required('Last name is required'),
   first_name: yup.string().required('First name is required'),
   full_name: yup.string().required(),
@@ -268,7 +233,7 @@ const schema: yup.ObjectSchema<AddTeamFormValues> = yup.object({
   created_by_role: yup.string().required('Creator role required'),
 });
 
-function toCreatePayload(values: AddTeamFormValues): any {
+function toCreatePayload(values: any): any {
   const scheduleText = Object.entries(values.schedule)
     .filter(([_, v]) => v && v.trim())
     .map(([day, v]) => `${day}: ${v}`)
@@ -312,7 +277,7 @@ function toCreatePayload(values: AddTeamFormValues): any {
   };
 }
 
-function toUpdatePayload(values: AddTeamFormValues, source: any): any {
+function toUpdatePayload(values: any, source: any): any {
   const payload = toCreatePayload(values);
   const branchesAsNumbers: number[] | undefined = Array.isArray(payload.branches)
     ? payload.branches
@@ -334,15 +299,15 @@ function toUpdatePayload(values: AddTeamFormValues, source: any): any {
   };
 }
 
-const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
+const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const id = searchParams.get('id');
-  const isEditMode = Boolean(id);
+  const id = teamMemberId ?? searchParams.get('id');
+  const isEditMode = isEdit ?? Boolean(id);
 
   const [faqs, setFaqs] = useState<Record<string, string>>({});
   const [loadedMember, setLoadedMember] = useState<any | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const {
     control,
@@ -352,7 +317,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
     reset,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<AddTeamFormValues>({
+  } = useForm<any>({
     resolver: yupResolver(schema),
     defaultValues: {
       last_name: '',
@@ -398,7 +363,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
 
   useEffect(() => {
     if (!isEditMode || !id) {
-      reset();
+      reset(); // clear form on add mode
       setLoadedMember(null);
       setLoading(false);
       return;
@@ -409,7 +374,6 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
       .then((data) => {
         if (!data) {
           setLoadedMember(null);
-          setLoading(false);
           return;
         }
 
@@ -466,9 +430,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
           diplomas_and_training: Array.isArray(data.diplomas_and_training)
             ? data.diplomas_and_training
             : [''],
-          specializations: Array.isArray(data.specializations)
-            ? data.specializations
-            : [''],
+          specializations: Array.isArray(data.specializations) ? data.specializations : [''],
           website: data.website ?? '',
           frequently_asked_questions:
             typeof data.frequently_asked_questions === 'object' &&
@@ -483,12 +445,11 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
             ? data.branch_ids.map((b: any) => (typeof b === 'string' ? Number(b) : b))
             : [],
           primary_branch_id:
-            typeof data.primary_branch_id === 'number'
-              ? data.primary_branch_id
-              : BRANCHES[0].id,
+            typeof data.primary_branch_id === 'number' ? data.primary_branch_id : BRANCHES[0].id,
           permissions: parsedPermissions,
           created_by_role: data.created_by_role ?? 'admin',
         });
+
         setFaqs(
           typeof data.frequently_asked_questions === 'string'
             ? JSON.parse(data.frequently_asked_questions)
@@ -504,14 +465,12 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
   }, [faqs, setValue]);
 
   useEffect(() => {
-    const firstName =
-      typeof watch('first_name') === 'string' ? watch('first_name').trim() : '';
-    const lastName =
-      typeof watch('last_name') === 'string' ? watch('last_name').trim() : '';
+    const firstName = typeof watch('first_name') === 'string' ? watch('first_name').trim() : '';
+    const lastName = typeof watch('last_name') === 'string' ? watch('last_name').trim() : '';
     setValue('full_name', `${firstName} ${lastName}`.trim());
   }, [watch('first_name'), watch('last_name'), setValue]);
 
-  const onSubmit = async (formData: AddTeamFormValues) => {
+  const onSubmit = async (formData: any) => {
     setLoading(true);
     let success = false;
 
@@ -619,6 +578,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
+
           {/* Contact & Office Info */}
           <Row>
             <Col md={6} lg={4} className="mb-3">
@@ -643,6 +603,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
+
           {/* About, Consultations, Biography */}
           <Row>
             <Col md={4} className="mb-3">
@@ -667,6 +628,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
+
           {/* Schedule */}
           <Card className="mb-4">
             <CardHeader>
@@ -687,11 +649,10 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                   </Col>
                 ))}
               </Row>
-              <Form.Text className="text-danger">
-                {typeof errors.schedule?.message === 'string' ? errors.schedule?.message : ''}
-              </Form.Text>
+              <Form.Text className="text-danger">{typeof errors.schedule?.message === 'string' ? errors.schedule?.message : ''}</Form.Text>
             </CardBody>
           </Card>
+
           {/* Arrays */}
           <Row className="mb-3 align-items-center">
             <div style={{ display: 'flex', gap: '25rem', alignItems: 'center' }}>
@@ -744,8 +705,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                 </Form.Group>
               </Col>
             </div>
-            </Row>
-
+          </Row>
 
           {/* Dynamic text arrays for diplomas and specializations */}
           <Row>
@@ -762,6 +722,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
+
           {/* Calendar Links and Branches */}
           <Row>
             <Col md={6} className="mb-3">
@@ -803,7 +764,6 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
                 </div>
                 <Form.Text className="text-danger">{errors.branches?.message}</Form.Text>
               </Form.Group>
-
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
@@ -825,10 +785,12 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
+
           {/* Permissions */}
           <Row>
             <Col md={12}>{renderPermissions(permissions, setValue, errors)}</Col>
           </Row>
+
           {/* Created By Role and other fields */}
           <Row>
             <Col md={6} className="mb-3">
@@ -855,6 +817,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
+
           {/* FAQ */}
           <Card className="mb-4">
             <CardHeader>
@@ -921,6 +884,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ defaultValues, isEdit }) => {
               </Form.Text>
             </CardBody>
           </Card>
+
           {/* Role and Status */}
           <Row>
             <Col md={6} className="mb-3">
