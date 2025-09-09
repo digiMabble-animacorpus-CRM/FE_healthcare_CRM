@@ -113,7 +113,7 @@ const TherapistDetails = ({
                 <Button
                   variant="outline-primary"
                   size="sm"
-                  onClick={() => handleEditClick(data.therapistId)}
+                  onClick={() => (data.therapistId !== undefined && data.therapistId !== null) && handleEditClick(data.therapistId)}
                 >
                   <FaEdit className="me-1" /> Edit
                 </Button>
