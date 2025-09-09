@@ -1,7 +1,5 @@
 import { StaticImageData } from 'next/image';
-import { Key, ReactNode } from 'react';
 import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
-import { BootstrapVariantType } from './component-props';
 import { file } from 'googleapis/build/src/apis/file';
 export type IdType = string;
 

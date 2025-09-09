@@ -127,7 +127,7 @@ const TherapistsListPage = () => {
   const handleEditClick = (id: any) => {
      console.log('Edit clicked for ID:', id);
     router.push(`/therapists/edit-therapist/${id}`);
-  };
+  }
 
   const handleDeleteClick = (id: any) => {
     setSelectedTherapistId(id);
@@ -165,14 +165,12 @@ const TherapistsListPage = () => {
       <Row>
         <Col xl={12}>
           <Card>
-            {/* Header */}
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
                 All Therapist List  <small>({filteredTherapists.length} total)</small>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
-                {/* Search Bar */}
                 <input
                   type="text"
                   className="form-control form-control-sm"
@@ -185,7 +183,6 @@ const TherapistsListPage = () => {
                   style={{ minWidth: 200 }}
                 />
 
-                {/* Branch Filter */}
                 <Dropdown>
                   <DropdownToggle className="btn btn-sm btn-primary dropdown-toggle text-white">
                     {selectedBranch || 'Filter by Branch'}
@@ -219,7 +216,6 @@ const TherapistsListPage = () => {
               </div>
             </CardHeader>
 
-            {/* Body */}
             <CardBody className="p-0">
               {loading ? (
                 <div className="text-center py-5">
@@ -234,7 +230,7 @@ const TherapistsListPage = () => {
                 <div className="table-responsive">
                   <table
                     className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 1000 }}
+                    style={{ minWidth: 1100 }}
                   >
                     <thead className="bg-light-subtle">
                       <tr>
@@ -278,9 +274,9 @@ const TherapistsListPage = () => {
                               </div>
                             )}
                           </td>
-
-                          {/* Details */}
-                          <td>{item.firstName} {item.lastName}</td>
+                          <td>
+                            {item.firstName} {item.lastName}
+                          </td>
                           <td>{item.contactEmail}</td>
                           <td>{item.contactPhone}</td>
                           <td>{item. departmentId}</td>
@@ -319,7 +315,6 @@ const TherapistsListPage = () => {
               )}
             </CardBody>
 
-            {/* Footer - Pagination */}
             <CardFooter>
               <ul className="pagination justify-content-end mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
@@ -332,10 +327,7 @@ const TherapistsListPage = () => {
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }).map((_, idx) => (
-                  <li
-                    key={idx}
-                    className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}
-                  >
+                  <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"

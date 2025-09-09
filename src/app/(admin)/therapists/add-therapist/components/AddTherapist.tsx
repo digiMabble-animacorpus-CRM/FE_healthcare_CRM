@@ -40,6 +40,7 @@ export interface BranchWithAvailability {
   availability: Availability[];
 }
 
+
 interface TherapistFormInputs {
   firstName: string;
   lastName: string;
@@ -64,10 +65,7 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   fullName: yup.string(),
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
-  contactPhone: yup
-    .string()
-    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
-    .required('Phone number is required'),
+  contactPhone: yup.string().matches(/^\+?[0-9]{7,15}$/, 'Invalid phone').required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
@@ -104,10 +102,7 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     .defined(),
   languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
-  paymentMethods: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'At least one payment method is required'),
+  paymentMethods: yup.array().of(yup.string().required()).min(1, 'At least one payment method is required'),
 });
 
 import { useParams } from 'next/navigation';
@@ -303,10 +298,6 @@ const TherapistForm = () => {
     } catch (err: any) {
       alert(err.message || 'Error saving therapist');
     }
-  } catch (err: any) {
-    console.error('Submit error:', err);
-    alert(err.message || 'Error saving therapist');
-  }
   };
 
   return (
@@ -444,7 +435,7 @@ const TherapistForm = () => {
       'Sunday',
     ];
 
-    return (
+        return (
       <>
         {fields.map((field, k) => (
           <Row key={field.id} className="align-items-center">
