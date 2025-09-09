@@ -53,7 +53,7 @@ const TherapistsListPage = () => {
           therapistId: t.id, // Map id to therapistId for UI compatibility
         })),
       );
-       setAllTherapists(response.data || []);
+      setAllTherapists(response.data || []);
     } catch (err) {
       console.error('Failed to fetch therapists', err);
       setAllTherapists([]);
@@ -125,9 +125,9 @@ const TherapistsListPage = () => {
   const handleView = (id: any) => router.push(`/therapists/details/${id}`);
 
   const handleEditClick = (id: any) => {
-     console.log('Edit clicked for ID:', id);
+    console.log('Edit clicked for ID:', id);
     router.push(`/therapists/edit-therapist/${id}`);
-  };
+  }
 
   const handleDeleteClick = (id: any) => {
     console.log('Delete clicked for ID:', id);
@@ -171,12 +171,12 @@ const TherapistsListPage = () => {
       <Row>
         <Col xl={12}>
           <Card>
-            {/* Header */}
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
-              <CardTitle as="h4" className="mb-0">All Therapist List</CardTitle>
+              <CardTitle as="h4" className="mb-0">
+                All Therapist List
+              </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
-                {/* Search Bar */}
                 <input
                   type="text"
                   className="form-control form-control-sm"
@@ -189,7 +189,6 @@ const TherapistsListPage = () => {
                   style={{ minWidth: 200 }}
                 />
 
-                {/* Branch Filter */}
                 <Dropdown>
                   <DropdownToggle className="btn btn-sm btn-primary dropdown-toggle text-white">
                     {selectedBranch || 'Filter by Branch'}
@@ -223,7 +222,6 @@ const TherapistsListPage = () => {
               </div>
             </CardHeader>
 
-            {/* Body */}
             <CardBody className="p-0">
               {loading ? (
                 <div className="text-center py-5">
@@ -233,10 +231,13 @@ const TherapistsListPage = () => {
                 <div className="table-responsive">
                   <table
                     className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 1000 }}
+                    style={{ minWidth: 1100 }}
                   >
                     <thead className="bg-light-subtle">
                       <tr>
+                        <th style={{ width: 30 }}>
+                          <input type="checkbox" />
+                        </th>
                         <th>Profile Pic</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -248,7 +249,9 @@ const TherapistsListPage = () => {
                     <tbody>
                       {currentData.map((item) => (
                         <tr key={item.therapistId}>
-                          {/* Profile Picture */}
+                          <td>
+                            <input type="checkbox" />
+                          </td>
                           <td>
                             {item.imageUrl &&
                             item.imageUrl !== 'null' &&
@@ -275,14 +278,12 @@ const TherapistsListPage = () => {
                               </div>
                             )}
                           </td>
-
-                          {/* Details */}
-                          <td>{item.firstName} {item.lastName}</td>
+                          <td>
+                            {item.firstName} {item.lastName}
+                          </td>
                           <td>{item.contactEmail}</td>
                           <td>{item.contactPhone}</td>
                           <td>{item.jobTitle || '-'}</td>
-
-                          {/* Actions */}
                           <td>
                             <div className="d-flex gap-2">
                               <Button
@@ -316,7 +317,6 @@ const TherapistsListPage = () => {
               )}
             </CardBody>
 
-            {/* Footer - Pagination */}
             <CardFooter>
               <ul className="pagination justify-content-end mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
@@ -329,10 +329,7 @@ const TherapistsListPage = () => {
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }).map((_, idx) => (
-                  <li
-                    key={idx}
-                    className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}
-                  >
+                  <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
@@ -390,3 +387,6 @@ const TherapistsListPage = () => {
 };
 
 export default TherapistsListPage;
+function setShowSuccessMessage(arg0: boolean) {
+  throw new Error('Function not implemented.');
+}

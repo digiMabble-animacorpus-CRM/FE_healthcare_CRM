@@ -7,7 +7,11 @@ import * as yup from 'yup';
 import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
-import { useParams } from 'next/navigation';
+import router from 'next/router';
+
+type AddTherapistProps = {
+  therapistId?: string;
+};
 
 interface Branch {
   branch_id: number;
@@ -29,67 +33,57 @@ interface Language {
   name: string;
 }
 
-interface Availability {
+export interface Availability {
   day: string;
   startTime: string;
   endTime: string;
 }
 
-interface BranchWithAvailability {
+export interface BranchWithAvailability {
   branch_id: number;
   branch_name: string;
   availability: Availability[];
 }
 
+
 interface TherapistFormInputs {
   firstName: string;
   lastName: string;
   fullName: string;
-  photo: string;
+  photo?: string | null;
   contactEmail: string;
   contactPhone: string;
   inamiNumber: string;
-  aboutMe: string;
-  consultations: string;
-  degreesTraining: string;
-  departmentId: number | '';
-  specializationIds: number[];
+  aboutMe?: string | null;
+  consultations?: string | null;
+  degreesTraining?: string | null;
+  departmentId: number | null;
+  specializationIds?: number[];
   branches: BranchWithAvailability[];
   languages: number[];
-  faq: string;
+  faq?: string | null;
   paymentMethods: string[];
 }
 
-const schema = yup.object({
+const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
-  fullName: yup
-    .string()
-    .transform((_, obj) => `${obj.firstName || ''} ${obj.lastName || ''}`.trim())
-    .required('Full Name is required'),
+  fullName: yup.string(), // not required, auto-updated
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
-  contactPhone: yup
-    .string()
-    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
-    .required('Phone number is required'),
+  contactPhone: yup.string().matches(/^\+?[0-9]{7,15}$/, 'Invalid phone').required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
   consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
-  departmentId: yup.number().required('Department is required'),
-  specializationIds: yup
-    .array()
-    .of(yup.number().required())
-    .min(1, 'At least one specialization is required'),
-  branches: yup
-    .array()
+  departmentId: yup.number().nullable().typeError('Department is required').required('Department is required'),
+  specializationIds: yup.array().of(yup.number().required()).min(1, 'At least one specialization is required'),
+  branches: yup.array()
     .of(
       yup.object({
         branch_id: yup.number().required('Branch is required'),
-        branch_name: yup.string().nullable(),
-        availability: yup
-          .array()
+        branch_name: yup.string().nullable().defined(),
+        availability: yup.array()
           .of(
             yup.object({
               day: yup.string().required('Day is required'),
@@ -97,19 +91,19 @@ const schema = yup.object({
               endTime: yup.string().required('End time is required'),
             }),
           )
-          .min(1, 'At least one availability slot is required'),
+          .min(1, 'At least one availability slot is required')
+          .required('Availability is required'),
       }),
     )
-    .min(1, 'At least one branch is required'),
+    .min(1, 'At least one branch is required')
+    .required('Branches are required')
+    .defined(),
   languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
-  paymentMethods: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'At least one payment method is required'),
+  paymentMethods: yup.array().of(yup.string().required()).min(1, 'At least one payment method is required'),
 });
 
-const AddTherapist = () => {
+const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   const {
     register,
     handleSubmit,
@@ -128,34 +122,34 @@ const AddTherapist = () => {
       contactEmail: '',
       contactPhone: '',
       inamiNumber: '',
-      aboutMe: '',
-      consultations: '',
-      degreesTraining: '',
-      departmentId: '' as unknown as number, // Ensure departmentId is typed as number or ''
+      aboutMe: null,
+      consultations: null,
+      degreesTraining: null,
+      departmentId: null,
       specializationIds: [],
       branches: [],
       languages: [],
-      faq: '',
+      faq: null,
       paymentMethods: [],
     },
   });
 
-  const {
-    fields: branchFields,
-    append: appendBranch,
-    remove: removeBranch,
-  } = useFieldArray({ control, name: 'branches' });
+  const { fields: branchFields, append: appendBranch, remove: removeBranch } = useFieldArray({
+    control,
+    name: 'branches',
+  });
+
   const [branches, setBranches] = useState<Branch[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const params = useParams();
+
   const departmentId = watch('departmentId');
   const firstName = watch('firstName');
   const lastName = watch('lastName');
 
-  // Update fullName automatically
+  // Automatically update fullName
   useEffect(() => {
     setValue('fullName', `${firstName || ''} ${lastName || ''}`.trim());
   }, [firstName, lastName, setValue]);
@@ -166,7 +160,7 @@ const AddTherapist = () => {
     return [];
   };
 
-  // Load lists for selects
+  // Load dropdown data (branches, departments, languages)
   useEffect(() => {
     if (!token) return;
 
@@ -208,6 +202,7 @@ const AddTherapist = () => {
     loadLanguages();
   }, [token]);
 
+  // Load specializations when department changes
   useEffect(() => {
     if (!departmentId) {
       setSpecializations([]);
@@ -227,69 +222,107 @@ const AddTherapist = () => {
     loadSpecializations();
   }, [departmentId, token, setValue]);
 
-  useEffect(() => {
-    // Load therapist data for editing if ID exists
-    if (params?.id) {
-      const fetchTherapist = async () => {
-        try {
-          const res = await axios.get(`${API_BASE_PATH}/therapists/${params.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          reset(res.data);
-        } catch (error) {
-          // Handle error if needed
-        }
-      };
-      fetchTherapist();
-    }
-  }, [params?.id, reset, token]);
-
-  // Transform form data to backend expected schema before POST
-  const transformPayload = (data: TherapistFormInputs) => {
-    return {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      photo: data.photo,
-      contactEmail: data.contactEmail,
-      contactPhone: data.contactPhone,
-      inamiNumber: data.inamiNumber,
-      aboutMe: data.aboutMe,
-      consultations: data.consultations,
-      degreesTraining: data.degreesTraining,
-      departmentId: data.departmentId,
-      specializations: data.specializationIds,
-      branches: data.branches.map((b) => b.branch_id),
-      availability: data.branches.flatMap((b) => b.availability),
-      languages: data.languages.map((langId) => {
-        const langObj = languages.find((l) => l.id === langId);
-        return langObj?.name || '';
-      }).filter((n) => n),
-      faq: data.faq,
-      paymentMethods: data.paymentMethods,
-    };
+  // Helpers to map language names <-> IDs
+  const languageNameToId = (name: string): number | undefined => {
+    return languages.find((l) => l.name === name)?.id;
+  };
+  const languageIdToName = (id: number): string => {
+    return languages.find((l) => l.id === id)?.name || '';
   };
 
-  
-const onSubmit = async (data: TherapistFormInputs) => {
-  console.log('Submitting data:', data); // debug
-  try {
-    const payload = transformPayload(data);
-    console.log('Transformed payload:', payload); // debug
-    const res = await fetch(`${API_BASE_PATH}/therapists`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` || '' },
-      body: JSON.stringify(payload),
-    });
-    if (res.ok) {
-      alert('Therapist saved successfully ✅');
-    } else {
-      const errText = await res.text();
-      throw new Error(`Unexpected status: ${res.status} - ${errText}`);
+  // Fetch therapist data for editing
+  useEffect(() => {
+    if (!therapistId) return;
+
+    const fetchTherapist = async () => {
+      try {
+        const res = await axios.get(`${API_BASE_PATH}/therapists/${therapistId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const data = res.data;
+
+        const transformedData: TherapistFormInputs = {
+          firstName: data.firstName || '',
+          lastName: data.lastName || '',
+          fullName: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
+          photo: data.photo || null,
+          contactEmail: data.contactEmail || '',
+          contactPhone: data.contactPhone || '',
+          inamiNumber: data.inamiNumber ? String(data.inamiNumber) : '',
+          aboutMe: data.aboutMe || null,
+          consultations: data.consultations || null,
+          degreesTraining: data.degreesTraining || null,
+          departmentId: data.departmentId || null,
+          specializationIds: data.specializations || [],
+          branches: Array.isArray(data.branches) && Array.isArray(data.availability)
+            ? data.branches.map((branchId: number) => ({
+                branch_id: branchId,
+                branch_name: branches.find((b) => b.branch_id === branchId)?.name || '',
+                availability: data.availability.filter((av: any) => av.branchId === branchId || av.branch_id === branchId) || [],
+              }))
+            : [],
+          languages: Array.isArray(data.languages)
+            ? data.languages
+                .map((name: string) => languageNameToId(name))
+                .filter((id: number | undefined): id is number => id !== undefined)
+            : [],
+          faq: data.faq || null,
+          paymentMethods: data.paymentMethods || [],
+        };
+
+        reset(transformedData);
+      } catch (error) {
+        console.error('Error loading therapist data:', error);
+      }
+    };
+
+    fetchTherapist();
+  }, [therapistId, reset, token, branches, languages]);
+
+  // Transform data before submit
+  const transformPayload = (data: TherapistFormInputs) => ({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    photo: data.photo,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    inamiNumber: Number(data.inamiNumber),
+    aboutMe: data.aboutMe,
+    consultations: data.consultations,
+    degreesTraining: data.degreesTraining,
+    departmentId: data.departmentId,
+    specializations: data.specializationIds,
+    branches: data.branches.map((b) => b.branch_id),
+    availability: data.branches.flatMap((b) => b.availability),
+    languages: data.languages.map((id) => languageIdToName(id)).filter((n) => n),
+    faq: data.faq,
+    paymentMethods: data.paymentMethods,
+  });
+
+  const onSubmit = async (data: TherapistFormInputs) => {
+    try {
+      const payload = transformPayload(data);
+
+      const url = therapistId ? `${API_BASE_PATH}/therapists/${therapistId}` : `${API_BASE_PATH}/therapists`;
+      const method = therapistId ? 'PATCH' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` || '' },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert(`Therapist ${therapistId ? 'updated' : 'saved'} successfully`);
+        router.push('/therapists/therapists-list')
+      } else {
+        const errText = await res.text();
+        throw new Error(`Unexpected status: ${res.status} - ${errText}`);
+      }
+    } catch (err: any) {
+      console.error('Submit error:', err);
+      alert(err.message || 'Error saving therapist');
     }
-  } catch (err: any) {
-    console.error('Submit error:', err);
-    alert(err.message || 'Error saving therapist');
-  }
   };
 
   const AvailabilitySlots = ({ nestIndex }: { nestIndex: number }) => {
@@ -300,7 +333,7 @@ const onSubmit = async (data: TherapistFormInputs) => {
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    return (
+        return (
       <>
         {fields.map((field, k) => (
           <Row key={field.id} className="align-items-center">
@@ -371,8 +404,8 @@ const onSubmit = async (data: TherapistFormInputs) => {
   return (
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
-        <h5 className="mb-4">Add Therapist</h5>
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <h5 className="mb-4">{therapistId ? 'Edit Therapist' : 'Add Therapist'}</h5>
+        <Form onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}>
           <Row>
             <Col md={6}>
               <Form.Group controlId="firstName" className="mb-3">
@@ -675,7 +708,7 @@ const onSubmit = async (data: TherapistFormInputs) => {
           </Form.Group>
 
           <Button variant="primary" type="submit">
-            Save Therapist
+            {therapistId ? 'Update Therapist' : 'Save Therapist'}
           </Button>
         </Form>
       </CardBody>
