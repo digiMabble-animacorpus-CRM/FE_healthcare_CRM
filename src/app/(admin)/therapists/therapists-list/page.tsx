@@ -46,7 +46,13 @@ const TherapistsListPage = () => {
     setLoading(true);
     try {
       const response = await getAllTherapists(1, 10000); // fetch all
-      setAllTherapists(response.data || []);
+      console.log(response.data);
+      setAllTherapists(
+        (response.data || []).map((t: any) => ({
+          ...t,
+          therapistId: t.id, // Map id to therapistId for UI compatibility
+        })),
+      );
     } catch (err) {
       console.error('Failed to fetch therapists', err);
       setAllTherapists([]);
@@ -120,6 +126,7 @@ const TherapistsListPage = () => {
   const handleEditClick = (id: any) => router.push(`/therapists/edit-therapist/${id}`);
 
   const handleDeleteClick = (id: any) => {
+    console.log('Delete clicked for ID:', id);
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
@@ -130,8 +137,8 @@ const TherapistsListPage = () => {
     try {
       const success = await deleteTherapist(selectedTherapistId);
       if (success) {
-        await fetchTherapists(); // 🔥 Refetch after delete
-        setToastMessage('Therapist deleted successfully!');
+        setAllTherapists((prev) => prev.filter((t) => t.therapistId !== selectedTherapistId));
+        setShowSuccessMessage(true);
       } else {
         setToastMessage('Failed to delete therapist');
       }

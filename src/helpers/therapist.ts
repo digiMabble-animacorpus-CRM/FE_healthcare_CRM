@@ -204,29 +204,46 @@ export const transformToBackendDto = (formData: any): TherapistUpdatePayload => 
     ],
   };
 };
-export const deleteTherapist = async (id: string | number): Promise<boolean> => {
-  try {
-    const token = localStorage.getItem('access_token');
-    if (!token) return false;
+// export const deleteTherapist = async (id: string | number): Promise<boolean> => {
+//   try {
+//     const token = localStorage.getItem('access_token');
+//     if (!token) return false;
 
-    const response = await fetch(`${API_BASE_PATH}/therapists/${id}`, {
-      method: 'DELETE',
+//     const response = await fetch(`${API_BASE_PATH}/therapists/${id}`, {
+//       method: 'DELETE',
+//       headers: {
+//         Authorization: `Bearer ${token}`,
+//         'Content-Type': 'application/json',
+//       },
+//     });
+
+//     const result = await response.json();
+
+//     if (!response.ok || !result.status) {
+//       console.error('Delete failed:', result.message || 'Unknown error');
+//       return false;
+//     }
+
+//     return true;
+//   } catch (error) {
+//     console.error('Error deleting therapist:', error);
+//     return false;
+//   }
+// };
+import axios from "axios";
+export const deleteTherapist = async (id: string) => {
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+
+  try {
+    await axios.delete(`${API_BASE_PATH}/therapists/${id}`, {
       headers: {
         Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
       },
     });
-
-    const result = await response.json();
-
-    if (!response.ok || !result.status) {
-      console.error('Delete failed:', result.message || 'Unknown error');
-      return false;
-    }
-
     return true;
-  } catch (error) {
-    console.error('Error deleting therapist:', error);
+  } catch (err) {
+    console.error("Delete therapist error:", err);
     return false;
   }
 };

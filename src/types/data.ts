@@ -320,11 +320,11 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  agendaLink: any;
-  email: any;
-  phoneNumber: any;
-  education: string[];
+  therapistId: Key | null | undefined;
   therapistId: string;
+  name: ReactNode;
+  branches: any;
+  _id: string;
   id: string;
   frequently_asked_questions: any;
   languages_spoken(languages_spoken: any): unknown;
