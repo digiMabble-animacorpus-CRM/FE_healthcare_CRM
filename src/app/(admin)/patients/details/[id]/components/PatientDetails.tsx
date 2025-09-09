@@ -1,13 +1,12 @@
 'use client';
 
 import avatar2 from '@/assets/images/users/avatar-2.jpg';
-import patientBannerImg from '@/assets/images/properties/p-12.jpg';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ReactApexChart from 'react-apexcharts';
-import { Card, CardBody, CardHeader, CardTitle, Col, Row, Table, Button } from 'react-bootstrap';
+import { Card, CardBody, CardTitle, Col, Row, Table, Button } from 'react-bootstrap';
 
 type WeeklyInquiryType = { week: string; inquiries: number };
 type TransactionStatType = {
@@ -39,13 +38,18 @@ export type PatientDetailsCardProps = {
   address?: string;
   city?: string;
   country?: string;
+  zipcode?: string;
+  language?: string;
+  ssin?: string;
+  mutualitynumber?: string;
+  mutualityregistrationnumber?: string;
   status?: 'ACTIVE' | 'INACTIVE';
   note?: string;
-  weeklyInquiry?: any[]; // replace `any` with the correct type if you have
-  transactionStats?: any[];
-  transactionHistory?: any[];
-  feedbacks?: any[];
-  files?: any[];
+  weeklyInquiry?: WeeklyInquiryType[];
+  transactionStats?: TransactionStatType[];
+  transactionHistory?: TransactionHistoryType[];
+  feedbacks?: FeedbackType[];
+  files?: FileType[];
 };
 
 const PatientDetails = ({
@@ -58,6 +62,11 @@ const PatientDetails = ({
   address,
   city,
   country,
+  zipcode,
+  language,
+  ssin,
+  mutualitynumber,
+  mutualityregistrationnumber,
   status = 'ACTIVE',
   note,
   weeklyInquiry = [],
@@ -83,7 +92,7 @@ const PatientDetails = ({
         </Button>
       </div>
 
-      {/* Profile / Avatar / Contact / Status / Action Buttons */}
+      {/* Profile Section */}
       <Card className="mb-4">
         <CardBody>
           <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mt-3">
@@ -101,7 +110,7 @@ const PatientDetails = ({
                 </p>
               </div>
             </div>
-            <div className="d-flex gap-1">
+           <div className="d-flex gap-1">
               <Button
                 variant="secondary"
                 className="avatar-sm d-flex align-items-center justify-content-center fs-20"
@@ -115,20 +124,50 @@ const PatientDetails = ({
             </div>
           </div>
 
-          <Row className="my-4">
+          {/* Contact & Info */}
+          <Row className="my-4 g-3">
             <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">Email Address :</p>
               <p className="mb-0">{email || '-'}</p>
             </Col>
-            <Col lg={3}>
+            <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
               <p className="mb-0">{phones?.join(', ') || '-'}</p>
             </Col>
-            <Col lg={3}>
+            <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">City :</p>
               <p className="mb-0">{city || '-'}</p>
             </Col>
-            <Col lg={2}>
+            <Col lg={4}>
+              <p className="text-dark fw-semibold fs-16 mb-1">Country :</p>
+              <p className="mb-0">{country || '-'}</p>
+            </Col>
+            <Col lg={4}>
+              <p className="text-dark fw-semibold fs-16 mb-1">Zip Code :</p>
+              <p className="mb-0">{zipcode || '-'}</p>
+            </Col>
+            <Col lg={4}>
+              <p className="text-dark fw-semibold fs-16 mb-1">Language :</p>
+              <p className="mb-0">{language || '-'}</p>
+            </Col>
+          </Row>
+
+          {/* IDs & Status */}
+          <Row className="my-4 g-3">
+            <Col lg={4}>
+              <p className="text-dark fw-semibold fs-16 mb-1">SSIN :</p>
+              <p className="mb-0">{ssin || '-'}</p>
+            </Col>
+            <Col lg={4}>
+              <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
+              <p className="mb-0">{[address, city, country].filter(Boolean).join(', ') || '-'}</p>
+            </Col>
+            <Col lg={4}>
+              <p className="text-dark fw-semibold fs-16 mb-1">Description / Notes :</p>
+              <p className="mb-0">{note || '-'}</p>
+             
+            </Col>
+            <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
               <span
                 className={`badge bg-${status === 'ACTIVE' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}
@@ -138,21 +177,19 @@ const PatientDetails = ({
             </Col>
           </Row>
 
-          <Row className="my-4">
-            <Col lg={9}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
-              <p className="mb-0">{[address, city, country].filter(Boolean).join(', ') || '-'}</p>
+          {/* Address & Notes */}
+          <Row className="my-4 g-3">
+            <Col lg={8}>
+              <p className="text-dark fw-semibold fs-16 mb-1">Mutuality Number :</p>
+              <p className="mb-0">{mutualitynumber || '-'}</p>
             </Col>
-            <Col lg={3}>
+            <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">Mode of Register :</p>
               <p className="mb-0">Online</p>
             </Col>
-          </Row>
-
-          <Row className="my-4">
             <Col lg={12}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Description / Notes :</p>
-              <p className="mb-0">{note || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Mutuality Registration Number :</p>
+              <p className="mb-0">{mutualityregistrationnumber || '-'}</p>
             </Col>
           </Row>
         </CardBody>
@@ -176,7 +213,7 @@ const PatientDetails = ({
               };
               return (
                 <Col lg={4} key={idx}>
-                  <Card className="border p-3">
+                  <Card className="border p-3 h-100">
                     <div className="d-flex align-items-center gap-3 mb-2">
                       <div className="avatar bg-primary bg-opacity-10 rounded flex-centered">
                         <IconifyIcon
@@ -213,7 +250,7 @@ const PatientDetails = ({
               };
               return (
                 <Col lg={4} key={idx}>
-                  <Card className="border p-3">
+                  <Card className="border p-3 h-100">
                     <div className="d-flex align-items-center gap-3 mb-2">
                       <div className={`avatar bg-${t.variant} bg-opacity-10 rounded flex-centered`}>
                         <IconifyIcon
@@ -242,7 +279,7 @@ const PatientDetails = ({
         </CardBody>
       </Card>
 
-      {/* Transaction History Table */}
+      {/* Transaction History */}
       <Card className="mb-4">
         <CardBody>
           <CardTitle as={'h4'} className="mb-3">
@@ -277,7 +314,7 @@ const PatientDetails = ({
         </CardBody>
       </Card>
 
-      {/* Reviews / Feedback */}
+      {/* Reviews */}
       <Card className="mb-4">
         <CardBody>
           <CardTitle as={'h4'} className="mb-3">
@@ -286,7 +323,7 @@ const PatientDetails = ({
           <Row>
             {feedbacks.map((f, idx) => (
               <Col lg={6} key={idx}>
-                <Card className="bg-light-subtle mb-3">
+                <Card className="bg-light-subtle mb-3 h-100">
                   <CardBody>
                     <div className="d-flex align-items-center gap-2">
                       {f.image && (
@@ -316,7 +353,7 @@ const PatientDetails = ({
         </CardBody>
       </Card>
 
-      {/* Files / Documents */}
+      {/* Files */}
       <Card className="mb-4">
         <CardBody>
           <CardTitle as={'h4'} className="mb-3">

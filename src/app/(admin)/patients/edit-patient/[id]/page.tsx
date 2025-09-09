@@ -9,7 +9,7 @@ export const metadata: Metadata = { title: 'Customers Add' };
 const PatientEditPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
-      <PageTitle title="Edit Enquiry" subName="" />
+      <PageTitle title="Edit Patient" subName="" />
       <AddPatient params={params} />
     </>
   );

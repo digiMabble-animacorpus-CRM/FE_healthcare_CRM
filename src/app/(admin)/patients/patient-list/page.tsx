@@ -27,7 +27,7 @@ import '@/assets/scss/components/_edittogglebtn.scss';
 import { getAllPatient, deletePatient } from '@/helpers/patient';
 
 const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
+
 
 const PatientsListPage = () => {
   const [allPatients, setAllPatients] = useState<PatientType[]>([]);
@@ -188,7 +188,7 @@ const PatientsListPage = () => {
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Patient List
+                All Patient List <span className="text-muted">({filteredPatients.length})</span>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
@@ -204,36 +204,7 @@ const PatientsListPage = () => {
                   style={{ minWidth: 200 }}
                 />
 
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-white">
-                    {selectedBranch || 'Filter by Branch'}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {BRANCHES.map((branch) => (
-                      <DropdownItem
-                        key={branch}
-                        onClick={() => {
-                          setSelectedBranch(branch);
-                          setCurrentPage(1);
-                        }}
-                        active={selectedBranch === branch}
-                      >
-                        {branch}
-                      </DropdownItem>
-                    ))}
-                    {selectedBranch && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Branch Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
+               
               </div>
             </CardHeader>
 
@@ -250,6 +221,7 @@ const PatientsListPage = () => {
                   >
                     <thead className="bg-light-subtle">
                       <tr>
+                        <th>No</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -261,8 +233,10 @@ const PatientsListPage = () => {
                     </thead>
                     <tbody>
                       {currentData.length > 0 ? (
-                        currentData.map((item) => (
+                        currentData.map((item, index) => (
                           <tr key={item.id}>
+                            {/* Auto Increment ID */}
+                            <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
                             <td>
                               {item.firstname} {item.lastname}
                             </td>
@@ -317,7 +291,7 @@ const PatientsListPage = () => {
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={7} className="text-center py-4 text-muted">
+                          <td colSpan={8} className="text-center py-4 text-muted">
                             No patient found
                           </td>
                         </tr>
