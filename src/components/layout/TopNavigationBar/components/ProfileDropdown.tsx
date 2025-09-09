@@ -17,6 +17,7 @@ import { API_BASE_PATH } from "@/context/constants";
 
 const ProfileDropdown = () => {
   const [fullName, setFullName] = useState<string>('User');
+  const [avatarUrl, setAvatarUrl] = useState<string>(avatar1.src); // Default to local image
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,10 +32,12 @@ const ProfileDropdown = () => {
           },
         });
 
-        if ( res.data?.user?.team.full_name) {
-          setFullName( res.data?.user?.team.full_name);
+        if (res.data?.user?.team.full_name) {
+          setFullName(res.data.user.team.full_name);
         }
-        // console.log('Full name:', res.data?.user?.team.full_name);
+        if (res.data?.user?.team.photo) {
+          setAvatarUrl(res.data.user.team.photo); // Use API photo field
+        }
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -55,7 +58,13 @@ const ProfileDropdown = () => {
         aria-expanded="false"
       >
         <span className="d-flex align-items-center">
-          <Image className="rounded-circle" width={32} src={avatar1} alt="avatar" />
+          <Image
+            className="rounded-circle"
+            width={32}
+            height={32}
+            src={avatarUrl}
+            alt="avatar"
+          />
         </span>
       </DropdownToggle>
       <DropdownMenu className="dropdown-menu-end">

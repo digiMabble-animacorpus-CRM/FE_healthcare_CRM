@@ -107,7 +107,7 @@ const ProfileDetails = () => {
   }, []);
 
   if (!profileData) {
-    return <p>Loading profile...</p>;
+    return <p>Check the User profile...</p>;
   }
 
   const {
@@ -128,7 +128,7 @@ const ProfileDetails = () => {
     schedule,
     photo,
   } = profileData;
-
+  // console.log('Photo URL:', photo);
   return (
     <div>
       {/* Profile Header */}
@@ -262,23 +262,30 @@ const ProfileDetails = () => {
             <Col lg={12}>
               <p className="fw-semibold mb-1">Frequently Asked Questions:</p>
               {frequently_asked_questions ? (
-                <ul>
+                <ul style={{ paddingLeft: '0', listStyle: 'none' }}>
                   {frequently_asked_questions
                     .split('\r\n')
                     .filter((line) => line.trim() !== '')
                     .map((line, idx) => {
-                      // Try to split into question/answer if possible
                       const [question, ...answerParts] = line.split('?');
-                      if (answerParts.length > 0) {
+                      const answer = answerParts.join('?').trim();
+                      if (answer) {
                         return (
-                          <li key={idx}>
-                            <strong>Q:</strong> {question.trim() + '?'}
+                          <li
+                            key={idx}
+                            style={{
+                              marginBottom: '1rem',
+                              background: '#f8f9fa',
+                              padding: '1rem',
+                              borderRadius: '8px',
+                            }}
+                          >
+                            <strong>Ques:</strong> {question.trim() + '?'}
                             <br />
-                            <strong>A:</strong> {answerParts.join('?').trim()}
+                            <strong>Ans:</strong> {answer}
                           </li>
                         );
                       }
-                      // If not a question/answer, just show the line
                       return <li key={idx}>{line.trim()}</li>;
                     })}
                 </ul>
