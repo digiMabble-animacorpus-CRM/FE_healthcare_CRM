@@ -1,36 +1,34 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
-import dayjs, { Dayjs } from 'dayjs';
 import Image from 'next/image';
-import { Icon } from '@iconify/react';
+import { useMemo, useRef, useState } from 'react';
 // import ReactApexChart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { ApexOptions } from 'apexcharts';
 import {
+  Button,
   Card,
   CardBody,
   CardHeader,
   CardTitle,
-  Row,
   Col,
   Dropdown,
   DropdownItem,
   DropdownMenu,
   DropdownToggle,
-  Button,
-  ButtonGroup,
-  Spinner,
+  Row,
+  Spinner
 } from 'react-bootstrap';
 
 // Example avatars
+import useCalendar from '@/app/(admin)/pages/calendar/useCalendar';
 import avatar1 from '@/assets/images/users/avatar-1.jpg';
 import avatar2 from '@/assets/images/users/avatar-2.jpg';
 import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
 import Calendar from './Calendar';
-import useCalendar from '@/app/(admin)/pages/calendar/useCalendar';
 
 const ReactApexChart = dynamic(() => import("react-apexcharts"), {
   ssr: false,
@@ -227,25 +225,6 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           {/* Chart + Calendar */}
           <Row className="g-3">
             <Col lg={6}>
-              <Row className="mb-2">
-                <Col>
-                  <Button
-                    size="sm"
-                    variant={chartMode === 'doctor' ? 'primary' : 'outline-primary'}
-                    onClick={() => setChartMode('doctor')}
-                    className="me-2"
-                  >
-                    Doctor-wise
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={chartMode === 'branch' ? 'primary' : 'outline-primary'}
-                    onClick={() => setChartMode('branch')}
-                  >
-                    Branch-wise
-                  </Button>
-                </Col>
-              </Row>
               <ReactApexChart
                 options={chartOptions}
                 series={chartSeries}
@@ -298,11 +277,10 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           {/* Appointments Breakdown */}
           <h5 className="mt-4 mb-2 text-primary fw-bold">Appointments Breakdown</h5>
           <p className="text-muted mb-3">
-            Showing appointments for <strong>{selectedDoctor}</strong> and{' '}
-            <strong>{selectedBranch}</strong>.
+            Showing appointments for <strong>{selectedDoctor}</strong>.
           </p>
 
-          <Row className="g-3">
+          <Row className="g-3 mb-3">
             {Object.keys(doctorMap).map((doc, idx) => {
               const value = doctorMap[doc];
               const percent = Math.round((value / totalAppointments) * 100);
@@ -334,7 +312,10 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
             })}
           </Row>
 
-          <Row className="g-3 mt-2">
+          <p className="text-muted">
+            Showing appointments for <strong>{selectedBranch}</strong>.
+          </p>
+          <Row className="g-3">
             {Object.keys(branchMap).map((branch, idx) => {
               const value = branchMap[branch];
               const percent = Math.round((value / totalAppointments) * 100);
