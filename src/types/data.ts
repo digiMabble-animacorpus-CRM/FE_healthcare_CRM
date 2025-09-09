@@ -1,6 +1,11 @@
 import { StaticImageData } from 'next/image';
+<<<<<<< HEAD
 import { BootstrapVariantType } from './component-props';
 import { file } from 'googleapis/build/src/apis/file';
+=======
+import { Key, ReactNode } from 'react';
+import { BootstrapVariantType } from './component-props';
+>>>>>>> 1856ea7 (design)
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -706,7 +711,6 @@ export type TeamMemberType = {
   status: "active" | "inactive" | string;
   created_by_role?: string;
 };
-
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency

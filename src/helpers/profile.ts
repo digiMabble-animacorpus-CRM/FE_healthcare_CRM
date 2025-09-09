@@ -1,8 +1,8 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import { encryptAES, decryptAES } from '@/utils/encryption';
 import type { ProfileCreatePayload, ProfileType } from '@/types/data';
+import { decryptAES, encryptAES } from '@/utils/encryption';
 
 export interface ProfileUpdatePayload {
   name?: string;
