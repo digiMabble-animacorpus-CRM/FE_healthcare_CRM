@@ -95,6 +95,8 @@ const ProfileDetails = () => {
           photo: apiProfile.photo || '',
         };
 
+        console.log('normalized.photo:', normalized.photo);
+        console.log('Fetched profile data:', normalized);
         setProfileData(normalized);
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -209,14 +211,30 @@ const ProfileDetails = () => {
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Diplomas / Training:</p>
-              <p>{diplomas_and_training.join(', ') || '-'}</p>
+              {diplomas_and_training.length > 0 ? (
+                <ul>
+                  {diplomas_and_training.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span>-</span>
+              )}
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Specializations:</p>
-              <p>{specializations.join(', ') || '-'}</p>
+              {specializations.length > 0 ? (
+                <ul>
+                  {specializations.map((item, idx) => (
+                    <li key={idx}>{item}</li>
+                  ))}
+                </ul>
+              ) : (
+                <span>-</span>
+              )}
             </Col>
           </Row>
 
@@ -245,25 +263,24 @@ const ProfileDetails = () => {
               <p className="fw-semibold mb-1">Frequently Asked Questions:</p>
               {frequently_asked_questions ? (
                 <ul>
-                  {(() => {
-                    // Split by '?', then reconstruct question/answer pairs
-                    const parts = frequently_asked_questions.split('?');
-                    const faqs = [];
-                    for (let i = 0; i < parts.length - 1; i++) {
-                      const question = parts[i].trim() + '?';
-                      // Answer is the start of the next part, up to the next question or end
-                      const answerMatch = parts[i + 1].match(/^(.*?)(?=[A-ZÀ-ÿ][^?]*\?|$)/s);
-                      const answer = answerMatch ? answerMatch[1].trim() : parts[i + 1].trim();
-                      faqs.push({ question, answer });
-                    }
-                    return faqs.map((faq, idx) => (
-                      <li key={idx}>
-                        <strong>Q:</strong> {faq.question}
-                        <br />
-                        <strong>A:</strong> {faq.answer}
-                      </li>
-                    ));
-                  })()}
+                  {frequently_asked_questions
+                    .split('\r\n')
+                    .filter((line) => line.trim() !== '')
+                    .map((line, idx) => {
+                      // Try to split into question/answer if possible
+                      const [question, ...answerParts] = line.split('?');
+                      if (answerParts.length > 0) {
+                        return (
+                          <li key={idx}>
+                            <strong>Q:</strong> {question.trim() + '?'}
+                            <br />
+                            <strong>A:</strong> {answerParts.join('?').trim()}
+                          </li>
+                        );
+                      }
+                      // If not a question/answer, just show the line
+                      return <li key={idx}>{line.trim()}</li>;
+                    })}
                 </ul>
               ) : (
                 <span>-</span>
