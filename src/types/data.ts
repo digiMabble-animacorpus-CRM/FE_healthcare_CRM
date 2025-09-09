@@ -1,11 +1,8 @@
 import { StaticImageData } from 'next/image';
-<<<<<<< HEAD
 import { BootstrapVariantType } from './component-props';
 import { file } from 'googleapis/build/src/apis/file';
-=======
 import { Key, ReactNode } from 'react';
-import { BootstrapVariantType } from './component-props';
->>>>>>> 1856ea7 (design)
+import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -338,36 +335,21 @@ export type TherapistType = {
   firstName: string;
   lastName: string;
   fullName: string;
-  photo: string;
-  jobTitle: string;
-  targetAudience?: string | null;
-  specialization1?: string | null;
-  specialization2?: string | null;
-  aboutMe: string;
-  about?: string | null;
-  consultations: string;
-  centerAddress: string;
-  centerEmail: string;
-  centerPhoneNumber: string;
+  photo?: string | null;
   contactEmail: string;
   contactPhone: string;
-  schedule: string;
-  spokenLanguages: string[]; // ✅ fixed
-  paymentMethods?: string;
-  degreesAndTraining: string;
-  specializations: string[];
-  website: string;
-  faq: string;
-  agendaLinks: string | null;
-  rosaLink?: string | null;
-  googleAgendaLink?: string | null;
-  appointmentStart?: string | null;
-  appointmentEnd?: string | null;
-  appointmentAlert?: string | null;
-  availability?: any | null;
-  tags?: any;
-  imageUrl?: string;
+  inamiNumber: string;
+  aboutMe?: string | null;
+  consultations?: string | null;
+  degreesAndTraining?: string | null;
+  departmentId: number | null;
+  specializationIds?: number[];
+  branches: BranchWithAvailability[];
+  languages: number[];
+  faq?: string | null;
+  paymentMethods: string[];
 };
+
 
 export type TherapistCreatePayload = {
   firstName: string;

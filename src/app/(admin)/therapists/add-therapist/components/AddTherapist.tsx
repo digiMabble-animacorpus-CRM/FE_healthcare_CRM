@@ -28,67 +28,57 @@ interface Language {
   name: string;
 }
 
-interface Availability {
+export interface Availability {
   day: string;
   startTime: string;
   endTime: string;
 }
 
-interface BranchWithAvailability {
+export interface BranchWithAvailability {
   branch_id: number;
   branch_name: string;
   availability: Availability[];
 }
 
+
 interface TherapistFormInputs {
   firstName: string;
   lastName: string;
   fullName: string;
-  photo: string;
+  photo?: string | null;
   contactEmail: string;
   contactPhone: string;
   inamiNumber: string;
-  aboutMe: string;
-  consultations: string;
-  degreesTraining: string;
-  departmentId: number | '';
-  specializationIds: number[];
+  aboutMe?: string | null;
+  consultations?: string | null;
+  degreesTraining?: string | null;
+  departmentId: number | null;
+  specializationIds?: number[];
   branches: BranchWithAvailability[];
   languages: number[];
-  faq: string;
+  faq?: string | null;
   paymentMethods: string[];
 }
 
-const schema = yup.object({
+const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
-  fullName: yup
-    .string()
-    .transform((_, obj) => `${obj.firstName || ''} ${obj.lastName || ''}`.trim())
-    .required('Full Name is required'),
+  fullName: yup.string(), // not required, auto-updated
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
-  contactPhone: yup
-    .string()
-    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
-    .required('Phone number is required'),
+  contactPhone: yup.string().matches(/^\+?[0-9]{7,15}$/, 'Invalid phone').required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
   consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
-  departmentId: yup.number().required('Department is required'),
-  specializationIds: yup
-    .array()
-    .of(yup.number().required())
-    .min(1, 'At least one specialization is required'),
-  branches: yup
-    .array()
+  departmentId: yup.number().nullable().typeError('Department is required').required('Department is required'),
+  specializationIds: yup.array().of(yup.number().required()).min(1, 'At least one specialization is required'),
+  branches: yup.array()
     .of(
       yup.object({
         branch_id: yup.number().required('Branch is required'),
-        branch_name: yup.string().nullable(),
-        availability: yup
-          .array()
+        branch_name: yup.string().nullable().defined(),
+        availability: yup.array()
           .of(
             yup.object({
               day: yup.string().required('Day is required'),
@@ -96,16 +86,16 @@ const schema = yup.object({
               endTime: yup.string().required('End time is required'),
             }),
           )
-          .min(1, 'At least one availability slot is required'),
+          .min(1, 'At least one availability slot is required')
+          .required('Availability is required'),
       }),
     )
-    .min(1, 'At least one branch is required'),
+    .min(1, 'At least one branch is required')
+    .required('Branches are required')
+    .defined(),
   languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
-  paymentMethods: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'At least one payment method is required'),
+  paymentMethods: yup.array().of(yup.string().required()).min(1, 'At least one payment method is required'),
 });
 
 import { useParams } from 'next/navigation';
@@ -130,34 +120,34 @@ const TherapistForm = () => {
       contactEmail: '',
       contactPhone: '',
       inamiNumber: '',
-      aboutMe: '',
-      consultations: '',
-      degreesTraining: '',
-      departmentId: '' as unknown as number, // Ensure departmentId is typed as number or ''
+      aboutMe: null,
+      consultations: null,
+      degreesTraining: null,
+      departmentId: null,
       specializationIds: [],
       branches: [],
       languages: [],
-      faq: '',
+      faq: null,
       paymentMethods: [],
     },
   });
 
-  const {
-    fields: branchFields,
-    append: appendBranch,
-    remove: removeBranch,
-  } = useFieldArray({ control, name: 'branches' });
+  const { fields: branchFields, append: appendBranch, remove: removeBranch } = useFieldArray({
+    control,
+    name: 'branches',
+  });
+
   const [branches, setBranches] = useState<Branch[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const params = useParams();
+
   const departmentId = watch('departmentId');
   const firstName = watch('firstName');
   const lastName = watch('lastName');
 
-  // Update fullName automatically
+  // Automatically update fullName
   useEffect(() => {
     setValue('fullName', `${firstName || ''} ${lastName || ''}`.trim());
   }, [firstName, lastName, setValue]);
@@ -168,7 +158,7 @@ const TherapistForm = () => {
     return [];
   };
 
-  // Load lists for selects
+  // Load dropdown data (branches, departments, languages)
   useEffect(() => {
     if (!token) return;
 
@@ -243,10 +233,6 @@ const TherapistForm = () => {
     } catch (err: any) {
       alert(err.message || 'Error saving therapist');
     }
-  } catch (err: any) {
-    console.error('Submit error:', err);
-    alert(err.message || 'Error saving therapist');
-  }
   };
 
   return (
@@ -376,7 +362,7 @@ const TherapistForm = () => {
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-    return (
+        return (
       <>
         {fields.map((field, k) => (
           <Row key={field.id} className="align-items-center">
@@ -447,8 +433,8 @@ const TherapistForm = () => {
   return (
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
-        <h5 className="mb-4">Add Therapist</h5>
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <h5 className="mb-4">{therapistId ? 'Edit Therapist' : 'Add Therapist'}</h5>
+        <Form onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}>
           <Row>
             <Col md={6}>
               <Form.Group controlId="firstName" className="mb-3">
@@ -751,7 +737,7 @@ const TherapistForm = () => {
           </Form.Group>
 
           <Button variant="primary" type="submit">
-            Save Therapist
+            {therapistId ? 'Update Therapist' : 'Save Therapist'}
           </Button>
         </Form>
       </CardBody>
