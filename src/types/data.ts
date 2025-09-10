@@ -1,6 +1,4 @@
 import { StaticImageData } from 'next/image';
-import { BootstrapVariantType } from './component-props';
-import { file } from 'googleapis/build/src/apis/file';
 import { Key, ReactNode } from 'react';
 import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
 export type IdType = string;
@@ -684,7 +682,6 @@ export type TeamMemberType = {
   status: "active" | "inactive" | string;
   created_by_role?: string;
 };
-
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency

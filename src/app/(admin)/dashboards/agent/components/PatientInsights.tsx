@@ -1,30 +1,52 @@
 'use client';
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import dynamic from 'next/dynamic';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  ProgressBar,
-  Row,
-} from 'react-bootstrap';
-
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
-
+import { Card, CardBody, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, ProgressBar, Row } from 'react-bootstrap';
+import { FaChild, FaFemale, FaMale } from 'react-icons/fa';
 
 type Demographics = {
   gender: { male: number; female: number; other: number };
   ageBuckets: { label: string; value: number }[];
   topCities: { city: string; count: number }[];
+};
+
+// New AgeDistributionWidget component
+const AgeDistributionWidget = ({ ageBuckets }: { ageBuckets: { label: string; value: number }[] }) => {
+  const total = ageBuckets.reduce((sum, a) => sum + a.value, 0);
+
+  const getIcon = (label: string) => {
+    if (label.toLowerCase().includes('kid')) return FaChild;
+    if (label.toLowerCase().includes('men')) return FaMale;
+    if (label.toLowerCase().includes('woman') || label.toLowerCase().includes('female')) return FaFemale;
+    return FaChild; // fallback
+  };
+
+  return (
+    <Row className="g-3">
+      {ageBuckets.map((bucket, idx) => {
+        const percent = Math.round((bucket.value / total) * 100);
+        const Icon = getIcon(bucket.label);
+        return (
+          <Col lg={4} key={bucket.label}>
+            <div className="border rounded p-3 d-flex align-items-center gap-3">
+              <div className="avatar-md flex-centered bg-light rounded-circle">
+                <Icon size={30} className="text-primary" />
+              </div>
+              <div className="flex-grow-1">
+                <p className="mb-1 text-muted">{bucket.label}</p>
+                <p className="fs-18 text-dark fw-medium">
+                  {bucket.value} <span className="text-muted fs-14">({percent}%)</span>
+                </p>
+                <div className="progress" style={{ height: 10 }}>
+                  <div className="progress-bar bg-warning" style={{ width: `${percent}%` }} />
+                </div>
+              </div>
+            </div>
+          </Col>
+        );
+      })}
+    </Row>
+  );
 };
 
 const PatientInsights = ({
@@ -36,29 +58,6 @@ const PatientInsights = ({
   newPatientsMonth: number;
   demographics: Demographics;
 }) => {
-  // Age chart setup
-  const ageChartOptions = {
-    chart: {
-      type: 'bar' as const,
-      toolbar: { show: false },
-    },
-    plotOptions: {
-      bar: { horizontal: true, borderRadius: 4 },
-    },
-    dataLabels: { enabled: false },
-    xaxis: {
-      categories: demographics.ageBuckets.map((a) => a.label),
-    },
-    colors: ['#0d6efd'],
-  };
-
-  const ageChartSeries = [
-    {
-      name: 'Patients',
-      data: demographics.ageBuckets.map((a) => a.value),
-    },
-  ];
-
   return (
     <Col xl={12} lg={12}>
       <Card>
@@ -114,7 +113,7 @@ const PatientInsights = ({
 
             <Col md={6}>
               <div className="p-2 border rounded bg-light-subtle">
-                <h6>Top Cities</h6>
+                <h6>Branch</h6>
                 {demographics.topCities.map((c, idx) => (
                   <div className="mb-2" key={idx}>
                     <div className="d-flex justify-content-between mb-1">
@@ -122,9 +121,7 @@ const PatientInsights = ({
                       <span>{c.count}</span>
                     </div>
                     <ProgressBar
-                      now={
-                        (c.count / Math.max(...demographics.topCities.map((t) => t.count))) * 100
-                      }
+                      now={(c.count / Math.max(...demographics.topCities.map((t) => t.count))) * 100}
                       variant="success"
                       className="progress-sm rounded"
                     />
@@ -134,15 +131,10 @@ const PatientInsights = ({
             </Col>
           </Row>
 
-          {/* Age Distribution Chart */}
+          {/* Age Distribution Widget */}
           <div className="p-2 border rounded bg-light-subtle">
             <h6>Age Distribution</h6>
-            <ReactApexChart
-              options={ageChartOptions}
-              series={ageChartSeries}
-              type="bar"
-              height={180}
-            />
+            <AgeDistributionWidget ageBuckets={demographics.ageBuckets} />
           </div>
         </CardBody>
       </Card>

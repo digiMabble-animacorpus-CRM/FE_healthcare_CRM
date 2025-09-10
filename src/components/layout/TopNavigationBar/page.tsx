@@ -1,11 +1,6 @@
+import { Container } from 'react-bootstrap';
 import LeftSideBarToggle from './components/LeftSideBarToggle';
 import ProfileDropdown from './components/ProfileDropdown';
-import ThemeCustomizerToggle from './components/ThemeCustomizerToggle';
-import Notifications from './components/Notifications';
-import ThemeModeToggle from './components/ThemeModeToggle';
-import MaximizeScreen from './components/MaximizeScreen';
-import { Container } from 'react-bootstrap';
-import Dropdownselector from './components/dropdownselector';
 
 const page = () => {
   return (
@@ -24,7 +19,7 @@ const page = () => {
               </form>
             </div>
             <div className="d-flex align-items-center gap-1">
-              <ThemeModeToggle />
+              {/*<ThemeModeToggle /> */}
 
               {/* <MaximizeScreen /> */}
 

@@ -34,7 +34,6 @@ const ProfileDropdown = () => {
         if ( res.data?.user?.team.full_name) {
           setFullName( res.data?.user?.team.full_name);
         }
-        // console.log('Full name:', res.data?.user?.team.full_name);
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -63,15 +62,15 @@ const ProfileDropdown = () => {
           Welcome {fullName}!
         </DropdownHeader>
         <DropdownItem as={Link} href="/profile/details">
-          <IconifyIcon icon="solar:calendar-broken" className="align-middle me-2 fs-18" />
+          <IconifyIcon icon="solar:user-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">My Profile</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/pages/pricing">
-          <IconifyIcon icon="solar:wallet-broken" className="align-middle me-2 fs-18" />
+          <IconifyIcon icon="solar:help-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">Help & Support</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/support/faqs">
-          <IconifyIcon icon="solar:help-broken" className="align-middle me-2 fs-18" />
+          <IconifyIcon icon="solar:lock-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">Privacy & Conditions</span>
         </DropdownItem>
         <div className="dropdown-divider my-1" />

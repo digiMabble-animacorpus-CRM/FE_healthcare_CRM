@@ -66,25 +66,6 @@ const BranchSummary = ({
                   <div className="text-muted">Appts (mo)</div>
                 </Col>
               </Row>
-              <div className="mt-3 d-flex justify-content-between align-items-center">
-                <div className="text-center">
-                  <div className="avatar-md bg-info bg-opacity-10 rounded flex-centered mb-1">
-                    <IconifyIcon
-                      icon="mdi:currency-eur"
-                      width={24}
-                      height={24}
-                      className="text-info"
-                    />
-                  </div>
-                  <div className="fw-semibold">€ {num(b.revenueMonth)}</div>
-                  <div className="text-muted">Revenue (mo)</div>
-                </div>
-                {onBranchClick && (
-                  <Button size="sm" variant="outline-primary" onClick={() => onBranchClick(b)}>
-                    View
-                  </Button>
-                )}
-              </div>
             </CardBody>
           </Card>
         </Col>

@@ -1,15 +1,14 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
+import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
-import { yupResolver } from '@hookform/resolvers/yup';
 
+import { API_BASE_PATH } from '@/context/constants';
 import { useNotificationContext } from '@/context/useNotificationContext';
 import useQueryParams from '@/hooks/useQueryParams';
-import { API_BASE_PATH } from '@/context/constants';
 import { encryptAES } from '@/utils/encryption';
 
 const useSignIn = () => {

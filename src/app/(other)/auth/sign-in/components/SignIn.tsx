@@ -1,15 +1,10 @@
 'use client';
-import logoDark from '@/assets/images/logo-light2.png';
-import LogoLight from '@/assets/images/logo-light2.png';
+import { default as logoDark, default as LogoLight } from '@/assets/images/logo-light2.png';
 import TextFormInput from '@/components/from/TextFormInput';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap';
-import { useForm } from 'react-hook-form';
-import * as yup from 'yup';
+import { Card, CardBody, Col, Container, Row } from 'react-bootstrap';
 import useSignIn from './useSignIn';
 
 const SignIn = () => {
@@ -19,15 +14,6 @@ const SignIn = () => {
       document.body.classList.remove('authentication-bg');
     };
   }, []);
-
-  // const messageSchema = yup.object({
-  //   email: yup.string().email().required('Please enter Email'),
-  //   password: yup.string().required('Please enter password'),
-  // })
-
-  // const { handleSubmit, control } = useForm({
-  //   resolver: yupResolver(messageSchema),
-  // })
 
   const { loading, login, control } = useSignIn();
   return (
