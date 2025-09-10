@@ -247,57 +247,85 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   const languageIdToName = (id: number): string => languages.find((l) => l.id === id)?.name || '';
 
   // Fetch therapist data for editing
-  useEffect(() => {
-    if (!therapistId) return;
+ useEffect(() => {
+  if (!therapistId) return;
 
-    const fetchTherapist = async () => {
-      try {
-        const res = await axios.get(`${API_BASE_PATH}/therapists/${therapistId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const data = res.data;
+  const fetchTherapist = async () => {
+    try {
+      const res = await axios.get(`${API_BASE_PATH}/therapists/${therapistId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = res.data;
 
-        const transformedData: TherapistFormInputs = {
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
-          fullName: `${data.firstName || ''} ${data.lastName || ''}`.trim(),
-          photo: data.photo || null,
-          contactEmail: data.contactEmail || '',
-          contactPhone: data.contactPhone || '',
-          inamiNumber: data.inamiNumber ? String(data.inamiNumber) : '',
-          aboutMe: data.aboutMe || null,
-          consultations: data.consultations || null,
-          degreesTraining: data.degreesTraining || null,
-          departmentId: data.departmentId || null,
-          specializationIds: data.specializations || [],
-          branches:
-            Array.isArray(data.branches) && Array.isArray(data.availability)
-              ? data.branches.map((branchId: number) => ({
-                  branch_id: branchId,
-                  branch_name: branches.find((b) => b.branch_id === branchId)?.name || '',
-                  availability:
-                    data.availability.filter(
-                      (av: any) => av.branchId === branchId || av.branch_id === branchId,
-                    ) || [],
-                }))
-              : [],
-          languages: Array.isArray(data.languages)
-            ? data.languages
-                .map((name: string) => languageNameToId(name))
-                .filter((id: number | undefined): id is number => id !== undefined)
-            : [],
-          faq: data.faq || null,
-          paymentMethods: data.paymentMethods || [],
-        };
+      // Map specialization objects or strings to number IDs - filter invalid values
+      const transformedSpecializations = Array.isArray(data.specializations)
+        ? data.specializations
+            .map((spec: any) => {
+              if (typeof spec === 'number') return spec;
+              if (spec && typeof spec === 'object' && 'id' in spec) return spec.id;
+              if (typeof spec === 'string') return parseInt(spec, 10);
+              return undefined;
+            })
+            .filter((id): id is number => typeof id === 'number' && !isNaN(id))
+        : [];
 
-        reset(transformedData);
-      } catch (error) {
-        console.error('Error loading therapist data:', error);
-      }
-    };
+      // Prepare branches with availability - if no availability, add empty slot to pass validation
+      const transformedBranches = Array.isArray(data.branches)
+        ? data.branches.map((branchId: number) => {
+            const avail = Array.isArray(data.availability)
+              ? data.availability.filter(
+                  (item: any) => item.branchId === branchId || item.branch_id === branchId
+                )
+              : [];
+            return {
+              branch_id: branchId,
+              branch_name: branches.find((b) => b.branch_id === branchId)?.name ?? '',
+              availability: avail.length > 0 ? avail : [{ day: '', startTime: '', endTime: '' }],
+            };
+          })
+        : [];
 
-    fetchTherapist();
-  }, [therapistId, reset, token, branches, languages]);
+      // Map languages strings to IDs or leave as is if numbers - filter invalid
+      const transformedLanguages = Array.isArray(data.languages)
+        ? data.languages
+            .map((lang: any) => {
+              if (typeof lang === 'number') return lang;
+              if (typeof lang === 'string') {
+                const found = languages.find((l) => l.name.toLowerCase() === lang.toLowerCase());
+                return found?.id;
+              }
+              return undefined;
+            })
+            .filter((id): id is number => typeof id === 'number' && !isNaN(id))
+        : [];
+
+      const transformedData = {
+        firstName: data.firstName ?? '',
+        lastName: data.lastName ?? '',
+        fullName: `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim(),
+        photo: data.photo ?? null,
+        contactEmail: data.contactEmail ?? '',
+        contactPhone: data.contactPhone ?? '',
+        inamiNumber: data.inamiNumber != null ? String(data.inamiNumber) : '',
+        aboutMe: data.aboutMe ?? null,
+        consultations: data.consultations ?? null,
+        degreesTraining: data.degreesTraining ?? null,
+        departmentId: data.departmentId ?? null,
+        specializationIds: transformedSpecializations,
+        branches: transformedBranches,
+        languages: transformedLanguages,
+        faq: data.faq ?? '',
+        paymentMethods: data.paymentMethods ?? [],
+      };
+
+      reset(transformedData);
+    } catch (error) {
+      console.error('Failed to fetch therapist:', error);
+    }
+  };
+
+  fetchTherapist();
+}, [therapistId, reset, token, branches, languages]);
 
   // Transform data before submit
   const transformPayload = (data: TherapistFormInputs) => ({
@@ -325,9 +353,10 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   });
 
   const onSubmit = async (data: TherapistFormInputs) => {
+    console.log('✅ onSubmit called with data:', data);
     try {
       const payload = transformPayload(data);
-
+      console.log('📦 Payload before sending:', payload);
       const url = therapistId
         ? `${API_BASE_PATH}/therapists/${therapistId}`
         : `${API_BASE_PATH}/therapists`;
