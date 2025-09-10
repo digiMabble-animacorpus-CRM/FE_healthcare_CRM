@@ -194,17 +194,33 @@ const ProfileDetails = () => {
           </Row>
 
           <Row className="my-4">
-            <Col lg={4}>
+            <Col lg={3}>
               <p className="fw-semibold mb-1">Languages Spoken:</p>
               <p>{languages_spoken.join(', ') || '-'}</p>
             </Col>
-            <Col lg={4}>
+            <Col lg={3}>
               <p className="fw-semibold mb-1">Payment Methods:</p>
               <p>{payment_methods.join(', ') || '-'}</p>
             </Col>
-            <Col lg={4}>
+            <Col lg={6}>
               <p className="fw-semibold mb-1">Schedule:</p>
-              <p>{schedule?.text || '-'}</p>
+              {schedule ? (
+                <div>
+                  {schedule.text && <p>{schedule.text}</p>}
+                  <ul style={{ paddingLeft: '1rem' }}>
+                    {Object.entries(schedule)
+                      .filter(([key]) => key !== 'text')
+                      .map(([day, timing], idx) => (
+                        <li key={idx}>
+                          <strong>{day.charAt(0).toUpperCase() + day.slice(1)}:</strong> {timing}
+                        </li>
+                      ))}
+                  </ul>
+                </div>
+              ) : (
+                <span>-</span>
+              )}
+              {/* <p>{schedule?.text || '-'}</p> */}
             </Col>
           </Row>
 
