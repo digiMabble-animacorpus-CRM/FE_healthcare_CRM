@@ -26,6 +26,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 
+
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
@@ -173,7 +174,7 @@ const TherapistsListPage = () => {
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Therapist List
+                All Therapist List  <small>({filteredTherapists.length} total)</small>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
@@ -227,7 +228,12 @@ const TherapistsListPage = () => {
                 <div className="text-center py-5">
                   <Spinner animation="border" />
                 </div>
-              ) : (
+              ) : filteredTherapists.length === 0 ? (
+                <div className="text-center py-4 text-muted">
+                  No therapist found
+                </div>
+              )
+              : (
                 <div className="table-responsive">
                   <table
                     className="table table-hover table-sm table-centered mb-0"
@@ -235,9 +241,8 @@ const TherapistsListPage = () => {
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 30 }}>
-                          <input type="checkbox" />
-                        </th>
+                      
+                         <th style={{ width: 50 }}>No</th>
                         <th>Profile Pic</th>
                         <th>Name</th>
                         <th>Email</th>
@@ -247,11 +252,9 @@ const TherapistsListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {currentData.map((item) => (
+                       {currentData.map((item, index) => (
                         <tr key={item.therapistId}>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
+                          <td>{(currentPage - 1) * PAGE_SIZE + index + 1}.</td>
                           <td>
                             {item.imageUrl &&
                             item.imageUrl !== 'null' &&
@@ -293,10 +296,12 @@ const TherapistsListPage = () => {
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
+                              
                               <Button
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => handleEditClick(item.therapistId)}
+                                
                               >
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
