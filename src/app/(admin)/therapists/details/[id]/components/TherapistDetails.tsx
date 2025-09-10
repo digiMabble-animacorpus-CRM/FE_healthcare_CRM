@@ -35,7 +35,7 @@ const TherapistDetails = ({ data }: TherapistDetailsProps) => {
               <Button
                 variant="secondary"
                 className="avatar-sm d-flex align-items-center justify-content-center fs-20"
-                onClick={() => handleEditClick(id)}
+                onClick={() => handleEditClick(data.therapistId!)}
               >
                 <span>
                   {' '}
@@ -140,7 +140,7 @@ const TherapistDetails = ({ data }: TherapistDetailsProps) => {
         </Row>
 
         {/* About Section */}
-        <div className="mb-3">
+        <div className="mt-4">
           <div className="d-flex justify-content-between mb-2">
             <h5>About</h5>
             <Button
