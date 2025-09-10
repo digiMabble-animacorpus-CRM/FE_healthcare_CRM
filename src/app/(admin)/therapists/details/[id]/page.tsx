@@ -8,6 +8,7 @@ import { useParams } from 'next/navigation';
 import TherapistDetails from './components/TherapistDetails';
 import { getTherapistById } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
+import { branches } from '@/assets/data/branchData';
 
 const TherapistDetailsPage = () => {
   const params = useParams();
@@ -28,24 +29,43 @@ const TherapistDetailsPage = () => {
       }
 
       const transformedData: TherapistType = {
-        therapistId: rawTherapist.therapistId ?? null,
-        firstName: rawTherapist.firstName || '',
-        lastName: rawTherapist.lastName || '',
-        fullName: `${rawTherapist.firstName || ''} ${rawTherapist.lastName || ''}`.trim(),
-        photo: rawTherapist.photo || null,
-        contactEmail: rawTherapist.contactEmail || '',
-        contactPhone: rawTherapist.contactPhone || '',
-        inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
-        aboutMe: rawTherapist.aboutMe || null,
-        consultations: rawTherapist.consultations || null,
-        degreesAndTraining: rawTherapist.degreesAndTraining || null,
-        departmentId: rawTherapist.departmentId ?? null,
-        specializationIds: rawTherapist.specializationIds || [],
-        branches: Array.isArray(rawTherapist.branches) ? rawTherapist.branches : [],
-        languages: Array.isArray(rawTherapist.languages) ? rawTherapist.languages : [],
-        faq: rawTherapist.faq || null,
-        paymentMethods: Array.isArray(rawTherapist.paymentMethods) ? rawTherapist.paymentMethods : [],
-      };
+  therapistId: rawTherapist.therapistId ?? null,
+  firstName: rawTherapist.firstName || '',
+  lastName: rawTherapist.lastName || '',
+  fullName: `${rawTherapist.firstName || ''} ${rawTherapist.lastName || ''}`.trim(),
+  photo: rawTherapist.photo || null,
+  contactEmail: rawTherapist.contactEmail || '',
+  contactPhone: rawTherapist.contactPhone || '',
+  inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
+  aboutMe: rawTherapist.aboutMe || null,
+  consultations: rawTherapist.consultations || null,
+  degreesAndTraining: rawTherapist.degreesAndTraining || null,
+  departmentId: rawTherapist.departmentId ?? null,
+  specializationIds: rawTherapist.specializationIds || [],
+
+  // 🔹 Branches with availability & branch name
+  branches:
+    Array.isArray(rawTherapist.branches) && Array.isArray(rawTherapist.availability)
+      ? rawTherapist.branches.map((branchId: number) => ({
+          branch_id: branchId,
+          branch_name:
+            branches.find((b) => b.branch_id === branchId)?.name || '',
+          availability:
+            rawTherapist.availability.filter(
+              (av: any) =>
+                av.branchId === branchId || av.branch_id === branchId
+            ) || [],
+        }))
+      : [],
+
+  languages: Array.isArray(rawTherapist.languages)
+    ? rawTherapist.languages
+    : [],
+  faq: rawTherapist.faq || null,
+  paymentMethods: Array.isArray(rawTherapist.paymentMethods)
+    ? rawTherapist.paymentMethods
+    : [],
+};
 
       setData(transformedData);
     } catch (error) {

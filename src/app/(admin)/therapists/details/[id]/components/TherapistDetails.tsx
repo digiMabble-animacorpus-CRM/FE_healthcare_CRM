@@ -1,8 +1,7 @@
 'use client';
 
-import Image from 'next/image';
 import React, { useState, useEffect } from 'react';
-import { Card, CardBody, Col, Row, Button, Badge, Collapse } from 'react-bootstrap';
+import { Card, CardBody, Row, Col, Button, Badge, Collapse } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { FaEnvelope, FaPhone, FaEdit } from 'react-icons/fa';
 import { useRouter } from 'next/navigation';
@@ -25,40 +24,60 @@ const TherapistDetails = ({ data }: TherapistDetailsProps) => {
   };
 
   return (
-    <div>
-      {/* Top Buttons */}
-      <div className="d-flex justify-content-between mb-3">
-        <Button variant="link" onClick={() => window.history.back()}>
-          <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back
-        </Button>
-        {/* You can add an appointment button if you have an agendaLink */}
-      </div>
+    <Card className="mb-4 shadow-lg">
+      <CardBody>
+        {/* Header */}
+        <div className="d-flex justify-content-between mb-3">
+          <Button variant="link" onClick={() => window.history.back()}>
+            <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back
+          </Button>
+         <div className="d-flex gap-1">
+              <Button
+                variant="secondary"
+                className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+                onClick={() => handleEditClick(id)}
+              >
+                <span>
+                  {' '}
+                  <IconifyIcon icon="ri:edit-fill" />
+                </span>
+              </Button>
+            </div>
+        </div>
 
-      {/* Profile */}
-      <Card className="mb-4 shadow-lg" style={{ backgroundColor: '#f8f9fa' }}>
-        <CardBody>
-          <Row className="align-items-center">
-            <Col lg={2} className="d-flex justify-content-center">
-              {data.photo ? (
-                <img
-                  src={data.photo}
-                  alt={`${data.firstName} ${data.lastName}`}
-                  className="rounded-circle object-cover"
-                  style={{ width: '140px', height: '140px' }}
-                />
-              ) : (
-                <div
-                  className="rounded-circle d-flex align-items-center justify-content-center"
-                  style={{
-                    width: '140px',
-                    height: '140px',
-                    backgroundColor: '#e7ddff',
-                    color: '#341539',
-                    fontSize: '52px',
-                    fontWeight: 'bold',
-                  }}
-                >
-                  {data.firstName[0]?.toUpperCase()}
+        {/* Profile Section */}
+        <Row className="align-items-center mb-4">
+          <Col md={2} className="text-center">
+            {data.photo && data.photo !== 'null' && data.photo.trim() !== '' ? (
+              <img
+                src={data.photo}
+                alt={`${data.firstName} ${data.lastName}`}
+                className="rounded-circle object-cover"
+                style={{ width: '120px', height: '120px', objectFit: 'cover' }}
+              />
+            ) : (
+              <div
+                className="rounded-circle d-flex align-items-center justify-content-center"
+                style={{
+                  width: '120px',
+                  height: '120px',
+                  backgroundColor: '#e7ddff',
+                  color: '#341539',
+                  fontSize: '42px',
+                  fontWeight: 'bold',
+                }}
+              >
+                {data.firstName?.[0]?.toUpperCase() || '?'}
+              </div>
+            )}
+          </Col>
+          <Col md={10}>
+            <h3 className="fw-bold mb-1">{data.firstName} {data.lastName}</h3>
+            <div className="d-flex gap-3 flex-wrap">
+              {data.contactEmail && (
+                <div className="d-flex align-items-center gap-2">
+                  <FaEnvelope className="text-primary" />
+                  <span>{data.contactEmail}</span>
                 </div>
               )}
             </Col>
@@ -92,12 +111,43 @@ const TherapistDetails = ({ data }: TherapistDetailsProps) => {
         </CardBody>
       </Card>
 
-      {/* About Section */}
-      <Card className="mb-4">
-        <CardBody>
+        {/* Grid Details */}
+        <Row className="mb-3">
+          <Col md={6}>
+            <strong>Inami Number :</strong> {data.inamiNumber || '-'}
+          </Col>
+          <Col md={6}>
+            <strong>Consultations :</strong> {data.consultations || '-'}
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col md={6}>
+            <strong>Department :</strong> {data.departmentId || '-'}
+          </Col>
+          <Col md={6}>
+            <strong>Languages :</strong>{' '}
+            {data.languages?.length > 0 ? data.languages.join(', ') : '-'}
+          </Col>
+        </Row>
+        <Row className="mb-3">
+          <Col md={6}>
+            <strong>Payment Methods :</strong>{' '}
+            {data.paymentMethods?.length > 0 ? data.paymentMethods.join(', ') : '-'}
+          </Col>
+          <Col md={6}>
+            <strong>FAQ :</strong> {data.faq || '-'}
+          </Col>
+        </Row>
+
+        {/* About Section */}
+        <div className="mb-3">
           <div className="d-flex justify-content-between mb-2">
-            <h4>About</h4>
-            <Button variant="link" size="sm" onClick={() => setAboutOpen(!aboutOpen)}>
+            <h5>About</h5>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => setAboutOpen(!aboutOpen)}
+            >
               {aboutOpen ? 'Hide' : 'Show'}
             </Button>
           </div>
@@ -106,91 +156,55 @@ const TherapistDetails = ({ data }: TherapistDetailsProps) => {
               <p>{data.aboutMe || '-'}</p>
             </div>
           </Collapse>
-        </CardBody>
-      </Card>
+        </div>
 
-      {/* Education & Training */}
-      {data.degreesAndTraining && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>Degrees & Training</h4>
+        {/* Degrees & Training */}
+        {data.degreesAndTraining && (
+          <div className="mt-4">
+            <h5>Degrees & Training</h5>
             <p>{data.degreesAndTraining}</p>
-          </CardBody>
-        </Card>
-      )}
+          </div>
+        )}
 
-      {/* Specializations */}
-      {data.specializationIds && data.specializationIds.length > 0 && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>Specializations</h4>
+        {/* Specializations */}
+        {data.specializationIds && data.specializationIds.length > 0 && (
+          <div className="mt-4">
+            <h5>Specializations</h5>
             <div className="d-flex gap-2 flex-wrap">
               {data.specializationIds.map((specId) => (
                 <Badge key={specId} bg="primary" className="fs-12">
-                  {/* Show specialization name if you have mapping, else show ID */}
                   {specId}
                 </Badge>
               ))}
             </div>
-          </CardBody>
-        </Card>
-      )}
+          </div>
+        )}
 
-      {/* Branches & Availability */}
-      {data.branches.length > 0 && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>Branches & Availability</h4>
+        {/* Branches & Availability */}
+        {data.branches && data.branches.length > 0 && (
+          <div className="mt-4">
+            <h5>Branches & Availability</h5>
             {data.branches.map((branch) => (
-              <div key={branch.branch_id} className="mb-3 border p-3 rounded">
-                <h5>{branch.branch_name}</h5>
-                {Array.isArray(branch.availability) && branch.availability.length > 0 ? (
-                  <ul>
-                    {branch.availability.map(({ day, startTime, endTime }, idx) => (
+              <div key={branch.branch_id} className="mb-3 p-3 border rounded bg-light">
+                <h6>{branch.branch_name}</h6>
+                {Array.isArray(branch.availability) &&
+                branch.availability.length > 0 ? (
+                  <ul className="mb-0">
+                    {branch.availability.map((av: any, idx: number) => (
                       <li key={idx}>
-                        {day}: {startTime} - {endTime}
+                        {av.day || av.date}: {av.startTime} - {av.endTime}
                       </li>
                     ))}
                   </ul>
                 ) : (
-                  <p>No available data</p>
+                  <p className="text-muted mb-0">No available data</p>
                 )}
               </div>
             ))}
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Languages */}
-      {data.languages && data.languages.length > 0 && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>Languages</h4>
-            <div>{data.languages.join(', ')}</div>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* Payment Methods */}
-      {data.paymentMethods && data.paymentMethods.length > 0 && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>Payment Methods</h4>
-            <div>{data.paymentMethods.join(', ')}</div>
-          </CardBody>
-        </Card>
-      )}
-
-      {/* FAQ */}
-      {data.faq && (
-        <Card className="mb-4">
-          <CardBody>
-            <h4>FAQ</h4>
-            <p>{data.faq}</p>
-          </CardBody>
-        </Card>
-      )}
-    </div>
+          </div>
+        )}
+      </CardBody>
+    </Card>
   );
 };
 

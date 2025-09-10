@@ -65,19 +65,31 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   fullName: yup.string(),
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
-  contactPhone: yup.string().matches(/^\+?[0-9]{7,15}$/, 'Invalid phone').required('Phone number is required'),
+  contactPhone: yup
+    .string()
+    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
+    .required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
   consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
-  departmentId: yup.number().nullable().typeError('Department is required').required('Department is required'),
-  specializationIds: yup.array().of(yup.number().required()).min(1, 'At least one specialization is required'),
-  branches: yup.array()
+  departmentId: yup
+    .number()
+    .nullable()
+    .typeError('Department is required')
+    .required('Department is required'),
+  specializationIds: yup
+    .array()
+    .of(yup.number().required())
+    .min(1, 'At least one specialization is required'),
+  branches: yup
+    .array()
     .of(
       yup.object({
         branch_id: yup.number().required('Branch is required'),
         branch_name: yup.string().nullable().defined(),
-        availability: yup.array()
+        availability: yup
+          .array()
           .of(
             yup.object({
               day: yup.string().required('Day is required'),
@@ -94,7 +106,10 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     .defined(),
   languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
-  paymentMethods: yup.array().of(yup.string().required()).min(1, 'At least one payment method is required'),
+  paymentMethods: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'At least one payment method is required'),
 });
 
 import { useParams } from 'next/navigation';
@@ -131,7 +146,11 @@ const TherapistForm = () => {
     },
   });
 
-  const { fields: branchFields, append: appendBranch, remove: removeBranch } = useFieldArray({
+  const {
+    fields: branchFields,
+    append: appendBranch,
+    remove: removeBranch,
+  } = useFieldArray({
     control,
     name: 'branches',
   });
