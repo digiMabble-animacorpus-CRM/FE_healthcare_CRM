@@ -346,13 +346,14 @@ function toUpdatePayload(values: AddTeamFormValues, source: any): any {
     ...payload,
     branches: branchesAsNumbers,
     selected_branch: values.primary_branch_id,
-    permissions: Object.keys(values.permissions || {}).flatMap((module) =>
-      Object.entries(values.permissions[module] || {}).map(([action, enabled]) => ({
-        action,
-        resource: module,
-        enabled,
-      }))
-    ),
+    // permissions: Object.keys(values.permissions || {}).flatMap((module) =>
+    //   Object.entries(values.permissions[module] || {}).map(([action, enabled]) => ({
+    //     action,
+    //     resource: module,
+    //     enabled,
+    //   }))
+    // ),
+    permissions: values.permissions,
     created_by_role: source.role === 'super_admin' ? 'super_admin' : 'admin',
   };
 }
