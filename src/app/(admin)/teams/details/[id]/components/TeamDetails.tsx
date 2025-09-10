@@ -40,7 +40,6 @@ type TeamDetailsCardProps = {
   status?: string;
   branches: number[];
   primary_branch_id: number;
-
 };
 
 const TeamDetails = ({
@@ -70,7 +69,7 @@ const TeamDetails = ({
   photo,
   role,
   status,
-  branches,
+  branches = [],
   primary_branch_id,
 }: TeamDetailsCardProps) => {
   const [aboutOpen, setAboutOpen] = useState(true);
@@ -89,10 +88,10 @@ const TeamDetails = ({
           .map((line) => line.trim())
           .filter((line) => line.includes(':'))
           .reduce((acc, line) => {
-              const [day, time] = line.split(':');
-              acc[day.trim()] = time.trim();
-              return acc;
-            }, {} as Record<string, string>)
+            const [day, time] = line.split(':');
+            acc[day.trim()] = time.trim();
+            return acc;
+          }, {} as Record<string, string>)
       : (schedule as Record<string, string>) || {};
 
   // Convert frequently asked questions from object to array if needed
@@ -135,10 +134,19 @@ const TeamDetails = ({
               <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
                 {full_name}
               </h2>
-              <p className="text-muted mb-1">{job_1 || '-'} {job_2 ? `/ ${job_2}` : ''} {job_3 ? `/ ${job_3}` : ''} {job_4 ? `/ ${job_4}` : ''}</p>
-              <p className="mb-2"><strong>Primary Specialization:</strong> {specialization_1 || '-'}</p>
-              <p className="mb-2"><strong>Role:</strong> {role || '-'}</p>
-              <p className="mb-2"><strong>Status:</strong> {status || '-'}</p>
+              <p className="text-muted mb-1">
+                {job_1 || '-'} {job_2 ? `/ ${job_2}` : ''} {job_3 ? `/ ${job_3}` : ''}{' '}
+                {job_4 ? `/ ${job_4}` : ''}
+              </p>
+              <p className="mb-2">
+                <strong>Primary Specialization:</strong> {specialization_1 || '-'}
+              </p>
+              <p className="mb-2">
+                <strong>Role:</strong> {role || '-'}
+              </p>
+              <p className="mb-2">
+                <strong>Status:</strong> {status || '-'}
+              </p>
               <div className="d-flex flex-column gap-2">
                 {contact_email && (
                   <div className="d-flex align-items-center gap-2">
@@ -211,6 +219,7 @@ const TeamDetails = ({
         </Card>
       )}
 
+      {/* Branches */}
       <Card className="mb-4">
         <CardBody>
           <h4>Branches</h4>
@@ -227,15 +236,12 @@ const TeamDetails = ({
                 >
                   {branch?.name || branchId}
                   {isPrimary ? ' (Primary)' : ''}
-    </Badge>
-  );
-})}
-
+                </Badge>
+              );
+            })}
           </div>
         </CardBody>
       </Card>
-
-
 
       {/* Languages Spoken */}
       {languages_spoken.length > 0 && (

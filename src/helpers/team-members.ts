@@ -151,18 +151,14 @@ export const updateTeamMember = async (
       selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
-    // Send plain ID and payload without encryption
-    const response = await fetch(
-      `${API_BASE_PATH}/team-members/${encodeURIComponent(String(id))}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(safePayload), // send plain JSON payload
+    const response = await fetch(`${API_BASE_PATH}/team-members/${encodeURIComponent(String(id))}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify(safePayload), // sending plain JSON without encryption
+    });
 
     const result = await response.json();
 
