@@ -289,6 +289,7 @@ const TherapistForm = () => {
 
   // ✅ Submit Handler
   const onSubmit = async (data: TherapistFormInputs) => {
+    console.log('✅ onSubmit called with data:', data);
     try {
       const res = await fetch(`${API_BASE_PATH}/therapists`, {
         method: 'POST',
