@@ -165,6 +165,7 @@ export interface AppointmentType {
 }
 
 export type BranchType = {
+  branch_id: number;
   _id: string;
 
   name: string;

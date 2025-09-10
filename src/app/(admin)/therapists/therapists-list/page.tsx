@@ -247,7 +247,7 @@ const TherapistsListPage = () => {
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Job Title</th>
+                        <th>Department</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -286,7 +286,7 @@ const TherapistsListPage = () => {
                           </td>
                           <td>{item.contactEmail}</td>
                           <td>{item.contactPhone}</td>
-                          <td>{item.jobTitle || '-'}</td>
+                          <td>{item. departmentId}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button

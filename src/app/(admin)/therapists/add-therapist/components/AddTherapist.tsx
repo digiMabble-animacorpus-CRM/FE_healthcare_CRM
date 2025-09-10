@@ -70,19 +70,31 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   fullName: yup.string(),
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
-  contactPhone: yup.string().matches(/^\+?[0-9]{7,15}$/, 'Invalid phone').required('Phone number is required'),
+  contactPhone: yup
+    .string()
+    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
+    .required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
   consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
-  departmentId: yup.number().nullable().typeError('Department is required').required('Department is required'),
-  specializationIds: yup.array().of(yup.number().required()).min(1, 'At least one specialization is required'),
-  branches: yup.array()
+  departmentId: yup
+    .number()
+    .nullable()
+    .typeError('Department is required')
+    .required('Department is required'),
+  specializationIds: yup
+    .array()
+    .of(yup.number().required())
+    .min(1, 'At least one specialization is required'),
+  branches: yup
+    .array()
     .of(
       yup.object({
         branch_id: yup.number().required('Branch is required'),
         branch_name: yup.string().nullable().defined(),
-        availability: yup.array()
+        availability: yup
+          .array()
           .of(
             yup.object({
               day: yup.string().required('Day is required'),
@@ -99,7 +111,10 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     .defined(),
   languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
-  paymentMethods: yup.array().of(yup.string().required()).min(1, 'At least one payment method is required'),
+  paymentMethods: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'At least one payment method is required'),
 });
 
 const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
@@ -133,7 +148,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     },
   });
 
-  const { fields: branchFields, append: appendBranch, remove: removeBranch } = useFieldArray({
+  const {
+    fields: branchFields,
+    append: appendBranch,
+    remove: removeBranch,
+  } = useFieldArray({
     control,
     name: 'branches',
   });
@@ -223,7 +242,8 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   }, [departmentId, token, setValue]);
 
   // Map language names <-> IDs
-  const languageNameToId = (name: string): number | undefined => languages.find((l) => l.name === name)?.id;
+  const languageNameToId = (name: string): number | undefined =>
+    languages.find((l) => l.name === name)?.id;
   const languageIdToName = (id: number): string => languages.find((l) => l.id === id)?.name || '';
 
   // Fetch therapist data for editing
@@ -255,7 +275,10 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               ? data.branches.map((branchId: number) => ({
                   branch_id: branchId,
                   branch_name: branches.find((b) => b.branch_id === branchId)?.name || '',
-                  availability: data.availability.filter((av: any) => av.branchId === branchId || av.branch_id === branchId) || [],
+                  availability:
+                    data.availability.filter(
+                      (av: any) => av.branchId === branchId || av.branch_id === branchId,
+                    ) || [],
                 }))
               : [],
           languages: Array.isArray(data.languages)
@@ -288,9 +311,14 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     consultations: data.consultations,
     degreesTraining: data.degreesTraining,
     departmentId: data.departmentId,
-    specializations: data.specializationIds,
+    specializations: data.specializationIds?.map((id) => id),
     branches: data.branches.map((b) => b.branch_id),
-    availability: data.branches.flatMap((b) => b.availability),
+    availability: data.branches.flatMap((b) =>
+      b.availability.map((av) => ({
+        ...av,
+        branchId: b.branch_id,
+      })),
+    ),
     languages: data.languages.map((id) => languageIdToName(id)).filter((n) => n),
     faq: data.faq,
     paymentMethods: data.paymentMethods,
@@ -300,7 +328,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     try {
       const payload = transformPayload(data);
 
-      const url = therapistId ? `${API_BASE_PATH}/therapists/${therapistId}` : `${API_BASE_PATH}/therapists`;
+      const url = therapistId
+        ? `${API_BASE_PATH}/therapists/${therapistId}`
+        : `${API_BASE_PATH}/therapists`;
       const method = therapistId ? 'PATCH' : 'POST';
 
       const res = await fetch(url, {
