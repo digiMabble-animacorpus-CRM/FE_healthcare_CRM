@@ -1,10 +1,13 @@
 'use client';
 
-import { getTeamMemberById } from '@/helpers/team-members';
-import type { TeamMemberType } from '@/types/data';
-import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useRouter, useParams } from 'next/navigation';
+import TherapistDetails from './components/TeamDetails';
+import { getTherapistById } from '@/helpers/therapist';
+import type { TeamMemberType, TherapistType } from '@/types/data';
+import { getTeamMemberById } from '@/helpers/team-members';
 import TeamDetails from './components/TeamDetails';
+import { paymentsresellersubscription } from 'googleapis/build/src/apis/paymentsresellersubscription';
 
 const TeamDetailsPage = () => {
   const { id } = useParams();
@@ -53,7 +56,7 @@ const TeamDetailsPage = () => {
       contact_email={data.contact_email}
       contact_phone={data.contact_phone}
       schedule={data.schedule}
-      about={data?.about}
+      about={data.about}
       languages_spoken={data.languages_spoken}
       payment_methods={data.payment_methods}
       diplomas_and_training={data.diplomas_and_training}
