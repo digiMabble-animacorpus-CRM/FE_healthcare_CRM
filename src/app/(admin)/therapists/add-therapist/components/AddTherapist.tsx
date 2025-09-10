@@ -40,7 +40,6 @@ export interface BranchWithAvailability {
   availability: Availability[];
 }
 
-
 interface TherapistFormInputs {
   firstName: string;
   lastName: string;
@@ -63,7 +62,7 @@ interface TherapistFormInputs {
 const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
-  fullName: yup.string(), // not required, auto-updated
+  fullName: yup.string(),
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
   contactPhone: yup.string().matches(/^\+?[0-9]{7,15}$/, 'Invalid phone').required('Phone number is required'),
@@ -142,6 +141,7 @@ const TherapistForm = () => {
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const router = useRouter();
 
   const departmentId = watch('departmentId');
   const firstName = watch('firstName');
@@ -362,12 +362,15 @@ const TherapistForm = () => {
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
-        return (
+    return (
       <>
         {fields.map((field, k) => (
           <Row key={field.id} className="align-items-center">
             <Col md={4}>
-              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.day`} className="mb-3">
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.day`}
+                className="mb-3"
+              >
                 <Form.Label>Day</Form.Label>
                 <Form.Select
                   {...register(`branches.${nestIndex}.availability.${k}.day` as const)}
@@ -386,7 +389,10 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.startTime`} className="mb-3">
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.startTime`}
+                className="mb-3"
+              >
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -399,7 +405,10 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group controlId={`branches.${nestIndex}.availability.${k}.endTime`} className="mb-3">
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.endTime`}
+                className="mb-3"
+              >
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -412,7 +421,12 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
             <Col md={2}>
-              <Button type="button" variant="danger" onClick={() => remove(k)} style={{ marginTop: '1.7rem' }}>
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => remove(k)}
+                style={{ marginTop: '1.7rem' }}
+              >
                 Remove
               </Button>
             </Col>
@@ -434,7 +448,9 @@ const TherapistForm = () => {
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
         <h5 className="mb-4">{therapistId ? 'Edit Therapist' : 'Add Therapist'}</h5>
-        <Form onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}>
+        <Form
+          onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}
+        >
           <Row>
             <Col md={6}>
               <Form.Group controlId="firstName" className="mb-3">
@@ -445,7 +461,9 @@ const TherapistForm = () => {
                   placeholder="Enter First Name"
                   isInvalid={!!errors.firstName}
                 />
-                <Form.Control.Feedback type="invalid">{errors.firstName?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.firstName?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -457,7 +475,9 @@ const TherapistForm = () => {
                   placeholder="Enter Last Name"
                   isInvalid={!!errors.lastName}
                 />
-                <Form.Control.Feedback type="invalid">{errors.lastName?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.lastName?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -466,7 +486,12 @@ const TherapistForm = () => {
             <Col md={6}>
               <Form.Group controlId="fullName" className="mb-3">
                 <Form.Label>Full Name</Form.Label>
-                <Form.Control type="text" placeholder="Full Name" {...register('fullName')} readOnly />
+                <Form.Control
+                  type="text"
+                  placeholder="Full Name"
+                  {...register('fullName')}
+                  readOnly
+                />
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -478,7 +503,9 @@ const TherapistForm = () => {
                   {...register('photo')}
                   isInvalid={!!errors.photo}
                 />
-                <Form.Control.Feedback type="invalid">{errors.photo?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.photo?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -493,7 +520,9 @@ const TherapistForm = () => {
                   placeholder="Enter Email"
                   isInvalid={!!errors.contactEmail}
                 />
-                <Form.Control.Feedback type="invalid">{errors.contactEmail?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactEmail?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -505,7 +534,9 @@ const TherapistForm = () => {
                   placeholder="Enter Phone Number"
                   isInvalid={!!errors.contactPhone}
                 />
-                <Form.Control.Feedback type="invalid">{errors.contactPhone?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactPhone?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -520,7 +551,9 @@ const TherapistForm = () => {
                   placeholder="Enter INAMI Number"
                   isInvalid={!!errors.inamiNumber}
                 />
-                <Form.Control.Feedback type="invalid">{errors.inamiNumber?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.inamiNumber?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -533,7 +566,9 @@ const TherapistForm = () => {
                   rows={3}
                   isInvalid={!!errors.aboutMe}
                 />
-                <Form.Control.Feedback type="invalid">{errors.aboutMe?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.aboutMe?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -549,7 +584,9 @@ const TherapistForm = () => {
                   rows={3}
                   isInvalid={!!errors.degreesTraining}
                 />
-                <Form.Control.Feedback type="invalid">{errors.degreesTraining?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.degreesTraining?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -562,7 +599,9 @@ const TherapistForm = () => {
                   rows={3}
                   isInvalid={!!errors.consultations}
                 />
-                <Form.Control.Feedback type="invalid">{errors.consultations?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.consultations?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -579,7 +618,9 @@ const TherapistForm = () => {
                     </option>
                   ))}
                 </Form.Select>
-                <Form.Control.Feedback type="invalid">{errors.departmentId?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.departmentId?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
@@ -608,7 +649,9 @@ const TherapistForm = () => {
                   ))}
                 </div>
                 {errors.specializationIds && (
-                  <Form.Text className="text-danger">{errors.specializationIds.message as string}</Form.Text>
+                  <Form.Text className="text-danger">
+                    {errors.specializationIds.message as string}
+                  </Form.Text>
                 )}
               </Form.Group>
             </Col>
@@ -638,7 +681,12 @@ const TherapistForm = () => {
                   </Form.Group>
                 </Col>
                 <Col md={4}>
-                  <Button type="button" variant="danger" className="mt-4" onClick={() => removeBranch(index)}>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    className="mt-4"
+                    onClick={() => removeBranch(index)}
+                  >
                     Remove Branch
                   </Button>
                 </Col>
@@ -685,7 +733,9 @@ const TherapistForm = () => {
                   ))}
                 </div>
                 {errors.languages && (
-                  <Form.Text className="text-danger">{errors.languages.message as string}</Form.Text>
+                  <Form.Text className="text-danger">
+                    {errors.languages.message as string}
+                  </Form.Text>
                 )}
               </Form.Group>
             </Col>
@@ -719,7 +769,9 @@ const TherapistForm = () => {
                     />
                   );
                 })}
-                {errors.paymentMethods && <div className="text-danger">{errors.paymentMethods.message}</div>}
+                {errors.paymentMethods && (
+                  <div className="text-danger">{errors.paymentMethods.message}</div>
+                )}
               </Form.Group>
             </Col>
           </Row>
