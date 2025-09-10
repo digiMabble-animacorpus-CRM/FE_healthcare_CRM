@@ -273,38 +273,31 @@ const ProfileDetails = () => {
               )}
             </Col>
           </Row>
-
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Frequently Asked Questions:</p>
               {frequently_asked_questions ? (
-                <ul style={{ paddingLeft: '0', listStyle: 'none' }}>
-                  {frequently_asked_questions
-                    .split('\r\n')
-                    .filter((line) => line.trim() !== '')
-                    .map((line, idx) => {
-                      const [question, ...answerParts] = line.split('?');
-                      const answer = answerParts.join('?').trim();
-                      if (answer) {
-                        return (
-                          <li
-                            key={idx}
-                            style={{
-                              marginBottom: '1rem',
-                              background: '#f8f9fa',
-                              padding: '1rem',
-                              borderRadius: '8px',
-                            }}
-                          >
-                            <strong>Ques:</strong> {question.trim() + '?'}
-                            <br />
-                            <strong>Ans:</strong> {answer}
-                          </li>
-                        );
-                      }
-                      return <li key={idx}>{line.trim()}</li>;
-                    })}
-                </ul>
+                <ol style={{ paddingLeft: '1.2rem' }}>
+                  {(() => {
+                    const lines = frequently_asked_questions
+                      .split('\r\n')
+                      .filter((line) => line.trim() !== '');
+                    const items: { question: string; answer: string }[] = [];
+                    for (let i = 0; i < lines.length; i += 2) {
+                      const question = lines[i] || '';
+                      const answer = lines[i + 1] || '';
+                      items.push({ question, answer });
+                    }
+                    return items.map((item, idx) => (
+                      <li key={idx} style={{ marginBottom: '1rem' }}>
+                        <div>
+                          <strong>{item.question.trim()}</strong>
+                        </div>
+                        <div>{item.answer.trim()}</div>
+                      </li>
+                    ));
+                  })()}
+                </ol>
               ) : (
                 <span>-</span>
               )}
