@@ -49,7 +49,6 @@ interface TherapistFormInputs {
   contactPhone: string;
   inamiNumber: string;
   aboutMe?: string | null;
-  consultations?: string | null;
   degreesTraining?: string | null;
   departmentId: number | null;
   specializationIds?: number[];
@@ -71,7 +70,6 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     .required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
-  consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
   departmentId: yup
     .number()
@@ -135,7 +133,6 @@ const TherapistForm = () => {
       contactPhone: '',
       inamiNumber: '',
       aboutMe: null,
-      consultations: null,
       degreesTraining: null,
       departmentId: null,
       specializationIds: [],
@@ -576,25 +573,8 @@ const TherapistForm = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col md={6}>
-              <Form.Group controlId="aboutMe" className="mb-3">
-                <Form.Label>About Me</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  {...register('aboutMe')}
-                  placeholder="Enter Description"
-                  rows={3}
-                  isInvalid={!!errors.aboutMe}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.aboutMe?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={6}>
+            
+             <Col md={6}>
               <Form.Group controlId="degreesTraining" className="mb-3">
                 <Form.Label>Degrees & Training</Form.Label>
                 <Form.Control
@@ -609,22 +589,26 @@ const TherapistForm = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col md={6}>
-              <Form.Group controlId="consultations" className="mb-3">
-                <Form.Label>Consultations</Form.Label>
+          </Row>
+
+          
+            
+              <Form.Group controlId="aboutMe" className="mb-3">
+                <Form.Label>About Me</Form.Label>
                 <Form.Control
                   as="textarea"
-                  {...register('consultations')}
-                  placeholder="Enter Consultations Details"
                   rows={3}
-                  isInvalid={!!errors.consultations}
+                  {...register('aboutMe')}
+                  placeholder="Enter Description"
+                  isInvalid={!!errors.aboutMe}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.consultations?.message}
+                  {errors.aboutMe?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Col>
-          </Row>
+            
+           
+          
 
           <Row>
             <Col md={6}>
