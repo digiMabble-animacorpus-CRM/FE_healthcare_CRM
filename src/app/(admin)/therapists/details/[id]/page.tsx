@@ -38,7 +38,6 @@ const TherapistDetailsPage = () => {
   contactPhone: rawTherapist.contactPhone || '',
   inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
   aboutMe: rawTherapist.aboutMe || null,
-  consultations: rawTherapist.consultations || null,
   degreesAndTraining: rawTherapist.degreesAndTraining || null,
   departmentId: rawTherapist.departmentId ?? null,
   specializationIds: rawTherapist.specializationIds || [],

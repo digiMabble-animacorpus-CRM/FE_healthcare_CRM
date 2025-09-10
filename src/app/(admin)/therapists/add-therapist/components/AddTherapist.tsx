@@ -54,7 +54,6 @@ interface TherapistFormInputs {
   contactPhone: string;
   inamiNumber: string;
   aboutMe?: string | null;
-  consultations?: string | null;
   degreesTraining?: string | null;
   departmentId: number | null;
   specializationIds?: number[];
@@ -76,7 +75,6 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     .required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
-  consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
   departmentId: yup
     .number()
@@ -137,7 +135,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       contactPhone: '',
       inamiNumber: '',
       aboutMe: null,
-      consultations: null,
       degreesTraining: null,
       departmentId: null,
       specializationIds: [],
@@ -266,7 +263,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               if (typeof spec === 'string') return parseInt(spec, 10);
               return undefined;
             })
-            .filter((id): id is number => typeof id === 'number' && !isNaN(id))
+            .filter((id: number): id is number => typeof id === 'number' && !isNaN(id))
         : [];
 
       // Prepare branches with availability - if no availability, add empty slot to pass validation
@@ -296,7 +293,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               }
               return undefined;
             })
-            .filter((id): id is number => typeof id === 'number' && !isNaN(id))
+            .filter((id: number): id is number => typeof id === 'number' && !isNaN(id))
         : [];
 
       const transformedData = {
@@ -308,7 +305,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         contactPhone: data.contactPhone ?? '',
         inamiNumber: data.inamiNumber != null ? String(data.inamiNumber) : '',
         aboutMe: data.aboutMe ?? null,
-        consultations: data.consultations ?? null,
         degreesTraining: data.degreesTraining ?? null,
         departmentId: data.departmentId ?? null,
         specializationIds: transformedSpecializations,
@@ -336,7 +332,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     contactPhone: data.contactPhone,
     inamiNumber: Number(data.inamiNumber),
     aboutMe: data.aboutMe,
-    consultations: data.consultations,
     degreesTraining: data.degreesTraining,
     departmentId: data.departmentId,
     specializations: data.specializationIds?.map((id) => id),
@@ -582,25 +577,8 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col md={6}>
-              <Form.Group controlId="aboutMe" className="mb-3">
-                <Form.Label>About Me</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  {...register('aboutMe')}
-                  placeholder="Enter Description"
-                  rows={3}
-                  isInvalid={!!errors.aboutMe}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.aboutMe?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={6}>
+            
+             <Col md={6}>
               <Form.Group controlId="degreesTraining" className="mb-3">
                 <Form.Label>Degrees & Training</Form.Label>
                 <Form.Control
@@ -615,22 +593,26 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col md={6}>
-              <Form.Group controlId="consultations" className="mb-3">
-                <Form.Label>Consultations</Form.Label>
+          </Row>
+
+          
+            
+              <Form.Group controlId="aboutMe" className="mb-3">
+                <Form.Label>About Me</Form.Label>
                 <Form.Control
                   as="textarea"
-                  {...register('consultations')}
-                  placeholder="Enter Consultations Details"
                   rows={3}
-                  isInvalid={!!errors.consultations}
+                  {...register('aboutMe')}
+                  placeholder="Enter Description"
+                  isInvalid={!!errors.aboutMe}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.consultations?.message}
+                  {errors.aboutMe?.message}
                 </Form.Control.Feedback>
               </Form.Group>
-            </Col>
-          </Row>
+            
+           
+          
 
           <Row>
             <Col md={6}>

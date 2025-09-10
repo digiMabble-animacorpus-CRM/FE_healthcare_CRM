@@ -95,9 +95,6 @@ const TherapistDetails = ({ data }: TherapistDetailsProps) => {
           <Col md={6}>
             <strong>Inami Number :</strong> {data.inamiNumber || '-'}
           </Col>
-          <Col md={6}>
-            <strong>Consultations :</strong> {data.consultations || '-'}
-          </Col>
         </Row>
         <Row className="mb-3">
           <Col md={6}>
