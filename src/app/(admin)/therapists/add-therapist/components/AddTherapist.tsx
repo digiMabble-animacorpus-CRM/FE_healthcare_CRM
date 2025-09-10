@@ -64,7 +64,10 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   fullName: yup.string(),
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
-  contactPhone: yup.string().matches(/^\+?[0-9]{7,15}$/, 'Invalid phone').required('Phone number is required'),
+  contactPhone: yup
+    .string()
+    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
+    .required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
@@ -101,7 +104,10 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     .defined(),
   languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
-  paymentMethods: yup.array().of(yup.string().required()).min(1, 'At least one payment method is required'),
+  paymentMethods: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'At least one payment method is required'),
 });
 
 import { useParams } from 'next/navigation';
