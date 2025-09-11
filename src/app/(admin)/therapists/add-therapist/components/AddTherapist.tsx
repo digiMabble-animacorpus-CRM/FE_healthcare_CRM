@@ -289,7 +289,6 @@ const TherapistForm = () => {
 
   // ✅ Submit Handler
   const onSubmit = async (data: TherapistFormInputs) => {
-    console.log('✅ onSubmit called with data:', data);
     try {
       const res = await fetch(`${API_BASE_PATH}/therapists`, {
         method: 'POST',
@@ -730,11 +729,16 @@ const TherapistForm = () => {
                       key={s.specialization_id}
                       type="checkbox"
                       label={s.specialization_type}
-                      checked={watch('specializationIds')?.includes(s.specialization_id)}
+                      checked={
+                        watch('specializationIds')?.includes(s.specialization_id)
+                      }
                       onChange={(e) => {
                         const current = watch('specializationIds') || [];
                         if (e.target.checked) {
-                          setValue('specializationIds', [...current, s.specialization_id]);
+                          setValue('specializationIds', [
+                            ...current,
+                            s.specialization_id,
+                          ]);
                         } else {
                           setValue(
                             'specializationIds',
