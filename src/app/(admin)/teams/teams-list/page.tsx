@@ -243,7 +243,11 @@ const TeamsListPage = () => {
                             <input type="checkbox" />
                           </td>
                           <td>
-                            <img src={item.photo} />
+                            <img
+                              src={item.photo}
+                              alt="Profile"
+                              style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50px' }}
+                            />
                           </td>
                           <td>
                             {item.first_name} {item.last_name}

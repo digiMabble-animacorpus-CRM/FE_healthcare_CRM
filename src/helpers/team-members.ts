@@ -151,34 +151,29 @@ export const updateTeamMember = async (
       selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
-    const encryptedId = encryptAES(String(id));
-    const encryptedPayload = encryptAES(safePayload);
-
-    const response = await fetch(
-      `${API_BASE_PATH}/team-members/${encodeURIComponent(encryptedId)}`,
-      {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ data: encryptedPayload }),
+    const response = await fetch(`${API_BASE_PATH}/team-members/${encodeURIComponent(String(id))}`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify(safePayload), // sending plain JSON without encryption
+    });
 
     const result = await response.json();
 
     if (!response.ok || !result.status) {
-      console.error(' Update failed:', result.message || 'Unknown error');
+      console.error('Update failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error(' Error updating team members:', error);
+    console.error('Error updating team members:', error);
     return false;
   }
 };
+
 
 
 export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreatePayload => {
