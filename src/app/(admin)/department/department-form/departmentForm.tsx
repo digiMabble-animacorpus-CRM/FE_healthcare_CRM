@@ -11,7 +11,6 @@ import { API_BASE_PATH } from '@/context/constants';
 
 export interface DepartmentFormValues {
   name: string;
-  _id?: string;
   description?: string;
   is_active: boolean;
 }

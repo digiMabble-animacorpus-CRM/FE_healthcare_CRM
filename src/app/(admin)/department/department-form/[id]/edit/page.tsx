@@ -45,7 +45,7 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
             name: department.name || '',
             description: department.description || '',
             is_active: department.is_active ?? true,
-            _id: department.id, // If your form expects _id
+            department_id: department.id, // Use department_id as expected by the type
           });
         }
       } catch (err) {
@@ -78,7 +78,7 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
         },
       });
 
-      // toast.success('Department updated successfully!');
+      toast.success('Department updated successfully!');
       router.push('/department');
     } catch (error) {
       console.error(error);
