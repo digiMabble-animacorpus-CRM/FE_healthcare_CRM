@@ -739,3 +739,5 @@ export interface DepartmentType {
   updatedAt?: string;
 }
 
+
+export { BranchWithAvailability };

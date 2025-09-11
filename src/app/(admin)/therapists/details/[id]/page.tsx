@@ -43,20 +43,23 @@ const TherapistDetailsPage = () => {
   specializationIds: rawTherapist.specializationIds || [],
 
   // 🔹 Branches with availability & branch name
-  branches:
-    Array.isArray(rawTherapist.branches) && Array.isArray(rawTherapist.availability)
-      ? rawTherapist.branches.map((branchId: number) => ({
-          branch_id: branchId,
-          branch_name:
-            branches.find((b) => b.branch_id === branchId)?.name || '',
-          availability:
-            rawTherapist.availability.filter(
-              (av: any) =>
-                av.branchId === branchId || av.branch_id === branchId
-            ) || [],
-        }))
-      : [],
-
+   branches:
+          Array.isArray(rawTherapist.branches) && Array.isArray(rawTherapist.availability)
+            ? rawTherapist.branches.map((branchId: number) => ({
+                branch_id: branchId,
+                branch_name: branches.find((b) => b.branch_id === branchId)?.name || '',
+                availability: rawTherapist.availability
+                  .filter(
+                    (av: any) =>
+                      av.branchId === branchId || av.branch_id === branchId
+                  )
+                  .map((av: any) => ({
+                    day: av.day ?? av.d ?? '',
+                    startTime: av.startTime ?? av.start_time ?? av.from ?? '',
+                    endTime: av.endTime ?? av.end_time ?? av.to ?? '',
+                  })),
+              }))
+            : [],
   languages: Array.isArray(rawTherapist.languages)
     ? rawTherapist.languages
     : [],

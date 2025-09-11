@@ -53,7 +53,7 @@ interface TherapistFormInputs {
   departmentId: number | null;
   specializationIds?: number[];
   branches: BranchWithAvailability[];
-  languages: number[];
+  languages: number[]; // selected language IDs
   faq?: string | null;
   paymentMethods: string[];
 }
@@ -156,6 +156,8 @@ const TherapistForm = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
+  const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
+
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const router = useRouter();
 
@@ -163,7 +165,7 @@ const TherapistForm = () => {
   const firstName = watch('firstName');
   const lastName = watch('lastName');
 
-  // Automatically update fullName
+  // Auto update fullName
   useEffect(() => {
     setValue('fullName', `${firstName || ''} ${lastName || ''}`.trim());
   }, [firstName, lastName, setValue]);
@@ -174,7 +176,59 @@ const TherapistForm = () => {
     return [];
   };
 
-  // Load dropdown data (branches, departments, languages)
+  // --- Loader functions (they return the loaded array)
+  const loadBranches = async (): Promise<Branch[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/branches`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setBranches(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading branches:', err);
+      setBranches([]);
+      return [];
+    }
+  };
+
+  const loadDepartments = async (): Promise<Department[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/departments`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setDepartments(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading departments:', err);
+      setDepartments([]);
+      return [];
+    }
+  };
+
+  const loadLanguages = async (): Promise<Language[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/languages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setLanguages(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading languages:', err);
+      setLanguages([]);
+      return [];
+    }
+  };
+
+  // Specializations loader based on department
   useEffect(() => {
     if (!token) return;
 
@@ -235,7 +289,6 @@ const TherapistForm = () => {
 
   // ✅ Submit Handler
   const onSubmit = async (data: TherapistFormInputs) => {
-    console.log('✅ onSubmit called with data:', data);
     try {
       const res = await fetch(`${API_BASE_PATH}/therapists`, {
         method: 'POST',
@@ -377,7 +430,15 @@ const TherapistForm = () => {
           </Form.Group>{' '}
         </Col>
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
 
     return (
       <>
@@ -390,8 +451,12 @@ const TherapistForm = () => {
               >
                 <Form.Label>Day</Form.Label>
                 <Form.Select
-                  {...register(`branches.${nestIndex}.availability.${k}.day` as const)}
-                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.day}
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.day` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]?.day
+                  }
                 >
                   <option value="">Select Day</option>
                   {days.map((d) => (
@@ -401,7 +466,10 @@ const TherapistForm = () => {
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
-                  {errors.branches?.[nestIndex]?.availability?.[k]?.day?.message}
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]?.day
+                      ?.message
+                  }
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -413,11 +481,19 @@ const TherapistForm = () => {
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
                   type="time"
-                  {...register(`branches.${nestIndex}.availability.${k}.startTime` as const)}
-                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.startTime}
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.startTime` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.startTime
+                  }
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.branches?.[nestIndex]?.availability?.[k]?.startTime?.message}
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.startTime?.message
+                  }
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -429,11 +505,18 @@ const TherapistForm = () => {
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
                   type="time"
-                  {...register(`branches.${nestIndex}.availability.${k}.endTime` as const)}
-                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.endTime}
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.endTime` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]?.endTime
+                  }
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.branches?.[nestIndex]?.availability?.[k]?.endTime?.message}
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.endTime?.message
+                  }
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -453,7 +536,9 @@ const TherapistForm = () => {
           type="button"
           variant="secondary"
           size="sm"
-          onClick={() => append({ day: '', startTime: '', endTime: '' })}
+          onClick={() =>
+            append({ day: '', startTime: '', endTime: '' })
+          }
         >
           Add Slot
         </Button>
@@ -464,10 +549,15 @@ const TherapistForm = () => {
   return (
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
-        <h5 className="mb-4">{therapistId ? 'Edit Therapist' : 'Add Therapist'}</h5>
+        <h5 className="mb-4">
+          {therapistId ? 'Edit Therapist' : 'Add Therapist'}
+        </h5>
         <Form
-          onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}
+          onSubmit={handleSubmit(onSubmit, (errors) =>
+            console.log('Validation errors:', errors),
+          )}
         >
+          {/* First name / Last name */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="firstName" className="mb-3">
@@ -499,14 +589,15 @@ const TherapistForm = () => {
             </Col>
           </Row>
 
+          {/* Full name, Photo */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="fullName" className="mb-3">
                 <Form.Label>Full Name</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Full Name"
                   {...register('fullName')}
+                  placeholder="Full Name"
                   readOnly
                 />
               </Form.Group>
@@ -527,6 +618,7 @@ const TherapistForm = () => {
             </Col>
           </Row>
 
+          {/* Email, Phone */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="contactEmail" className="mb-3">
@@ -558,6 +650,7 @@ const TherapistForm = () => {
             </Col>
           </Row>
 
+          {/* INAMI Number, Degrees & Training */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="inamiNumber" className="mb-3">
@@ -573,8 +666,7 @@ const TherapistForm = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            
-             <Col md={6}>
+            <Col md={6}>
               <Form.Group controlId="degreesTraining" className="mb-3">
                 <Form.Label>Degrees & Training</Form.Label>
                 <Form.Control
@@ -591,30 +683,30 @@ const TherapistForm = () => {
             </Col>
           </Row>
 
-          
-            
-              <Form.Group controlId="aboutMe" className="mb-3">
-                <Form.Label>About Me</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={3}
-                  {...register('aboutMe')}
-                  placeholder="Enter Description"
-                  isInvalid={!!errors.aboutMe}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.aboutMe?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            
-           
-          
+          {/* About Me */}
+          <Form.Group controlId="aboutMe" className="mb-3">
+            <Form.Label>About Me</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              {...register('aboutMe')}
+              placeholder="Enter Description"
+              isInvalid={!!errors.aboutMe}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.aboutMe?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
 
+          {/* Department + Specializations */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="departmentId" className="mb-3">
                 <Form.Label>Department</Form.Label>
-                <Form.Select {...register('departmentId')} isInvalid={!!errors.departmentId}>
+                <Form.Select
+                  {...register('departmentId')}
+                  isInvalid={!!errors.departmentId}
+                >
                   <option value="">Select Department</option>
                   {departments.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -637,11 +729,16 @@ const TherapistForm = () => {
                       key={s.specialization_id}
                       type="checkbox"
                       label={s.specialization_type}
-                      checked={watch('specializationIds')?.includes(s.specialization_id)}
+                      checked={
+                        watch('specializationIds')?.includes(s.specialization_id)
+                      }
                       onChange={(e) => {
                         const current = watch('specializationIds') || [];
                         if (e.target.checked) {
-                          setValue('specializationIds', [...current, s.specialization_id]);
+                          setValue('specializationIds', [
+                            ...current,
+                            s.specialization_id,
+                          ]);
                         } else {
                           setValue(
                             'specializationIds',
@@ -661,12 +758,16 @@ const TherapistForm = () => {
             </Col>
           </Row>
 
+          {/* Branch & Availability */}
           <h6>Branch & Availability</h6>
           {branchFields.map((branch, index) => (
             <Card key={branch.id} className="mb-3 p-3">
               <Row className="align-items-center">
                 <Col md={8}>
-                  <Form.Group controlId={`branches.${index}.branch_id`} className="mb-3">
+                  <Form.Group
+                    controlId={`branches.${index}.branch_id`}
+                    className="mb-3"
+                  >
                     <Form.Label>Branch</Form.Label>
                     <Form.Select
                       {...register(`branches.${index}.branch_id` as const)}
@@ -701,12 +802,15 @@ const TherapistForm = () => {
           <Button
             type="button"
             variant="secondary"
-            onClick={() => appendBranch({ branch_id: 0, branch_name: '', availability: [] })}
+            onClick={() =>
+              appendBranch({ branch_id: 0, branch_name: '', availability: [{ day: '', startTime: '', endTime: '' }] })
+            }
             className="mb-3"
           >
             Add Branch
           </Button>
 
+          {/* Languages + Payment Methods */}
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
@@ -744,6 +848,7 @@ const TherapistForm = () => {
               </Form.Group>
             </Col>
 
+
             <Col md={6}>
               <Form.Group controlId="paymentMethods" className="mb-3">
                 <Form.Label>Payment Methods</Form.Label>
@@ -774,12 +879,15 @@ const TherapistForm = () => {
                   );
                 })}
                 {errors.paymentMethods && (
-                  <div className="text-danger">{errors.paymentMethods.message}</div>
+                  <div className="text-danger">
+                    {errors.paymentMethods.message}
+                  </div>
                 )}
               </Form.Group>
             </Col>
           </Row>
 
+          {/* FAQ */}
           <Form.Group controlId="faq" className="mb-3">
             <Form.Label>FAQ</Form.Label>
             <Form.Control
@@ -789,7 +897,9 @@ const TherapistForm = () => {
               placeholder="Enter FAQs"
               isInvalid={!!errors.faq}
             />
-            <Form.Control.Feedback type="invalid">{errors.faq?.message}</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">
+              {errors.faq?.message}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Button variant="primary" type="submit">
