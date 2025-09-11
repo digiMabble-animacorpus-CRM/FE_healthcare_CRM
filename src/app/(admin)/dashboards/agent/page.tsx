@@ -1,10 +1,9 @@
 'use client';
 
-import { Row, Col } from 'react-bootstrap';
 import PageTitle from '@/components/PageTitle';
+import { Col, Row } from 'react-bootstrap';
 import AppointmentsOverview from './components/AppointmentsOverview';
 import BranchSummary from './components/BranchSummary';
-import DoctorPerformance from './components/DoctorPerformance';
 import DoctorProfile from './components/DoctorProfile';
 import Financials from './components/Financials';
 import PatientInsights from './components/PatientInsights';
@@ -54,7 +53,7 @@ const AgentPage = () => {
                 },
                 {
                   branchId: 3,
-                  branchName: 'Anima Corpus Namur',
+                  branchName: 'Namur',
                   doctors: 10,
                   patients: 350,
                   appointmentsMonth: 275,
@@ -82,7 +81,7 @@ const AgentPage = () => {
             />
           </Col>
 
-          <Col lg={6}>
+          <Col lg={12}>
             <PatientInsights
               newPatientsWeek={22}
               newPatientsMonth={93}
@@ -101,19 +100,6 @@ const AgentPage = () => {
                   { city: 'Ottignies', count: 60 },
                 ],
               }}
-            />
-          </Col>
-
-          <Col lg={6}>
-            <Financials
-              revenueWeek={8650}
-              revenueMonth={55650}
-              outstandingPayments={2140}
-              paymentMethods={[
-                { method: 'Insurance', amount: 31200 },
-                { method: 'Self-pay', amount: 21450 },
-                { method: 'Other', amount: 3000 },
-              ]}
             />
           </Col>
 

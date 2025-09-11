@@ -107,9 +107,9 @@ const PatientDetailsPage = () => {
   if (!data) return <p>No patient found.</p>;
 
   return (
-    <>
-      <PageTitle subName="Healthcare" title="Patient Overview" />
-      <PatientDetails
+  <>
+    <PageTitle subName="Healthcare" title="Patient Overview" />
+    <PatientDetails
         id={data.id}
         name={`${data.firstname} ${data.lastname}`}
         // 👇 Now showing Age along with DOB + Gender
@@ -128,6 +128,11 @@ const PatientDetailsPage = () => {
         address={data.street}
         city={data.city}
         country={data.country}
+        zipcode={data.zipcode}         // ✅ new
+        language={data.language}       // ✅ new
+        ssin={data.ssin}               // ✅ new
+        mutualitynumber={data.mutualitynumber}   // ✅ new
+        mutualityregistrationnumber={data.mutualityregistrationnumber} // ✅ new
         status={data.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'}
         note={data.note}
         weeklyInquiry={defaultWeeklyInquiry}
@@ -136,8 +141,9 @@ const PatientDetailsPage = () => {
         feedbacks={defaultFeedbacks}
         files={defaultFiles}
       />
-    </>
-  );
+  </>
+);
+
 };
 
 export default PatientDetailsPage;

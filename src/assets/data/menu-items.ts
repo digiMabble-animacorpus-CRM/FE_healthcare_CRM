@@ -16,14 +16,14 @@ export const MENU_ITEMS: MenuItemType[] = [
   {
     key: 'appointments',
     label: 'Appointments',
-    icon: 'ri:chat-quote-line',
+    icon: 'ri-calendar-line',
     url: '/appointments/appointment-list',
   },
 
   {
     key: 'therapists',
     label: 'Therapist',
-    icon: 'ri:contacts-book-3-line',
+    icon: 'ri-stethoscope-line',
     children: [
       {
         key: 'therapists-list',
@@ -42,7 +42,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   {
     key: 'patients',
     label: 'Patient',
-    icon: 'ri:contacts-book-3-line',
+    icon: 'ri-hospital-line',
     children: [
       {
         key: 'patient-list',
@@ -61,7 +61,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   {
     key: 'teams',
     label: 'Teams',
-    icon: 'ri:contacts-book-3-line',
+    icon: 'ri-team-line',
     children: [
       {
         key: 'teams-list',
@@ -86,31 +86,31 @@ export const MENU_ITEMS: MenuItemType[] = [
   {
     key: 'languages',
     label: 'Languages',
-    icon: 'ri:home-office-line',
+    icon: 'ri-translate',
     url: '/languages',
   },
   {
     key: 'StaffRoles',
     label: 'Staff Roles',
-    icon: 'ri:discuss-line',
+    icon: 'ri-user-settings-line',
     url: '/staff-role',
   },
   {
     key: 'permissions',
     label: 'Permissions',
-    icon: 'ri:chat-quote-line',
+    icon: 'ri-shield-line',
     url: '/permissions',
   },
   {
     key: 'branchs',
     label: 'Branches',
-    icon: 'ri:chat-quote-line',
+    icon: 'ri-building-2-line',
     url: '/branches',
   },
   {
     key: 'department',
     label: 'Department',
-    icon: 'ri:chat-quote-line',
+    icon: 'ri-organization-chart',
     url: '/department',
   },
 ];

@@ -1,492 +1,962 @@
 'use client';
 
-import { useEffect, useState, useMemo } from 'react';
-import { useForm, Controller, FormProvider, useFieldArray } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Row,
-  Spinner,
-} from 'react-bootstrap';
+import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
+import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
 import { useRouter } from 'next/navigation';
 
-import TextFormInput from '@/components/from/TextFormInput';
-import TextAreaFormInput from '@/components/from/TextAreaFormInput';
-import ChoicesFormInput from '@/components/from/ChoicesFormInput';
-import DropzoneFormInput from '@/components/from/DropzoneFormInput';
-import {
-  getTherapistById,
-  createTherapist,
-  updateTherapist,
-} from '@/helpers/therapist';
-import { getAllLanguages } from '@/helpers/languages';
-import type { LanguageType } from '@/types/data';
-import { TherapistUpdatePayload } from '@/helpers/therapist';
+type AddTherapistProps = {
+  therapistId?: string;
+};
 
-const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+interface Branch {
+  branch_id: number;
+  name: string;
+}
 
-type AvailabilitySlot = {
+interface Department {
+  id: number;
+  name: string;
+}
+
+interface Specialization {
+  specialization_id: number;
+  specialization_type: string;
+}
+
+interface Language {
+  id: number;
+  name: string;
+}
+
+export interface Availability {
   day: string;
   startTime: string;
   endTime: string;
-};
+}
 
-type Center = {
-  center_address: string;
-  center_email: string;
-  center_phone_number: string;
-  availability: AvailabilitySlot[];
-};
+export interface BranchWithAvailability {
+  branch_id: number;
+  branch_name: string;
+  availability: Availability[];
+}
 
-export type TherapistFormValues = {
-  id_pro?: string;
-  first_name: string;
-  last_name: string;
-  photo: string;
-  job_title: string;
-  about_me: string;
-  consultations: string;
-  centers: Center[];
-  contact_email: string;
-  contact_phone: string;
-  spoken_languages: string[];
-  degrees_and_training: string[];
-  specializations: string[];
-  website: string;
-  faq: string;
-  agenda_links: string;
-  tags: string[];
-  certificationFiles: File[];
-};
+interface TherapistFormInputs {
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo?: string | null;
+  contactEmail: string;
+  contactPhone: string;
+  inamiNumber: string;
+  aboutMe?: string | null;
+  degreesTraining?: string | null;
+  departmentId: number | null;
+  specializationIds?: number[];
+  branches: BranchWithAvailability[];
+  languages: number[]; // selected language IDs
+  faq?: string | null;
+  paymentMethods: string[];
+}
 
-const schema: yup.ObjectSchema<TherapistFormValues> = yup.object({
-  id_pro: yup.string().default(''),
-  first_name: yup.string().required('First name is required'),
-  last_name: yup.string().required('Last name is required'),
-  photo: yup.string().default(''),
-  job_title: yup.string().required('Job title is required'),
-  about_me: yup.string().default(''),
-  consultations: yup.string().default(''),
-  centers: yup
+const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
+  firstName: yup.string().required('First Name is required'),
+  lastName: yup.string().required('Last Name is required'),
+  fullName: yup.string(),
+  photo: yup.string().url('Must be a valid URL').nullable(),
+  contactEmail: yup.string().email('Invalid email').required('Email is required'),
+  contactPhone: yup
+    .string()
+    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
+    .required('Phone number is required'),
+  inamiNumber: yup.string().required('INAMI Number is required'),
+  aboutMe: yup.string().nullable(),
+  degreesTraining: yup.string().nullable(),
+  departmentId: yup
+    .number()
+    .nullable()
+    .typeError('Department is required')
+    .required('Department is required'),
+  specializationIds: yup
+    .array()
+    .of(yup.number().required())
+    .min(1, 'At least one specialization is required'),
+  branches: yup
     .array()
     .of(
       yup.object({
-        center_address: yup.string().default(''),
-        center_email: yup.string().email('Invalid email').default(''),
-        center_phone_number: yup.string().default(''),
+        branch_id: yup.number().required('Branch is required'),
+        branch_name: yup.string().nullable().defined(),
         availability: yup
           .array()
           .of(
             yup.object({
-              day: yup.string().default(''),
-              startTime: yup.string().default(''),
-              endTime: yup.string().default(''),
-            })
+              day: yup.string().required('Day is required'),
+              startTime: yup.string().required('Start time is required'),
+              endTime: yup.string().required('End time is required'),
+            }),
           )
-          .default([]),
-      })
+          .min(1, 'At least one availability slot is required')
+          .required('Availability is required'),
+      }),
     )
-    .required('At least one center is required')
-    .default([]),
-  contact_email: yup.string().email('Invalid email').required('Email is required'),
-  contact_phone: yup.string().required('Phone number is required'),
-  // ✅ Force string[] without undefined
-  spoken_languages: yup
+    .min(1, 'At least one branch is required')
+    .required('Branches are required')
+    .defined(),
+  languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
+  faq: yup.string().nullable(),
+  paymentMethods: yup
     .array()
     .of(yup.string().required())
-    .min(1, 'At least one language is required')
-    .default([]),
-  degrees_and_training: yup.array().of(yup.string().required()).default([]),
-  specializations: yup.array().of(yup.string().required()).default([]),
-  website: yup.string().default(''),
-  faq: yup.string().default(''),
-  agenda_links: yup.string().default(''),
-  tags: yup.array().of(yup.string().required()).default([]),
-  certificationFiles: yup.array().of(yup.mixed<File>().required()).default([]),
+    .min(1, 'At least one payment method is required'),
 });
 
-interface Props {
-  params?: { id?: string };
-}
-
-const AddTherapist = ({ params }: Props) => {
-  const router = useRouter();
-  const isEditMode = !!params?.id;
-  const [loading, setLoading] = useState<boolean>(isEditMode);
-
-  const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
-
-  const methods = useForm<TherapistFormValues>({
+const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    control,
+    reset,
+    formState: { errors },
+  } = useForm<TherapistFormInputs>({
     resolver: yupResolver(schema),
     defaultValues: {
-      first_name: '',
-      last_name: '',
+      firstName: '',
+      lastName: '',
+      fullName: '',
       photo: '',
-      job_title: '',
-      about_me: '',
-      consultations: '',
-      centers: [
-        {
-          center_address: '',
-          center_email: '',
-          center_phone_number: '',
-          availability: [],
-        },
-      ],
-      contact_email: '',
-      contact_phone: '',
-      spoken_languages: [],
-      degrees_and_training: [],
-      specializations: [],
-      website: '',
-      faq: '',
-      agenda_links: '',
-      tags: [],
-      certificationFiles: [],
+      contactEmail: '',
+      contactPhone: '',
+      inamiNumber: '',
+      aboutMe: null,
+      degreesTraining: null,
+      departmentId: null,
+      specializationIds: [],
+      branches: [],
+      languages: [],
+      faq: null,
+      paymentMethods: [],
     },
   });
 
-  const { control, handleSubmit, reset } = methods;
-  const { fields: centerFields, append: addCenter, remove: removeCenter } = useFieldArray({
+  const {
+    fields: branchFields,
+    append: appendBranch,
+    remove: removeBranch,
+  } = useFieldArray({
     control,
-    name: 'centers',
+    name: 'branches',
   });
 
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [departments, setDepartments] = useState<Department[]>([]);
+  const [specializations, setSpecializations] = useState<Specialization[]>([]);
+  const [languages, setLanguages] = useState<Language[]>([]);
+  const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
+
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const router = useRouter();
+
+  const departmentId = watch('departmentId');
+  const firstName = watch('firstName');
+  const lastName = watch('lastName');
+
+  // Auto update fullName
   useEffect(() => {
-    if (isEditMode && params?.id) {
-      setLoading(true);
-      getTherapistById(params.id)
-        .then((data) => {
-          if (data) {
-            const mapped: TherapistFormValues = {
-              ...data,
-              tags: data.tags || [],
-              certificationFiles: [],
-              centers: data.centers || [],
-            };
-            reset(mapped);
-          }
-        })
-        .catch(console.error)
-        .finally(() => setLoading(false));
-    }
-  }, [isEditMode, params?.id, reset]);
+    setValue('fullName', `${firstName || ''} ${lastName || ''}`.trim());
+  }, [firstName, lastName, setValue]);
 
-  const onSubmit = async (data: TherapistFormValues) => {
+  const safeArray = (res: any): any[] => {
+    if (Array.isArray(res)) return res;
+    if (res && Array.isArray(res.data)) return res.data;
+    return [];
+  };
+
+  // --- Loader functions (they return the loaded array)
+  const loadBranches = async (): Promise<Branch[]> => {
+    if (!token) return [];
     try {
-      const payload: TherapistUpdatePayload = {
-        photo: data.photo || "",
-        consultations: data.consultations || "",
-        specializations: data.specializations || [],
-        website: data.website || "",
-        faq: data.faq || "",
-        firstName: data.first_name || "",
-        lastName: data.last_name || "",
-        jobTitle: data.job_title || "",
-        aboutMe: data.about_me || "",
-        contactEmail: data.contact_email || "",
-        contactPhone: data.contact_phone || "",
-        spokenLanguages: (data.spoken_languages || []).join(", "),
-        degreesAndTraining: (data.degrees_and_training || []).join(", "),
-        agendaLinks: data.agenda_links || "",
-        tags: (data.tags || []).join(", "),
-        centers: (data.centers || []).map((c) => ({
-          centerAddress: c.center_address || "",
-          centerEmail: c.center_email || "",
-          centerPhoneNumber: c.center_phone_number || "",
-          availability: (c.availability || []).map((slot) => ({
-            day: slot.day,
-            startTime: slot.startTime,
-            endTime: slot.endTime,
-          })),
-        })),
-      };
-
-      let success = false;
-
-      if (data.certificationFiles?.length > 0) {
-        const formData = new FormData();
-        Object.entries(payload).forEach(([key, value]) => {
-          if (value !== null && value !== undefined) {
-            formData.append(key, JSON.stringify(value));
-          }
-        });
-        data.certificationFiles.forEach((file) =>
-          formData.append("certificationFiles", file)
-        );
-
-        success =
-          isEditMode && params?.id
-            ? await updateTherapist(params.id, formData)
-            : await createTherapist(formData);
-      } else {
-        success =
-          isEditMode && params?.id
-            ? await updateTherapist(params.id, payload)
-            : await createTherapist(payload);
-      }
-
-      if (success) {
-        alert(isEditMode ? "Therapist updated successfully" : "Therapist created successfully");
-        if (isEditMode) router.back();
-        else reset();
-      } else {
-        alert("Operation failed");
-      }
-    } catch (error) {
-      console.error("Submit error:", error);
-      alert("Operation failed");
+      const res = await fetch(`${API_BASE_PATH}/branches`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setBranches(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading branches:', err);
+      setBranches([]);
+      return [];
     }
   };
 
-  if (loading)
-    return <Spinner animation="border" className="my-5 d-block mx-auto" />;
+  const loadDepartments = async (): Promise<Department[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/departments`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setDepartments(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading departments:', err);
+      setDepartments([]);
+      return [];
+    }
+  };
 
-  return (
-    <FormProvider {...methods}>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Basic Info */}
-         {/* Basic Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">{isEditMode ? 'Edit Therapist' : 'Basic Information'}</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <Row>
-            <Col lg={6}>
-              <TextFormInput control={control} name="first_name" label="First Name" />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput control={control} name="last_name" label="Last Name" />
-            </Col>
-            
-          </Row>
-        
-          <Row>
-            <Col lg={6}>
-              <TextFormInput control={control} name="contact_email" label="Contact Email" />
-            </Col>
-            <Col lg={6}>
-              <TextFormInput control={control} name="contact_phone" label="Contact Phone" />
-            </Col>
-            <Col lg={12}>
-              <label className="form-label">Spoken Languages</label>
-              <Controller
-                control={control}
-                name="spoken_languages"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" multiple {...field}>
-                    {allLanguages.map((lang) => (
-                      <option key={lang.key} value={lang.key}>
-                        {lang.label}
-                      </option>
-                    ))}
-                  </ChoicesFormInput>
-                )}
-              />
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
+  const loadLanguages = async (): Promise<Language[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/languages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setLanguages(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading languages:', err);
+      setLanguages([]);
+      return [];
+    }
+  };
 
-      {/* Professional Details */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Professional Details</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <Row>
-            <Col lg={6}>
-              <TextFormInput control={control} name="job_title" label="Job Title" />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="about_me" label="About Me" rows={3} />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="consultations" label="Consultations" rows={2} />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="degrees_and_training" label="Degrees & Training" rows={2} />
-            </Col>
-            <Col lg={12}>
-              <TextAreaFormInput control={control} name="specializations" label="Specializations" rows={2} />
-            </Col>
-          </Row>
-        </CardBody>
-      </Card>
+  // Specializations loader based on department
+  useEffect(() => {
+    if (!departmentId || !token) {
+      setSpecializations([]);
+      return;
+    }
+    const loadSpecializations = async () => {
+      try {
+        const res = await fetch(
+          `${API_BASE_PATH}/specializations?departmentId=${departmentId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        const json = await res.json();
+        setSpecializations(safeArray(json));
+      } catch (err) {
+        console.error('Error loading specializations:', err);
+        setSpecializations([]);
+      }
+    };
+    loadSpecializations();
+  }, [departmentId, token]);
 
-      {/* Centers */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Centers & Availability</CardTitle>
-        </CardHeader>
-        <CardBody>
-          {centerFields.map((center, cIndex) => (
-            <div key={center.id} className="mb-3 p-3 border rounded">
-              <Row>
-                <Col lg={6}>
-                  <TextFormInput control={control} name={`centers.${cIndex}.center_address`} label="Center Address" />
-                </Col>
-                <Col lg={6}>
-                  <TextFormInput control={control} name={`centers.${cIndex}.center_email`} label="Center Email" />
-                </Col>
-                <Col lg={6}>
-                  <TextFormInput
-                    control={control}
-                    name={`centers.${cIndex}.center_phone_number`}
-                    label="Center Phone"
-                  />
-                </Col>
-              </Row>
-              <h6 className="mt-3">Availability</h6>
-              <Controller
-                control={control}
-                name={`centers.${cIndex}.availability`}
-                render={({ field }) => (
-                  <div>
-                    {(field.value || []).map((slot: AvailabilitySlot, i: number) => (
-                      <Row key={i} className="mb-2">
-                        <Col lg={4}>
-                          <select
-                            className="form-control"
-                            value={slot.day}
-                            onChange={(e) => {
-                              const newSlots = [...field.value];
-                              newSlots[i].day = e.target.value;
-                              field.onChange(newSlots);
-                            }}
-                          >
-                            <option value="">Select Day</option>
-                            {days.map((d) => (
-                              <option key={d} value={d}>
-                                {d}
-                              </option>
-                            ))}
-                          </select>
-                        </Col>
-                        <Col lg={3}>
-                          <input
-                            type="time"
-                            className="form-control"
-                            value={slot.startTime}
-                            onChange={(e) => {
-                              const newSlots = [...field.value];
-                              newSlots[i].startTime = e.target.value;
-                              field.onChange(newSlots);
-                            }}
-                          />
-                        </Col>
-                        <Col lg={3}>
-                          <input
-                            type="time"
-                            className="form-control"
-                            value={slot.endTime}
-                            onChange={(e) => {
-                              const newSlots = [...field.value];
-                              newSlots[i].endTime = e.target.value;
-                              field.onChange(newSlots);
-                            }}
-                          />
-                        </Col>
-                        <Col lg={2}>
-                          <Button
-                            variant="danger"
-                            onClick={() => {
-                              const newSlots = [...field.value];
-                              newSlots.splice(i, 1);
-                              field.onChange(newSlots);
-                            }}
-                          >
-                            Remove
-                          </Button>
-                        </Col>
-                      </Row>
-                    ))}
-                    <Button
-                      variant="outline-primary"
-                      onClick={() =>
-                        field.onChange([...(field.value || []), { day: '', startTime: '', endTime: '' }])
-                      }
-                    >
-                      Add Slot
-                    </Button>
-                  </div>
-                )}
-              />
-              <Button variant="danger" className="mt-2" onClick={() => removeCenter(cIndex)}>
-                Remove Center
-              </Button>
-            </div>
-          ))}
-          <Button
-            variant="outline-success"
-            onClick={() => addCenter({ center_address: '', center_email: '', center_phone_number: '', availability: [] })}
-          >
-            Add Center 
-          </Button>
+  // --- Mapping helper: transform API therapist -> form shape
+  // IMPORTANT: This mapper expects the API shape you posted:
+  // languages: ["English", "French"]
+  // branches: [1,2]
+  // availability: [{day, startTime, endTime}, ...] (root array)
+  const mapTherapistToFormValues = (
+    data: any,
+    branchesList: Branch[],
+    languagesList: Language[],
+  ): TherapistFormInputs => {
+    if (!data) {
+      return {
+        firstName: '',
+        lastName: '',
+        fullName: '',
+        photo: null,
+        contactEmail: '',
+        contactPhone: '',
+        inamiNumber: '',
+        aboutMe: null,
+        degreesTraining: null,
+        departmentId: null,
+        specializationIds: [],
+        branches: [],
+        languages: [],
+        faq: null,
+        paymentMethods: [],
+      };
+    }
+
+    // --- Specializations (IDs) — API provides array of numbers in your example
+    const specializationIds: number[] = Array.isArray(data.specializations)
+  ? data.specializations.map((s: any) =>
+      typeof s === 'number' ? s : s.specialization_id || s.id
+    )
+  : [];
+
+
+    // --- Availability root array (normalize keys)
+    const rootAvailability: Availability[] = Array.isArray(data.availability)
+      ? data.availability.map((av: any) => ({
+          day: av.day ?? av.d ?? '',
+          startTime: av.startTime ?? av.start_time ?? av.from ?? '',
+          endTime: av.endTime ?? av.end_time ?? av.to ?? '',
+        }))
+      : [];
+
+    
+    const formBranches: BranchWithAvailability[] = Array.isArray(data.branches)
+  ? data.branches.map((b: any) => {
+      const branchId = b.branch_id ?? 0;
+      const branchName = b.name ?? '';
           
-        </CardBody>
-      </Card>
+          const availabilityForThisBranch = rootAvailability.length > 0 ? rootAvailability.map(a => ({ ...a })) : [{ day: '', startTime: '', endTime: '' }];
 
-      {/* Additional Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Additional Information</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <TextAreaFormInput control={control} name="faq" label="FAQ (Frequently Asked Questions)" rows={3} />
-        </CardBody>
-      </Card>
+          return {
+            branch_id: branchId,
+        branch_name: branchName,
+        availability: availabilityForThisBranch,
+          };
+        })
+      : [];
 
-      {/* Certifications */}
-      <Card>
-        <CardHeader>
-          <CardTitle as="h4">Photo</CardTitle>
-        </CardHeader>
-        <CardBody>
-          <Controller
-            control={control}
-            name="certificationFiles"
-            render={({ field }) => (
-              <DropzoneFormInput
-                className="py-5"
-                text="Drop your Photo files here or click to browse"
-                showPreview
-                onFileUpload={(files) => field.onChange(files)}
-              />
-            )}
-          />
-        </CardBody>
-      </Card>
+    // --- Languages: API gives strings, match to languagesList to get IDs
+    const langIds: number[] = Array.isArray(data.languages)
+      ? data.languages
+          .map((langNameOrObj: any) => {
+            if (typeof langNameOrObj === 'number') return langNameOrObj;
+            if (typeof langNameOrObj === 'object' && langNameOrObj !== null) {
+              // sometimes API might return objects; accept language_id or id
+              return langNameOrObj.language_id ?? langNameOrObj.id ?? undefined;
+            }
+            if (typeof langNameOrObj === 'string') {
+              const found = languagesList.find(
+                (l) => l.name?.toLowerCase() === langNameOrObj.toLowerCase(),
+              );
+              return found?.id;
+            }
+            return undefined;
+          })
+          .filter((id: any) => typeof id === 'number')
+      : [];
 
-        {/* Buttons */}
-        <div className="mb-3 rounded">
-          <Row className="justify-content-end g-2 mt-2">
-            <Col lg={2}>
-              <Button type="submit" variant="outline-primary" className="w-100">
-                {isEditMode ? 'Update' : 'Create'} Therapist
-              </Button>
+    const resetObj: TherapistFormInputs = {
+      firstName: data.firstName ?? '',
+      lastName: data.lastName ?? '',
+      fullName: `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim(),
+      photo: data.photo ?? data.imageUrl ?? null,
+      contactEmail: data.contactEmail ?? '',
+      contactPhone: data.contactPhone ?? '',
+      inamiNumber: data.inamiNumber != null ? String(data.inamiNumber) : '',
+      aboutMe: data.aboutMe ?? null,
+      degreesTraining: data.degreesTraining ?? null,
+      departmentId: data.departmentId ?? null,
+      specializationIds,
+      branches: formBranches,
+      languages: langIds,
+      faq: data.faq ?? null,
+      paymentMethods: Array.isArray(data.paymentMethods) ? data.paymentMethods : [],
+    };
+
+    // debug logs to help you verify mapping
+    console.log('mapTherapistToFormValues -> rootAvailability:', rootAvailability);
+    console.log('mapTherapistToFormValues -> formBranches:', formBranches);
+    console.log('mapTherapistToFormValues -> langIds:', langIds);
+    console.log('mapTherapistToFormValues -> resetObj:', resetObj);
+
+    return resetObj;
+  };
+
+  // --- Combined init: load dropdowns (and use returned arrays) then fetch therapist and reset
+  useEffect(() => {
+    const init = async () => {
+      if (!token) return;
+
+      console.log('Starting to load branches/departments/languages...');
+      try {
+        const [branchesRes, departmentsRes, languagesRes] = await Promise.all([
+          loadBranches(),
+          loadDepartments(),
+          loadLanguages(),
+        ]);
+        console.log('Loaded dropdowns:', { branchesRes, departmentsRes, languagesRes });
+
+        setDropdownsLoaded(true);
+
+        // If editing, fetch therapist and map using the freshly loaded dropdown arrays
+        if (therapistId) {
+          try {
+            const resp = await axios.get(`${API_BASE_PATH}/therapists/${therapistId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = resp.data;
+            console.log('Fetched therapist API data:', data);
+
+            const mapped = mapTherapistToFormValues(data, branchesRes, languagesRes);
+            console.log('Mapped therapist -> form values (before reset):', mapped);
+
+            // Reset form with mapped object (this will populate field arrays)
+            reset(mapped);
+          } catch (err) {
+            console.error('Failed to fetch therapist for edit:', err);
+          }
+        }
+      } catch (err) {
+        console.error('Init error loading dropdowns:', err);
+      }
+    };
+
+    init();
+    // Intentionally depend only on token & therapistId & reset
+  }, [token, therapistId, reset]);
+
+  // Debug watch of all form values
+  useEffect(() => {
+    const sub = watch((vals) => {
+      console.log('Watched form values:', vals);
+    });
+    return () => sub.unsubscribe();
+  }, [watch]);
+
+  // Transform before submit: this sends availability with branchId attached per your transformPayload
+  const transformPayload = (data: TherapistFormInputs) => ({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    photo: data.photo,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    inamiNumber: Number(data.inamiNumber),
+    aboutMe: data.aboutMe,
+    degreesTraining: data.degreesTraining,
+    departmentId: data.departmentId,
+    specializations: data.specializationIds?.map((id) => id),
+    branches: data.branches.map((b) => b.branch_id),
+    availability: data.branches.flatMap((b) =>
+      b.availability.map((av) => ({
+        ...av,
+        branchId: b.branch_id,
+      })),
+    ),
+    languages: data.languages
+      .map((id) => {
+        const langObj = languages.find((l) => l.id === id);
+        return langObj ? langObj.name : null;
+      })
+      .filter((n) => n),
+    faq: data.faq,
+    paymentMethods: data.paymentMethods,
+  });
+
+  const onSubmit = async (data: TherapistFormInputs) => {
+    try {
+      const payload = transformPayload(data);
+      const url = therapistId ? `${API_BASE_PATH}/therapists/${therapistId}` : `${API_BASE_PATH}/therapists`;
+      const method = therapistId ? 'PATCH' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` || '',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (res.ok) {
+        alert(`Therapist ${therapistId ? 'updated' : 'saved'} successfully`);
+        router.push('/therapists/therapists-list');
+      } else {
+        const errText = await res.text();
+        throw new Error(`Unexpected status: ${res.status} - ${errText}`);
+      }
+    } catch (err: any) {
+      console.error('Submit error:', err);
+      alert(err.message || 'Error saving therapist');
+    }
+  };
+
+  // Component for availability slots remains same (uses field arrays)
+  const AvailabilitySlots = ({ nestIndex }: { nestIndex: number }) => {
+    const { fields, append, remove } = useFieldArray({
+      control,
+      name: `branches.${nestIndex}.availability`,
+    });
+
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
+
+    return (
+      <>
+        {fields.map((field, k) => (
+          <Row key={field.id} className="align-items-center">
+            <Col md={4}>
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.day`}
+                className="mb-3"
+              >
+                <Form.Label>Day</Form.Label>
+                <Form.Select
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.day` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]?.day
+                  }
+                >
+                  <option value="">Select Day</option>
+                  {days.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]?.day
+                      ?.message
+                  }
+                </Form.Control.Feedback>
+              </Form.Group>
             </Col>
-            <Col lg={2}>
+            <Col md={3}>
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.startTime`}
+                className="mb-3"
+              >
+                <Form.Label>Start Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.startTime` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.startTime
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.startTime?.message
+                  }
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={3}>
+              <Form.Group
+                controlId={`branches.${nestIndex}.availability.${k}.endTime`}
+                className="mb-3"
+              >
+                <Form.Label>End Time</Form.Label>
+                <Form.Control
+                  type="time"
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.endTime` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]?.endTime
+                  }
+                />
+                <Form.Control.Feedback type="invalid">
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.endTime?.message
+                  }
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={2}>
               <Button
                 type="button"
                 variant="danger"
-                className="w-100"
-                onClick={() => router.back()}
+                onClick={() => remove(k)}
+                style={{ marginTop: '1.7rem' }}
               >
-                Cancel
+                Remove
               </Button>
             </Col>
           </Row>
-        </div>
-      </form>
-    </FormProvider>
+        ))}
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() =>
+            append({ day: '', startTime: '', endTime: '' })
+          }
+        >
+          Add Slot
+        </Button>
+      </>
+    );
+  };
+
+  return (
+    <Card className="p-3 shadow-sm rounded">
+      <CardBody>
+        <h5 className="mb-4">
+          {therapistId ? 'Edit Therapist' : 'Add Therapist'}
+        </h5>
+        <Form
+          onSubmit={handleSubmit(onSubmit, (errors) =>
+            console.log('Validation errors:', errors),
+          )}
+        >
+          {/* First name / Last name */}
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="firstName" className="mb-3">
+                <Form.Label>First Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('firstName')}
+                  placeholder="Enter First Name"
+                  isInvalid={!!errors.firstName}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.firstName?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="lastName" className="mb-3">
+                <Form.Label>Last Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('lastName')}
+                  placeholder="Enter Last Name"
+                  isInvalid={!!errors.lastName}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.lastName?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Full name, Photo */}
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="fullName" className="mb-3">
+                <Form.Label>Full Name</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('fullName')}
+                  placeholder="Full Name"
+                  readOnly
+                />
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="photo" className="mb-3">
+                <Form.Label>Photo (URL)</Form.Label>
+                <Form.Control
+                  type="text"
+                  placeholder="Photo URL"
+                  {...register('photo')}
+                  isInvalid={!!errors.photo}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.photo?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Email, Phone */}
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="contactEmail" className="mb-3">
+                <Form.Label>Email</Form.Label>
+                <Form.Control
+                  type="email"
+                  {...register('contactEmail')}
+                  placeholder="Enter Email"
+                  isInvalid={!!errors.contactEmail}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactEmail?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="contactPhone" className="mb-3">
+                <Form.Label>Phone Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('contactPhone')}
+                  placeholder="Enter Phone Number"
+                  isInvalid={!!errors.contactPhone}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactPhone?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* INAMI Number, Degrees & Training */}
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="inamiNumber" className="mb-3">
+                <Form.Label>INAMI Number</Form.Label>
+                <Form.Control
+                  type="text"
+                  {...register('inamiNumber')}
+                  placeholder="Enter INAMI Number"
+                  isInvalid={!!errors.inamiNumber}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.inamiNumber?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group controlId="degreesTraining" className="mb-3">
+                <Form.Label>Degrees & Training</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  {...register('degreesTraining')}
+                  placeholder="Enter Degrees & Training"
+                  rows={3}
+                  isInvalid={!!errors.degreesTraining}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.degreesTraining?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* About Me */}
+          <Form.Group controlId="aboutMe" className="mb-3">
+            <Form.Label>About Me</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              {...register('aboutMe')}
+              placeholder="Enter Description"
+              isInvalid={!!errors.aboutMe}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.aboutMe?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {/* Department + Specializations */}
+          <Row>
+            <Col md={6}>
+              <Form.Group controlId="departmentId" className="mb-3">
+                <Form.Label>Department</Form.Label>
+                <Form.Select
+                  {...register('departmentId')}
+                  isInvalid={!!errors.departmentId}
+                >
+                  <option value="">Select Department</option>
+                  {departments.map((d) => (
+                    <option key={d.id} value={d.id}>
+                      {d.name}
+                    </option>
+                  ))}
+                </Form.Select>
+                <Form.Control.Feedback type="invalid">
+                  {errors.departmentId?.message}
+                </Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Specialization</Form.Label>
+                <div>
+                  {specializations.map((s) => (
+                    <Form.Check
+                      inline
+                      key={s.specialization_id}
+                      type="checkbox"
+                      label={s.specialization_type}
+                      checked={
+                        watch('specializationIds')?.includes(s.specialization_id)
+                      }
+                      onChange={(e) => {
+                        const current = watch('specializationIds') || [];
+                        if (e.target.checked) {
+                          setValue('specializationIds', [
+                            ...current,
+                            s.specialization_id,
+                          ]);
+                        } else {
+                          setValue(
+                            'specializationIds',
+                            current.filter((id: number) => id !== s.specialization_id),
+                          );
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                {errors.specializationIds && (
+                  <Form.Text className="text-danger">
+                    {errors.specializationIds.message as string}
+                  </Form.Text>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Branch & Availability */}
+          <h6>Branch & Availability</h6>
+          {branchFields.map((branch, index) => (
+            <Card key={branch.id} className="mb-3 p-3">
+              <Row className="align-items-center">
+                <Col md={8}>
+                  <Form.Group
+                    controlId={`branches.${index}.branch_id`}
+                    className="mb-3"
+                  >
+                    <Form.Label>Branch</Form.Label>
+                    <Form.Select
+                      {...register(`branches.${index}.branch_id` as const)}
+                      isInvalid={!!errors.branches?.[index]?.branch_id}
+                    >
+                      <option value="">Select Branch</option>
+                      {branches.map((b) => (
+                        <option key={b.branch_id} value={b.branch_id}>
+                          {b.name}
+                        </option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.branches?.[index]?.branch_id?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+                <Col md={4}>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    className="mt-4"
+                    onClick={() => removeBranch(index)}
+                  >
+                    Remove Branch
+                  </Button>
+                </Col>
+              </Row>
+              <AvailabilitySlots nestIndex={index} />
+            </Card>
+          ))}
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() =>
+              appendBranch({ branch_id: 0, branch_name: '', availability: [{ day: '', startTime: '', endTime: '' }] })
+            }
+            className="mb-3"
+          >
+            Add Branch
+          </Button>
+
+          {/* Languages + Payment Methods */}
+          <Row>
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Languages</Form.Label>
+                <div style={{ display: 'flex', gap: '2rem', flexWrap: 'wrap' }}>
+                  {[
+                    { id: 1, name: 'English' },
+                    { id: 2, name: 'French' },
+                    { id: 3, name: 'German' },
+                  ].map((lang) => (
+                    <Form.Check
+                      key={lang.id}
+                      type="checkbox"
+                      label={lang.name}
+                      checked={watch('languages')?.includes(lang.id)}
+                      onChange={(e) => {
+                        const current = watch('languages') || [];
+                        if (e.target.checked) {
+                          setValue('languages', [...current, lang.id]);
+                        } else {
+                          setValue(
+                            'languages',
+                            current.filter((l: number) => l !== lang.id),
+                          );
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                {errors.languages && (
+                  <Form.Text className="text-danger">
+                    {errors.languages.message as string}
+                  </Form.Text>
+                )}
+              </Form.Group>
+            </Col>
+
+
+            <Col md={6}>
+              <Form.Group controlId="paymentMethods" className="mb-3">
+                <Form.Label>Payment Methods</Form.Label>
+                {[
+                  { id: 'cash', name: 'Cash' },
+                  { id: 'card', name: 'Card' },
+                  { id: 'upi', name: 'UPI' },
+                  { id: 'bank', name: 'Bank Transfer' },
+                ].map((pm) => {
+                  const current = watch('paymentMethods') || [];
+                  return (
+                    <Form.Check
+                      key={pm.id}
+                      type="checkbox"
+                      label={pm.name}
+                      checked={current.includes(pm.id)}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setValue('paymentMethods', [...current, pm.id]);
+                        } else {
+                          setValue(
+                            'paymentMethods',
+                            current.filter((p: string) => p !== pm.id),
+                          );
+                        }
+                      }}
+                    />
+                  );
+                })}
+                {errors.paymentMethods && (
+                  <div className="text-danger">
+                    {errors.paymentMethods.message}
+                  </div>
+                )}
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* FAQ */}
+          <Form.Group controlId="faq" className="mb-3">
+            <Form.Label>FAQ</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              {...register('faq')}
+              placeholder="Enter FAQs"
+              isInvalid={!!errors.faq}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.faq?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          <Button variant="primary" type="submit">
+            {therapistId ? 'Update Therapist' : 'Save Therapist'}
+          </Button>
+        </Form>
+      </CardBody>
+    </Card>
   );
 };
 

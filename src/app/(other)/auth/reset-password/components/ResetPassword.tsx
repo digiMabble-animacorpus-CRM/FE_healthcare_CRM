@@ -84,7 +84,7 @@ const ResetPassword = () => {
                     ? 'Enter your new password to reset your account.'
                     : 'Enter your email address and we’ll send you an email with instructions to reset your password.'}
                 </p>
-                <div className="px-4">
+                <div className="px-4 mb-5">
                   <form onSubmit={handleSubmit(onSubmit)} className="authentication-form">
                     <div className="mb-3">
                       {token ? (
@@ -128,14 +128,16 @@ const ResetPassword = () => {
                     </div>
                   </form>
                 </div>
+                <p className="mb-0 text-center">
+                  Back to{' '}
+                  <Link href="/auth/sign-in" className="text-reset text-unline-dashed fw-bold ms-1">
+                    Sign In
+                  </Link>
+                </p>
               </CardBody>
+              
             </Card>
-            <p className="mb-0 text-center text-white">
-              Back to{' '}
-              <Link href="/auth/sign-in" className="text-reset text-unline-dashed fw-bold ms-1">
-                Sign In
-              </Link>
-            </p>
+            
           </Col>
         </Row>
       </Container>

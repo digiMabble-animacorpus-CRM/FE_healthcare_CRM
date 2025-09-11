@@ -16,6 +16,7 @@ export default function AppointmentPage() {
   const [customer, setCustomer] = useState<PatientType | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
   const [isClient, setIsClient] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(0);
 
   useEffect(() => {
     setIsClient(true);
@@ -34,16 +35,24 @@ export default function AppointmentPage() {
     setCustomer(saved);
   };
 
+  const handleReset = () => {
+    setCustomer(null);
+    setResetTrigger(prev => prev + 1); // Force re-render of CustomerInfoCard
+  };
+
   const handleAppointmentSubmit = (appointmentData: any) => {
     console.log("Appointment Data:", appointmentData);
-    alert("Appointment submitted successfully!");
   };
 
   if (!isClient) return null;
 
   return (
     <div className="p-3">
-      <CustomerInfoCard onSave={handleCustomerSave} />
+      <CustomerInfoCard 
+        onSave={handleCustomerSave} 
+        onReset={handleReset}
+        key={resetTrigger} // Force re-render when reset is triggered
+      />
 
       {customer?.id && (
         <BookAppointmentForm

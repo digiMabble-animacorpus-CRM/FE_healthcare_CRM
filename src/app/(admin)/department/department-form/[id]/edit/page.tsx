@@ -78,7 +78,7 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
         },
       });
 
-      toast.success('Department updated successfully!');
+      // toast.success('Department updated successfully!');
       router.push('/department');
     } catch (error) {
       console.error(error);

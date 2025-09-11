@@ -1,6 +1,6 @@
 import { StaticImageData } from 'next/image';
-import { BootstrapVariantType } from './component-props';
-import { file } from 'googleapis/build/src/apis/file';
+import { Key, ReactNode } from 'react';
+import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -165,6 +165,7 @@ export interface AppointmentType {
 }
 
 export type BranchType = {
+  branch_id: number;
   _id: string;
 
   name: string;
@@ -320,45 +321,29 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  _id: string;
-  id: string;
-  frequently_asked_questions: any;
-  languages_spoken(languages_spoken: any): unknown;
-  _key: number;
-  idPro: number;
+  centerAddress: any;
+  appointmentStart: any;
+  imageUrl: boolean;
+  jobTitle: string;
+  therapistId: string | number | null | undefined;
   firstName: string;
   lastName: string;
   fullName: string;
-  photo: string;
-  jobTitle: string;
-  targetAudience?: string | null;
-  specialization1?: string | null;
-  specialization2?: string | null;
-  aboutMe: string;
-  about?: string | null;
-  consultations: string;
-  centerAddress: string;
-  centerEmail: string;
-  centerPhoneNumber: string;
+  photo?: string | null;
   contactEmail: string;
   contactPhone: string;
-  schedule: string;
-  spokenLanguages: string[]; // ✅ fixed
-  paymentMethods?: string;
-  degreesAndTraining: string;
-  specializations: string;
-  website: string;
-  faq: string;
-  agendaLinks: string | null;
-  rosaLink?: string | null;
-  googleAgendaLink?: string | null;
-  appointmentStart?: string | null;
-  appointmentEnd?: string | null;
-  appointmentAlert?: string | null;
-  availability?: any | null;
-  tags?: any;
-  imageUrl?: string;
+  inamiNumber: string;
+  aboutMe?: string | null;
+  consultations?: string | null;
+  degreesAndTraining?: string | null;
+  departmentId: number | null;
+  specializationIds?: number[];
+  branches: BranchWithAvailability[];
+  languages: number[];
+  faq?: string | null;
+  paymentMethods: string[];
 };
+
 
 export type TherapistCreatePayload = {
   firstName: string;
@@ -668,15 +653,6 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
-  about: string;
-  payment_methods: string[];
-  diplomas_and_training: any;
-  specializations: any;
-  website: string;
-  frequently_asked_questions: any;
-  calendar_links: any;
-  photo: string;
-  languages_spoken: string[];
   team_id: string;
   last_name: string;
   first_name: string;
@@ -693,9 +669,24 @@ export type TeamMemberType = {
   contact_email: string;
   contact_phone: string;
   schedule: {
-  text: string | null;
+    text: string | null;
+  };
+  about?: string | null;
+  languages_spoken: string[]; // always an array
+  payment_methods: string[]; // always an array
+  diplomas_and_training: string[]; // always an array
+  specializations: string[]; // always an array
+  website?: string;
+  frequently_asked_questions?: string | Record<string, any> | null; // JSON string or object
+  calendar_links: string[]; // always an array
+  photo: string;
+  branch_ids?: (string | number)[]; // array of strings or numbers
+  primary_branch_id: number;
+  permissions: Record<string, any>; // object for permissions
+  role: string;
+  status: "active" | "inactive" | string;
+  created_by_role?: string;
 };
-}
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency
@@ -726,7 +717,12 @@ export type TeamMemberCreatePayload = {
   calendarLinks: string[]; // always an array
   photo: string;
   branches?: (string | number)[];
-  selectedBranch?: string | number | null;
+  selected_branch?: string | number | null;
+  role: string;
+  status: "active" | "inactive";
+  primaryBranchId: number;
+  permissions: Record<string, any>;
+  createdByRole: string;
 };
 
 export interface DepartmentType {
@@ -738,3 +734,5 @@ export interface DepartmentType {
   updatedAt?: string;
 }
 
+
+export { BranchWithAvailability };
