@@ -17,6 +17,7 @@ import { API_BASE_PATH } from "@/context/constants";
 
 const ProfileDropdown = () => {
   const [fullName, setFullName] = useState<string>('User');
+  const [avatarUrl, setAvatarUrl] = useState<string>(avatar1.src); // Default to local image
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,8 +32,11 @@ const ProfileDropdown = () => {
           },
         });
 
-        if ( res.data?.user?.team.full_name) {
-          setFullName( res.data?.user?.team.full_name);
+        if (res.data?.user?.team.full_name) {
+          setFullName(res.data.user.team.full_name);
+        }
+        if (res.data?.user?.team.photo) {
+          setAvatarUrl(res.data.user.team.photo); // Use API photo field
         }
       } catch (error) {
         console.error('Error fetching profile:', error);
@@ -54,7 +58,13 @@ const ProfileDropdown = () => {
         aria-expanded="false"
       >
         <span className="d-flex align-items-center">
-          <Image className="rounded-circle" width={32} src={avatar1} alt="avatar" />
+          <Image
+            className="rounded-circle"
+            width={32}
+            height={32}
+            src={avatarUrl}
+            alt="avatar"
+          />
         </span>
       </DropdownToggle>
       <DropdownMenu className="dropdown-menu-end">
@@ -62,15 +72,18 @@ const ProfileDropdown = () => {
           Welcome {fullName}!
         </DropdownHeader>
         <DropdownItem as={Link} href="/profile/details">
-          <IconifyIcon icon="solar:user-broken" className="align-middle me-2 fs-18" />
+          {/* <IconifyIcon icon="solar:user-broken" className="align-middle me-2 fs-18" /> */}
+          <IconifyIcon icon="mdi:account" className="align-middle me-2 fs-18" />
+
+
           <span className="align-middle">My Profile</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/pages/pricing">
-          <IconifyIcon icon="solar:help-broken" className="align-middle me-2 fs-18" />
+          <IconifyIcon icon="solar:wallet-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">Help & Support</span>
         </DropdownItem>
         <DropdownItem as={Link} href="/support/faqs">
-          <IconifyIcon icon="solar:lock-broken" className="align-middle me-2 fs-18" />
+          <IconifyIcon icon="solar:help-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">Privacy & Conditions</span>
         </DropdownItem>
         <div className="dropdown-divider my-1" />
