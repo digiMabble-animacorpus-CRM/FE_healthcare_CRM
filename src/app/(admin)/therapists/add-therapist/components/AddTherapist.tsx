@@ -7,7 +7,11 @@ import * as yup from 'yup';
 import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
-import { useParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
+
+type AddTherapistProps = {
+  therapistId?: string;
+};
 
 interface Branch {
   branch_id: number;
@@ -29,13 +33,13 @@ interface Language {
   name: string;
 }
 
-interface Availability {
+export interface Availability {
   day: string;
   startTime: string;
   endTime: string;
 }
 
-interface BranchWithAvailability {
+export interface BranchWithAvailability {
   branch_id: number;
   branch_name: string;
   availability: Availability[];
@@ -45,39 +49,38 @@ interface TherapistFormInputs {
   firstName: string;
   lastName: string;
   fullName: string;
-  photo: string;
+  photo?: string | null;
   contactEmail: string;
   contactPhone: string;
   inamiNumber: string;
-  aboutMe: string;
-  consultations: string;
-  degreesTraining: string;
-  departmentId: number | '';
-  specializationIds: number[];
+  aboutMe?: string | null;
+  degreesTraining?: string | null;
+  departmentId: number | null;
+  specializationIds?: number[];
   branches: BranchWithAvailability[];
-  languages: number[];
-  faq: string;
+  languages: number[]; // selected language IDs
+  faq?: string | null;
   paymentMethods: string[];
 }
 
-const schema = yup.object({
+const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   firstName: yup.string().required('First Name is required'),
   lastName: yup.string().required('Last Name is required'),
-  fullName: yup
-    .string()
-    .transform((_, obj) => `${obj.firstName || ''} ${obj.lastName || ''}`.trim())
-    .required('Full Name is required'),
+  fullName: yup.string(),
   photo: yup.string().url('Must be a valid URL').nullable(),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
   contactPhone: yup
     .string()
-    .matches(/^[0-9]{10}$/, 'Must be a valid 10-digit phone number')
+    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
     .required('Phone number is required'),
   inamiNumber: yup.string().required('INAMI Number is required'),
   aboutMe: yup.string().nullable(),
-  consultations: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
-  departmentId: yup.number().required('Department is required'),
+  departmentId: yup
+    .number()
+    .nullable()
+    .typeError('Department is required')
+    .required('Department is required'),
   specializationIds: yup
     .array()
     .of(yup.number().required())
@@ -87,7 +90,7 @@ const schema = yup.object({
     .of(
       yup.object({
         branch_id: yup.number().required('Branch is required'),
-        branch_name: yup.string().nullable(),
+        branch_name: yup.string().nullable().defined(),
         availability: yup
           .array()
           .of(
@@ -97,10 +100,13 @@ const schema = yup.object({
               endTime: yup.string().required('End time is required'),
             }),
           )
-          .min(1, 'At least one availability slot is required'),
+          .min(1, 'At least one availability slot is required')
+          .required('Availability is required'),
       }),
     )
-    .min(1, 'At least one branch is required'),
+    .min(1, 'At least one branch is required')
+    .required('Branches are required')
+    .defined(),
   languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
   faq: yup.string().nullable(),
   paymentMethods: yup
@@ -109,7 +115,7 @@ const schema = yup.object({
     .min(1, 'At least one payment method is required'),
 });
 
-const AddTherapist = () => {
+const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   const {
     register,
     handleSubmit,
@@ -128,14 +134,13 @@ const AddTherapist = () => {
       contactEmail: '',
       contactPhone: '',
       inamiNumber: '',
-      aboutMe: '',
-      consultations: '',
-      degreesTraining: '',
-      departmentId: '' as unknown as number, // Ensure departmentId is typed as number or ''
+      aboutMe: null,
+      degreesTraining: null,
+      departmentId: null,
       specializationIds: [],
       branches: [],
       languages: [],
-      faq: '',
+      faq: null,
       paymentMethods: [],
     },
   });
@@ -144,18 +149,25 @@ const AddTherapist = () => {
     fields: branchFields,
     append: appendBranch,
     remove: removeBranch,
-  } = useFieldArray({ control, name: 'branches' });
+  } = useFieldArray({
+    control,
+    name: 'branches',
+  });
+
   const [branches, setBranches] = useState<Branch[]>([]);
   const [departments, setDepartments] = useState<Department[]>([]);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
+  const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
+
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  const params = useParams();
+  const router = useRouter();
+
   const departmentId = watch('departmentId');
   const firstName = watch('firstName');
   const lastName = watch('lastName');
 
-  // Update fullName automatically
+  // Auto update fullName
   useEffect(() => {
     setValue('fullName', `${firstName || ''} ${lastName || ''}`.trim());
   }, [firstName, lastName, setValue]);
@@ -166,108 +178,316 @@ const AddTherapist = () => {
     return [];
   };
 
-  // Load lists for selects
+  // --- Loader functions (they return the loaded array)
+  const loadBranches = async (): Promise<Branch[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/branches`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setBranches(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading branches:', err);
+      setBranches([]);
+      return [];
+    }
+  };
+
+  const loadDepartments = async (): Promise<Department[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/departments`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setDepartments(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading departments:', err);
+      setDepartments([]);
+      return [];
+    }
+  };
+
+  const loadLanguages = async (): Promise<Language[]> => {
+    if (!token) return [];
+    try {
+      const res = await fetch(`${API_BASE_PATH}/languages`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const json = await res.json();
+      const arr = safeArray(json);
+      setLanguages(arr);
+      return arr;
+    } catch (err) {
+      console.error('Error loading languages:', err);
+      setLanguages([]);
+      return [];
+    }
+  };
+
+  // Specializations loader based on department
   useEffect(() => {
-    if (!token) return;
-
-    const loadBranches = async () => {
-      try {
-        const res = await fetch(`${API_BASE_PATH}/branches`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setBranches(safeArray(await res.json()));
-      } catch {
-        setBranches([]);
-      }
-    };
-
-    const loadDepartments = async () => {
-      try {
-        const res = await fetch(`${API_BASE_PATH}/departments`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setDepartments(safeArray(await res.json()));
-      } catch {
-        setDepartments([]);
-      }
-    };
-
-    const loadLanguages = async () => {
-      try {
-        const res = await fetch(`${API_BASE_PATH}/languages`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setLanguages(safeArray(await res.json()));
-      } catch {
-        setLanguages([]);
-      }
-    };
-
-    loadBranches();
-    loadDepartments();
-    loadLanguages();
-  }, [token]);
-
-  useEffect(() => {
-    if (!departmentId) {
+    if (!departmentId || !token) {
       setSpecializations([]);
-      setValue('specializationIds', []);
       return;
     }
     const loadSpecializations = async () => {
       try {
-        const res = await fetch(`${API_BASE_PATH}/specializations?departmentId=${departmentId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setSpecializations(safeArray(await res.json()));
-      } catch {
+        const res = await fetch(
+          `${API_BASE_PATH}/specializations?departmentId=${departmentId}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
+        const json = await res.json();
+        setSpecializations(safeArray(json));
+      } catch (err) {
+        console.error('Error loading specializations:', err);
         setSpecializations([]);
       }
     };
     loadSpecializations();
-  }, [departmentId, token, setValue]);
+  }, [departmentId, token]);
 
-  useEffect(() => {
-    // Load therapist data for editing if ID exists
-    if (params?.id) {
-      const fetchTherapist = async () => {
-        try {
-          const res = await axios.get(`${API_BASE_PATH}/therapists/${params.id}`, {
-            headers: { Authorization: `Bearer ${token}` },
-          });
-          reset(res.data);
-        } catch (error) {
-          // Handle error if needed
-        }
+  // --- Mapping helper: transform API therapist -> form shape
+  // IMPORTANT: This mapper expects the API shape you posted:
+  // languages: ["English", "French"]
+  // branches: [1,2]
+  // availability: [{day, startTime, endTime}, ...] (root array)
+  const mapTherapistToFormValues = (
+    data: any,
+    branchesList: Branch[],
+    languagesList: Language[],
+  ): TherapistFormInputs => {
+    if (!data) {
+      return {
+        firstName: '',
+        lastName: '',
+        fullName: '',
+        photo: null,
+        contactEmail: '',
+        contactPhone: '',
+        inamiNumber: '',
+        aboutMe: null,
+        degreesTraining: null,
+        departmentId: null,
+        specializationIds: [],
+        branches: [],
+        languages: [],
+        faq: null,
+        paymentMethods: [],
       };
-      fetchTherapist();
     }
-  }, [params?.id, reset, token]);
+
+    // --- Specializations (IDs) — API provides array of numbers in your example
+    const specializationIds: number[] = Array.isArray(data.specializations)
+  ? data.specializations.map((s: any) =>
+      typeof s === 'number' ? s : s.specialization_id || s.id
+    )
+  : [];
+
+
+    // --- Availability root array (normalize keys)
+    const rootAvailability: Availability[] = Array.isArray(data.availability)
+      ? data.availability.map((av: any) => ({
+          day: av.day ?? av.d ?? '',
+          startTime: av.startTime ?? av.start_time ?? av.from ?? '',
+          endTime: av.endTime ?? av.end_time ?? av.to ?? '',
+        }))
+      : [];
+
+    
+    const formBranches: BranchWithAvailability[] = Array.isArray(data.branches)
+  ? data.branches.map((b: any) => {
+      const branchId = b.branch_id ?? 0;
+      const branchName = b.name ?? '';
+          
+          const availabilityForThisBranch = rootAvailability.length > 0 ? rootAvailability.map(a => ({ ...a })) : [{ day: '', startTime: '', endTime: '' }];
+
+          return {
+            branch_id: branchId,
+        branch_name: branchName,
+        availability: availabilityForThisBranch,
+          };
+        })
+      : [];
+
+    // --- Languages: API gives strings, match to languagesList to get IDs
+    const langIds: number[] = Array.isArray(data.languages)
+      ? data.languages
+          .map((langNameOrObj: any) => {
+            if (typeof langNameOrObj === 'number') return langNameOrObj;
+            if (typeof langNameOrObj === 'object' && langNameOrObj !== null) {
+              // sometimes API might return objects; accept language_id or id
+              return langNameOrObj.language_id ?? langNameOrObj.id ?? undefined;
+            }
+            if (typeof langNameOrObj === 'string') {
+              const found = languagesList.find(
+                (l) => l.name?.toLowerCase() === langNameOrObj.toLowerCase(),
+              );
+              return found?.id;
+            }
+            return undefined;
+          })
+          .filter((id: any) => typeof id === 'number')
+      : [];
+
+    const resetObj: TherapistFormInputs = {
+      firstName: data.firstName ?? '',
+      lastName: data.lastName ?? '',
+      fullName: `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim(),
+      photo: data.photo ?? data.imageUrl ?? null,
+      contactEmail: data.contactEmail ?? '',
+      contactPhone: data.contactPhone ?? '',
+      inamiNumber: data.inamiNumber != null ? String(data.inamiNumber) : '',
+      aboutMe: data.aboutMe ?? null,
+      degreesTraining: data.degreesTraining ?? null,
+      departmentId: data.departmentId ?? null,
+      specializationIds,
+      branches: formBranches,
+      languages: langIds,
+      faq: data.faq ?? null,
+      paymentMethods: Array.isArray(data.paymentMethods) ? data.paymentMethods : [],
+    };
+
+    // debug logs to help you verify mapping
+    console.log('mapTherapistToFormValues -> rootAvailability:', rootAvailability);
+    console.log('mapTherapistToFormValues -> formBranches:', formBranches);
+    console.log('mapTherapistToFormValues -> langIds:', langIds);
+    console.log('mapTherapistToFormValues -> resetObj:', resetObj);
+
+    return resetObj;
+  };
+
+  // --- Combined init: load dropdowns (and use returned arrays) then fetch therapist and reset
+  useEffect(() => {
+    const init = async () => {
+      if (!token) return;
+
+      console.log('Starting to load branches/departments/languages...');
+      try {
+        const [branchesRes, departmentsRes, languagesRes] = await Promise.all([
+          loadBranches(),
+          loadDepartments(),
+          loadLanguages(),
+        ]);
+        console.log('Loaded dropdowns:', { branchesRes, departmentsRes, languagesRes });
+
+        setDropdownsLoaded(true);
+
+        // If editing, fetch therapist and map using the freshly loaded dropdown arrays
+        if (therapistId) {
+          try {
+            const resp = await axios.get(`${API_BASE_PATH}/therapists/${therapistId}`, {
+              headers: { Authorization: `Bearer ${token}` },
+            });
+            const data = resp.data;
+            console.log('Fetched therapist API data:', data);
+
+            const mapped = mapTherapistToFormValues(data, branchesRes, languagesRes);
+            console.log('Mapped therapist -> form values (before reset):', mapped);
+
+            // Reset form with mapped object (this will populate field arrays)
+            reset(mapped);
+          } catch (err) {
+            console.error('Failed to fetch therapist for edit:', err);
+          }
+        }
+      } catch (err) {
+        console.error('Init error loading dropdowns:', err);
+      }
+    };
+
+    init();
+    // Intentionally depend only on token & therapistId & reset
+  }, [token, therapistId, reset]);
+
+  // Debug watch of all form values
+  useEffect(() => {
+    const sub = watch((vals) => {
+      console.log('Watched form values:', vals);
+    });
+    return () => sub.unsubscribe();
+  }, [watch]);
+
+  // Transform before submit: this sends availability with branchId attached per your transformPayload
+  const transformPayload = (data: TherapistFormInputs) => ({
+    firstName: data.firstName,
+    lastName: data.lastName,
+    photo: data.photo,
+    contactEmail: data.contactEmail,
+    contactPhone: data.contactPhone,
+    inamiNumber: Number(data.inamiNumber),
+    aboutMe: data.aboutMe,
+    degreesTraining: data.degreesTraining,
+    departmentId: data.departmentId,
+    specializations: data.specializationIds?.map((id) => id),
+    branches: data.branches.map((b) => b.branch_id),
+    availability: data.branches.flatMap((b) =>
+      b.availability.map((av) => ({
+        ...av,
+        branchId: b.branch_id,
+      })),
+    ),
+    languages: data.languages
+      .map((id) => {
+        const langObj = languages.find((l) => l.id === id);
+        return langObj ? langObj.name : null;
+      })
+      .filter((n) => n),
+    faq: data.faq,
+    paymentMethods: data.paymentMethods,
+  });
 
   const onSubmit = async (data: TherapistFormInputs) => {
     try {
-      const res = await fetch(`${API_BASE_PATH}/therapists`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` || '' },
-        body: JSON.stringify(data),
+      const payload = transformPayload(data);
+      const url = therapistId ? `${API_BASE_PATH}/therapists/${therapistId}` : `${API_BASE_PATH}/therapists`;
+      const method = therapistId ? 'PATCH' : 'POST';
+
+      const res = await fetch(url, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}` || '',
+        },
+        body: JSON.stringify(payload),
       });
-      if (res.status === 200) {
-        alert('Therapist saved successfully ✅');
+
+      if (res.ok) {
+        alert(`Therapist ${therapistId ? 'updated' : 'saved'} successfully`);
+        router.push('/therapists/therapists-list');
       } else {
-        throw new Error(`Unexpected status: ${res.status}`);
+        const errText = await res.text();
+        throw new Error(`Unexpected status: ${res.status} - ${errText}`);
       }
     } catch (err: any) {
+      console.error('Submit error:', err);
       alert(err.message || 'Error saving therapist');
     }
   };
 
+  // Component for availability slots remains same (uses field arrays)
   const AvailabilitySlots = ({ nestIndex }: { nestIndex: number }) => {
     const { fields, append, remove } = useFieldArray({
       control,
       name: `branches.${nestIndex}.availability`,
     });
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
+    ];
 
     return (
       <>
@@ -280,8 +500,12 @@ const AddTherapist = () => {
               >
                 <Form.Label>Day</Form.Label>
                 <Form.Select
-                  {...register(`branches.${nestIndex}.availability.${k}.day` as const)}
-                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.day}
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.day` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]?.day
+                  }
                 >
                   <option value="">Select Day</option>
                   {days.map((d) => (
@@ -291,7 +515,10 @@ const AddTherapist = () => {
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
-                  {errors.branches?.[nestIndex]?.availability?.[k]?.day?.message}
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]?.day
+                      ?.message
+                  }
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -303,11 +530,19 @@ const AddTherapist = () => {
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
                   type="time"
-                  {...register(`branches.${nestIndex}.availability.${k}.startTime` as const)}
-                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.startTime}
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.startTime` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.startTime
+                  }
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.branches?.[nestIndex]?.availability?.[k]?.startTime?.message}
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.startTime?.message
+                  }
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -319,25 +554,40 @@ const AddTherapist = () => {
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
                   type="time"
-                  {...register(`branches.${nestIndex}.availability.${k}.endTime` as const)}
-                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.endTime}
+                  {...register(
+                    `branches.${nestIndex}.availability.${k}.endTime` as const,
+                  )}
+                  isInvalid={
+                    !!errors.branches?.[nestIndex]?.availability?.[k]?.endTime
+                  }
                 />
                 <Form.Control.Feedback type="invalid">
-                  {errors.branches?.[nestIndex]?.availability?.[k]?.endTime?.message}
+                  {
+                    errors.branches?.[nestIndex]?.availability?.[k]
+                      ?.endTime?.message
+                  }
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={2}>
-              <Button variant="danger" onClick={() => remove(k)} style={{ marginTop: '1.7rem' }}>
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => remove(k)}
+                style={{ marginTop: '1.7rem' }}
+              >
                 Remove
               </Button>
             </Col>
           </Row>
         ))}
         <Button
+          type="button"
           variant="secondary"
           size="sm"
-          onClick={() => append({ day: '', startTime: '', endTime: '' })}
+          onClick={() =>
+            append({ day: '', startTime: '', endTime: '' })
+          }
         >
           Add Slot
         </Button>
@@ -348,8 +598,15 @@ const AddTherapist = () => {
   return (
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
-        <h5 className="mb-4">Add Therapist</h5>
-        <Form onSubmit={handleSubmit(onSubmit)}>
+        <h5 className="mb-4">
+          {therapistId ? 'Edit Therapist' : 'Add Therapist'}
+        </h5>
+        <Form
+          onSubmit={handleSubmit(onSubmit, (errors) =>
+            console.log('Validation errors:', errors),
+          )}
+        >
+          {/* First name / Last name */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="firstName" className="mb-3">
@@ -381,14 +638,15 @@ const AddTherapist = () => {
             </Col>
           </Row>
 
+          {/* Full name, Photo */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="fullName" className="mb-3">
                 <Form.Label>Full Name</Form.Label>
                 <Form.Control
                   type="text"
-                  placeholder="Full Name"
                   {...register('fullName')}
+                  placeholder="Full Name"
                   readOnly
                 />
               </Form.Group>
@@ -409,6 +667,7 @@ const AddTherapist = () => {
             </Col>
           </Row>
 
+          {/* Email, Phone */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="contactEmail" className="mb-3">
@@ -440,6 +699,7 @@ const AddTherapist = () => {
             </Col>
           </Row>
 
+          {/* INAMI Number, Degrees & Training */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="inamiNumber" className="mb-3">
@@ -456,24 +716,6 @@ const AddTherapist = () => {
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group controlId="aboutMe" className="mb-3">
-                <Form.Label>About Me</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  {...register('aboutMe')}
-                  placeholder="Enter Description"
-                  rows={3}
-                  isInvalid={!!errors.aboutMe}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.aboutMe?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-          </Row>
-
-          <Row>
-            <Col md={6}>
               <Form.Group controlId="degreesTraining" className="mb-3">
                 <Form.Label>Degrees & Training</Form.Label>
                 <Form.Control
@@ -488,28 +730,32 @@ const AddTherapist = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-            <Col md={6}>
-              <Form.Group controlId="consultations" className="mb-3">
-                <Form.Label>Consultations</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  {...register('consultations')}
-                  placeholder="Enter Consultations Details"
-                  rows={3}
-                  isInvalid={!!errors.consultations}
-                />
-                <Form.Control.Feedback type="invalid">
-                  {errors.consultations?.message}
-                </Form.Control.Feedback>
-              </Form.Group>
-            </Col>
           </Row>
 
+          {/* About Me */}
+          <Form.Group controlId="aboutMe" className="mb-3">
+            <Form.Label>About Me</Form.Label>
+            <Form.Control
+              as="textarea"
+              rows={3}
+              {...register('aboutMe')}
+              placeholder="Enter Description"
+              isInvalid={!!errors.aboutMe}
+            />
+            <Form.Control.Feedback type="invalid">
+              {errors.aboutMe?.message}
+            </Form.Control.Feedback>
+          </Form.Group>
+
+          {/* Department + Specializations */}
           <Row>
             <Col md={6}>
               <Form.Group controlId="departmentId" className="mb-3">
                 <Form.Label>Department</Form.Label>
-                <Form.Select {...register('departmentId')} isInvalid={!!errors.departmentId}>
+                <Form.Select
+                  {...register('departmentId')}
+                  isInvalid={!!errors.departmentId}
+                >
                   <option value="">Select Department</option>
                   {departments.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -522,49 +768,55 @@ const AddTherapist = () => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-           <Col md={6}>
-  <Form.Group className="mb-3">
-    <Form.Label>Specialization</Form.Label>
-    <div>
-      {specializations.map((s) => (
-        <Form.Check
-          inline
-          key={s.specialization_id}
-          type="checkbox"
-          label={s.specialization_type}
-          checked={watch('specializationIds')?.includes(s.specialization_id)}
-          onChange={(e) => {
-            const current = watch('specializationIds') || [];
-            if (e.target.checked) {
-              setValue('specializationIds', [...current, s.specialization_id]);
-            } else {
-              setValue(
-                'specializationIds',
-                current.filter((id: number) => id !== s.specialization_id)
-              );
-            }
-          }}
-        />
-      ))}
-    </div>
-    {errors.specializationIds && (
-      <Form.Text className="text-danger">
-        {errors.specializationIds.message as string}
-      </Form.Text>
-    )}
-  </Form.Group>
-</Col>
-
-
-
+            <Col md={6}>
+              <Form.Group className="mb-3">
+                <Form.Label>Specialization</Form.Label>
+                <div>
+                  {specializations.map((s) => (
+                    <Form.Check
+                      inline
+                      key={s.specialization_id}
+                      type="checkbox"
+                      label={s.specialization_type}
+                      checked={
+                        watch('specializationIds')?.includes(s.specialization_id)
+                      }
+                      onChange={(e) => {
+                        const current = watch('specializationIds') || [];
+                        if (e.target.checked) {
+                          setValue('specializationIds', [
+                            ...current,
+                            s.specialization_id,
+                          ]);
+                        } else {
+                          setValue(
+                            'specializationIds',
+                            current.filter((id: number) => id !== s.specialization_id),
+                          );
+                        }
+                      }}
+                    />
+                  ))}
+                </div>
+                {errors.specializationIds && (
+                  <Form.Text className="text-danger">
+                    {errors.specializationIds.message as string}
+                  </Form.Text>
+                )}
+              </Form.Group>
+            </Col>
           </Row>
 
+          {/* Branch & Availability */}
           <h6>Branch & Availability</h6>
           {branchFields.map((branch, index) => (
             <Card key={branch.id} className="mb-3 p-3">
               <Row className="align-items-center">
                 <Col md={8}>
-                  <Form.Group controlId={`branches.${index}.branch_id`} className="mb-3">
+                  <Form.Group
+                    controlId={`branches.${index}.branch_id`}
+                    className="mb-3"
+                  >
                     <Form.Label>Branch</Form.Label>
                     <Form.Select
                       {...register(`branches.${index}.branch_id` as const)}
@@ -583,7 +835,12 @@ const AddTherapist = () => {
                   </Form.Group>
                 </Col>
                 <Col md={4}>
-                  <Button variant="danger" className="mt-4" onClick={() => removeBranch(index)}>
+                  <Button
+                    type="button"
+                    variant="danger"
+                    className="mt-4"
+                    onClick={() => removeBranch(index)}
+                  >
                     Remove Branch
                   </Button>
                 </Col>
@@ -592,13 +849,17 @@ const AddTherapist = () => {
             </Card>
           ))}
           <Button
+            type="button"
             variant="secondary"
-            onClick={() => appendBranch({ branch_id: 0, branch_name: '', availability: [] })}
+            onClick={() =>
+              appendBranch({ branch_id: 0, branch_name: '', availability: [{ day: '', startTime: '', endTime: '' }] })
+            }
             className="mb-3"
           >
             Add Branch
           </Button>
 
+          {/* Languages + Payment Methods */}
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
@@ -636,6 +897,7 @@ const AddTherapist = () => {
               </Form.Group>
             </Col>
 
+
             <Col md={6}>
               <Form.Group controlId="paymentMethods" className="mb-3">
                 <Form.Label>Payment Methods</Form.Label>
@@ -666,12 +928,15 @@ const AddTherapist = () => {
                   );
                 })}
                 {errors.paymentMethods && (
-                  <div className="text-danger">{errors.paymentMethods.message}</div>
+                  <div className="text-danger">
+                    {errors.paymentMethods.message}
+                  </div>
                 )}
               </Form.Group>
             </Col>
           </Row>
 
+          {/* FAQ */}
           <Form.Group controlId="faq" className="mb-3">
             <Form.Label>FAQ</Form.Label>
             <Form.Control
@@ -681,11 +946,13 @@ const AddTherapist = () => {
               placeholder="Enter FAQs"
               isInvalid={!!errors.faq}
             />
-            <Form.Control.Feedback type="invalid">{errors.faq?.message}</Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">
+              {errors.faq?.message}
+            </Form.Control.Feedback>
           </Form.Group>
 
           <Button variant="primary" type="submit">
-            Save Therapist
+            {therapistId ? 'Update Therapist' : 'Save Therapist'}
           </Button>
         </Form>
       </CardBody>

@@ -27,7 +27,7 @@ import '@/assets/scss/components/_edittogglebtn.scss';
 import { getAllPatient, deletePatient } from '@/helpers/patient';
 
 const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
+
 
 const PatientsListPage = () => {
   const [allPatients, setAllPatients] = useState<PatientType[]>([]);
@@ -39,6 +39,7 @@ const PatientsListPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const router = useRouter();
 
   // Fetch patients
@@ -93,11 +94,12 @@ const PatientsListPage = () => {
 
     if (searchTerm.trim()) {
       const term = searchTerm.trim().toLowerCase();
-      data = data.filter((p) =>
-        (p?.firstname ?? '').toLowerCase().includes(term) ||
-        (p?.lastname ?? '').toLowerCase().includes(term) ||
-        (p?.emails ?? '').toLowerCase().includes(term) ||
-        (p?.phones ? p.phones.join(' ').toLowerCase() : '').includes(term)
+      data = data.filter(
+        (p) =>
+          (p?.firstname ?? '').toLowerCase().includes(term) ||
+          (p?.lastname ?? '').toLowerCase().includes(term) ||
+          (p?.emails ?? '').toLowerCase().includes(term) ||
+          (p?.phones ? p.phones.join(' ').toLowerCase() : '').includes(term),
       );
     }
 
@@ -186,7 +188,7 @@ const PatientsListPage = () => {
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Patient List
+                All Patient List <span className="text-muted">({filteredPatients.length})</span>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
@@ -202,75 +204,7 @@ const PatientsListPage = () => {
                   style={{ minWidth: 200 }}
                 />
 
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-white">
-                    {selectedBranch || 'Filter by Branch'}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {BRANCHES.map((branch) => (
-                      <DropdownItem
-                        key={branch}
-                        onClick={() => {
-                          setSelectedBranch(branch);
-                          setCurrentPage(1);
-                        }}
-                        active={selectedBranch === branch}
-                      >
-                        {branch}
-                      </DropdownItem>
-                    ))}
-                    {selectedBranch && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Branch Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-white">
-                    {dateFilter === 'all'
-                      ? 'Filter by Date'
-                      : dateFilter.replace('_', ' ').toUpperCase()}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {[
-                      { label: 'Today', value: 'today' },
-                      { label: 'This Week', value: 'this_week' },
-                      { label: 'Last 15 Days', value: '15_days' },
-                      { label: 'This Month', value: 'this_month' },
-                      { label: 'This Year', value: 'this_year' },
-                    ].map((f) => (
-                      <DropdownItem
-                        key={f.value}
-                        onClick={() => {
-                          setDateFilter(f.value);
-                          setCurrentPage(1);
-                        }}
-                        active={dateFilter === f.value}
-                      >
-                        {f.label}
-                      </DropdownItem>
-                    ))}
-                    {dateFilter !== 'all' && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setDateFilter('all');
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Date Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
+               
               </div>
             </CardHeader>
 
@@ -283,13 +217,11 @@ const PatientsListPage = () => {
                 <div className="table-responsive">
                   <table
                     className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 1100 }}
+                    style={{ minWidth: 1000 }}
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 30 }}>
-                          <input type="checkbox" />
-                        </th>
+                        <th>No</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
@@ -300,60 +232,70 @@ const PatientsListPage = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {currentData.map((item) => (
-                        <tr key={item.id}>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
-                          <td>
-                            {item.firstname} {item.lastname}
-                          </td>
-                          <td>{item.emails ?? ''}</td>
-                          <td>
-                            {Array.isArray(item.phones)
-                              ? item.phones.join(', ')
-                              : item.phones || ''}
-                          </td>
-                          <td>
-                            {calculateAge(item.birthdate)}
-                            {item.legalgender ? ` yrs | ${formatGender(item.legalgender)}` : ' yrs'}
-                          </td>
-                          <td>{item.city}</td>
-                          <td>
-                            <span
-                              className={`badge bg-${item.status === 'ACTIVE' ? 'success' : 'secondary'} text-white`}
-                            >
-                              {item.status}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="d-flex gap-2">
-                               <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleView(item.id)}
+                      {currentData.length > 0 ? (
+                        currentData.map((item, index) => (
+                          <tr key={item.id}>
+                            {/* Auto Increment ID */}
+                            <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
+                            <td>
+                              {item.firstname} {item.lastname}
+                            </td>
+                            <td>{item.emails ?? ''}</td>
+                            <td>
+                              {Array.isArray(item.phones)
+                                ? item.phones.join(', ')
+                                : item.phones || ''}
+                            </td>
+                            <td>
+                              {calculateAge(item.birthdate)}
+                              {item.legalgender
+                                ? ` yrs | ${formatGender(item.legalgender)}`
+                                : ' yrs'}
+                            </td>
+                            <td>{item.city}</td>
+                            <td>
+                              <span
+                                className={`badge bg-${
+                                  item.status === 'ACTIVE' ? 'success' : 'secondary'
+                                } text-white`}
                               >
-                                <IconifyIcon icon="solar:eye-broken" />
-                              </Button>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => handleEditClick(item.id)}
-                              >
-                                <IconifyIcon icon="solar:pen-2-broken" />
-                              </Button>
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(item.id)}
-                              
-                              >
-                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
-                              </Button>
-                            </div>
+                                {item.status}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={() => handleView(item.id)}
+                                >
+                                  <IconifyIcon icon="solar:eye-broken" />
+                                </Button>
+                                <Button
+                                  variant="secondary"
+                                  size="sm"
+                                  onClick={() => handleEditClick(item.id)}
+                                >
+                                  <IconifyIcon icon="solar:pen-2-broken" />
+                                </Button>
+                                <Button
+                                  variant="danger"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(item.id)}
+                                >
+                                  <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={8} className="text-center py-4 text-muted">
+                            No patient found
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>

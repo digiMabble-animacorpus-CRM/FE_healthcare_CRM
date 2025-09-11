@@ -1,6 +1,6 @@
 import { StaticImageData } from 'next/image';
 import { Key, ReactNode } from 'react';
-import { BootstrapVariantType } from './component-props';
+import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -165,6 +165,7 @@ export interface AppointmentType {
 }
 
 export type BranchType = {
+  branch_id: number;
   _id: string;
 
   name: string;
@@ -320,54 +321,29 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  therapistId: Key | null | undefined;
-  // therapistId: string;
-  name: ReactNode;
-  branches: any;
-  _id: string;
-  agendaLink: any;
-  email: any;
-  phoneNumber: any;
-  education: string[];
-  // therapistId: string;
-  id: string;
-  frequently_asked_questions: any;
-  languages_spoken(languages_spoken: any): unknown;
-  _key: number;
-  idPro: number;
+  centerAddress: any;
+  appointmentStart: any;
+  imageUrl: boolean;
+  jobTitle: string;
+  therapistId: string | number | null | undefined;
   firstName: string;
   lastName: string;
   fullName: string;
-  photo: string;
-  jobTitle: string;
-  targetAudience?: string | null;
-  specialization1?: string | null;
-  specialization2?: string | null;
-  aboutMe: string;
-  about?: string | null;
-  consultations: string;
-  centerAddress: string;
-  centerEmail: string;
-  centerPhoneNumber: string;
+  photo?: string | null;
   contactEmail: string;
   contactPhone: string;
-  schedule: string;
-  spokenLanguages: string[]; // ✅ fixed
-  paymentMethods?: string;
-  degreesAndTraining: string;
-  specializations: string[];
-  website: string;
-  faq: string;
-  agendaLinks: string | null;
-  rosaLink?: string | null;
-  googleAgendaLink?: string | null;
-  appointmentStart?: string | null;
-  appointmentEnd?: string | null;
-  appointmentAlert?: string | null;
-  availability?: any | null;
-  tags?: any;
-  imageUrl?: string;
+  inamiNumber: string;
+  aboutMe?: string | null;
+  consultations?: string | null;
+  degreesAndTraining?: string | null;
+  departmentId: number | null;
+  specializationIds?: number[];
+  branches: BranchWithAvailability[];
+  languages: number[];
+  faq?: string | null;
+  paymentMethods: string[];
 };
+
 
 export type TherapistCreatePayload = {
   firstName: string;
@@ -758,3 +734,5 @@ export interface DepartmentType {
   updatedAt?: string;
 }
 
+
+export { BranchWithAvailability };
