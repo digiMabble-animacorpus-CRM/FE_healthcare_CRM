@@ -9,6 +9,7 @@ import TherapistDetails from './components/TherapistDetails';
 import { getTherapistById } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
 import { branches } from '@/assets/data/branchData';
+import { Availability } from '../../add-therapist/components/AddTherapist';
 
 const TherapistDetailsPage = () => {
   const params = useParams();
@@ -39,27 +40,40 @@ const TherapistDetailsPage = () => {
   inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
   aboutMe: rawTherapist.aboutMe || null,
   degreesAndTraining: rawTherapist.degreesAndTraining || null,
-  departmentId: rawTherapist.departmentId ?? null,
+  departmentId:
+    rawTherapist.departmentId ??
+    rawTherapist.department_id ??
+    (rawTherapist.department ? rawTherapist.department.id : null) ??
+    null,
   specializationIds: rawTherapist.specializationIds || [],
 
   // 🔹 Branches with availability & branch name
-   branches:
-          Array.isArray(rawTherapist.branches) && Array.isArray(rawTherapist.availability)
-            ? rawTherapist.branches.map((branchId: number) => ({
-                branch_id: branchId,
-                branch_name: branches.find((b) => b.branch_id === branchId)?.name || '',
-                availability: rawTherapist.availability
-                  .filter(
-                    (av: any) =>
-                      av.branchId === branchId || av.branch_id === branchId
-                  )
-                  .map((av: any) => ({
-                    day: av.day ?? av.d ?? '',
-                    startTime: av.startTime ?? av.start_time ?? av.from ?? '',
-                    endTime: av.endTime ?? av.end_time ?? av.to ?? '',
-                  })),
-              }))
-            : [],
+   branches: Array.isArray(rawTherapist.branches)
+  ? rawTherapist.branches.map((b: any) => {
+      // accept both object or number from API
+      const branchId = b.branch_id ?? b.id ?? b ?? 0;
+      const branchName =
+        b.name ||
+        branchesList.find((br) => br.branch_id === branchId)?.name ||
+        '';
+
+      // if availability is attached per branch – filter it; else copy root availability
+     const rootAvailability: Availability[] = Array.isArray(rawTherapist.availability)
+  ? rawTherapist.availability.map((av: any) => ({
+      branchId: av.branchId ?? av.branch_id ?? null,
+      day: av.day ?? av.d ?? '',
+      startTime: av.startTime ?? av.start_time ?? av.from ?? '',
+      endTime: av.endTime ?? av.end_time ?? av.to ?? '',
+            }))
+        : [{ day: '', startTime: '', endTime: '' }];
+const availabilityForThisBranch = rootAvailability.length > 0 ? rootAvailability.map(a => ({ ...a })) : [{ day: '', startTime: '', endTime: '' }];
+      return {
+        branch_id: branchId,
+        branch_name: branchName,
+        availability: availabilityForThisBranch,
+      };
+    })
+  : [],
   languages: Array.isArray(rawTherapist.languages)
     ? rawTherapist.languages
     : [],

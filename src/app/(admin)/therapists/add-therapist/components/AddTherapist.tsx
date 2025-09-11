@@ -301,13 +301,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         }))
       : [];
 
-    // --- Branches: API provides array of branch IDs in your Postman example
+    
     const formBranches: BranchWithAvailability[] = Array.isArray(data.branches)
   ? data.branches.map((b: any) => {
       const branchId = b.branch_id ?? 0;
       const branchName = b.name ?? '';
-          // For availability: since API's availability is flat, copy the rootAvailability into each branch
-          // (If your backend instead attaches availability entries to specific branches via branchId, update logic accordingly)
+          
           const availabilityForThisBranch = rootAvailability.length > 0 ? rootAvailability.map(a => ({ ...a })) : [{ day: '', startTime: '', endTime: '' }];
 
           return {

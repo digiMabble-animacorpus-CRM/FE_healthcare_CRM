@@ -140,6 +140,7 @@ const TherapistDetails = ({
               <p>{data.aboutMe || '-'}</p>
             </div>
           </Collapse>
+          
         </div>
         {/* Degrees & Training */}
         {data.degreesAndTraining && (
