@@ -113,22 +113,51 @@ const TherapistDetails = ({
           </Col>
         </Row>
         <Row className="mb-3">
-          <Col md={6}>
-            <strong>Languages:</strong>{' '}
-            {data.languages?.length > 0 ? data.languages.join(', ') : '-'}
-          </Col>
+         <Col md={6}>
+  <strong>Languages:</strong>{' '}
+  {data.languages?.length > 0
+    ? data.languages.map((lang: any) => lang.name).join(', ')
+    : '-'}
+</Col>
+
           <Col md={6}>
             <strong>Payment Methods:</strong>{' '}
             {data.paymentMethods?.length > 0 ? data.paymentMethods.join(', ') : '-'}
           </Col>
-        </Row>
         {data.faq && (
-          <Row className="mb-3">
-            <Col>
-              <strong>FAQ:</strong> {data.faq}
-            </Col>
-          </Row>
-        )}
+  <Row className="my-4">
+    <Col lg={12}>
+      <p className="fw-semibold mb-1">Frequently Asked Questions:</p>
+      {data.faq ? (
+        <ol style={{ paddingLeft: '1.2rem' }}>
+          {(() => {
+            const lines = data.faq
+              .split('\r\n')
+              .filter((line) => line.trim() !== '');
+            const items: { question: string; answer: string }[] = [];
+            for (let i = 0; i < lines.length; i += 2) {
+              const question = lines[i] || '';
+              const answer = lines[i + 1] || '';
+              items.push({ question, answer });
+            }
+            return items.map((item, idx) => (
+              <li key={idx} style={{ marginBottom: '1rem' }}>
+                <div>
+                  <strong>{item.question.trim()}</strong>
+                </div>
+                <div>{item.answer.trim()}</div>
+              </li>
+            ));
+          })()}
+        </ol>
+      ) : (
+        <span>-</span>
+      )}
+    </Col>
+  </Row>
+)}
+
+        </Row>
         {/* About Section */}
         <div className="mt-4">
           <div className="d-flex justify-content-between mb-2">
