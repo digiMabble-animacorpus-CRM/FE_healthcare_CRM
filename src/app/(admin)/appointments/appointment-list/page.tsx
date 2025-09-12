@@ -30,6 +30,10 @@ const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
   loading: () => <div>Loading calendar...</div>
 });
 
+type CalendarInstance = {
+  getInstance: () => any; 
+};
+
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
@@ -119,7 +123,9 @@ const AppointmentCalendarPage = () => {
   const [moreEvents, setMoreEvents] = useState<any[]>([]);
   const [calendarInstance, setCalendarInstance] = useState<any | null>(null);
 
-  const calendarRef = useRef<{ setDate: (date: Date) => void }>(null);
+  const calendarRef = useRef<{
+    getInstance(): any; setDate: (date: Date) => void 
+}>(null);
 
 
 
@@ -159,7 +165,7 @@ const AppointmentCalendarPage = () => {
       console.error('Calendar ref is not initialized');
       return null;
     }
-    return calendarRef.current.getInstance();
+    return calendarRef?.current?.getInstance();
   }, []);
 
   const handleSetDate = useCallback(() => {
