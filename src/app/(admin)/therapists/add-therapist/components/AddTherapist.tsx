@@ -301,7 +301,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         }))
       : [];
 
-    
+    // --- Branches: API provides array of branch IDs in your Postman example
     const formBranches: BranchWithAvailability[] = Array.isArray(data.branches)
   ? data.branches.map((b: any) => {
       const branchId = b.branch_id ?? 0;

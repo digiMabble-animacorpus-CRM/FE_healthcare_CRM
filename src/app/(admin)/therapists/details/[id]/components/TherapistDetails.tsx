@@ -58,9 +58,9 @@ const TherapistDetails = ({
         {/* Profile Section */}
         <Row className="align-items-center mb-4">
           <Col md={2} className="text-center">
-            {data.photo && data.photo.trim() !== '' && data.photo !== 'null' ? (
+            {data.imageUrl && data.imageUrl.trim() !== '' && data.imageUrl !== 'null' ? (
               <img
-                src={data.photo}
+                src={data.imageUrl}
                 alt={`${data.firstName} ${data.lastName}`}
                 className="rounded-circle object-cover"
                 style={{ width: '120px', height: '120px', objectFit: 'cover' }}
@@ -73,14 +73,15 @@ const TherapistDetails = ({
                   height: '120px',
                   backgroundColor: '#e7ddff',
                   color: '#341539',
-                  fontSize: '42px',
+                  fontSize: '40px',
                   fontWeight: 'bold',
                 }}
               >
-                {data.firstName?.[0]?.toUpperCase() || '?'}
+                {data.firstName?.charAt(0).toUpperCase()}
               </div>
             )}
           </Col>
+
           <Col md={10}>
             <h3 className="fw-bold mb-1">
               {data.firstName} {data.lastName}
@@ -107,7 +108,8 @@ const TherapistDetails = ({
             <strong>INAMI Number:</strong> {data.inamiNumber || '-'}
           </Col>
           <Col md={6}>
-            <strong>Department:</strong> {departmentsMap[data.departmentId || 0] || '-'}
+           <strong>Department:</strong> {departmentsMap[data.departmentId || 0] || data.departmentId || '-'}
+
           </Col>
         </Row>
         <Row className="mb-3">
@@ -140,23 +142,20 @@ const TherapistDetails = ({
               <p>{data.aboutMe || '-'}</p>
             </div>
           </Collapse>
-          
         </div>
-        {/* Degrees & Training */}
         {data.degreesAndTraining && (
           <div className="mt-4">
             <h5>Degrees & Training</h5>
             <p>{data.degreesAndTraining}</p>
           </div>
         )}
-        {/* Specializations */}
-        {data.specializationIds && data.specializationIds.length > 0 && (
+        {data.specializations && data.specializations.length > 0 && (
           <div className="mt-4">
             <h5>Specializations</h5>
             <div className="d-flex gap-2 flex-wrap">
-              {data.specializationIds.map((specId) => (
-                <Badge key={specId} bg="primary" className="fs-12">
-                  {specializationsMap[specId] || specId}
+              {data.specializations.map((spec) => (
+                <Badge key={spec.id ?? spec.name} bg="primary" className="fs-12">
+                  {spec.name || specializationsMap[spec.id ?? 0] || spec.id}
                 </Badge>
               ))}
             </div>

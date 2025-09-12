@@ -337,7 +337,7 @@ export type TherapistType = {
   consultations?: string | null;
   degreesAndTraining?: string | null;
   departmentId: number | null;
-  specializationIds?: number[];
+  specializations?: { id: number | null; name: string }[];
   branches: BranchWithAvailability[];
   languages: number[];
   faq?: string | null;

@@ -26,7 +26,6 @@ import {
 import { useRouter } from 'next/navigation';
 import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 
-
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
@@ -128,7 +127,7 @@ const TherapistsListPage = () => {
   const handleEditClick = (id: any) => {
     console.log('Edit clicked for ID:', id);
     router.push(`/therapists/edit-therapist/${id}`);
-  }
+  };
 
   const handleDeleteClick = (id: any) => {
     console.log('Delete clicked for ID:', id);
@@ -139,16 +138,16 @@ const TherapistsListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedTherapistId) return;
 
-     try {
+    try {
       const success = await deleteTherapist(selectedTherapistId);
       if (success) {
         setAllTherapists((prev) => prev.filter((t) => t.therapistId !== selectedTherapistId));
         setShowSuccessMessage(true);
-        console.log('Therapist ID :', selectedTherapistId );
+        console.log('Therapist ID :', selectedTherapistId);
         await fetchTherapists(); // 🔥 Refetch after delete
         setToastMessage('Therapist deleted successfully!');
       } else {
-        console.log('Fail to delete')
+        console.log('Fail to delete');
         setToastMessage('Failed to delete therapist');
       }
     } catch (err) {
@@ -174,7 +173,7 @@ const TherapistsListPage = () => {
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Therapist List  <small>({filteredTherapists.length} total)</small>
+                All Therapist List <small>({filteredTherapists.length} total)</small>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
@@ -229,11 +228,8 @@ const TherapistsListPage = () => {
                   <Spinner animation="border" />
                 </div>
               ) : filteredTherapists.length === 0 ? (
-                <div className="text-center py-4 text-muted">
-                  No therapist found
-                </div>
-              )
-              : (
+                <div className="text-center py-4 text-muted">No therapist found</div>
+              ) : (
                 <div className="table-responsive">
                   <table
                     className="table table-hover table-sm table-centered mb-0"
@@ -241,18 +237,18 @@ const TherapistsListPage = () => {
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                      
-                         <th style={{ width: 50 }}>No</th>
+                        <th style={{ width: 50 }}>No</th>
                         <th>Profile Pic</th>
                         <th>Name</th>
                         <th>Email</th>
                         <th>Phone</th>
-                        <th>Department</th>
+                        <th>branch</th>
+                        <th>Specialization</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                       {currentData.map((item, index) => (
+                      {currentData.map((item, index) => (
                         <tr key={item.therapistId}>
                           <td>{(currentPage - 1) * PAGE_SIZE + index + 1}.</td>
                           <td>
@@ -286,7 +282,18 @@ const TherapistsListPage = () => {
                           </td>
                           <td>{item.contactEmail}</td>
                           <td>{item.contactPhone}</td>
-                          <td>{item. departmentId}</td>
+                          <td>
+                            {item.branches && item.branches.length > 0
+                              ? item.branches.map((b: any) => b.name).join(', ')
+                              : '—'}
+                          </td>
+                          <td>
+                            {item.specializations && item.specializations.length > 0
+                              ? item.specializations
+                                  .map((s: any) => s.specialization_type)
+                                  .join(', ')
+                              : '—'}
+                          </td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
@@ -296,12 +303,11 @@ const TherapistsListPage = () => {
                               >
                                 <IconifyIcon icon="solar:eye-broken" />
                               </Button>
-                              
+
                               <Button
                                 variant="secondary"
                                 size="sm"
                                 onClick={() => handleEditClick(item.therapistId)}
-                                
                               >
                                 <IconifyIcon icon="solar:pen-2-broken" />
                               </Button>
