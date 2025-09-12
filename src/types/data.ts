@@ -1,6 +1,7 @@
 import { StaticImageData } from 'next/image';
 import { Key, ReactNode } from 'react';
 import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
+import { BootstrapVariantType } from './component-props';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -735,4 +736,4 @@ export interface DepartmentType {
 }
 
 
-export { BranchWithAvailability };
+// export { BranchWithAvailability };

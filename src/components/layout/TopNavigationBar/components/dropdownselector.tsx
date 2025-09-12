@@ -1,8 +1,8 @@
 'use client';
+import '@/assets/scss/components/_dropdown-selector.scss';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import '@/assets/scss/components/_dropdown-selector.scss';
 
 const branches = [
   { label: 'ALL Branch', path: '/branches/orneau' },
