@@ -238,12 +238,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     }
     const loadSpecializations = async () => {
       try {
-        const res = await fetch(
-          `${API_BASE_PATH}/specializations?departmentId=${departmentId}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
+        const res = await fetch(`${API_BASE_PATH}/specializations?departmentId=${departmentId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const json = await res.json();
         setSpecializations(safeArray(json));
       } catch (err) {
@@ -286,11 +283,10 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
 
     // --- Specializations (IDs) — API provides array of numbers in your example
     const specializationIds: number[] = Array.isArray(data.specializations)
-  ? data.specializations.map((s: any) =>
-      typeof s === 'number' ? s : s.specialization_id || s.id
-    )
-  : [];
-
+      ? data.specializations.map((s: any) =>
+          typeof s === 'number' ? s : s.specialization_id || s.id,
+        )
+      : [];
 
     // --- Availability root array (normalize keys)
     const rootAvailability: Availability[] = Array.isArray(data.availability)
@@ -301,18 +297,21 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         }))
       : [];
 
-    
+    // --- Branches: API provides array of branch IDs in your Postman example
     const formBranches: BranchWithAvailability[] = Array.isArray(data.branches)
-  ? data.branches.map((b: any) => {
-      const branchId = b.branch_id ?? 0;
-      const branchName = b.name ?? '';
-          
-          const availabilityForThisBranch = rootAvailability.length > 0 ? rootAvailability.map(a => ({ ...a })) : [{ day: '', startTime: '', endTime: '' }];
+      ? data.branches.map((b: any) => {
+          const branchId = b.branch_id ?? 0;
+          const branchName = b.name ?? '';
+
+          const availabilityForThisBranch =
+            rootAvailability.length > 0
+              ? rootAvailability.map((a) => ({ ...a }))
+              : [{ day: '', startTime: '', endTime: '' }];
 
           return {
             branch_id: branchId,
-        branch_name: branchName,
-        availability: availabilityForThisBranch,
+            branch_name: branchName,
+            availability: availabilityForThisBranch,
           };
         })
       : [];
@@ -447,7 +446,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   const onSubmit = async (data: TherapistFormInputs) => {
     try {
       const payload = transformPayload(data);
-      const url = therapistId ? `${API_BASE_PATH}/therapists/${therapistId}` : `${API_BASE_PATH}/therapists`;
+      const url = therapistId
+        ? `${API_BASE_PATH}/therapists/${therapistId}`
+        : `${API_BASE_PATH}/therapists`;
       const method = therapistId ? 'PATCH' : 'POST';
 
       const res = await fetch(url, {
@@ -479,15 +480,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       name: `branches.${nestIndex}.availability`,
     });
 
-    const days = [
-      'Monday',
-      'Tuesday',
-      'Wednesday',
-      'Thursday',
-      'Friday',
-      'Saturday',
-      'Sunday',
-    ];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
     return (
       <>
@@ -500,12 +493,8 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               >
                 <Form.Label>Day</Form.Label>
                 <Form.Select
-                  {...register(
-                    `branches.${nestIndex}.availability.${k}.day` as const,
-                  )}
-                  isInvalid={
-                    !!errors.branches?.[nestIndex]?.availability?.[k]?.day
-                  }
+                  {...register(`branches.${nestIndex}.availability.${k}.day` as const)}
+                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.day}
                 >
                   <option value="">Select Day</option>
                   {days.map((d) => (
@@ -515,10 +504,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                   ))}
                 </Form.Select>
                 <Form.Control.Feedback type="invalid">
-                  {
-                    errors.branches?.[nestIndex]?.availability?.[k]?.day
-                      ?.message
-                  }
+                  {errors.branches?.[nestIndex]?.availability?.[k]?.day?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -530,19 +516,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
                   type="time"
-                  {...register(
-                    `branches.${nestIndex}.availability.${k}.startTime` as const,
-                  )}
-                  isInvalid={
-                    !!errors.branches?.[nestIndex]?.availability?.[k]
-                      ?.startTime
-                  }
+                  {...register(`branches.${nestIndex}.availability.${k}.startTime` as const)}
+                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.startTime}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {
-                    errors.branches?.[nestIndex]?.availability?.[k]
-                      ?.startTime?.message
-                  }
+                  {errors.branches?.[nestIndex]?.availability?.[k]?.startTime?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -554,18 +532,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
                   type="time"
-                  {...register(
-                    `branches.${nestIndex}.availability.${k}.endTime` as const,
-                  )}
-                  isInvalid={
-                    !!errors.branches?.[nestIndex]?.availability?.[k]?.endTime
-                  }
+                  {...register(`branches.${nestIndex}.availability.${k}.endTime` as const)}
+                  isInvalid={!!errors.branches?.[nestIndex]?.availability?.[k]?.endTime}
                 />
                 <Form.Control.Feedback type="invalid">
-                  {
-                    errors.branches?.[nestIndex]?.availability?.[k]
-                      ?.endTime?.message
-                  }
+                  {errors.branches?.[nestIndex]?.availability?.[k]?.endTime?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
@@ -585,9 +556,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           type="button"
           variant="secondary"
           size="sm"
-          onClick={() =>
-            append({ day: '', startTime: '', endTime: '' })
-          }
+          onClick={() => append({ day: '', startTime: '', endTime: '' })}
         >
           Add Slot
         </Button>
@@ -598,13 +567,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   return (
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
-        <h5 className="mb-4">
-          {therapistId ? 'Edit Therapist' : 'Add Therapist'}
-        </h5>
+        <h5 className="mb-4">{therapistId ? 'Edit Therapist' : 'Add Therapist'}</h5>
         <Form
-          onSubmit={handleSubmit(onSubmit, (errors) =>
-            console.log('Validation errors:', errors),
-          )}
+          onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}
         >
           {/* First name / Last name */}
           <Row>
@@ -742,9 +707,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               placeholder="Enter Description"
               isInvalid={!!errors.aboutMe}
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.aboutMe?.message}
-            </Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">{errors.aboutMe?.message}</Form.Control.Feedback>
           </Form.Group>
 
           {/* Department + Specializations */}
@@ -752,10 +715,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             <Col md={6}>
               <Form.Group controlId="departmentId" className="mb-3">
                 <Form.Label>Department</Form.Label>
-                <Form.Select
-                  {...register('departmentId')}
-                  isInvalid={!!errors.departmentId}
-                >
+                <Form.Select {...register('departmentId')} isInvalid={!!errors.departmentId}>
                   <option value="">Select Department</option>
                   {departments.map((d) => (
                     <option key={d.id} value={d.id}>
@@ -772,31 +732,30 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               <Form.Group className="mb-3">
                 <Form.Label>Specialization</Form.Label>
                 <div>
-                  {specializations.map((s) => (
-                    <Form.Check
-                      inline
-                      key={s.specialization_id}
-                      type="checkbox"
-                      label={s.specialization_type}
-                      checked={
-                        watch('specializationIds')?.includes(s.specialization_id)
-                      }
-                      onChange={(e) => {
-                        const current = watch('specializationIds') || [];
-                        if (e.target.checked) {
-                          setValue('specializationIds', [
-                            ...current,
-                            s.specialization_id,
-                          ]);
-                        } else {
-                          setValue(
-                            'specializationIds',
-                            current.filter((id: number) => id !== s.specialization_id),
-                          );
-                        }
-                      }}
-                    />
-                  ))}
+                  {specializations && specializations.length > 0 ? (
+                    specializations.map((s) => (
+                      <Form.Check
+                        inline
+                        key={s.specialization_id}
+                        type="checkbox"
+                        label={s.specialization_type}
+                        checked={watch('specializationIds')?.includes(s.specialization_id)}
+                        onChange={(e) => {
+                          const current = watch('specializationIds') || [];
+                          if (e.target.checked) {
+                            setValue('specializationIds', [...current, s.specialization_id]);
+                          } else {
+                            setValue(
+                              'specializationIds',
+                              current.filter((id: number) => id !== s.specialization_id),
+                            );
+                          }
+                        }}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-muted">No specializations available</p>
+                  )}
                 </div>
                 {errors.specializationIds && (
                   <Form.Text className="text-danger">
@@ -813,10 +772,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             <Card key={branch.id} className="mb-3 p-3">
               <Row className="align-items-center">
                 <Col md={8}>
-                  <Form.Group
-                    controlId={`branches.${index}.branch_id`}
-                    className="mb-3"
-                  >
+                  <Form.Group controlId={`branches.${index}.branch_id`} className="mb-3">
                     <Form.Label>Branch</Form.Label>
                     <Form.Select
                       {...register(`branches.${index}.branch_id` as const)}
@@ -852,7 +808,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             type="button"
             variant="secondary"
             onClick={() =>
-              appendBranch({ branch_id: 0, branch_name: '', availability: [{ day: '', startTime: '', endTime: '' }] })
+              appendBranch({
+                branch_id: 0,
+                branch_name: '',
+                availability: [{ day: '', startTime: '', endTime: '' }],
+              })
             }
             className="mb-3"
           >
@@ -897,7 +857,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               </Form.Group>
             </Col>
 
-
             <Col md={6}>
               <Form.Group controlId="paymentMethods" className="mb-3">
                 <Form.Label>Payment Methods</Form.Label>
@@ -928,9 +887,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                   );
                 })}
                 {errors.paymentMethods && (
-                  <div className="text-danger">
-                    {errors.paymentMethods.message}
-                  </div>
+                  <div className="text-danger">{errors.paymentMethods.message}</div>
                 )}
               </Form.Group>
             </Col>
@@ -946,9 +903,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               placeholder="Enter FAQs"
               isInvalid={!!errors.faq}
             />
-            <Form.Control.Feedback type="invalid">
-              {errors.faq?.message}
-            </Form.Control.Feedback>
+            <Form.Control.Feedback type="invalid">{errors.faq?.message}</Form.Control.Feedback>
           </Form.Group>
 
           <Button variant="primary" type="submit">

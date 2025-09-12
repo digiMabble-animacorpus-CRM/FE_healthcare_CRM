@@ -35,17 +35,23 @@ const TherapistDetailsPage = () => {
   lastName: rawTherapist.lastName || '',
   fullName: `${rawTherapist.firstName || ''} ${rawTherapist.lastName || ''}`.trim(),
   photo: rawTherapist.photo || null,
+   imageUrl: rawTherapist.imageUrl || rawTherapist.photo || null,
   contactEmail: rawTherapist.contactEmail || '',
   contactPhone: rawTherapist.contactPhone || '',
   inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
   aboutMe: rawTherapist.aboutMe || null,
-  degreesAndTraining: rawTherapist.degreesAndTraining || null,
-  departmentId:
-    rawTherapist.departmentId ??
-    rawTherapist.department_id ??
-    (rawTherapist.department ? rawTherapist.department.id : null) ??
-    null,
-  specializationIds: rawTherapist.specializationIds || [],
+   degreesAndTraining: rawTherapist.degreesAndTraining || rawTherapist.degreesTraining || null,
+  departmentId: rawTherapist.departmentId ?? null,
+
+
+specializations: Array.isArray(rawTherapist.specializations)
+  ? rawTherapist.specializations.map((s: any) => ({
+      id: s.specialization_id ?? null,
+      name: s.specialization_type ?? '',
+    }))
+  : [],
+
+
 
   // 🔹 Branches with availability & branch name
    branches: Array.isArray(rawTherapist.branches)

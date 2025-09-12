@@ -1,12 +1,8 @@
 'use client';
 
-import avatar2 from '@/assets/images/users/avatar-2.jpg';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import Image from 'next/image';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import ReactApexChart from 'react-apexcharts';
-import { Card, CardBody, CardTitle, Col, Row, Table, Button } from 'react-bootstrap';
+import { Card, CardBody, Col, Row, Button } from 'react-bootstrap';
 
 type WeeklyInquiryType = { week: string; inquiries: number };
 type TransactionStatType = {
@@ -97,12 +93,20 @@ const PatientDetails = ({
         <CardBody>
           <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mt-3">
             <div className="d-flex align-items-center gap-3">
-              <Image
-                src={avatar2}
-                alt="avatar"
-                priority
-                className="rounded-circle avatar-xl img-thumbnail"
-              />
+              {/* Initial instead of image */}
+              <div
+                className="rounded-circle d-flex align-items-center justify-content-center"
+                style={{
+                  width: '100px',
+                  height: '100px',
+                  backgroundColor: '#0d6efd',
+                  color: '#fff',
+                  fontSize: '36px',
+                  fontWeight: 'bold',
+                }}
+              >
+                {name ? name[0].toUpperCase() : 'T'}
+              </div>
               <div>
                 <h3 className="fw-semibold mb-1">{name}</h3>
                 <p className="link-primary fw-medium fs-14">
@@ -110,14 +114,13 @@ const PatientDetails = ({
                 </p>
               </div>
             </div>
-           <div className="d-flex gap-1">
+            <div className="d-flex gap-1">
               <Button
                 variant="secondary"
                 className="avatar-sm d-flex align-items-center justify-content-center fs-20"
                 onClick={() => handleEditClick(id)}
               >
                 <span>
-                  {' '}
                   <IconifyIcon icon="ri:edit-fill" />
                 </span>
               </Button>
@@ -165,7 +168,6 @@ const PatientDetails = ({
             <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">Description / Notes :</p>
               <p className="mb-0">{note || '-'}</p>
-             
             </Col>
             <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
@@ -194,194 +196,201 @@ const PatientDetails = ({
           </Row>
         </CardBody>
       </Card>
-
-      {/* Weekly Inquiry & Transactions */}
-      <Card className="mb-4">
-        <CardBody>
-          <CardTitle as={'h4'} className="mb-3">
-            Weekly Inquiry & Transactions
-          </CardTitle>
-          <Row className="g-3">
-            {weeklyInquiry.map((w, idx) => {
-              const options = {
-                series: [w.inquiries],
-                chart: { type: 'radialBar' as const, height: 90, sparkline: { enabled: true } },
-                plotOptions: {
-                  radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } },
-                },
-                colors: ['#0d6efd'],
-              };
-              return (
-                <Col lg={4} key={idx}>
-                  <Card className="border p-3 h-100">
-                    <div className="d-flex align-items-center gap-3 mb-2">
-                      <div className="avatar bg-primary bg-opacity-10 rounded flex-centered">
-                        <IconifyIcon
-                          icon="ri:calendar-line"
-                          width={28}
-                          height={28}
-                          className="fs-28 text-primary"
-                        />
-                      </div>
-                      <div>
-                        <p className="fw-medium fs-15 mb-1">{w.week}</p>
-                        <p className="fw-semibold fs-20 mb-0">{w.inquiries}</p>
-                      </div>
-                    </div>
-                    <ReactApexChart
-                      options={options}
-                      series={options.series}
-                      type="radialBar"
-                      height={90}
-                    />
-                  </Card>
-                </Col>
-              );
-            })}
-
-            {transactionStats.map((t, idx) => {
-              const options = {
-                series: [t.progress],
-                chart: { type: 'radialBar' as const, height: 90, sparkline: { enabled: true } },
-                plotOptions: {
-                  radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } },
-                },
-                colors: [t.variant],
-              };
-              return (
-                <Col lg={4} key={idx}>
-                  <Card className="border p-3 h-100">
-                    <div className="d-flex align-items-center gap-3 mb-2">
-                      <div className={`avatar bg-${t.variant} bg-opacity-10 rounded flex-centered`}>
-                        <IconifyIcon
-                          icon={t.icon}
-                          width={28}
-                          height={28}
-                          className={`fs-28 text-${t.variant}`}
-                        />
-                      </div>
-                      <div>
-                        <p className="fw-medium fs-15 mb-1">{t.title}</p>
-                        <p className="fw-semibold fs-20 mb-0">{t.count}</p>
-                      </div>
-                    </div>
-                    <ReactApexChart
-                      options={options}
-                      series={options.series}
-                      type="radialBar"
-                      height={90}
-                    />
-                  </Card>
-                </Col>
-              );
-            })}
-          </Row>
-        </CardBody>
-      </Card>
-
-      {/* Transaction History */}
-      <Card className="mb-4">
-        <CardBody>
-          <CardTitle as={'h4'} className="mb-3">
-            Transaction History
-          </CardTitle>
-          <Table responsive striped hover>
-            <thead>
-              <tr>
-                <th>Date</th>
-                <th>Type</th>
-                <th>Amount</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactionHistory.map((tr, idx) => (
-                <tr key={idx}>
-                  <td>{tr.date}</td>
-                  <td>{tr.type}</td>
-                  <td>${tr.amount.toFixed(2)}</td>
-                  <td>
-                    <span
-                      className={`badge bg-${tr.status === 'Completed' ? 'success' : tr.status === 'Pending' ? 'warning' : 'danger'} text-white`}
-                    >
-                      {tr.status}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </Table>
-        </CardBody>
-      </Card>
-
-      {/* Reviews */}
-      <Card className="mb-4">
-        <CardBody>
-          <CardTitle as={'h4'} className="mb-3">
-            Reviews / Feedback
-          </CardTitle>
-          <Row>
-            {feedbacks.map((f, idx) => (
-              <Col lg={6} key={idx}>
-                <Card className="bg-light-subtle mb-3 h-100">
-                  <CardBody>
-                    <div className="d-flex align-items-center gap-2">
-                      {f.image && (
-                        <Image src={f.image} alt="avatar" className="rounded-circle avatar-md" />
-                      )}
-                      <div>
-                        <h5 className="fw-semibold mb-1">{f.name}</h5>
-                        <p className="m-0">
-                          @{f.userName} <span className="ms-1">({f.country})</span>
-                        </p>
-                      </div>
-                    </div>
-                    <p className="my-3">&quot;{f.description}&quot;</p>
-                    <ul className="d-flex text-warning m-0 fs-18 list-unstyled">
-                      {Array.from({ length: 5 }).map((_, i) => (
-                        <li key={i}>
-                          <IconifyIcon icon={i < f.rating ? 'ri:star-fill' : 'ri:star-line'} />
-                        </li>
-                      ))}
-                    </ul>
-                    <p className="fw-medium text-muted mb-0">{f.day} Days Ago</p>
-                  </CardBody>
-                </Card>
-              </Col>
-            ))}
-          </Row>
-        </CardBody>
-      </Card>
-
-      {/* Files */}
-      <Card className="mb-4">
-        <CardBody>
-          <CardTitle as={'h4'} className="mb-3">
-            Files / Documents
-          </CardTitle>
-          <div className="d-flex flex-wrap gap-2">
-            {files.map((file, idx) => (
-              <div
-                key={idx}
-                className="d-flex p-2 gap-2 bg-light-subtle align-items-center border rounded position-relative"
-              >
-                <IconifyIcon icon={file.icon} className={`text-${file.variant} fs-24`} />
-                <div>
-                  <h4 className="fs-14 mb-1">
-                    <Link href="#" className="text-dark stretched-link">
-                      {file.name}
-                    </Link>
-                  </h4>
-                  <p className="fs-12 mb-0">{file.size} MB</p>
-                </div>
-                <IconifyIcon icon="ri:download-cloud-line" className="fs-20 text-muted" />
-              </div>
-            ))}
-          </div>
-        </CardBody>
-      </Card>
     </div>
   );
 };
 
 export default PatientDetails;
+
+
+
+//       {/* Weekly Inquiry & Transactions */}
+//       <Card className="mb-4">
+//         <CardBody>
+//           <CardTitle as={'h4'} className="mb-3">
+//             Weekly Inquiry & Transactions
+//           </CardTitle>
+//           <Row className="g-3">
+//             {weeklyInquiry.map((w, idx) => {
+//               const options = {
+//                 series: [w.inquiries],
+//                 chart: { type: 'radialBar' as const, height: 90, sparkline: { enabled: true } },
+//                 plotOptions: {
+//                   radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } },
+//                 },
+//                 colors: ['#0d6efd'],
+//               };
+//               return (
+//                 <Col lg={4} key={idx}>
+//                   <Card className="border p-3 h-100">
+//                     <div className="d-flex align-items-center gap-3 mb-2">
+//                       <div className="avatar bg-primary bg-opacity-10 rounded flex-centered">
+//                         <IconifyIcon
+//                           icon="ri:calendar-line"
+//                           width={28}
+//                           height={28}
+//                           className="fs-28 text-primary"
+//                         />
+//                       </div>
+//                       <div>
+//                         <p className="fw-medium fs-15 mb-1">{w.week}</p>
+//                         <p className="fw-semibold fs-20 mb-0">{w.inquiries}</p>
+//                       </div>
+//                     </div>
+//                     <ReactApexChart
+//                       options={options}
+//                       series={options.series}
+//                       type="radialBar"
+//                       height={90}
+//                     />
+//                   </Card>
+//                 </Col>
+//               );
+//             })}
+
+//             {transactionStats.map((t, idx) => {
+//               const options = {
+//                 series: [t.progress],
+//                 chart: { type: 'radialBar' as const, height: 90, sparkline: { enabled: true } },
+//                 plotOptions: {
+//                   radialBar: { hollow: { size: '50%' }, dataLabels: { show: false } },
+//                 },
+//                 colors: [t.variant],
+//               };
+//               return (
+//                 <Col lg={4} key={idx}>
+//                   <Card className="border p-3 h-100">
+//                     <div className="d-flex align-items-center gap-3 mb-2">
+//                       <div className={`avatar bg-${t.variant} bg-opacity-10 rounded flex-centered`}>
+//                         <IconifyIcon
+//                           icon={t.icon}
+//                           width={28}
+//                           height={28}
+//                           className={`fs-28 text-${t.variant}`}
+//                         />
+//                       </div>
+//                       <div>
+//                         <p className="fw-medium fs-15 mb-1">{t.title}</p>
+//                         <p className="fw-semibold fs-20 mb-0">{t.count}</p>
+//                       </div>
+//                     </div>
+//                     <ReactApexChart
+//                       options={options}
+//                       series={options.series}
+//                       type="radialBar"
+//                       height={90}
+//                     />
+//                   </Card>
+//                 </Col>
+//               );
+//             })}
+//           </Row>
+//         </CardBody>
+//       </Card>
+
+//       {/* Transaction History */}
+//       <Card className="mb-4">
+//         <CardBody>
+//           <CardTitle as={'h4'} className="mb-3">
+//             Transaction History
+//           </CardTitle>
+//           <Table responsive striped hover>
+//             <thead>
+//               <tr>
+//                 <th>Date</th>
+//                 <th>Type</th>
+//                 <th>Amount</th>
+//                 <th>Status</th>
+//               </tr>
+//             </thead>
+//             <tbody>
+//               {transactionHistory.map((tr, idx) => (
+//                 <tr key={idx}>
+//                   <td>{tr.date}</td>
+//                   <td>{tr.type}</td>
+//                   <td>${tr.amount.toFixed(2)}</td>
+//                   <td>
+//                     <span
+//                       className={`badge bg-${tr.status === 'Completed' ? 'success' : tr.status === 'Pending' ? 'warning' : 'danger'} text-white`}
+//                     >
+//                       {tr.status}
+//                     </span>
+//                   </td>
+//                 </tr>
+//               ))}
+//             </tbody>
+//           </Table>
+//         </CardBody>
+//       </Card>
+
+//       {/* Reviews */}
+//       <Card className="mb-4">
+//         <CardBody>
+//           <CardTitle as={'h4'} className="mb-3">
+//             Reviews / Feedback
+//           </CardTitle>
+//           <Row>
+//             {feedbacks.map((f, idx) => (
+//               <Col lg={6} key={idx}>
+//                 <Card className="bg-light-subtle mb-3 h-100">
+//                   <CardBody>
+//                     <div className="d-flex align-items-center gap-2">
+//                       {f.image && (
+//                         <Image src={f.image} alt="avatar" className="rounded-circle avatar-md" />
+//                       )}
+//                       <div>
+//                         <h5 className="fw-semibold mb-1">{f.name}</h5>
+//                         <p className="m-0">
+//                           @{f.userName} <span className="ms-1">({f.country})</span>
+//                         </p>
+//                       </div>
+//                     </div>
+//                     <p className="my-3">&quot;{f.description}&quot;</p>
+//                     <ul className="d-flex text-warning m-0 fs-18 list-unstyled">
+//                       {Array.from({ length: 5 }).map((_, i) => (
+//                         <li key={i}>
+//                           <IconifyIcon icon={i < f.rating ? 'ri:star-fill' : 'ri:star-line'} />
+//                         </li>
+//                       ))}
+//                     </ul>
+//                     <p className="fw-medium text-muted mb-0">{f.day} Days Ago</p>
+//                   </CardBody>
+//                 </Card>
+//               </Col>
+//             ))}
+//           </Row>
+//         </CardBody>
+//       </Card>
+
+//       {/* Files */}
+//       <Card className="mb-4">
+//         <CardBody>
+//           <CardTitle as={'h4'} className="mb-3">
+//             Files / Documents
+//           </CardTitle>
+//           <div className="d-flex flex-wrap gap-2">
+//             {files.map((file, idx) => (
+//               <div
+//                 key={idx}
+//                 className="d-flex p-2 gap-2 bg-light-subtle align-items-center border rounded position-relative"
+//               >
+//                 <IconifyIcon icon={file.icon} className={`text-${file.variant} fs-24`} />
+//                 <div>
+//                   <h4 className="fs-14 mb-1">
+//                     <Link href="#" className="text-dark stretched-link">
+//                       {file.name}
+//                     </Link>
+//                   </h4>
+//                   <p className="fs-12 mb-0">{file.size} MB</p>
+//                 </div>
+//                 <IconifyIcon icon="ri:download-cloud-line" className="fs-20 text-muted" />
+//               </div>
+//             ))}
+//           </div>
+//         </CardBody>
+//       </Card>
+//     </div>
+//   );
+// };
+
+// export default PatientDetails;
