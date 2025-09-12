@@ -228,25 +228,34 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   };
 
   // Specializations loader based on department
+  // Specializations loader based on department
   useEffect(() => {
-    if (!departmentId || !token) {
+    if (!token) {
       setSpecializations([]);
       return;
     }
     const loadSpecializations = async () => {
       try {
-        const res = await fetch(`${API_BASE_PATH}/specializations?departmentId=${departmentId}`, {
+        const res = await fetch(`${API_BASE_PATH}/specializations`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const json = await res.json();
-        setSpecializations(safeArray(json));
+        const arr = safeArray(json);
+
+        // ✅ Deduplicate by specialization_type
+        const uniqueArr = arr.filter(
+          (s: Specialization, index: number, self: Specialization[]) =>
+            index === self.findIndex((sp) => sp.specialization_type === s.specialization_type),
+        );
+
+        setSpecializations(uniqueArr);
       } catch (err) {
         console.error('Error loading specializations:', err);
         setSpecializations([]);
       }
     };
     loadSpecializations();
-  }, [departmentId, token]);
+  }, [token]);
 
   // --- Mapping API therapist -> form
   const mapTherapistToFormValues = (
