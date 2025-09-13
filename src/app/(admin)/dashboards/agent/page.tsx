@@ -5,7 +5,6 @@ import { Col, Row } from 'react-bootstrap';
 import AppointmentsOverview from './components/AppointmentsOverview';
 import BranchSummary from './components/BranchSummary';
 import DoctorProfile from './components/DoctorProfile';
-import Financials from './components/Financials';
 import PatientInsights from './components/PatientInsights';
 import PatientRecords from './components/PatientRecords';
 import PerformanceSnapshot from './components/PerformanceSnapshot';

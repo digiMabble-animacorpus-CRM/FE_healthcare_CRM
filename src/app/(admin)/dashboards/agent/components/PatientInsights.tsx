@@ -1,7 +1,19 @@
 'use client';
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { Card, CardBody, CardHeader, CardTitle, Col, Dropdown, DropdownItem, DropdownMenu, DropdownToggle, ProgressBar, Row } from 'react-bootstrap';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  ProgressBar,
+  Row,
+} from 'react-bootstrap';
 import { FaChild, FaFemale, FaMale } from 'react-icons/fa';
 
 type Demographics = {
@@ -11,13 +23,18 @@ type Demographics = {
 };
 
 // New AgeDistributionWidget component
-const AgeDistributionWidget = ({ ageBuckets }: { ageBuckets: { label: string; value: number }[] }) => {
+const AgeDistributionWidget = ({
+  ageBuckets,
+}: {
+  ageBuckets: { label: string; value: number }[];
+}) => {
   const total = ageBuckets.reduce((sum, a) => sum + a.value, 0);
 
   const getIcon = (label: string) => {
     if (label.toLowerCase().includes('kid')) return FaChild;
     if (label.toLowerCase().includes('men')) return FaMale;
-    if (label.toLowerCase().includes('woman') || label.toLowerCase().includes('female')) return FaFemale;
+    if (label.toLowerCase().includes('woman') || label.toLowerCase().includes('female'))
+      return FaFemale;
     return FaChild; // fallback
   };
 
@@ -121,7 +138,9 @@ const PatientInsights = ({
                       <span>{c.count}</span>
                     </div>
                     <ProgressBar
-                      now={(c.count / Math.max(...demographics.topCities.map((t) => t.count))) * 100}
+                      now={
+                        (c.count / Math.max(...demographics.topCities.map((t) => t.count))) * 100
+                      }
                       variant="success"
                       className="progress-sm rounded"
                     />

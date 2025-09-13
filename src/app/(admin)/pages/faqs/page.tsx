@@ -1,18 +1,16 @@
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import type { Metadata } from 'next';
 import {
   Accordion,
   AccordionBody,
   AccordionHeader,
   AccordionItem,
   Button,
-  Card,
-  CardBody,
   Col,
   Row,
 } from 'react-bootstrap';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { faqData } from './data';
-import type { Metadata } from 'next';
-import PageTitle from '@/components/PageTitle';
 
 export const metadata: Metadata = { title: 'FAQs' };
 

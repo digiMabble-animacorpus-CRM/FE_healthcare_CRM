@@ -2,9 +2,11 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState, useMemo } from 'react';
+import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -23,8 +25,6 @@ import {
   Toast,
   ToastContainer,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];

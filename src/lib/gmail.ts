@@ -1,7 +1,6 @@
 // lib/gmail.ts
 
 import { google } from 'googleapis';
-import { OAuth2Client } from 'google-auth-library';
 
 const SCOPES = ['https://www.googleapis.com/auth/gmail.readonly'];
 

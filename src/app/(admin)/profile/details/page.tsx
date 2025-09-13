@@ -1,12 +1,7 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { getProfileById } from '@/helpers/profile';
 import ProfileDetails from './[id]/components/ProfileDetails';
-import { useRouter } from 'next/router';
-import axios from 'axios';
 
 interface ProfileData {
   ID_Pro: string;
@@ -37,7 +32,7 @@ const ProfileDetailsPage = () => {
   return (
     <>
       <PageTitle subName="Profile" title="Profile" />
-      <ProfileDetails/>
+      <ProfileDetails />
     </>
   );
 };

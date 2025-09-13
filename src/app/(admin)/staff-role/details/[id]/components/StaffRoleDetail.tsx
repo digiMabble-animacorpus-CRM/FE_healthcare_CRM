@@ -1,17 +1,18 @@
 'use client';
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { Button, Card, CardBody, Col, Row } from 'react-bootstrap';
 import type { PermissionType, StaffRoleType } from '@/types/data';
 import { useRouter } from 'next/navigation';
+import { Button, Card, CardBody, Col, Row } from 'react-bootstrap';
 
 const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
+  const router = useRouter();
   console.log('StaffRoleDetail data:', data);
 
   if (!data) {
     return <div>Loading...</div>; // Handle loading state or error
   }
-  const router = useRouter();
+
 
   const handleEditClick = (id: string) => {
     router.push(`/staff-role/edit-staffRole/${id}`);

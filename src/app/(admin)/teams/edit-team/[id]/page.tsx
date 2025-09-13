@@ -1,5 +1,4 @@
 import PageTitle from '@/components/PageTitle';
-import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
 import AddTeamPage from '../../add-team/components/AddTeam';
 

@@ -2,8 +2,10 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getLanguages } from '@/helpers/languages';
+import type { LanguageType } from '@/types/data';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import type { LanguageType, StaffType } from '@/types/data';
 import {
   Button,
   Card,
@@ -16,8 +18,6 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import { getLanguages } from '@/helpers/languages';
 
 const PAGE_LIMIT = 10;
 

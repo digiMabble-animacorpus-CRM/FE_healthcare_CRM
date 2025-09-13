@@ -1,9 +1,8 @@
 'use client';
 
-import { toast } from 'react-toastify';
+import { API_BASE_PATH } from '@/context/constants';
 import { useRouter } from 'next/navigation';
 import DepartmentForm, { DepartmentFormValues } from '../departmentForm';
-import { API_BASE_PATH } from '@/context/constants';
 
 const CreateDepartmentPage = () => {
   const token = localStorage.getItem('access_token');

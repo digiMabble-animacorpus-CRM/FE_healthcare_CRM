@@ -1,13 +1,10 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter, useParams } from 'next/navigation';
-import TherapistDetails from './components/TeamDetails';
-import { getTherapistById } from '@/helpers/therapist';
-import type { TeamMemberType, TherapistType } from '@/types/data';
 import { getTeamMemberById } from '@/helpers/team-members';
+import type { TeamMemberType } from '@/types/data';
+import { useParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import TeamDetails from './components/TeamDetails';
-import { paymentsresellersubscription } from 'googleapis/build/src/apis/paymentsresellersubscription';
 
 const TeamDetailsPage = () => {
   const { id } = useParams();
@@ -64,6 +61,8 @@ const TeamDetailsPage = () => {
       frequently_asked_questions={data.frequently_asked_questions}
       calendar_links={data.calendar_links}
       photo={data.photo}
+      branches={data.branches || []} // ✅ added
+      primary_branch_id={data.primary_branch_id || 0} // ✅ added
     />
   );
 };

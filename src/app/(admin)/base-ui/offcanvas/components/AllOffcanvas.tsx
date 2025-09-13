@@ -1,18 +1,17 @@
 'use client';
+import ComponentContainerCard from '@/components/ComponentContainerCard';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import useToggle from '@/hooks/useToggle';
 import {
-  Card,
-  Col,
-  Row,
   Offcanvas as BSOffcanvas,
   Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownToggle,
+  OffcanvasBody,
   OffcanvasHeader,
   OffcanvasTitle,
-  OffcanvasBody,
-  Dropdown,
-  DropdownToggle,
-  DropdownMenu,
-  DropdownItem,
 } from 'react-bootstrap';
 import {
   backdropOptions,
@@ -20,8 +19,6 @@ import {
   type BackdropOption,
   type PlacementOption,
 } from '../data';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import ComponentContainerCard from '@/components/ComponentContainerCard';
 
 const OffcanvasDropdown = () => {
   return (
