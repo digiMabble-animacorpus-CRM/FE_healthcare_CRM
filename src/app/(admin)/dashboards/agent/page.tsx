@@ -11,6 +11,7 @@ import PerformanceSnapshot from './components/PerformanceSnapshot';
 import TasksReminders from './components/TaskReminders';
 import TodayAppointments from './components/TodayAppointments';
 import WeeklySchedule from './components/WeeklySchedule';
+import BranchSummaryContainer from './components/BranchSummary';
 
 // ===================
 // Define role directly
@@ -31,35 +32,7 @@ const AgentPage = () => {
       {isAdmin(role) && (
         <Row className="gy-4">
           <Col xs={12}>
-            <BranchSummary
-              summaries={[
-                {
-                  branchId: 1,
-                  branchName: 'Gembloux - Orneau',
-                  doctors: 12,
-                  patients: 420,
-                  appointmentsMonth: 320,
-                  revenueMonth: 21850,
-                },
-                {
-                  branchId: 2,
-                  branchName: 'Gembloux - Tout Vent',
-                  doctors: 8,
-                  patients: 290,
-                  appointmentsMonth: 210,
-                  revenueMonth: 14600,
-                },
-                {
-                  branchId: 3,
-                  branchName: 'Namur',
-                  doctors: 10,
-                  patients: 350,
-                  appointmentsMonth: 275,
-                  revenueMonth: 19200,
-                },
-              ]}
-              onBranchClick={(b) => console.log('Go to branch detail:', b)}
-            />
+            <BranchSummaryContainer />
           </Col>
 
           <Col lg={12}>

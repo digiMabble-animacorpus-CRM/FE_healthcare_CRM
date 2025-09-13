@@ -3,7 +3,7 @@
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 // import ReactApexChart from 'react-apexcharts';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { ApexOptions } from 'apexcharts';
@@ -21,6 +21,7 @@ import {
   Spinner,
 } from 'react-bootstrap';
 
+
 // Example avatars
 import useCalendar from '@/app/(admin)/pages/calendar/useCalendar';
 import avatar1 from '@/assets/images/users/avatar-1.jpg';
@@ -28,6 +29,7 @@ import avatar2 from '@/assets/images/users/avatar-2.jpg';
 import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
 import Calendar from './Calendar';
+import { AppointmentStats, getAppointmentStats } from '@/helpers/dashboard';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
@@ -69,6 +71,8 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
   const [calendarViewMode, setCalendarViewMode] = useState<'calendar' | 'list'>('calendar');
   const [calendarHeight] = useState('750px');
   const [loading] = useState(false);
+  const [appointmentStats, setAppointmentStats] = useState<AppointmentStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState<boolean>(false);
 
   const calendarRef = useRef<any>(null);
 
@@ -77,7 +81,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
     return upcoming.filter(
       (a) =>
         (selectedDoctor === 'All Doctors' || a.doctor === selectedDoctor) &&
-        (selectedBranch === 'All Branches' || a.branch === selectedBranch),
+        (selectedBranch === 'All Branches' || a.branch === selectedBranch)
     );
   }, [selectedDoctor, selectedBranch, upcoming]);
 
@@ -93,7 +97,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
   // Chart
   const chartCategories = chartMode === 'doctor' ? Object.keys(doctorMap) : Object.keys(branchMap);
   const chartData = chartCategories.map((key) =>
-    chartMode === 'doctor' ? doctorMap[key] : branchMap[key],
+    chartMode === 'doctor' ? doctorMap[key] : branchMap[key]
   );
 
   const chartOptions: ApexOptions = {
@@ -141,6 +145,41 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
     onUpdateEvent,
     show,
   } = useCalendar();
+
+  // Date range for API call - here using this week as in the original prompt, adjust as needed
+  const startDate = dayjs().startOf('week').toISOString();
+  const endDate = dayjs().endOf('week').toISOString();
+
+  // Map selectedDoctor and selectedBranch to IDs if you have mapping available.
+  // For demonstration, assuming no mapping available; so send undefined if 'All ...' selected.
+  const doctorId = selectedDoctor !== 'All Doctors' ? undefined : undefined; // Replace with mapping if available
+  const branchId = selectedBranch !== 'All Branches' ? undefined : undefined; // Replace with mapping if available
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      try {
+        const response = await getAppointmentStats({
+          startDate,
+          endDate,
+          doctorId,
+          branchId,
+          timeFilter: 'thisWeek',
+        });
+        if (response?.stats) {
+          setAppointmentStats(response.stats);
+        } else {
+          setAppointmentStats(null);
+        }
+      } catch {
+        setAppointmentStats(null);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, [selectedDoctor, selectedBranch, startDate, endDate]);
 
   return (
     <Col lg={12}>
@@ -200,14 +239,16 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
                 <p className="text-muted mb-1">Nombre total de rendez-vous</p>
-                <h5 className="text-dark mb-1">{filteredAppointments.length}</h5>
+                <h5 className="text-dark mb-1">
+                  {statsLoading ? <Spinner animation="border" size="sm" /> : appointmentStats?.totalAppointments ?? filteredAppointments.length}
+                </h5>
               </div>
             </Col>
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
                 <p className="text-muted mb-1">Completed</p>
                 <h5 className="text-dark mb-1">
-                  {filteredAppointments.filter((a) => a.status === 'COMPLETED').length}
+                  {statsLoading ? <Spinner animation="border" size="sm" /> : appointmentStats?.completed ?? filteredAppointments.filter((a) => a.status === 'COMPLETED').length}
                 </h5>
               </div>
             </Col>
@@ -215,7 +256,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               <div className="border bg-light-subtle p-2 rounded">
                 <p className="text-muted mb-1">Annulations</p>
                 <h5 className="text-dark mb-1">
-                  {filteredAppointments.filter((a) => a.status === 'CANCELLED').length}
+                  {statsLoading ? <Spinner animation="border" size="sm" /> : appointmentStats?.cancellations ?? filteredAppointments.filter((a) => a.status === 'CANCELLED').length}
                 </h5>
               </div>
             </Col>

@@ -1,7 +1,9 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { Card, CardBody, Col, Row } from 'react-bootstrap';
+import { getBranchSummary } from '@/helpers/dashboard';
 
 export type BranchSummaryItem = {
   branchId: number | string;
@@ -14,18 +16,50 @@ export type BranchSummaryItem = {
 
 const num = (n: number) => new Intl.NumberFormat().format(n);
 
-const BranchSummary = ({
-  summaries,
-  onBranchClick,
-}: {
-  summaries: BranchSummaryItem[];
-  onBranchClick?: (branch: BranchSummaryItem) => void;
-}) => {
+const BranchSummary = () => {
+  const [summaries, setSummaries] = useState<BranchSummaryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await getBranchSummary();
+        if (response && response.summaries) {
+          const mappedData: BranchSummaryItem[] = response.summaries.map((item: any) => ({
+            branchId: item.branch_id,
+            branchName: item.branch_name,
+            doctors: Number(item.therapists_count)?? 0,
+            patients: item.patients_count,
+            appointmentsMonth: item.appointments_count,
+            revenueMonth: 0,
+          }));
+        setSummaries(mappedData);
+}
+ else {
+          setSummaries([]);
+        }
+      } catch (err) {
+        setError('Failed to load branch summaries.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  if (loading) return <div>Loading branch summaries...</div>;
+  if (error) return <div>{error}</div>;
+  if (summaries.length === 0) return <div>No branch summaries available.</div>;
+
   return (
     <Row className="g-3">
       {summaries.map((b) => (
         <Col xl={4} key={b.branchId}>
-          <Card className="h-100">
+          <Card className="h-100" style={{ cursor: 'pointer' }}>
             <CardBody>
               <h5 className="mb-3">{b.branchName}</h5>
               <Row className="text-center g-3">
