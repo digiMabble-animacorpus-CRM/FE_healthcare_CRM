@@ -26,7 +26,7 @@ const isAdmin = (role: Role) => ['admin', 'super_admin'].includes(role);
 const AgentPage = () => {
   return (
     <>
-      <PageTitle title="Dashboard" subName={isAdmin(role) ? 'Admin' : 'Doctor'} />
+      <PageTitle title="Tableau de bord" subName={isAdmin(role) ? 'Admin' : 'Doctor'} />
 
       {/* ========== ADMIN / SUPER ADMIN DASHBOARD ========== */}
       {isAdmin(role) && (
@@ -102,36 +102,6 @@ const AgentPage = () => {
             />
           </Col>
 
-          <Col xs={12}>
-            <ReportsTrends
-              appointmentsSeries={[
-                { label: 'Appointments', points: [18, 24, 26, 19, 30, 27, 33, 29, 35, 31, 34, 38] },
-              ]}
-              patientGrowthSeries={[
-                { label: 'New Patients', points: [12, 14, 9, 16, 20, 18, 22, 24, 19, 23, 28, 31] },
-              ]}
-              revenueSeries={[
-                {
-                  label: 'Revenue (€)',
-                  points: [3500, 4200, 3900, 4300, 4700, 5100, 4900, 5200, 5600, 6000, 6100, 6500],
-                },
-              ]}
-              xLabels={[
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ]}
-            />
-          </Col>
         </Row>
       )}
 

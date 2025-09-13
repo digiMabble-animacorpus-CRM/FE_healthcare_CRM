@@ -39,7 +39,7 @@ const BranchSummary = ({
                     />
                   </div>
                   <div className="fw-semibold fs-4">{num(b.doctors)}</div>
-                  <div className="text-muted">Doctors</div>
+                  <div className="text-muted">Thérapeutes</div>
                 </Col>
                 <Col>
                   <div className="avatar-md bg-success bg-opacity-10 rounded flex-centered mb-2">
@@ -63,7 +63,7 @@ const BranchSummary = ({
                     />
                   </div>
                   <div className="fw-semibold fs-4">{num(b.appointmentsMonth)}</div>
-                  <div className="text-muted">Appts (mo)</div>
+                  <div className="text-muted">Rendez-vous (mois)</div>
                 </Col>
               </Row>
             </CardBody>
