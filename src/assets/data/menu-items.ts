@@ -21,6 +21,12 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
 
   {
+    key: 'chat',
+    label: 'Chat History',
+    icon: 'ri:message-2-line',
+    url: '/chat',
+  },
+  {
     key: 'therapists',
     label: 'Therapist',
     icon: 'ri-stethoscope-line',
