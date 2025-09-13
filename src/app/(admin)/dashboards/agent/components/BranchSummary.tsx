@@ -27,14 +27,13 @@ const BranchSummary = () => {
       setError(null);
       try {
         const response = await getBranchSummary();
-        console.log('Branch summary fetched:', response);
-        if (response) {
+        if (response && response.summaries) {
           const mappedData: BranchSummaryItem[] = response.summaries.map((item: any) => ({
             branchId: item.branch_id,
             branchName: item.branch_name,
-            doctors: item.doctors,
-            patients: item.patients,
-            appointmentsMonth: item.appointmentsMonth,
+            doctors: Number(item.therapists_count)?? 0,
+            patients: item.patients_count,
+            appointmentsMonth: item.appointments_count,
             revenueMonth: 0,
           }));
         setSummaries(mappedData);
