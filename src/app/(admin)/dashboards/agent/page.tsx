@@ -5,7 +5,7 @@ import { Col, Row } from 'react-bootstrap';
 import AppointmentsOverview from './components/AppointmentsOverview';
 import BranchSummary from './components/BranchSummary';
 import DoctorProfile from './components/DoctorProfile';
-import PatientInsights from './components/PatientInsights';
+import PatientInsightsContainer from './components/PatientInsights';
 import PatientRecords from './components/PatientRecords';
 import PerformanceSnapshot from './components/PerformanceSnapshot';
 import TasksReminders from './components/TaskReminders';
@@ -80,7 +80,7 @@ const AgentPage = () => {
           </Col>
 
           <Col lg={12}>
-            <PatientInsights
+            <PatientInsightsContainer
               newPatientsWeek={22}
               newPatientsMonth={93}
               demographics={{
