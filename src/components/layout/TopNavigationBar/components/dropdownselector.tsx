@@ -11,7 +11,7 @@ const branches = [
   { label: 'Anima Corpus Namur', path: '/branches/anima-corpus' },
 ];
 
-const dropdownselector = () => {
+const DropdownSelector = () => {
   const [selected, setSelected] = useState('Choose a branch');
   const router = useRouter();
 
@@ -40,4 +40,4 @@ const dropdownselector = () => {
   );
 };
 
-export default dropdownselector;
+export default DropdownSelector;

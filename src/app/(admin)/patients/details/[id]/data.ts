@@ -1,17 +1,15 @@
-import { currency } from '@/context/constants';
-
 export type FamilyMember = {
-  name: string
-  relation: string
-  age: number
-}
+  name: string;
+  relation: string;
+  age: number;
+};
 
 export type AppointmentDetails = {
-  date: string
-  time?: string
-  purpose: string
-  status: string
-}
+  date: string;
+  time?: string;
+  purpose: string;
+  status: string;
+};
 
 export type CustomerType = {
   title: string;
@@ -21,5 +19,3 @@ export type CustomerType = {
   progress: number;
   variant: string;
 };
-
-

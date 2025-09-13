@@ -1,6 +1,4 @@
-import FileUpload from '@/components/FileUpload';
 import PageTitle from '@/components/PageTitle';
-import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
 import AddPatient from './components/AddPatient';
 

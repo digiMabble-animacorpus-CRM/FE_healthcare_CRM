@@ -1,15 +1,19 @@
-// TherapistDetailsPage.tsx (or your page file)
-
+// TherapistDetailsPage.tsx
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import TherapistDetails from './components/TherapistDetails';
 import { getTherapistById } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
-import { branches } from '@/assets/data/branchData';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import { Availability } from '../../add-therapist/components/AddTherapist';
+import TherapistDetails from './components/TherapistDetails';
+
+// ✅ Temporary placeholder branches list (replace with real import or API)
+const branchesList = [
+  { branch_id: 1, name: 'Main Branch' },
+  { branch_id: 2, name: 'Secondary Branch' },
+];
 
 const TherapistDetailsPage = () => {
   const params = useParams();
@@ -30,64 +34,68 @@ const TherapistDetailsPage = () => {
       }
 
       const transformedData: TherapistType = {
-  therapistId: rawTherapist.therapistId ?? null,
-  firstName: rawTherapist.firstName || '',
-  lastName: rawTherapist.lastName || '',
-  fullName: `${rawTherapist.firstName || ''} ${rawTherapist.lastName || ''}`.trim(),
-  photo: rawTherapist.photo || null,
-   imageUrl: rawTherapist.imageUrl || rawTherapist.photo || null,
-  contactEmail: rawTherapist.contactEmail || '',
-  contactPhone: rawTherapist.contactPhone || '',
-  inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
-  aboutMe: rawTherapist.aboutMe || null,
-   degreesAndTraining: rawTherapist.degreesAndTraining || rawTherapist.degreesTraining || null,
-  departmentId: rawTherapist.departmentId ?? null,
+        therapistId: rawTherapist.therapistId ?? null,
+        firstName: rawTherapist.firstName || '',
+        lastName: rawTherapist.lastName || '',
+        fullName: `${rawTherapist.firstName || ''} ${rawTherapist.lastName || ''}`.trim(),
+        photo: rawTherapist.photo || null,
+        imageUrl: rawTherapist.imageUrl || rawTherapist.photo || null,
+        contactEmail: rawTherapist.contactEmail || '',
+        contactPhone: rawTherapist.contactPhone || '',
+        inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
+        aboutMe: rawTherapist.aboutMe || null,
+        degreesAndTraining:
+          rawTherapist.degreesAndTraining || rawTherapist.degreesTraining || null,
+        departmentId: rawTherapist.departmentId ?? null,
 
+        // ✅ Required TherapistType props
+        centerAddress: rawTherapist.centerAddress || '',
+        appointmentStart: rawTherapist.appointmentStart || '',
+        jobTitle: rawTherapist.jobTitle || '',
 
-specializations: Array.isArray(rawTherapist.specializations)
-  ? rawTherapist.specializations.map((s: any) => ({
-      id: s.specialization_id ?? null,
-      name: s.specialization_type ?? '',
-    }))
-  : [],
-
-
-
-  // 🔹 Branches with availability & branch name
-   branches: Array.isArray(rawTherapist.branches)
-  ? rawTherapist.branches.map((b: any) => {
-      // accept both object or number from API
-      const branchId = b.branch_id ?? b.id ?? b ?? 0;
-      const branchName =
-        b.name ||
-        branchesList.find((br) => br.branch_id === branchId)?.name ||
-        '';
-
-      // if availability is attached per branch – filter it; else copy root availability
-     const rootAvailability: Availability[] = Array.isArray(rawTherapist.availability)
-  ? rawTherapist.availability.map((av: any) => ({
-      branchId: av.branchId ?? av.branch_id ?? null,
-      day: av.day ?? av.d ?? '',
-      startTime: av.startTime ?? av.start_time ?? av.from ?? '',
-      endTime: av.endTime ?? av.end_time ?? av.to ?? '',
+        specializations: Array.isArray(rawTherapist.specializations)
+          ? rawTherapist.specializations.map((s: any) => ({
+              id: s.specialization_id ?? null,
+              name: s.specialization_type ?? '',
             }))
-        : [{ day: '', startTime: '', endTime: '' }];
-const availabilityForThisBranch = rootAvailability.length > 0 ? rootAvailability.map(a => ({ ...a })) : [{ day: '', startTime: '', endTime: '' }];
-      return {
-        branch_id: branchId,
-        branch_name: branchName,
-        availability: availabilityForThisBranch,
+          : [],
+
+        branches: Array.isArray(rawTherapist.branches)
+          ? rawTherapist.branches.map((b: any) => {
+              const branchId = b.branch_id ?? b.id ?? b ?? 0;
+              const branchName =
+                b.name ||
+                branchesList.find((br) => br.branch_id === branchId)?.name ||
+                '';
+
+              const rootAvailability: Availability[] = Array.isArray(rawTherapist.availability)
+                ? rawTherapist.availability.map((av: any) => ({
+                    branchId: av.branchId ?? av.branch_id ?? null,
+                    day: av.day ?? av.d ?? '',
+                    startTime: av.startTime ?? av.start_time ?? av.from ?? '',
+                    endTime: av.endTime ?? av.end_time ?? av.to ?? '',
+                  }))
+                : [{ day: '', startTime: '', endTime: '' }];
+
+              const availabilityForThisBranch =
+                rootAvailability.length > 0
+                  ? rootAvailability.map((a) => ({ ...a }))
+                  : [{ day: '', startTime: '', endTime: '' }];
+
+              return {
+                branch_id: branchId,
+                branch_name: branchName,
+                availability: availabilityForThisBranch,
+              };
+            })
+          : [],
+
+        languages: Array.isArray(rawTherapist.languages) ? rawTherapist.languages : [],
+        faq: rawTherapist.faq || null,
+        paymentMethods: Array.isArray(rawTherapist.paymentMethods)
+          ? rawTherapist.paymentMethods
+          : [],
       };
-    })
-  : [],
-  languages: Array.isArray(rawTherapist.languages)
-    ? rawTherapist.languages
-    : [],
-  faq: rawTherapist.faq || null,
-  paymentMethods: Array.isArray(rawTherapist.paymentMethods)
-    ? rawTherapist.paymentMethods
-    : [],
-};
 
       setData(transformedData);
     } catch (error) {

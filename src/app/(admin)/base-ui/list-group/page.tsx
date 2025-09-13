@@ -4,7 +4,7 @@ import PageTitle from '@/components/PageTitle';
 import UIExamplesList from '@/components/UIExamplesList';
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Card, Col, Row, ListGroup as BSListGroup, Badge, ListGroupItem } from 'react-bootstrap';
+import { ListGroup as BSListGroup, Badge, Col, ListGroupItem, Row } from 'react-bootstrap';
 
 export const metadata: Metadata = { title: 'List Group' };
 

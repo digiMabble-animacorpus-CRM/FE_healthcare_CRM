@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import avatar2 from '@/assets/images/users/avatar-2.jpg';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, Button, Col, Row } from 'react-bootstrap';
-import axios from 'axios';
-import { API_BASE_PATH } from '@/context/constants';
+import { useEffect, useState } from 'react';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
 type ProfileDetailsProps = {
   team_id: string;

@@ -1,11 +1,15 @@
 'use client';
 
+import '@/assets/scss/components/_edittogglebtn.scss';
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState, useMemo } from 'react';
+import { deletePatient, getAllPatient } from '@/helpers/patient';
 import type { PatientType } from '@/types/data';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -13,21 +17,12 @@ import {
   CardHeader,
   CardTitle,
   Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Modal,
   Row,
   Spinner,
-  Alert,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import '@/assets/scss/components/_edittogglebtn.scss';
-import { getAllPatient, deletePatient } from '@/helpers/patient';
 
 const PAGE_SIZE = 500;
-
 
 const PatientsListPage = () => {
   const [allPatients, setAllPatients] = useState<PatientType[]>([]);
@@ -203,8 +198,6 @@ const PatientsListPage = () => {
                   }}
                   style={{ minWidth: 200 }}
                 />
-
-               
               </div>
             </CardHeader>
 

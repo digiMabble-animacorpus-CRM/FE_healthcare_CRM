@@ -1,20 +1,20 @@
 'use client';
 
+import { createPatient, findPatient, updatePatient } from '@/helpers/patient';
+import type { PatientType } from '@/types/data';
 import { useState } from 'react';
 import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardTitle,
+  Badge,
   Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
   Form,
   Row,
-  Col,
   Spinner,
-  Badge,
 } from 'react-bootstrap';
-import { createPatient, updatePatient, findPatient } from '@/helpers/patient';
-import type { PatientType } from '@/types/data';
 import * as yup from 'yup';
 
 // Yup validation schema
@@ -22,7 +22,10 @@ const patientSchema = yup.object().shape({
   firstname: yup.string().required('First name is required'),
   lastname: yup.string().required('Last name is required'),
   emails: yup.string().email('Please enter a valid email').required('Email is required'),
-  phones: yup.array().of(yup.string().required('Phone number is required')).min(1, 'At least one phone number is required'),
+  phones: yup
+    .array()
+    .of(yup.string().required('Phone number is required'))
+    .min(1, 'At least one phone number is required'),
   birthdate: yup.date().nullable(),
   legalgender: yup.string().required('Gender is required'),
   city: yup.string().required('City is required'),
@@ -110,10 +113,10 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
       ...prev,
       [field]: value,
     }));
-    
+
     // Clear validation error for this field when user starts typing
     if (validationErrors[field]) {
-      setValidationErrors(prev => {
+      setValidationErrors((prev) => {
         const newErrors = { ...prev };
         delete newErrors[field];
         return newErrors;
@@ -186,10 +189,11 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
   return (
     <Card className="shadow-sm">
       <CardHeader className="bg-light">
-        <CardTitle as="h4" className="mb-0">Patient Details</CardTitle>
+        <CardTitle as="h4" className="mb-0">
+          Patient Details
+        </CardTitle>
       </CardHeader>
       <CardBody>
-
         {/* Messages */}
         {errorMsg && (
           <div className="alert alert-danger alert-dismissible fade show" role="alert">
@@ -197,11 +201,15 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <button type="button" className="btn-close" onClick={() => setErrorMsg(null)}></button>
           </div>
         )}
-        
+
         {successMsg && (
           <div className="alert alert-success alert-dismissible fade show" role="alert">
             {successMsg}
-            <button type="button" className="btn-close" onClick={() => setSuccessMsg(null)}></button>
+            <button
+              type="button"
+              className="btn-close"
+              onClick={() => setSuccessMsg(null)}
+            ></button>
           </div>
         )}
 
@@ -244,15 +252,16 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
                 {formData.status}
               </Badge>
             </div>
-            
+
             <Row>
               <Col md={6}>
                 <div className="mb-2">
                   <strong>Email:</strong> {formData.emails || 'N/A'}
                 </div>
                 <div className="mb-2">
-                  <strong>Phone:</strong> {Array.isArray(formData.phones) && formData.phones.length > 0 
-                    ? formData.phones.join(', ') 
+                  <strong>Phone:</strong>{' '}
+                  {Array.isArray(formData.phones) && formData.phones.length > 0
+                    ? formData.phones.join(', ')
                     : 'N/A'}
                 </div>
                 <div className="mb-2">
@@ -276,27 +285,24 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
                   <strong>Address:</strong> {formData.street || 'N/A'}
                 </div>
                 <div className="mb-2">
-                  <strong>DOB:</strong> {formData.birthdate 
-                    ? new Date(formData.birthdate).toLocaleDateString() 
-                    : 'N/A'}
+                  <strong>DOB:</strong>{' '}
+                  {formData.birthdate ? new Date(formData.birthdate).toLocaleDateString() : 'N/A'}
                 </div>
               </Col>
             </Row>
-            
+
             {formData.note && (
               <div className="mt-3 p-3 bg-white rounded">
                 <strong>Description:</strong>
                 <p className="mb-0 mt-1">{formData.note}</p>
               </div>
             )}
-            
+
             <div className="d-flex gap-2 mt-4">
-              <Button size="sm" onClick={() => setMode('edit')}>Edit</Button>
-              <Button
-                size="sm"
-                variant="outline-primary"
-                onClick={handleReset}
-              >
+              <Button size="sm" onClick={() => setMode('edit')}>
+                Edit
+              </Button>
+              <Button size="sm" variant="outline-primary" onClick={handleReset}>
                 New Search
               </Button>
             </div>
@@ -310,7 +316,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>First Name <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    First Name <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.firstname}
@@ -324,7 +332,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Last Name <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Last Name <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.lastname}
@@ -341,7 +351,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Email <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Email <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="email"
                     value={formData.emails || ''}
@@ -355,14 +367,20 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Phone Numbers (comma separated) <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Phone Numbers (comma separated) <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
-                    value={Array.isArray(formData.phones) ? formData.phones.join(', ') : formData.phones || ''}
+                    value={
+                      Array.isArray(formData.phones)
+                        ? formData.phones.join(', ')
+                        : formData.phones || ''
+                    }
                     onChange={(e) =>
                       handleChange(
                         'phones',
-                        e.target.value.split(',').map((p) => p.trim())
+                        e.target.value.split(',').map((p) => p.trim()),
                       )
                     }
                     isInvalid={!!validationErrors.phones}
@@ -378,7 +396,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Gender <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Gender <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Select
                     value={formData.legalgender || ''}
                     onChange={(e) => handleChange('legalgender', e.target.value)}
@@ -410,7 +430,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Preferred Language <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Preferred Language <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Select
                     value={formData.language || ''}
                     onChange={(e) => handleChange('language', e.target.value)}
@@ -428,7 +450,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Status <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Status <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Select
                     value={formData.status || ''}
                     onChange={(e) => handleChange('status', e.target.value)}
@@ -448,7 +472,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Country <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Country <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Select
                     value={formData.country || ''}
                     onChange={(e) => handleChange('country', e.target.value)}
@@ -467,7 +493,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>City <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    City <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.city || ''}
@@ -485,7 +513,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Zip Code <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Zip Code <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     type="text"
                     value={formData.zipcode || ''}
@@ -499,7 +529,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
               <Col md={6}>
                 <Form.Group>
-                  <Form.Label>Address <span className="text-danger">*</span></Form.Label>
+                  <Form.Label>
+                    Address <span className="text-danger">*</span>
+                  </Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={2}
@@ -526,14 +558,20 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             </Form.Group>
 
             <div className="d-flex justify-content-end gap-2">
-              <Button 
-                variant="outline-secondary" 
-                onClick={() => mode === 'edit' ? setMode('view') : handleReset()}
+              <Button
+                variant="outline-secondary"
+                onClick={() => (mode === 'edit' ? setMode('view') : handleReset())}
               >
                 Cancel
               </Button>
               <Button variant="primary" onClick={handleSave} disabled={loading}>
-                {loading ? <Spinner size="sm" animation="border" /> : mode === 'edit' ? 'Update' : 'Add Patient'}
+                {loading ? (
+                  <Spinner size="sm" animation="border" />
+                ) : mode === 'edit' ? (
+                  'Update'
+                ) : (
+                  'Add Patient'
+                )}
               </Button>
             </div>
           </Form>

@@ -1,5 +1,5 @@
-import { CardTitle } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { CardTitle } from 'react-bootstrap';
 
 type FileType = { name: string; size: string; icon: string; variant: string };
 type Props = { files?: FileType[] };

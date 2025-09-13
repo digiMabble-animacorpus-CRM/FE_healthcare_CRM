@@ -7,8 +7,6 @@ import {
   CardTitle,
   Col,
   Dropdown,
-  DropdownItem,
-  DropdownMenu,
   DropdownToggle,
   ProgressBar,
   Row,

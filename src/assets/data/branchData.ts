@@ -2,6 +2,7 @@ import { BranchType } from '@/types/data';
 
 export const branches: BranchType[] = [
   {
+    branch_id: 1, // ✅ Added
     _id: 'b1',
     name: 'Gembloux - Orneau',
     code: 'ORN',
@@ -19,6 +20,7 @@ export const branches: BranchType[] = [
     createdAt: '2024-12-15T10:30:00.000Z',
   },
   {
+    branch_id: 2, // ✅ Added
     _id: 'b2',
     name: 'Gembloux - Tout Vent',
     code: 'TTV',
@@ -41,6 +43,7 @@ export const branches: BranchType[] = [
     createdAt: '2025-01-10T14:00:00.000Z',
   },
   {
+    branch_id: 3, // ✅ Added
     _id: 'b3',
     name: 'Anima Corpus Namur',
     code: 'NAM',

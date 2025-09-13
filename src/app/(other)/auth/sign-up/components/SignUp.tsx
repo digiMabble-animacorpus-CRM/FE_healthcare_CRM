@@ -2,12 +2,11 @@
 import logoDark from '@/assets/images/logo-dark.png';
 import LogoLight from '@/assets/images/logo-light.png';
 import TextFormInput from '@/components/from/TextFormInput';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap';
+import { Card, CardBody, Col, Container, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import useSignup from './useSignup';

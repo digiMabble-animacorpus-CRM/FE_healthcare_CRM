@@ -1,6 +1,6 @@
 'use client';
 import ComponentContainerCard from '@/components/ComponentContainerCard';
-import { Card, CardBody, Pagination } from 'react-bootstrap';
+import { Pagination } from 'react-bootstrap';
 
 const DefaultPagination = () => {
   let items = [];

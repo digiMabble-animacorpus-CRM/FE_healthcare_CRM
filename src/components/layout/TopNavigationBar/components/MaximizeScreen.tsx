@@ -1,7 +1,6 @@
 'use client';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useEffect } from 'react';
-import { Dropdown } from 'react-bootstrap';
 
 const MaximizeScreen = () => {
   useEffect(() => {

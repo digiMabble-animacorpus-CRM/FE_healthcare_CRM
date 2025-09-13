@@ -1,4 +1,3 @@
-import FileUpload from '@/components/FileUpload';
 import PageTitle from '@/components/PageTitle';
 import { Metadata } from 'next';
 import AddTeamPage from './components/AddTeam';

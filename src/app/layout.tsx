@@ -1,12 +1,11 @@
-import logoDark from '@/assets/images/logo-dark.png';
+import logoLight2 from '@/assets/images/logo-light2.png';
+import '@/assets/scss/app.scss';
 import AppProvidersWrapper from '@/components/wrappers/AppProvidersWrapper';
+import { DEFAULT_PAGE_TITLE } from '@/context/constants';
 import type { Metadata } from 'next';
 import { Figtree } from 'next/font/google';
 import Image from 'next/image';
-import logoLight2 from '@/assets/images/logo-light2.png';
 import NextTopLoader from 'nextjs-toploader';
-import '@/assets/scss/app.scss';
-import { DEFAULT_PAGE_TITLE } from '@/context/constants';
 
 const figtree = Figtree({
   subsets: ['latin'],

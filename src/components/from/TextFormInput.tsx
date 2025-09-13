@@ -1,6 +1,6 @@
 import { type InputHTMLAttributes } from 'react';
 import { FormControl, FormGroup, FormLabel, type FormControlProps } from 'react-bootstrap';
-import { Controller, type FieldPath, type FieldValues, type PathValue } from 'react-hook-form';
+import { Controller, type FieldPath, type FieldValues } from 'react-hook-form';
 
 import type { FormInputProps } from '@/types/component-props';
 

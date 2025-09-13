@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Card, CardBody, Col, Row, Button, Badge, Collapse, Table } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { FaEnvelope, FaPhone, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa';
+import { useState } from 'react';
+import { Badge, Button, Card, CardBody, Col, Collapse, Row, Table } from 'react-bootstrap';
+import { FaEnvelope, FaGlobe, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
 type FAQItem = { question: string; answer: string };
 
@@ -43,8 +43,6 @@ type TeamDetailsCardProps = {
 };
 
 const TeamDetails = ({
-  last_name,
-  first_name,
   full_name,
   job_1,
   job_2,
@@ -87,11 +85,14 @@ const TeamDetails = ({
           .split('\n')
           .map((line) => line.trim())
           .filter((line) => line.includes(':'))
-          .reduce((acc, line) => {
-            const [day, time] = line.split(':');
-            acc[day.trim()] = time.trim();
-            return acc;
-          }, {} as Record<string, string>)
+          .reduce(
+            (acc, line) => {
+              const [day, time] = line.split(':');
+              acc[day.trim()] = time.trim();
+              return acc;
+            },
+            {} as Record<string, string>,
+          )
       : (schedule as Record<string, string>) || {};
 
   // Convert frequently asked questions from object to array if needed
@@ -161,7 +162,12 @@ const TeamDetails = ({
                 {website && (
                   <div className="d-flex align-items-center gap-2">
                     <FaGlobe className="text-info" />{' '}
-                    <a href={website} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                    <a
+                      href={website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-decoration-none"
+                    >
                       {website}
                     </a>
                   </div>
@@ -329,7 +335,11 @@ const TeamDetails = ({
         <CardBody>
           <div className="d-flex justify-content-between mb-2">
             <h4>Specific Audience</h4>
-            <Button variant="link" size="sm" onClick={() => setSpecificAudienceOpen(!specificAudienceOpen)}>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => setSpecificAudienceOpen(!specificAudienceOpen)}
+            >
               {specificAudienceOpen ? 'Hide' : 'Show'}
             </Button>
           </div>

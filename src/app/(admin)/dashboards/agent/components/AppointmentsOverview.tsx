@@ -8,7 +8,6 @@ import { useMemo, useRef, useState } from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { ApexOptions } from 'apexcharts';
 import {
-  Button,
   Card,
   CardBody,
   CardHeader,
@@ -19,7 +18,7 @@ import {
   DropdownMenu,
   DropdownToggle,
   Row,
-  Spinner
+  Spinner,
 } from 'react-bootstrap';
 
 // Example avatars
@@ -30,7 +29,7 @@ import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
 import Calendar from './Calendar';
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
 

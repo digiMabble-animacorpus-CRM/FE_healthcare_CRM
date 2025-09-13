@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Card, CardBody, Row, Col, Button, Badge, Collapse, Table } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { FaEnvelope, FaPhone } from 'react-icons/fa';
+import type { TherapistType } from '@/types/data';
 import { useRouter } from 'next/navigation';
-import type { TherapistType, BranchWithAvailability } from '@/types/data';
+import { useEffect, useState } from 'react';
+import { Badge, Button, Card, CardBody, Col, Collapse, Row, Table } from 'react-bootstrap';
+import { FaEnvelope, FaPhone } from 'react-icons/fa';
+import { BranchWithAvailability } from '../../../add-therapist/components/AddTherapist';
 
 type TherapistDetailsProps = {
   data: TherapistType;
@@ -182,7 +183,7 @@ const TherapistDetails = ({
           <div className="mt-4">
             <h5>Specializations</h5>
             <div className="d-flex gap-2 flex-wrap">
-              {data.specializations.map((spec) => (
+              {data.specializations.map((spec: { id: any; name: any; }) => (
                 <Badge key={spec.id ?? spec.name} bg="primary" className="fs-12">
                   {spec.name || specializationsMap[spec.id ?? 0] || spec.id}
                 </Badge>

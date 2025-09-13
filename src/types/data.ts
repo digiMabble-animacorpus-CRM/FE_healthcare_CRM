@@ -1,6 +1,5 @@
-import { StaticImageData } from 'next/image';
-import { Key, ReactNode } from 'react';
 import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
+import { StaticImageData } from 'next/image';
 import { BootstrapVariantType } from './component-props';
 export type IdType = string;
 
@@ -113,7 +112,7 @@ export interface FamilyMember {
   gender?: string;
 }
 
-export type CustomerStatus = "new" | "active" | "inactive" | "closed";
+export type CustomerStatus = 'new' | 'active' | 'inactive' | 'closed';
 
 export interface CustomerEnquiriesType {
   _id: string;
@@ -137,7 +136,6 @@ export interface CustomerEnquiriesType {
   familyDetails?: FamilyMember[];
   modeOfRegister: string;
 }
-
 
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';
 
@@ -168,20 +166,17 @@ export interface AppointmentType {
 export type BranchType = {
   branch_id: number;
   _id: string;
-
   name: string;
   code?: string;
   email?: string;
   phoneNumber?: string;
   address?: Address;
   status: 'active' | 'inactive';
-
   createdBy: string;
   updatedBy: {
     staffId: string;
     updatedAt: string;
   }[];
-
   createdAt: string;
 };
 
@@ -324,7 +319,7 @@ export type BranchDetails = {
 export type TherapistType = {
   centerAddress: any;
   appointmentStart: any;
-  imageUrl: boolean;
+  imageUrl?: string | null;
   jobTitle: string;
   therapistId: string | number | null | undefined;
   firstName: string;
@@ -338,13 +333,12 @@ export type TherapistType = {
   consultations?: string | null;
   degreesAndTraining?: string | null;
   departmentId: number | null;
-  specializations?: { id: number | null; name: string }[];
+  specializations?: any;
   branches: BranchWithAvailability[];
   languages: number[];
   faq?: string | null;
   paymentMethods: string[];
 };
-
 
 export type TherapistCreatePayload = {
   firstName: string;
@@ -672,21 +666,22 @@ export type TeamMemberType = {
   schedule: {
     text: string | null;
   };
-  about?: string | null;
+  about: string;
   languages_spoken: string[]; // always an array
   payment_methods: string[]; // always an array
   diplomas_and_training: string[]; // always an array
   specializations: string[]; // always an array
-  website?: string;
-  frequently_asked_questions?: string | Record<string, any> | null; // JSON string or object
+  website: string;
+  frequently_asked_questions: any; // JSON string or object
   calendar_links: string[]; // always an array
   photo: string;
   branch_ids?: (string | number)[]; // array of strings or numbers
   primary_branch_id: number;
   permissions: Record<string, any>; // object for permissions
   role: string;
-  status: "active" | "inactive" | string;
+  status: 'active' | 'inactive' | string;
   created_by_role?: string;
+  branches: any;
 };
 
 export type TeamMemberCreatePayload = {
@@ -720,7 +715,7 @@ export type TeamMemberCreatePayload = {
   branches?: (string | number)[];
   selected_branch?: string | number | null;
   role: string;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
   primaryBranchId: number;
   permissions: Record<string, any>;
   createdByRole: string;
@@ -734,6 +729,5 @@ export interface DepartmentType {
   createdAt?: string;
   updatedAt?: string;
 }
-
 
 // export { BranchWithAvailability };
