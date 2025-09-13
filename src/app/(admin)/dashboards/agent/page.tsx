@@ -8,7 +8,6 @@ import DoctorProfile from './components/DoctorProfile';
 import PatientInsights from './components/PatientInsights';
 import PatientRecords from './components/PatientRecords';
 import PerformanceSnapshot from './components/PerformanceSnapshot';
-import ReportsTrends from './components/ReportsTrends';
 import TasksReminders from './components/TaskReminders';
 import TodayAppointments from './components/TodayAppointments';
 import WeeklySchedule from './components/WeeklySchedule';
@@ -101,7 +100,6 @@ const AgentPage = () => {
               }}
             />
           </Col>
-
         </Row>
       )}
 
