@@ -326,24 +326,22 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       : [];
 
     // --- Languages: API gives strings, match to languagesList to get IDs
-    const langIds: number[] = Array.isArray(data.languages)
-      ? data.languages
-          .map((langNameOrObj: any) => {
-            if (typeof langNameOrObj === 'number') return langNameOrObj;
-            if (typeof langNameOrObj === 'object' && langNameOrObj !== null) {
-              // sometimes API might return objects; accept language_id or id
-              return langNameOrObj.language_id ?? langNameOrObj.id ?? undefined;
-            }
-            if (typeof langNameOrObj === 'string') {
-              const found = languagesList.find(
-                (l) => l.name?.toLowerCase() === langNameOrObj.toLowerCase(),
-              );
-              return found?.id;
-            }
-            return undefined;
-          })
-          .filter((id: any) => typeof id === 'number')
-      : [];
+   const langIds: number[] = Array.isArray(data.languages)
+  ? data.languages.map((langNameOrObj: any) => {
+      if (typeof langNameOrObj === 'number') return langNameOrObj;
+      if (typeof langNameOrObj === 'object') {
+        return langNameOrObj.language_id ?? langNameOrObj.id;
+      }
+      if (typeof langNameOrObj === 'string') {
+        const found = languagesList.find(
+          (l) => l.name?.toLowerCase() === langNameOrObj.toLowerCase(),
+        );
+        return found?.id;
+      }
+    })
+  : [];
+
+
 
     const resetObj: TherapistFormInputs = {
       firstName: data.firstName ?? '',
@@ -442,12 +440,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         branchId: b.branch_id,
       })),
     ),
-    languages: data.languages
-      .map((id) => {
-        const langObj = languages.find((l) => l.id === id);
-        return langObj ? langObj.name : null;
-      })
-      .filter((n) => n),
+    languages: data.languages.map((id) => {
+  const langObj = languages.find((l) => l.id === id);
+  return langObj ? { id: langObj.id, name: langObj.name } : null;
+}).filter((l): l is { id: number; name: string } => l !== null),
+
+
     faq: data.faq,
     paymentMethods: data.paymentMethods,
   });

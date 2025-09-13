@@ -41,7 +41,8 @@ const TherapistDetailsPage = () => {
   inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
   aboutMe: rawTherapist.aboutMe || null,
    degreesAndTraining: rawTherapist.degreesAndTraining || rawTherapist.degreesTraining || null,
-  departmentId: rawTherapist.departmentId ?? null,
+   departmentId: rawTherapist.departmentId ?? rawTherapist.department?.id ?? null,
+  departmentName: rawTherapist.department?.name || null,
 
 
 specializations: Array.isArray(rawTherapist.specializations)
