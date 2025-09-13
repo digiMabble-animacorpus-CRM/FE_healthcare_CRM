@@ -149,7 +149,7 @@ const DepartmentListPage = () => {
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Departments List
+                All Departments List ({departments.length})
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -184,11 +184,7 @@ const DepartmentListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>
-                          <div className="form-check">
-                            <input type="checkbox" className="form-check-input" />
-                          </div>
-                        </th>
+                        <th style={{ width: 20 }}>No</th>
                         <th>Department Name</th>
                         <th>Description</th>
                         <th>Status</th>
@@ -198,11 +194,7 @@ const DepartmentListPage = () => {
                     <tbody>
                       {departments.map((department: DepartmentType, idx: number) => (
                         <tr key={idx}>
-                          <td>
-                            <div className="form-check">
-                              <input type="checkbox" className="form-check-input" />
-                            </div>
-                          </td>
+                          <td>{idx + 1}</td>
                           <td>{department.name}</td>
                           <td>{department.description}</td>
                           <td>
