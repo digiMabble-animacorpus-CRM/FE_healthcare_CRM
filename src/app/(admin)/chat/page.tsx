@@ -1,18 +1,9 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Button,
-  Form,
-  Row,
-  Col,
-} from 'react-bootstrap';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, Row } from 'react-bootstrap';
 
 type ApiChatItem = {
   session_id: string;
@@ -43,7 +34,6 @@ const ChatHistory: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const chatBoxRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
 
   const formatDate = (isoDate: string) => {
     const [year, month, day] = isoDate.slice(0, 10).split('-');
@@ -89,7 +79,6 @@ const ChatHistory: React.FC = () => {
     fetchChats();
   }, []);
 
-
   useEffect(() => {
     Object.keys(chatBoxRefs.current).forEach((sid) => {
       const box = chatBoxRefs.current[sid];
@@ -120,7 +109,6 @@ const ChatHistory: React.FC = () => {
   };
 
   if (loading) return <div>Loading chat history...</div>;
-
 
   const chatEntries = Object.entries(filteredChats);
   const totalPages = Math.ceil(chatEntries.length / ITEMS_PER_PAGE);
@@ -179,7 +167,9 @@ const ChatHistory: React.FC = () => {
                     <CardBody className="p-3">
                       <div
                         className="chat-box"
-                        ref={(el) => (chatBoxRefs.current[sid] = el)}
+                        ref={(el) => {
+                          chatBoxRefs.current[sid] = el;
+                        }}
                       >
                         {chatData.messages.length > 0 ? (
                           chatData.messages.map((msg, i) => (
@@ -197,9 +187,7 @@ const ChatHistory: React.FC = () => {
               ))
             ) : (
               <Col>
-                <div className="alert alert-warning text-center mb-0">
-                  No chats found
-                </div>
+                <div className="alert alert-warning text-center mb-0">No chats found</div>
               </Col>
             )}
           </Row>
@@ -220,10 +208,7 @@ const ChatHistory: React.FC = () => {
               </li>
 
               {Array.from({ length: totalPages }).map((_, idx) => (
-                <li
-                  key={idx}
-                  className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}
-                >
+                <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
                   <Button
                     variant="link"
                     className="page-link"
