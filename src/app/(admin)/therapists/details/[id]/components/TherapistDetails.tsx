@@ -110,7 +110,7 @@ const TherapistDetails = ({
           </Col>
           <Col md={6}>
             <strong>Département:</strong>{' '}
-            {departmentsMap[data.departmentId || 0] || data.departmentId || '-'}
+            {data.departmentName || departmentsMap[data.departmentId || 0] || '-'}
           </Col>
         </Row>
         <Row className="mb-3">
