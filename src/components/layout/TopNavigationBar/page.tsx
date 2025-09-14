@@ -1,5 +1,4 @@
 import { Container } from 'react-bootstrap';
-import Dropdownselector from './components/dropdownselector';
 import LeftSideBarToggle from './components/LeftSideBarToggle';
 import ProfileDropdown from './components/ProfileDropdown';
 import ThemeCustomizerToggle from './components/ThemeCustomizerToggle';
@@ -17,7 +16,7 @@ const page = () => {
                   <input type="search" className="form-control border-0" placeholder="Search..." autoComplete="off" />
                   <IconifyIcon icon="ri:search-line" className=" search-widget-icon" />
                 </div> */}
-                <Dropdownselector />
+                {/* <Dropdownselector /> */}
               </form>
             </div>
             <div className="d-flex align-items-center gap-1">

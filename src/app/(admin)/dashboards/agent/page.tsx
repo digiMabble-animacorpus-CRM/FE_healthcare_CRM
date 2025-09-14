@@ -3,7 +3,7 @@
 import PageTitle from '@/components/PageTitle';
 import { Col, Row } from 'react-bootstrap';
 import AppointmentsOverview from './components/AppointmentsOverview';
-import BranchSummary from './components/BranchSummary';
+import BranchSummaryContainer from './components/BranchSummaryContainer';
 import DoctorProfile from './components/DoctorProfile';
 import PatientInsightsContainer from './components/PatientInsights';
 import PatientRecords from './components/PatientRecords';
@@ -11,7 +11,6 @@ import PerformanceSnapshot from './components/PerformanceSnapshot';
 import TasksReminders from './components/TaskReminders';
 import TodayAppointments from './components/TodayAppointments';
 import WeeklySchedule from './components/WeeklySchedule';
-import BranchSummaryContainer from './components/BranchSummaryContainer';
 
 // ===================
 // Define role directly
@@ -32,7 +31,7 @@ const AgentPage = () => {
       {isAdmin(role) && (
         <Row className="gy-4">
           <Col xs={12}>
-            <BranchSummaryContainer/>
+            <BranchSummaryContainer />
           </Col>
 
           <Col lg={12}>

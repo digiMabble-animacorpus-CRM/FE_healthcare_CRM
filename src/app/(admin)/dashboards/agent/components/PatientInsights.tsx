@@ -1,8 +1,10 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { getPatientsDashboardData } from '@/helpers/dashboard'; // Adjust path as needed
+import { useEffect, useState } from 'react';
 import {
+  Alert,
   Card,
   CardBody,
   CardHeader,
@@ -15,10 +17,8 @@ import {
   ProgressBar,
   Row,
   Spinner,
-  Alert,
 } from 'react-bootstrap';
 import { FaChild, FaFemale, FaMale } from 'react-icons/fa';
-import { getPatientsDashboardData } from '@/helpers/dashboard'; // Adjust path as needed
 
 type Demographics = {
   gender: { male: number; female: number; other: number };
@@ -142,9 +142,7 @@ const PatientInsights = ({
                     </div>
                     <ProgressBar
                       now={
-                        c.count /
-                          Math.max(...demographics.topCities.map((t) => t.count)) *
-                        100
+                        (c.count / Math.max(...demographics.topCities.map((t) => t.count))) * 100
                       }
                       variant="success"
                       className="progress-sm rounded"
@@ -166,7 +164,7 @@ const PatientInsights = ({
   );
 };
 
-const PatientInsightsContainer= () => {
+const PatientInsightsContainer = (props: any) => {
   const [dashboardData, setDashboardData] = useState<{
     newPatientsWeek: number;
     newPatientsMonth: number;

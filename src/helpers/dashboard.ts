@@ -1,7 +1,6 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import { useEffect } from 'react';
 
 export interface Demographics {
   gender: { male: number; female: number; other: number };
@@ -23,7 +22,7 @@ export const getPatientsDashboardData = async (): Promise<PatientsDashboardData 
       console.warn('No access token found.');
       return null;
     }
-    
+
     const response = await fetch(`${API_BASE_PATH}/dashboard/patients`, {
       method: 'GET',
       headers: {
@@ -31,20 +30,20 @@ export const getPatientsDashboardData = async (): Promise<PatientsDashboardData 
         'Content-Type': 'application/json',
       },
     });
-    
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Failed to fetch patients dashboard data:', response.status, errorText);
       return null;
     }
-    
+
     const result = await response.json();
-    
+
     if (!result.status || !result.data) {
       console.error('API returned unsuccessful status or empty data');
       return null;
     }
-    
+
     const data = result.data;
 
     // Calculate total gender count for percentage conversion
@@ -56,8 +55,12 @@ export const getPatientsDashboardData = async (): Promise<PatientsDashboardData 
     // Convert gender counts to percentage
     const genderPercentages = {
       male: totalGenderCount ? ((data.gender_distribution?.male ?? 0) / totalGenderCount) * 100 : 0,
-      female: totalGenderCount ? ((data.gender_distribution?.female ?? 0) / totalGenderCount) * 100 : 0,
-      other: totalGenderCount ? ((data.gender_distribution?.other ?? 0) / totalGenderCount) * 100 : 0,
+      female: totalGenderCount
+        ? ((data.gender_distribution?.female ?? 0) / totalGenderCount) * 100
+        : 0,
+      other: totalGenderCount
+        ? ((data.gender_distribution?.other ?? 0) / totalGenderCount) * 100
+        : 0,
     };
 
     const demographics: Demographics = {
@@ -105,15 +108,13 @@ export interface CalendarAppointmentsResponse {
   appointments: CalendarAppointment[];
 }
 
-export const getCalendarAppointments = async (
-  params: {
-    startDate: string;
-    endDate: string;
-    doctorId?: number;
-    branchId?: number;
-    timeFilter?: string;
-  }
-): Promise<CalendarAppointmentsResponse | null> => {
+export const getCalendarAppointments = async (params: {
+  startDate: string;
+  endDate: string;
+  doctorId?: number;
+  branchId?: number;
+  timeFilter?: string;
+}): Promise<CalendarAppointmentsResponse | null> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) {
@@ -166,15 +167,13 @@ export interface AppointmentStatsResponse {
 }
 
 // Helper to fetch appointment stats
-export const getAppointmentStats = async (
-  params: {
-    startDate: string;
-    endDate: string;
-    doctorId?: number;
-    branchId?: number;
-    timeFilter?: string;
-  }
-): Promise<AppointmentStatsResponse | null> => {
+export const getAppointmentStats = async (params: {
+  startDate: string;
+  endDate: string;
+  doctorId?: number;
+  branchId?: number;
+  timeFilter?: string;
+}): Promise<AppointmentStatsResponse | null> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) {
@@ -190,16 +189,13 @@ export const getAppointmentStats = async (
       ...(params.timeFilter ? { timeFilter: params.timeFilter } : {}),
     }).toString();
 
-    const response = await fetch(
-      `${API_BASE_PATH}/dashboard/appointments/stats?${query}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE_PATH}/dashboard/appointments/stats?${query}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -222,7 +218,6 @@ export const getAppointmentStats = async (
         cancellations: result.data.cancellations ?? 0,
       },
     };
-
   } catch (error) {
     console.error('Error fetching appointment stats:', error);
     return null;
@@ -271,7 +266,11 @@ export const getBranchSummary = async () => {
     const result = await response.json();
     console.log('Response JSON:', result);
 
-    const dataArray = Array.isArray(result) ? result : (Array.isArray(result.data) ? result.data : []);
+    const dataArray = Array.isArray(result)
+      ? result
+      : Array.isArray(result.data)
+        ? result.data
+        : [];
     console.log('Data array length:', dataArray.length);
 
     if (!dataArray.length) {
@@ -297,8 +296,6 @@ export const getBranchSummary = async () => {
   }
 };
 
-
-
 // Interface for appointment distribution data item
 export interface AppointmentDistributionItem {
   id: number | string;
@@ -313,16 +310,14 @@ export interface AppointmentDistributionResponse {
 }
 
 // Helper to fetch appointment distribution data
-export const getAppointmentDistribution = async (
-  params: {
-    startDate: string;
-    endDate: string;
-    doctorId?: number;
-    branchId?: number;
-    timeFilter?: string;
-    groupBy: string;
-  }
-): Promise<{ distribution: AppointmentDistributionItem[]; totalAppointments: number } | null> => {
+export const getAppointmentDistribution = async (params: {
+  startDate: string;
+  endDate: string;
+  doctorId?: number;
+  branchId?: number;
+  timeFilter?: string;
+  groupBy: string;
+}): Promise<{ distribution: AppointmentDistributionItem[]; totalAppointments: number } | null> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) {
@@ -339,16 +334,13 @@ export const getAppointmentDistribution = async (
       ...(params.timeFilter ? { timeFilter: params.timeFilter } : {}),
     }).toString();
 
-    const response = await fetch(
-      `${API_BASE_PATH}/dashboard/appointments/distribution?${query}`,
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      }
-    );
+    const response = await fetch(`${API_BASE_PATH}/dashboard/appointments/distribution?${query}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
     if (!response.ok) {
       const errorText = await response.text();
@@ -368,5 +360,3 @@ export const getAppointmentDistribution = async (
     return null;
   }
 };
-
-

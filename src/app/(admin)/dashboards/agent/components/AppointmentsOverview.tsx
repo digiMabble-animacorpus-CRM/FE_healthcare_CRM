@@ -2,35 +2,18 @@
 
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
-import Image from 'next/image';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { ApexOptions } from 'apexcharts';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Row,
-  Spinner,
-} from 'react-bootstrap';
+import { useEffect, useRef, useState } from 'react';
+import { Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
 
-import useCalendar from '@/app/(admin)/pages/calendar/useCalendar';
 import avatar1 from '@/assets/images/users/avatar-1.jpg';
 import avatar2 from '@/assets/images/users/avatar-2.jpg';
 import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
-import Calendar from './Calendar';
 import {
-  AppointmentStats,
-  getAppointmentStats,
-  getAppointmentDistribution,
   AppointmentDistributionItem,
+  AppointmentStats,
+  getAppointmentDistribution,
+  getAppointmentStats,
 } from '@/helpers/dashboard';
 
 const ReactApexChart = dynamic(() => import('react-apexcharts'), {
@@ -176,7 +159,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           {/*
           <div className="d-flex gap-2">
             {/* Doctor Dropdown */}
-            {/* <Dropdown>
+          {/* <Dropdown>
               <DropdownToggle
                 as="a"
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
@@ -195,8 +178,8 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               </DropdownMenu>
             </Dropdown> */}
 
-            {/* Branch Dropdown */}
-            {/* <Dropdown>
+          {/* Branch Dropdown */}
+          {/* <Dropdown>
               <DropdownToggle
                 as="a"
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
@@ -229,7 +212,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
                   {statsLoading ? (
                     <Spinner animation="border" size="sm" />
                   ) : (
-                    appointmentStats?.totalAppointments ?? totalAppointments
+                    (appointmentStats?.totalAppointments ?? totalAppointments)
                   )}
                 </h5>
               </div>
@@ -238,7 +221,11 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               <div className="border bg-light-subtle p-2 rounded">
                 <p className="text-muted mb-1">Complété</p>
                 <h5 className="text-dark mb-1">
-                  {statsLoading ? <Spinner animation="border" size="sm" /> : appointmentStats?.completed ?? 0}
+                  {statsLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    (appointmentStats?.completed ?? 0)
+                  )}
                 </h5>
               </div>
             </Col>
@@ -246,12 +233,15 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               <div className="border bg-light-subtle p-2 rounded">
                 <p className="text-muted mb-1">Annulations</p>
                 <h5 className="text-dark mb-1">
-                  {statsLoading ? <Spinner animation="border" size="sm" /> : appointmentStats?.cancellations ?? 0}
+                  {statsLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    (appointmentStats?.cancellations ?? 0)
+                  )}
                 </h5>
               </div>
             </Col>
           </Row>
-
 
           {/*
           // Chart + Calendar
