@@ -227,28 +227,23 @@ const TeamDetails = ({
       )}
 
       {/* Branches */}
-      <Card className="mb-4">
-        <CardBody>
-          <h4>Succursales</h4>
-          <div className="d-flex flex-wrap gap-2">
-            {(branches || []).map((branchId: number) => {
-              const branch = BRANCHES.find((b) => b.id === branchId);
-              const isPrimary = branchId === primary_branch_id;
-              return (
-                <Badge
-                  key={branchId}
-                  bg={isPrimary ? 'success' : 'secondary'}
-                  className="fs-13 text-white px-2 py-1"
-                  title={branch?.name || 'Unknown'}
-                >
-                  {branch?.name || branchId}
-                  {isPrimary ? ' (Primary)' : ''}
-                </Badge>
-              );
-            })}
-          </div>
-        </CardBody>
-      </Card>
+      <div className="d-flex flex-wrap gap-2">
+        {(branches || []).map((branch: any) => {
+          const isPrimary = branch.branch_id === primary_branch_id;
+          return (
+            <Badge
+              key={branch.branch_id}
+              bg={isPrimary ? 'success' : 'secondary'}
+              className="fs-13 text-white px-2 py-1"
+              title={branch.name || 'Unknown'}
+            >
+              {branch.name || branch.branch_id}
+              {isPrimary ? ' (Primary)' : ''}
+            </Badge>
+          );
+        })}
+      </div>
+
 
       {/* Languages Spoken */}
       {languages_spoken.length > 0 && (
