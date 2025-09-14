@@ -316,12 +316,17 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       ? data.languages
           .map((langNameOrObj: any) => {
             if (typeof langNameOrObj === 'number') return langNameOrObj;
-            if (typeof langNameOrObj === 'object' && langNameOrObj !== null)
-              return langNameOrObj.language_id ?? langNameOrObj.id ?? undefined;
+            if (typeof langNameOrObj === 'object' && langNameOrObj !== null) {
+              const langName = langNameOrObj.name?.toLowerCase();
+              if (langName === 'english') return 1;
+              if (langName === 'french') return 2;
+              if (langName === 'german') return 3;
+            }
             if (typeof langNameOrObj === 'string') {
-              if (langNameOrObj.toLowerCase() === 'english') return 1;
-              if (langNameOrObj.toLowerCase() === 'french') return 2;
-              if (langNameOrObj.toLowerCase() === 'german') return 3;
+              const langName = langNameOrObj.toLowerCase();
+              if (langName === 'english') return 1;
+              if (langName === 'french') return 2;
+              if (langName === 'german') return 3;
             }
 
             return undefined;
