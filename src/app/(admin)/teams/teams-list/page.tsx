@@ -26,7 +26,7 @@ import { useRouter } from 'next/navigation';
 import { getAllTeamMembers } from '@/helpers/team-members';
 
 const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const TeamsListPage = () => {
   const [allTeamMembers, setAllTeamMembers] = useState<TeamMemberType[]>([]);
@@ -122,7 +122,7 @@ const TeamsListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedTeamId) return;
     try {
-      await fetch(`http://localhost:8080/api/v1/team-members/${selectedTeamId}`, {
+      await fetch(`http://164.92.220.65/api/v1/team-members/${selectedTeamId}`, {
         method: 'DELETE',
       });
       setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTeamId));
@@ -148,13 +148,17 @@ const TeamsListPage = () => {
         <img
           src={photoUrl}
           alt="Profile"
-          style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50px', background: '#f6f6f6' }}
+          style={{
+            width: '40px',
+            height: '40px',
+            objectFit: 'cover',
+            borderRadius: '50px',
+            background: '#f6f6f6',
+          }}
         />
       );
     // Fallback: first letter in a colored circle
-    const initial = member.first_name
-      ? member.first_name.trim().charAt(0).toUpperCase()
-      : 'U';
+    const initial = member.first_name ? member.first_name.trim().charAt(0).toUpperCase() : 'U';
     return (
       <div
         style={{
@@ -178,20 +182,20 @@ const TeamsListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Teams" title="Teams List" />
+      <PageTitle subName="Teams" title="Liste des équipes" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Teams List
+                Liste de toutes les équipes <small>({filteredTeamMembers.length} Total)</small>
               </CardTitle>
               {error && <div className="alert alert-danger text-center">{error}</div>}
               <div className="d-flex gap-2 align-items-center">
                 <input
                   type="text"
                   className="form-control form-control-sm"
-                  placeholder="Search by name, email, number..."
+                  placeholder="Rechercher par nom, email, numéro..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -202,7 +206,7 @@ const TeamsListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle className="btn btn-sm btn-primary dropdown-toggle text-white">
-                    {selectedBranch || 'Filter by Branch'}
+                    {selectedBranch || 'Filtrer par succursale'}
                   </DropdownToggle>
                   <DropdownMenu>
                     {BRANCHES.map((branch) => (
@@ -246,15 +250,15 @@ const TeamsListPage = () => {
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 30 }}>#</th>
+                        <th style={{ width: 30 }}>Non</th>
                         <th>Photo</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Branch</th>
-                        <th>Job Title</th>
-                        <th>Role</th>
-                        <th>Status</th>
+                        <th>Nom</th>
+                        <th>E-mail</th>
+                        <th>Téléphone</th>
+                        <th>Succursale</th>
+                        <th>Titre demploi</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -281,10 +285,10 @@ const TeamsListPage = () => {
                               {item.role === 'super_admin'
                                 ? 'Super Admin'
                                 : item.role === 'staff'
-                                ? 'Staff'
-                                : item.role === 'admin'
-                                ? 'Admin'
-                                : item.role}
+                                  ? 'Staff'
+                                  : item.role === 'admin'
+                                    ? 'Admin'
+                                    : item.role}
                             </td>
                             <td>
                               <Badge
@@ -337,7 +341,7 @@ const TeamsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    Previous
+                    Précédent
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }).map((_, idx) => (
@@ -357,7 +361,7 @@ const TeamsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
-                    Next
+                    Suivant
                   </Button>
                 </li>
               </ul>
@@ -368,15 +372,15 @@ const TeamsListPage = () => {
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this Team Member?</Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce membre de l équipe ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

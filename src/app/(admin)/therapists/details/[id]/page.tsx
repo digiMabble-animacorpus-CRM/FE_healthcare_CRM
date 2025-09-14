@@ -111,12 +111,12 @@ const TherapistDetailsPage = () => {
     fetchTherapist();
   }, [therapistId]);
 
-  if (loading) return <p>Loading...</p>;
-  if (!data) return <p>No therapist found.</p>;
+  if (loading) return <p>Chargement...</p>;
+  if (!data) return <p>Aucun thérapeute trouvé.</p>;
 
   return (
     <>
-      <PageTitle subName="Healthcare" title="Therapist Overview" />
+      <PageTitle subName="Healthcare" title="Présentation du thérapeute" />
       <TherapistDetails data={data} />
     </>
   );

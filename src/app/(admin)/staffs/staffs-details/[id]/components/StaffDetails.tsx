@@ -63,11 +63,11 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
         {/* Contact Info */}
         <Row className="my-4">
           <Col lg={4}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Email Address :</p>
+            <p className="text-dark fw-semibold fs-16 mb-1">E-mail Address :</p>
             <p className="mb-0">{data?.email}</p>
           </Col>
           <Col lg={4}>
-            <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Numéro de téléphone :</p>
             <p className="mb-0">{data?.phoneNumber}</p>
           </Col>
           <Col lg={4}>

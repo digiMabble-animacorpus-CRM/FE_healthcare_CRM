@@ -181,9 +181,9 @@ export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreat
   console.log('Input formData to transformToBackendDto:', formData);
 
   const BRANCHES = [
-    { id: 1, name: 'Central London' },
-    { id: 2, name: 'East Side' },
-    { id: 3, name: 'North Branch' },
+    { id: 1, name: 'Gembloux - Orneau' },
+    { id: 2, name: 'Gembloux - Tout Vent' },
+    { id: 3, name: 'Namur' },
   ];
 
   const status: 'active' | 'inactive' =

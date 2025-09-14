@@ -72,7 +72,7 @@ const DocumentUploadCard = ({ field, error, single = false }: Props) => {
               View
             </Button>
             <Button size="sm" variant="outline-danger" onClick={() => handleDelete(idx)}>
-              Delete
+              Supprimer
             </Button>
           </div>
         </div>

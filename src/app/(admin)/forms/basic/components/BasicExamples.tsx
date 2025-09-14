@@ -24,9 +24,9 @@ const BasicExamples = () => {
         <TextFormInput
           name="email"
           type="email"
-          label="Email"
+          label="E-mail"
           control={control}
-          placeholder="Email"
+          placeholder="E-mail"
           containerClassName="mb-3"
         />
         <PasswordFormInput

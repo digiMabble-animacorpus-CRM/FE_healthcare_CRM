@@ -97,7 +97,7 @@ const AllDataTables = ({ dataTableRecords }: { dataTableRecords: Employee[] }) =
       >
         <div className="pt-3">
           <Grid
-            columns={['Name', 'Email', 'Phone Number']}
+            columns={['Name', 'E-mail', 'Numéro de téléphone']}
             sort={true}
             search={true}
             pagination={{ limit: 5 }}

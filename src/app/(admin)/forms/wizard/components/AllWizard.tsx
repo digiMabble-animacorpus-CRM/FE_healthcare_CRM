@@ -107,7 +107,7 @@ const HorizontalWizard = () => {
                       className={clsx({ disabled: activeStep === 1 })}
                     >
                       <IconifyIcon icon="bx:left-arrow-alt" className="me-2" />
-                      Back To Previous
+                      Back To Précédent
                     </Button>
                   </div>
                   <div className="next">
@@ -196,7 +196,7 @@ const VerticalWizard = () => {
                             className={clsx({ disabled: activeStep === 1 })}
                           >
                             <IconifyIcon icon="bx:left-arrow-alt" className="me-2" />
-                            Back To Previous
+                            Back To Précédent
                           </Button>
                         </div>
                         <div className="next">

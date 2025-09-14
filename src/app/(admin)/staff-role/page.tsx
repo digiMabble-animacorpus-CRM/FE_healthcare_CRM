@@ -96,13 +96,13 @@ const StaffRoleListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Staff Roles" title="Staff Roles List" />
+      <PageTitle subName="Rôles du personnel" title="Liste des rôles du personnel" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Staff Roles List
+                Liste de tous les rôles du personnel
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -110,7 +110,7 @@ const StaffRoleListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Search by key or label..."
+                    placeholder="Rechercher par clé ou par étiquette..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -125,7 +125,7 @@ const StaffRoleListPage = () => {
                       width={18}
                       className="me-1"
                     />
-                    {selectedTag || 'Filter by Tag'}
+                    {selectedTag || 'Filtrer par balise'}
                   </DropdownToggle>
                   <DropdownMenu>
                     <DropdownItem
@@ -135,7 +135,7 @@ const StaffRoleListPage = () => {
                       }}
                       active={selectedTag === 'Role'}
                     >
-                      Role
+                      Rôle
                     </DropdownItem>
                     <DropdownItem
                       onClick={() => {
@@ -144,7 +144,7 @@ const StaffRoleListPage = () => {
                       }}
                       active={selectedTag === 'AccessLevel'}
                     >
-                      AccessLevel
+                      Niveau d accès
                     </DropdownItem>
                     {selectedTag && (
                       <DropdownItem
@@ -154,7 +154,7 @@ const StaffRoleListPage = () => {
                           setCurrentPage(1);
                         }}
                       >
-                        Clear Tag Filter
+                        Effacer le filtre de balises
                       </DropdownItem>
                     )}
                   </DropdownMenu>
@@ -163,7 +163,7 @@ const StaffRoleListPage = () => {
                   variant="primary"
                   onClick={() => router.push('/staff-role/staffRole-form/create')}
                 >
-                  Add Staff Role
+                  Ajouter un rôle de personnel
                 </Button>
               </div>
             </CardHeader>
@@ -178,15 +178,17 @@ const StaffRoleListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>Key</th>
-                        <th>Label</th>
-                        <th>Tag</th>
+                        <th>NON</th>
+                        <th>Clé</th>
+                        <th>Étiquette</th>
+                        <th>Étiqueter</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {staffRoles.map((item, idx) => (
                         <tr key={idx}>
+                          <td>{idx + 1}</td>
                           <td>{item.key}</td>
                           <td>{item.label}</td>
                           <td>{item.tag}</td>
@@ -241,7 +243,7 @@ const StaffRoleListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      Précédent
                     </Button>
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
@@ -264,7 +266,7 @@ const StaffRoleListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Suivant
                     </Button>
                   </li>
                 </ul>
@@ -276,17 +278,15 @@ const StaffRoleListPage = () => {
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this staff role? This action cannot be undone.
-        </Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce rôle de personnel ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

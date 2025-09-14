@@ -152,7 +152,7 @@ const BookAppointmentForm = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card className="mb-4">
           <CardHeader className="d-flex justify-content-between align-items-center">
-            <CardTitle as="h6">{isEditMode ? 'Edit Appointment' : 'Book Appointment'}</CardTitle>
+            <CardTitle as="h6">{isEditMode ? 'Edit Appointment' : 'Prendre rendez-vous'}</CardTitle>
             {selectedCustomer && (
               <small className="text-muted">
                 Booking for:{' '}
@@ -173,7 +173,7 @@ const BookAppointmentForm = ({
                 ) : isEditMode ? (
                   'Update Appointment'
                 ) : (
-                  'Book Appointment'
+                  'Prendre rendez-vous'
                 )}
               </Button>
             </div>

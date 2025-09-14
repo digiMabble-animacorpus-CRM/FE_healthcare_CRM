@@ -16,7 +16,7 @@ const AgentsDetailsBanner = () => {
                   <input
                     type="search"
                     className="form-control"
-                    placeholder="Search"
+                    placeholder="Recherche"
                     autoComplete="off"
                   />
                   <IconifyIcon icon="solar:magnifer-broken" className="search-widget-icon" />

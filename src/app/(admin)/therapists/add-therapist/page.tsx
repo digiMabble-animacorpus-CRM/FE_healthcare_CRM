@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: 'Customers Add' };
 const TherapistAddPage = () => {
   return (
     <>
-      <PageTitle title="Add Therapist" subName="" />
+      <PageTitle title="Ajouter un thérapeute" subName="" />
       <AddTherapist />;
     </>
   );

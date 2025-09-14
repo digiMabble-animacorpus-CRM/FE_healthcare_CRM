@@ -241,7 +241,7 @@ const PropertyAdd = () => {
             </Col>
             <Col lg={2}>
               <Button variant="danger" className="w-100">
-                Cancel
+              Annuler
               </Button>
             </Col>
           </Row>

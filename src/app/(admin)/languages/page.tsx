@@ -82,13 +82,13 @@ const LanguageListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Languages" title="Languages List" />
+      <PageTitle subName="Langues" title="Liste des langues" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Languages List
+                Liste de toutes les langues
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -96,7 +96,7 @@ const LanguageListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Search by name, email, number..."
+                    placeholder="Rechercher par nom, email, numéro..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -108,7 +108,7 @@ const LanguageListPage = () => {
                   variant="primary"
                   onClick={() => router.push('/languages/language-form/create')}
                 >
-                  Add Language
+                  Ajouter une langue
                 </Button>
               </div>
             </CardHeader>
@@ -123,31 +123,16 @@ const LanguageListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>
-                          <div className="form-check">
-                            <input type="checkbox" className="form-check-input" id="customCheck1" />
-                            <label className="form-check-label" htmlFor="customCheck1" />
-                          </div>
-                        </th>
-                        {/* <th>Id</th> */}
-                        <th>Key</th>
-                        <th>Label</th>
+                        <th>Non</th>
+                        <th>Clé</th>
+                        <th>Étiquette</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {languages.map((item: LanguageType, idx: number) => (
                         <tr key={idx}>
-                          <td>
-                            <div className="form-check">
-                              <input
-                                type="checkbox"
-                                className="form-check-input"
-                                id={`check-${idx}`}
-                              />
-                            </div>
-                          </td>
-                          {/* <td>{item._id}</td> */}
+                          <td>{idx + 1}</td>
                           <td>{item.key}</td>
                           <td>{item.label}</td>
                           <td>
@@ -191,7 +176,7 @@ const LanguageListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      Précédent
                     </Button>
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
@@ -214,7 +199,7 @@ const LanguageListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Suivant
                     </Button>
                   </li>
                 </ul>
@@ -227,17 +212,15 @@ const LanguageListPage = () => {
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this customer? This action cannot be undone.
-        </Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce client ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>
