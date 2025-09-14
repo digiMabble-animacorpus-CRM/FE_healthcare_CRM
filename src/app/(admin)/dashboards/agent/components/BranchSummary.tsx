@@ -1,5 +1,6 @@
 'use client';
 
+import React from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
@@ -12,20 +13,21 @@ export type BranchSummaryItem = {
   revenueMonth: number; // currency handling left to consumer
 };
 
+type BranchSummaryProps = {
+  summaries: BranchSummaryItem[];
+};
+
 const num = (n: number) => new Intl.NumberFormat().format(n);
 
-const BranchSummary = ({
-  summaries,
-  onBranchClick,
-}: {
-  summaries: BranchSummaryItem[];
-  onBranchClick?: (branch: BranchSummaryItem) => void;
-}) => {
+const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries }) => {
+  if (!summaries || summaries.length === 0) {
+    return <div>No branch summaries available.</div>;
+  }
   return (
     <Row className="g-3">
       {summaries.map((b) => (
         <Col xl={4} key={b.branchId}>
-          <Card className="h-100">
+          <Card className="h-100" style={{ cursor: 'pointer' }}>
             <CardBody>
               <h5 className="mb-3">{b.branchName}</h5>
               <Row className="text-center g-3">

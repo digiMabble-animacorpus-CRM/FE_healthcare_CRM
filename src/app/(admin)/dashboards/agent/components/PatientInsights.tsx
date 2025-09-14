@@ -1,5 +1,6 @@
 'use client';
 
+import React, { useEffect, useState } from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import {
   Card,
@@ -13,8 +14,11 @@ import {
   DropdownToggle,
   ProgressBar,
   Row,
+  Spinner,
+  Alert,
 } from 'react-bootstrap';
 import { FaChild, FaFemale, FaMale } from 'react-icons/fa';
+import { getPatientsDashboardData } from '@/helpers/dashboard'; // Adjust path as needed
 
 type Demographics = {
   gender: { male: number; female: number; other: number };
@@ -22,7 +26,6 @@ type Demographics = {
   topCities: { city: string; count: number }[];
 };
 
-// New AgeDistributionWidget component
 const AgeDistributionWidget = ({
   ageBuckets,
 }: {
@@ -40,8 +43,8 @@ const AgeDistributionWidget = ({
 
   return (
     <Row className="g-3">
-      {ageBuckets.map((bucket, idx) => {
-        const percent = Math.round((bucket.value / total) * 100);
+      {ageBuckets.map((bucket) => {
+        const percent = total ? Math.round((bucket.value / total) * 100) : 0;
         const Icon = getIcon(bucket.label);
         return (
           <Col lg={4} key={bucket.label}>
@@ -139,7 +142,9 @@ const PatientInsights = ({
                     </div>
                     <ProgressBar
                       now={
-                        (c.count / Math.max(...demographics.topCities.map((t) => t.count))) * 100
+                        c.count /
+                          Math.max(...demographics.topCities.map((t) => t.count)) *
+                        100
                       }
                       variant="success"
                       className="progress-sm rounded"
@@ -161,4 +166,65 @@ const PatientInsights = ({
   );
 };
 
-export default PatientInsights;
+const PatientInsightsContainer= () => {
+  const [dashboardData, setDashboardData] = useState<{
+    newPatientsWeek: number;
+    newPatientsMonth: number;
+    demographics: Demographics;
+  } | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getPatientsDashboardData();
+        if (data) {
+          setDashboardData(data);
+        } else {
+          setError('Échec du chargement des données du tableau de bord des patients.');
+        }
+      } catch (err) {
+        setError('Une erreur est survenue lors du chargement.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Col xl={12} lg={12} className="text-center my-5">
+        <Spinner animation="border" />
+      </Col>
+    );
+  }
+
+  if (error) {
+    return (
+      <Col xl={12} lg={12} className="my-5">
+        <Alert variant="danger">{error}</Alert>
+      </Col>
+    );
+  }
+
+  if (!dashboardData) {
+    return null;
+  }
+
+  return (
+    <PatientInsights
+      newPatientsWeek={dashboardData.newPatientsWeek}
+      newPatientsMonth={dashboardData.newPatientsMonth}
+      demographics={dashboardData.demographics}
+    />
+  );
+};
+
+export default PatientInsightsContainer;
