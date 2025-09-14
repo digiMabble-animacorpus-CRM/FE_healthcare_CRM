@@ -21,7 +21,6 @@ const useSignup = () => {
   const [loading, setLoading] = useState(false);
 
   const signup = async (formData: SignupFormFields) => {
-    console.log(' Signup data:', formData);
     setLoading(true);
 
     // Encrypt the payload
@@ -38,7 +37,6 @@ const useSignup = () => {
       });
 
       const data = await res.json();
-      console.log('Response:', data);
 
       if (res.ok && data.status) {
         localStorage.setItem('email_id', formData.email);

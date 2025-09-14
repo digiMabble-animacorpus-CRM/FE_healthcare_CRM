@@ -512,12 +512,9 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           : null,
         branches: payload.branches?.map((b: any) => (typeof b === 'string' ? Number(b) : b)) || [],
       };
-      console.log('Update payload:', safeUpdatePayload);
-      console.log('Sanitized payload before sending:', safeUpdatePayload);
       success = await updateTeamMember(id, safeUpdatePayload);
     } else {
       const payload = toCreatePayload(formData);
-      console.log('Create payload:', payload);
       success = await createTeamMember(payload);
     }
 

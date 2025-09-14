@@ -56,7 +56,6 @@ const DepartmentListPage = () => {
       );
       setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
-      console.log('Failed to fetch departments data:', error);
       // fallback mock data
       setDepartments([
         {

@@ -25,7 +25,6 @@ const TuiCalendar = ({ date,height = '600px', ...restProps }: TuiCalendarProps, 
     setDate: (newDate: Date) => {
       if (calendarRef.current) {
         const calendarInstance = calendarRef.current.getInstance();
-        console.log(newDate)
         calendarInstance.setDate(newDate);
         calendarInstance.render(); 
       }

@@ -45,7 +45,6 @@ const useSignIn = () => {
   type LoginFormFields = yup.InferType<typeof loginFormSchema>;
 
   const login = handleSubmit(async (values: LoginFormFields) => {
-    console.log('Form submitted with:', values);
     setLoading(true);
 
     const encryptedData = encryptAES({

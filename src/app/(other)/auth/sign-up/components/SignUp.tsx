@@ -53,7 +53,6 @@ const SignUp = () => {
                 <div className="px-4">
                   <form
                     onSubmit={handleSubmit((data) => {
-                      console.log('🚀 Submitting form with:', data);
                       signup(data);
                     })}
                     className="authentication-form"

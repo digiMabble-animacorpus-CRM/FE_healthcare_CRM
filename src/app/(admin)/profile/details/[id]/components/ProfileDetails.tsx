@@ -56,8 +56,6 @@ const ProfileDetails = () => {
           },
         });
 
-        // console.log("Fetched profile data:", res.data);
-
         // Extract nested team object
         const apiProfile = res.data?.user?.team;
         if (!apiProfile) {
@@ -92,9 +90,6 @@ const ProfileDetails = () => {
           calendar_links: apiProfile.calendar_links || [],
           photo: apiProfile.photo || '',
         };
-
-        console.log('normalized.photo:', normalized.photo);
-        console.log('Fetched profile data:', normalized);
         setProfileData(normalized);
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -126,7 +121,6 @@ const ProfileDetails = () => {
     schedule,
     photo,
   } = profileData;
-  // console.log('Photo URL:', photo);
   return (
     <div>
       {/* Profile Header */}

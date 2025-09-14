@@ -7,7 +7,6 @@ import { Button, Card, CardBody, Col, Row } from 'react-bootstrap';
 
 const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
   const router = useRouter();
-  console.log('StaffRoleDetail data:', data);
 
   if (!data) {
     return <div>Loading...</div>; // Handle loading state or error

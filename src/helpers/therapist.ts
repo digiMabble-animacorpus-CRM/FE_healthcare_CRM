@@ -46,7 +46,6 @@ export const getAllTherapists = async (
       ...(to ? { toDate: to } : {}),
       ...(search ? { searchText: search } : {}),
     };
-    console.log('Filters (plain):', filters);
 
     const queryParams = new URLSearchParams(filters).toString();
 
@@ -65,7 +64,6 @@ export const getAllTherapists = async (
     }
 
     const jsonData = await response.json();
-    console.log('Response from server:', jsonData);
 
     const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
@@ -87,7 +85,6 @@ export const getTherapistById = async (therapistId: any): Promise<any | null> =>
   }
 
   const url = `${API_BASE_PATH}/therapists/${therapistId}`;
-  console.log('Requesting therapist by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -98,9 +95,7 @@ export const getTherapistById = async (therapistId: any): Promise<any | null> =>
       },
     });
 
-    console.log('Response status:', response.status);
     const result = await response.json();
-    console.log('Full API response:', result);
 
     if (!response.ok) {
       console.error('Failed to fetch therapist:', result?.message || 'Unknown error');

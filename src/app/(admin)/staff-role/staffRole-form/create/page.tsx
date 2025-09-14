@@ -13,7 +13,6 @@ const CreateStaffRolePage = () => {
 
   const handleCreate = async (data: Omit<StaffRoleType, '_id'>) => {
     try {
-      console.log('Creating StaffRole...', data);
       // await createStaffRoleAPI(data);
 
       toast.success('StaffRole created successfully!');
