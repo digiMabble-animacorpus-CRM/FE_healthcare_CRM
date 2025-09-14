@@ -82,12 +82,7 @@ export const therapistData: TherapistType[] = [
     languages: [], // ✅ Replace with IDs if using numeric language codes
     faq: 'Les nouveaux patients sont-ils acceptés ? Oui, Hajiba Bounouch accepte de nouveaux patients...',
     paymentMethods: [], // ✅ Empty array until payment methods are defined
-    specializations: [
-      'Psychologue clinicienne',
-      'Psychothérapeute systémique',
-      'Thérapie familiale et de couple',
-      'Numéro INAMI 70101702000',
-    ], // ✅ Converted to array
+    specializations: [], // ✅ Converted to array
   },
 ];
 

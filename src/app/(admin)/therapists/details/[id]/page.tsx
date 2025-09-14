@@ -44,9 +44,9 @@ const TherapistDetailsPage = () => {
         contactPhone: rawTherapist.contactPhone || '',
         inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
         aboutMe: rawTherapist.aboutMe || null,
-        degreesAndTraining:
-          rawTherapist.degreesAndTraining || rawTherapist.degreesTraining || null,
-        departmentId: rawTherapist.departmentId ?? null,
+        degreesAndTraining: rawTherapist.degreesAndTraining || rawTherapist.degreesTraining || null,
+        departmentId: rawTherapist.departmentId ?? rawTherapist.department?.id ?? null,
+        departmentName: rawTherapist.department?.name || null,
 
         // ✅ Required TherapistType props
         centerAddress: rawTherapist.centerAddress || '',
@@ -64,9 +64,7 @@ const TherapistDetailsPage = () => {
           ? rawTherapist.branches.map((b: any) => {
               const branchId = b.branch_id ?? b.id ?? b ?? 0;
               const branchName =
-                b.name ||
-                branchesList.find((br) => br.branch_id === branchId)?.name ||
-                '';
+                b.name || branchesList.find((br) => br.branch_id === branchId)?.name || '';
 
               const rootAvailability: Availability[] = Array.isArray(rawTherapist.availability)
                 ? rawTherapist.availability.map((av: any) => ({
