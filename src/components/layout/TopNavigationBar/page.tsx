@@ -1,7 +1,8 @@
 import { Container } from 'react-bootstrap';
+import Dropdownselector from './components/dropdownselector';
 import LeftSideBarToggle from './components/LeftSideBarToggle';
 import ProfileDropdown from './components/ProfileDropdown';
-import Dropdownselector from './components/dropdownselector';
+import ThemeCustomizerToggle from './components/ThemeCustomizerToggle';
 
 const page = () => {
   return (
@@ -26,7 +27,7 @@ const page = () => {
 
               {/* <Notifications /> */}
 
-              {/* <ThemeCustomizerToggle /> */}
+              <ThemeCustomizerToggle />
 
               <ProfileDropdown />
             </div>
