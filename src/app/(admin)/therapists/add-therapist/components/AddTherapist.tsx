@@ -316,14 +316,19 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       ? data.languages
           .map((langNameOrObj: any) => {
             if (typeof langNameOrObj === 'number') return langNameOrObj;
-            if (typeof langNameOrObj === 'object' && langNameOrObj !== null)
-              return langNameOrObj.language_id ?? langNameOrObj.id ?? undefined;
-            if (typeof langNameOrObj === 'string') {
-              const found = languagesList.find(
-                (l) => l.name?.toLowerCase() === langNameOrObj.toLowerCase(),
-              );
-              return found?.id;
+            if (typeof langNameOrObj === 'object' && langNameOrObj !== null) {
+              const langName = langNameOrObj.name?.toLowerCase();
+              if (langName === 'english') return 1;
+              if (langName === 'french') return 2;
+              if (langName === 'german') return 3;
             }
+            if (typeof langNameOrObj === 'string') {
+              const langName = langNameOrObj.toLowerCase();
+              if (langName === 'english') return 1;
+              if (langName === 'french') return 2;
+              if (langName === 'german') return 3;
+            }
+
             return undefined;
           })
           .filter((id: any) => typeof id === 'number')
@@ -395,10 +400,13 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     ),
     languages: data.languages
       ?.map((id) => {
-        const langObj = languages.find((l) => l.id === id);
-        return langObj ? langObj.name : null;
+        if (id === 1) return 'English';
+        if (id === 2) return 'French';
+        if (id === 3) return 'German';
+        return null;
       })
       .filter((n) => n),
+
     faq: data.faq,
     paymentMethods: data.paymentMethods,
   });
