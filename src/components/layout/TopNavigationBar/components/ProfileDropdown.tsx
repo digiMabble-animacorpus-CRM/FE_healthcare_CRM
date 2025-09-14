@@ -78,11 +78,11 @@ const ProfileDropdown = () => {
 
           <span className="align-middle">My Profile</span>
         </DropdownItem>
-        <DropdownItem as={Link} href="/pages/pricing">
+        <DropdownItem as={Link} href="/maintenance">
           <IconifyIcon icon="solar:wallet-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">Help & Support</span>
         </DropdownItem>
-        <DropdownItem as={Link} href="/support/faqs">
+        <DropdownItem as={Link} href="/maintenance">
           <IconifyIcon icon="solar:help-broken" className="align-middle me-2 fs-18" />
           <span className="align-middle">Privacy & Conditions</span>
         </DropdownItem>
