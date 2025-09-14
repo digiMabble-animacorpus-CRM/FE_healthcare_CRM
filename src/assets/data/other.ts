@@ -9,19 +9,15 @@ import avatar8 from '@/assets/images/users/avatar-8.jpg';
 import avatar9 from '@/assets/images/users/avatar-9.jpg';
 import {
   AgentType,
-  CustomerReviewsType,
   CustomerType,
-  PatientType,
   Employee,
   PricingType,
   ProjectType,
   PropertyType,
+  TherapistType,
   TimelineType,
   TransactionType,
   UserType,
-  TherapistType,
-  StaffType,
-  BranchType,
 } from '@/types/data';
 import { addOrSubtractDaysFromDate, addOrSubtractMinutesFromDate } from '@/utils/date';
 
@@ -62,44 +58,39 @@ export const customerEnquiriesData: any[] = [
 
 export const therapistData: TherapistType[] = [
   {
-    _id: '2',
-    _key: 2,
-    idPro: 2,
-    id: '2',
+    therapistId: '2', // ✅ Mapped from id
     firstName: 'Hajiba',
     lastName: 'Bounouch',
     fullName: 'Bounouch Hajiba',
     photo: '457264826_478108485_478108485141765_7923440431478900254_n.jpg',
+    imageUrl: null, // ✅ Optional image URL if different from photo
     jobTitle:
-      'Psychologue clinicienne,Psychothérapeute,Coordinateur du centre,Psychothérapeute systémique',
-    about: 'Je suis psychologue clinicienne et psychothérapeute familial...',
-    aboutMe: "Je suis psychologue clinicienne, diplômée de l'Université Catholique de Louvain...",
-    agendaLinks: 'https://rosa.be/fr/booking/hp/hajiba-bounouch-1/site/',
-    appointmentAlert: null,
-    appointmentStart: null,
-    appointmentEnd: null,
-    availability: null,
-    centerAddress: "Anima Corpus Gembloux - Orneau Place de l'Orneau, 15 5030 Gembloux, ...",
-    centerEmail: 'gembloux@animacorpus.be, gembloux@animacorpus.be, namur@animacorpus.be',
-    centerPhoneNumber: '0492/40.18.77',
+      'Psychologue clinicienne, Psychothérapeute, Coordinateur du centre, Psychothérapeute systémique',
+    aboutMe:
+      "Je suis psychologue clinicienne, diplômée de l'Université Catholique de Louvain...",
     consultations: 'Mon rôle à Anima Corpus...',
-    contactEmail: 'hajiba.bounouch@animacorpus.be',
-    contactPhone: '0488/45.89.44',
     degreesAndTraining:
       'Diplôme en psychologie clinique, Louvain la Neuve\nDiplôme en psychothérapie systémique, ULB...',
-    frequently_asked_questions:
-      'Les nouveaux patients sont-ils acceptés ? Oui, Hajiba Bounouch accepte de nouveaux patients...',
-    specializations:
-      'Psychologue clinicienne\nPsychothérapeute systémique\nThérapie familiale et de couple\nNuméro INAMI\n70101702000',
-    spokenLanguages: ['Français', 'Anglais', 'Néerlandais'],
-    website: 'https://www.animacorpus.be/equipe/hajiba-bounouch',
-    rosaLink: null,
-    googleAgendaLink: null,
-    schedule: 'Je consulte le lundi, jeudi, vendredi et samedi...',
+    contactEmail: 'hajiba.bounouch@animacorpus.be',
+    contactPhone: '0488/45.89.44',
+    inamiNumber: '', // ✅ Provide a value if available
+    centerAddress:
+      "Anima Corpus Gembloux - Orneau Place de l'Orneau, 15 5030 Gembloux, ...",
+    appointmentStart: null, // ✅ Placeholder for appointment start
+    departmentId: null, // ✅ No department assigned yet
+    branches: [], // ✅ Empty array until branches are provided
+    languages: [], // ✅ Replace with IDs if using numeric language codes
     faq: 'Les nouveaux patients sont-ils acceptés ? Oui, Hajiba Bounouch accepte de nouveaux patients...',
-    // add id since it's required in the type
+    paymentMethods: [], // ✅ Empty array until payment methods are defined
+    specializations: [
+      'Psychologue clinicienne',
+      'Psychothérapeute systémique',
+      'Thérapie familiale et de couple',
+      'Numéro INAMI 70101702000',
+    ], // ✅ Converted to array
   },
 ];
+
 
 export const userData: UserType[] = [
   {
@@ -933,7 +924,7 @@ export const pricingData: PricingType[] = [
       '50 GB Storage',
       '900 GB Bandwidth',
       '1 Domain',
-      'Email Support',
+      'E-mail Support',
       '24x7 Support',
       '5 User',
     ],
@@ -948,7 +939,7 @@ export const pricingData: PricingType[] = [
       '500 GB Storage',
       '2.5 TB Bandwidth',
       '5 Domain',
-      'Email Support',
+      'E-mail Support',
       '24x7 Support',
       '10 User',
     ],
@@ -961,7 +952,7 @@ export const pricingData: PricingType[] = [
       '2 TB Storage',
       'Unlimited Bandwidth',
       '50 Domain',
-      'Email Support',
+      'E-mail Support',
       '24x7 Support',
       'Unlimited User',
     ],

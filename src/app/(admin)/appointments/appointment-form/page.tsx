@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from "react";
-import type { CustomerEnquiriesType, PatientType } from "@/types/data";
-import dynamic from "next/dynamic";
+import type { PatientType } from '@/types/data';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 
 // Dynamically import client-only components
-const CustomerInfoCard = dynamic(() => import("./components/CustomerInfoCard"), { ssr: false });
-const BookAppointmentForm = dynamic(() => import("./components/BookAppointmentForm"), { ssr: false });
+const CustomerInfoCard = dynamic(() => import('./components/CustomerInfoCard'), { ssr: false });
+const BookAppointmentForm = dynamic(() => import('./components/BookAppointmentForm'), {
+  ssr: false,
+});
 
 interface UserType {
   team_id: string | number;
@@ -21,12 +23,12 @@ export default function AppointmentPage() {
   useEffect(() => {
     setIsClient(true);
 
-    const userString = localStorage.getItem("user");
+    const userString = localStorage.getItem('user');
     if (userString) {
       try {
         setUser(JSON.parse(userString));
       } catch (err) {
-        console.error("Failed to parse user from localStorage", err);
+        console.error('Failed to parse user from localStorage', err);
       }
     }
   }, []);
@@ -37,19 +39,19 @@ export default function AppointmentPage() {
 
   const handleReset = () => {
     setCustomer(null);
-    setResetTrigger(prev => prev + 1); // Force re-render of CustomerInfoCard
+    setResetTrigger((prev) => prev + 1); // Force re-render of CustomerInfoCard
   };
 
   const handleAppointmentSubmit = (appointmentData: any) => {
-    console.log("Appointment Data:", appointmentData);
+    console.log('Appointment Data:', appointmentData);
   };
 
   if (!isClient) return null;
 
   return (
     <div className="p-3">
-      <CustomerInfoCard 
-        onSave={handleCustomerSave} 
+      <CustomerInfoCard
+        onSave={handleCustomerSave}
         onReset={handleReset}
         key={resetTrigger} // Force re-render when reset is triggered
       />
@@ -57,7 +59,7 @@ export default function AppointmentPage() {
       {customer?.id && (
         <BookAppointmentForm
           patientId={customer.id}
-          createdById={user?.team_id ? String(user.team_id) : ""}
+          createdById={user?.team_id ? String(user.team_id) : ''}
           onSubmitHandler={handleAppointmentSubmit}
           selectedCustomer={customer}
         />

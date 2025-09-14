@@ -1,8 +1,8 @@
 'use client';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import React, { useEffect, useRef } from 'react';
-import { usePathname } from 'next/navigation';
 import { useLayoutContext } from '@/context/useLayoutContext';
+import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 const LeftSideBarToggle = () => {
   const {

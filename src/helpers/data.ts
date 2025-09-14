@@ -7,25 +7,23 @@ import {
   pricingData,
   projectsData,
   propertyData,
-  therapistData,
   timelineData,
   transactionData,
   userData,
 } from '@/assets/data/other';
 import { sellersData } from '@/assets/data/product';
 import { emailsData, socialGroupsData } from '@/assets/data/social';
-import { staffData } from '@/assets/data/staffData';
 import { todoData } from '@/assets/data/task';
 import { notificationsData } from '@/assets/data/topbar';
 import {
   AgentType,
   CustomerReviewsType,
   CustomerType,
-  PatientType,
   EmailCountType,
   Employee,
   GroupType,
   NotificationType,
+  PatientType,
   PricingType,
   ProjectType,
   PropertyType,
@@ -33,12 +31,8 @@ import {
   TodoType,
   TransactionType,
   UserType,
-  TherapistType,
-  StaffType,
 } from '@/types/data';
-import { db } from '@/utils/firebase';
 import { sleep } from '@/utils/promise';
-import { collection, doc, getDoc, getDocs } from 'firebase/firestore';
 import * as yup from 'yup';
 
 export const getNotifications = async (): Promise<NotificationType[]> => {

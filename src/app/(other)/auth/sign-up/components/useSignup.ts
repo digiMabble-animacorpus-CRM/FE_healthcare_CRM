@@ -9,7 +9,7 @@ import { encryptAES } from '@/utils/encryption';
 
 export const signupSchema = yup.object({
   name: yup.string().required('Name is required'),
-  email: yup.string().email().required('Email is required'),
+  email: yup.string().email().required('E-mail is required'),
   password: yup.string().required('Password is required'),
 });
 

@@ -1,17 +1,14 @@
 'use client';
-
-import React, { useEffect, useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
-import { Form, Row, Col, Button, Card, CardBody } from 'react-bootstrap';
-import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
+import { yupResolver } from '@hookform/resolvers/yup';
+import axios from 'axios';
 import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
+import { Button, Card, CardBody, Col, Form, Row } from 'react-bootstrap';
+import { useFieldArray, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-type AddTherapistProps = {
-  therapistId?: string;
-};
+type AddTherapistProps = { therapistId?: string };
 
 interface Branch {
   branch_id: number;
@@ -41,78 +38,78 @@ export interface Availability {
 
 export interface BranchWithAvailability {
   branch_id: number;
-  branch_name: string;
+  branch_name: string | null;
   availability: Availability[];
 }
 
 interface TherapistFormInputs {
-  firstName: string;
-  lastName: string;
-  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  fullName?: string;
   photo?: string | null;
   contactEmail: string;
-  contactPhone: string;
+  contactPhone?: string;
   inamiNumber: string;
   aboutMe?: string | null;
   degreesTraining?: string | null;
-  departmentId: number | null;
+  departmentId?: number | null;
   specializationIds?: number[];
-  branches: BranchWithAvailability[];
-  languages: number[]; // selected language IDs
+  branches?: BranchWithAvailability[];
+  languages?: number[]; // selected language IDs
   faq?: string | null;
-  paymentMethods: string[];
+  paymentMethods?: string[];
 }
 
 const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
-  firstName: yup.string().required('First Name is required'),
-  lastName: yup.string().required('Last Name is required'),
-  fullName: yup.string(),
-  photo: yup.string().url('Must be a valid URL').nullable(),
-  contactEmail: yup.string().email('Invalid email').required('Email is required'),
+  firstName: yup.string().required('Le prénom est obligatoire'),
+  lastName: yup.string().required('Le nom de famille est obligatoire'),
+  fullName: yup.string().required('Le nom complet est requis'),
+  photo: yup.string().url('Doit être une URL valide').nullable(),
+  contactEmail: yup.string().email('E-mail invalide').required('L e-mail est requis'),
   contactPhone: yup
     .string()
-    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
-    .required('Phone number is required'),
-  inamiNumber: yup.string().required('INAMI Number is required'),
+    .matches(/^\+?[0-9]{7,15}$/, 'Téléphone invalide')
+    .required('Le numéro de téléphone est requis'),
+  inamiNumber: yup.string().required('Numéro INAMI is required'),
   aboutMe: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
   departmentId: yup
     .number()
     .nullable()
-    .typeError('Department is required')
-    .required('Department is required'),
+    .typeError('Le département est requis')
+    .required('Le département est requis'),
   specializationIds: yup
     .array()
     .of(yup.number().required())
-    .min(1, 'At least one specialization is required'),
+    .min(1, 'Au moins une spécialisation est requise'),
   branches: yup
     .array()
     .of(
       yup.object({
-        branch_id: yup.number().required('Branch is required'),
+        branch_id: yup.number().required('Une succursale est requise'),
         branch_name: yup.string().nullable().defined(),
         availability: yup
           .array()
           .of(
             yup.object({
-              day: yup.string().required('Day is required'),
-              startTime: yup.string().required('Start time is required'),
-              endTime: yup.string().required('End time is required'),
+              day: yup.string().required('La journée est obligatoire'),
+              startTime: yup.string().required('L`heure de début est requise'),
+              endTime: yup.string().required('L`heure de fin est requise'),
             }),
           )
-          .min(1, 'At least one availability slot is required')
-          .required('Availability is required'),
+          .min(1, 'Au moins un créneau de disponibilité est requis')
+          .required('La disponibilité est requise'),
       }),
     )
-    .min(1, 'At least one branch is required')
-    .required('Branches are required')
+    .min(1, 'Au moins une branche est requise')
+    .required('Des succursales sont nécessaires')
     .defined(),
-  languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
+  languages: yup.array().of(yup.number().required()).min(1, 'Au moins une langue est requise'),
   faq: yup.string().nullable(),
   paymentMethods: yup
     .array()
     .of(yup.string().required())
-    .min(1, 'At least one payment method is required'),
+    .min(1, 'Au moins un mode de paiement est requis'),
 });
 
 const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
@@ -174,7 +171,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
 
   const safeArray = (res: any): any[] => {
     if (Array.isArray(res)) return res;
-    if (res && Array.isArray(res.data)) return res.data;
+    if (res?.data && Array.isArray(res.data)) return res.data;
     return [];
   };
 
@@ -260,17 +257,13 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     loadSpecializations();
   }, [token]);
 
-  // --- Mapping helper: transform API therapist -> form shape
-  // IMPORTANT: This mapper expects the API shape you posted:
-  // languages: ["English", "French"]
-  // branches: [1,2]
-  // availability: [{day, startTime, endTime}, ...] (root array)
+  // --- Mapping API therapist -> form
   const mapTherapistToFormValues = (
     data: any,
     branchesList: Branch[],
     languagesList: Language[],
   ): TherapistFormInputs => {
-    if (!data) {
+    if (!data)
       return {
         firstName: '',
         lastName: '',
@@ -288,16 +281,13 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         faq: null,
         paymentMethods: [],
       };
-    }
 
-    // --- Specializations (IDs) — API provides array of numbers in your example
     const specializationIds: number[] = Array.isArray(data.specializations)
       ? data.specializations.map((s: any) =>
           typeof s === 'number' ? s : s.specialization_id || s.id,
         )
       : [];
 
-    // --- Availability root array (normalize keys)
     const rootAvailability: Availability[] = Array.isArray(data.availability)
       ? data.availability.map((av: any) => ({
           day: av.day ?? av.d ?? '',
@@ -306,17 +296,14 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         }))
       : [];
 
-    // --- Branches: API provides array of branch IDs in your Postman example
     const formBranches: BranchWithAvailability[] = Array.isArray(data.branches)
       ? data.branches.map((b: any) => {
           const branchId = b.branch_id ?? 0;
           const branchName = b.name ?? '';
-
           const availabilityForThisBranch =
             rootAvailability.length > 0
               ? rootAvailability.map((a) => ({ ...a }))
               : [{ day: '', startTime: '', endTime: '' }];
-
           return {
             branch_id: branchId,
             branch_name: branchName,
@@ -325,25 +312,24 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         })
       : [];
 
-    // --- Languages: API gives strings, match to languagesList to get IDs
-   const langIds: number[] = Array.isArray(data.languages)
-  ? data.languages.map((langNameOrObj: any) => {
-      if (typeof langNameOrObj === 'number') return langNameOrObj;
-      if (typeof langNameOrObj === 'object') {
-        return langNameOrObj.language_id ?? langNameOrObj.id;
-      }
-      if (typeof langNameOrObj === 'string') {
-        const found = languagesList.find(
-          (l) => l.name?.toLowerCase() === langNameOrObj.toLowerCase(),
-        );
-        return found?.id;
-      }
-    })
-  : [];
+    const langIds: number[] = Array.isArray(data.languages)
+      ? data.languages
+          .map((langNameOrObj: any) => {
+            if (typeof langNameOrObj === 'number') return langNameOrObj;
+            if (typeof langNameOrObj === 'object' && langNameOrObj !== null)
+              return langNameOrObj.language_id ?? langNameOrObj.id ?? undefined;
+            if (typeof langNameOrObj === 'string') {
+              const found = languagesList.find(
+                (l) => l.name?.toLowerCase() === langNameOrObj.toLowerCase(),
+              );
+              return found?.id;
+            }
+            return undefined;
+          })
+          .filter((id: any) => typeof id === 'number')
+      : [];
 
-
-
-    const resetObj: TherapistFormInputs = {
+    return {
       firstName: data.firstName ?? '',
       lastName: data.lastName ?? '',
       fullName: `${data.firstName ?? ''} ${data.lastName ?? ''}`.trim(),
@@ -360,45 +346,26 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       faq: data.faq ?? null,
       paymentMethods: Array.isArray(data.paymentMethods) ? data.paymentMethods : [],
     };
-
-    // debug logs to help you verify mapping
-    console.log('mapTherapistToFormValues -> rootAvailability:', rootAvailability);
-    console.log('mapTherapistToFormValues -> formBranches:', formBranches);
-    console.log('mapTherapistToFormValues -> langIds:', langIds);
-    console.log('mapTherapistToFormValues -> resetObj:', resetObj);
-
-    return resetObj;
   };
 
-  // --- Combined init: load dropdowns (and use returned arrays) then fetch therapist and reset
+  // --- Init load
   useEffect(() => {
     const init = async () => {
       if (!token) return;
-
-      console.log('Starting to load branches/departments/languages...');
       try {
         const [branchesRes, departmentsRes, languagesRes] = await Promise.all([
           loadBranches(),
           loadDepartments(),
           loadLanguages(),
         ]);
-        console.log('Loaded dropdowns:', { branchesRes, departmentsRes, languagesRes });
-
         setDropdownsLoaded(true);
 
-        // If editing, fetch therapist and map using the freshly loaded dropdown arrays
         if (therapistId) {
           try {
             const resp = await axios.get(`${API_BASE_PATH}/therapists/${therapistId}`, {
               headers: { Authorization: `Bearer ${token}` },
             });
-            const data = resp.data;
-            console.log('Fetched therapist API data:', data);
-
-            const mapped = mapTherapistToFormValues(data, branchesRes, languagesRes);
-            console.log('Mapped therapist -> form values (before reset):', mapped);
-
-            // Reset form with mapped object (this will populate field arrays)
+            const mapped = mapTherapistToFormValues(resp.data, branchesRes, languagesRes);
             reset(mapped);
           } catch (err) {
             console.error('Failed to fetch therapist for edit:', err);
@@ -408,20 +375,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         console.error('Init error loading dropdowns:', err);
       }
     };
-
     init();
-    // Intentionally depend only on token & therapistId & reset
   }, [token, therapistId, reset]);
 
-  // Debug watch of all form values
-  useEffect(() => {
-    const sub = watch((vals) => {
-      console.log('Watched form values:', vals);
-    });
-    return () => sub.unsubscribe();
-  }, [watch]);
-
-  // Transform before submit: this sends availability with branchId attached per your transformPayload
   const transformPayload = (data: TherapistFormInputs) => ({
     firstName: data.firstName,
     lastName: data.lastName,
@@ -433,19 +389,16 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     degreesTraining: data.degreesTraining,
     departmentId: data.departmentId,
     specializations: data.specializationIds?.map((id) => id),
-    branches: data.branches.map((b) => b.branch_id),
-    availability: data.branches.flatMap((b) =>
-      b.availability.map((av) => ({
-        ...av,
-        branchId: b.branch_id,
-      })),
+    branches: data.branches?.map((b) => b.branch_id),
+    availability: data.branches?.flatMap((b) =>
+      b.availability.map((av) => ({ ...av, branchId: b.branch_id })),
     ),
-    languages: data.languages.map((id) => {
-  const langObj = languages.find((l) => l.id === id);
-  return langObj ? { id: langObj.id, name: langObj.name } : null;
-}).filter((l): l is { id: number; name: string } => l !== null),
-
-
+    languages: data.languages
+      ?.map((id) => {
+        const langObj = languages.find((l) => l.id === id);
+        return langObj ? langObj.name : null;
+      })
+      .filter((n) => n),
     faq: data.faq,
     paymentMethods: data.paymentMethods,
   });
@@ -457,16 +410,14 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         ? `${API_BASE_PATH}/therapists/${therapistId}`
         : `${API_BASE_PATH}/therapists`;
       const method = therapistId ? 'PATCH' : 'POST';
-
       const res = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}` || '',
+          Authorization: `Bearer ${token || ''}`,
         },
         body: JSON.stringify(payload),
       });
-
       if (res.ok) {
         alert(`Therapist ${therapistId ? 'updated' : 'saved'} successfully`);
         router.push('/therapists/therapists-list');
@@ -480,24 +431,19 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     }
   };
 
-  // Component for availability slots remains same (uses field arrays)
   const AvailabilitySlots = ({ nestIndex }: { nestIndex: number }) => {
     const { fields, append, remove } = useFieldArray({
       control,
       name: `branches.${nestIndex}.availability`,
     });
-
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
     return (
       <>
         {fields.map((field, k) => (
           <Row key={field.id} className="align-items-center">
             <Col md={4}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.day`}
-                className="mb-3"
-              >
+              <Form.Group className="mb-3">
                 <Form.Label>Day</Form.Label>
                 <Form.Select
                   {...register(`branches.${nestIndex}.availability.${k}.day` as const)}
@@ -516,10 +462,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.startTime`}
-                className="mb-3"
-              >
+              <Form.Group className="mb-3">
                 <Form.Label>Start Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -532,10 +475,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               </Form.Group>
             </Col>
             <Col md={3}>
-              <Form.Group
-                controlId={`branches.${nestIndex}.availability.${k}.endTime`}
-                className="mb-3"
-              >
+              <Form.Group className="mb-3">
                 <Form.Label>End Time</Form.Label>
                 <Form.Control
                   type="time"
@@ -551,8 +491,8 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               <Button
                 type="button"
                 variant="danger"
-                onClick={() => remove(k)}
                 style={{ marginTop: '1.7rem' }}
+                onClick={() => remove(k)}
               >
                 Remove
               </Button>
@@ -574,19 +514,19 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   return (
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
-        <h5 className="mb-4">{therapistId ? 'Edit Therapist' : 'Add Therapist'}</h5>
+        <h5 className="mb-4">{therapistId ? 'Modifier le thérapeute' : 'Ajouter un thérapeute'}</h5>
         <Form
           onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}
         >
           {/* First name / Last name */}
           <Row>
             <Col md={6}>
-              <Form.Group controlId="firstName" className="mb-3">
-                <Form.Label>First Name</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Prénom</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('firstName')}
-                  placeholder="Enter First Name"
+                  placeholder="Entre Prénom"
                   isInvalid={!!errors.firstName}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -595,12 +535,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group controlId="lastName" className="mb-3">
-                <Form.Label>Last Name</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Nom de famille</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('lastName')}
-                  placeholder="Enter Last Name"
+                  placeholder="Entrez Nom de famille"
                   isInvalid={!!errors.lastName}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -613,18 +553,18 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           {/* Full name, Photo */}
           <Row>
             <Col md={6}>
-              <Form.Group controlId="fullName" className="mb-3">
-                <Form.Label>Full Name</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Nom et prénom</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('fullName')}
-                  placeholder="Full Name"
+                  placeholder="Nom et prénom"
                   readOnly
                 />
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group controlId="photo" className="mb-3">
+              <Form.Group className="mb-3">
                 <Form.Label>Photo (URL)</Form.Label>
                 <Form.Control
                   type="text"
@@ -639,15 +579,15 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
           </Row>
 
-          {/* Email, Phone */}
+          {/* E-mail, Phone */}
           <Row>
             <Col md={6}>
-              <Form.Group controlId="contactEmail" className="mb-3">
-                <Form.Label>Email</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>E-mail</Form.Label>
                 <Form.Control
                   type="email"
                   {...register('contactEmail')}
-                  placeholder="Enter Email"
+                  placeholder="Entrez votre adresse e-mail"
                   isInvalid={!!errors.contactEmail}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -656,12 +596,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group controlId="contactPhone" className="mb-3">
-                <Form.Label>Phone Number</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Numéro de téléphone</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('contactPhone')}
-                  placeholder="Enter Phone Number"
+                  placeholder="Entrez le numéro de téléphone"
                   isInvalid={!!errors.contactPhone}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -671,15 +611,15 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
           </Row>
 
-          {/* INAMI Number, Degrees & Training */}
+          {/* Numéro INAMI, Diplômes et formations */}
           <Row>
             <Col md={6}>
-              <Form.Group controlId="inamiNumber" className="mb-3">
-                <Form.Label>INAMI Number</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Numéro INAMI</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('inamiNumber')}
-                  placeholder="Enter INAMI Number"
+                  placeholder="Enter Numéro INAMI"
                   isInvalid={!!errors.inamiNumber}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -688,13 +628,13 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group controlId="degreesTraining" className="mb-3">
-                <Form.Label>Degrees & Training</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Diplômes et formations</Form.Label>
                 <Form.Control
                   as="textarea"
-                  {...register('degreesTraining')}
-                  placeholder="Enter Degrees & Training"
                   rows={3}
+                  {...register('degreesTraining')}
+                  placeholder="Entrez Diplômes et formations"
                   isInvalid={!!errors.degreesTraining}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -704,14 +644,14 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
           </Row>
 
-          {/* About Me */}
-          <Form.Group controlId="aboutMe" className="mb-3">
-            <Form.Label>About Me</Form.Label>
+          {/* Sur moi */}
+          <Form.Group className="mb-3">
+            <Form.Label>Sur moi</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
               {...register('aboutMe')}
-              placeholder="Enter Description"
+              placeholder="Entrez la description"
               isInvalid={!!errors.aboutMe}
             />
             <Form.Control.Feedback type="invalid">{errors.aboutMe?.message}</Form.Control.Feedback>
@@ -720,10 +660,10 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           {/* Department + Specializations */}
           <Row>
             <Col md={6}>
-              <Form.Group controlId="departmentId" className="mb-3">
-                <Form.Label>Department</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Département</Form.Label>
                 <Form.Select {...register('departmentId')} isInvalid={!!errors.departmentId}>
-                  <option value="">Select Department</option>
+                  <option value="">Sélectionnez un département</option>
                   {departments.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.name}
@@ -737,9 +677,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Specialization</Form.Label>
+                <Form.Label>Spécialisation</Form.Label>
                 <div>
-                  {specializations && specializations.length > 0 ? (
+                  {specializations.length ? (
                     specializations.map((s) => (
                       <Form.Check
                         inline
@@ -749,19 +689,18 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                         checked={watch('specializationIds')?.includes(s.specialization_id)}
                         onChange={(e) => {
                           const current = watch('specializationIds') || [];
-                          if (e.target.checked) {
+                          if (e.target.checked)
                             setValue('specializationIds', [...current, s.specialization_id]);
-                          } else {
+                          else
                             setValue(
                               'specializationIds',
-                              current.filter((id: number) => id !== s.specialization_id),
+                              current.filter((id) => id !== s.specialization_id),
                             );
-                          }
                         }}
                       />
                     ))
                   ) : (
-                    <p className="text-muted">No specializations available</p>
+                    <p className="text-muted">Aucune spécialisation disponible</p>
                   )}
                 </div>
                 {errors.specializationIds && (
@@ -774,18 +713,18 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           </Row>
 
           {/* Branch & Availability */}
-          <h6>Branch & Availability</h6>
+          <h6>Succursale et disponibilité</h6>
           {branchFields.map((branch, index) => (
             <Card key={branch.id} className="mb-3 p-3">
               <Row className="align-items-center">
                 <Col md={8}>
-                  <Form.Group controlId={`branches.${index}.branch_id`} className="mb-3">
+                  <Form.Group className="mb-3">
                     <Form.Label>Branch</Form.Label>
                     <Form.Select
                       {...register(`branches.${index}.branch_id` as const)}
                       isInvalid={!!errors.branches?.[index]?.branch_id}
                     >
-                      <option value="">Select Branch</option>
+                      <option value="">Sélectionnez une succursale</option>
                       {branches.map((b) => (
                         <option key={b.branch_id} value={b.branch_id}>
                           {b.name}
@@ -804,7 +743,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                     className="mt-4"
                     onClick={() => removeBranch(index)}
                   >
-                    Remove Branch
+                    Supprimer la branche
                   </Button>
                 </Col>
               </Row>
@@ -814,6 +753,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           <Button
             type="button"
             variant="secondary"
+            className="mb-3"
             onClick={() =>
               appendBranch({
                 branch_id: 0,
@@ -821,9 +761,8 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                 availability: [{ day: '', startTime: '', endTime: '' }],
               })
             }
-            className="mb-3"
           >
-            Add Branch
+            Ajouter une succursale
           </Button>
 
           {/* Languages + Payment Methods */}
@@ -844,14 +783,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                       checked={watch('languages')?.includes(lang.id)}
                       onChange={(e) => {
                         const current = watch('languages') || [];
-                        if (e.target.checked) {
-                          setValue('languages', [...current, lang.id]);
-                        } else {
+                        if (e.target.checked) setValue('languages', [...current, lang.id]);
+                        else
                           setValue(
                             'languages',
-                            current.filter((l: number) => l !== lang.id),
+                            current.filter((l) => l !== lang.id),
                           );
-                        }
                       }}
                     />
                   ))}
@@ -863,10 +800,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                 )}
               </Form.Group>
             </Col>
-
             <Col md={6}>
-              <Form.Group controlId="paymentMethods" className="mb-3">
-                <Form.Label>Payment Methods</Form.Label>
+              <Form.Group className="mb-3">
+                <Form.Label>Méthodes de paiement</Form.Label>
                 {[
                   { id: 'cash', name: 'Cash' },
                   { id: 'card', name: 'Card' },
@@ -881,14 +817,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                       label={pm.name}
                       checked={current.includes(pm.id)}
                       onChange={(e) => {
-                        if (e.target.checked) {
-                          setValue('paymentMethods', [...current, pm.id]);
-                        } else {
+                        if (e.target.checked) setValue('paymentMethods', [...current, pm.id]);
+                        else
                           setValue(
                             'paymentMethods',
-                            current.filter((p: string) => p !== pm.id),
+                            current.filter((p) => p !== pm.id),
                           );
-                        }
                       }}
                     />
                   );
@@ -901,7 +835,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           </Row>
 
           {/* FAQ */}
-          <Form.Group controlId="faq" className="mb-3">
+          <Form.Group className="mb-3">
             <Form.Label>FAQ</Form.Label>
             <Form.Control
               as="textarea"
@@ -914,7 +848,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           </Form.Group>
 
           <Button variant="primary" type="submit">
-            {therapistId ? 'Update Therapist' : 'Save Therapist'}
+            {therapistId ? 'Mettre à jour le thérapeute' : 'Enregistrer le thérapeute'}
           </Button>
         </Form>
       </CardBody>

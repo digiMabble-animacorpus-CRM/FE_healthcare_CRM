@@ -1,7 +1,7 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import { encryptAES, decryptAES } from '@/utils/encryption';
+import { decryptAES } from '@/utils/encryption';
 
 export interface PatientUpdatePayload {
   name?: string;
@@ -159,7 +159,6 @@ export const findPatient = async (value: string): Promise<any | null> => {
   }
 };
 
-
 export const createPatient = async (payload: any): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -279,9 +278,6 @@ export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   };
 };
 
-
-
-
 export const deletePatient = async (id: string | number): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -308,20 +304,6 @@ export const deletePatient = async (id: string | number): Promise<boolean> => {
     return false;
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export const getAllRoles = async (): Promise<any[]> => {
   try {
@@ -367,6 +349,4 @@ export const getAllAccessLevels = async (): Promise<any[]> => {
     console.error(' Error fetching access levels:', error);
     return [];
   }
-
-
 };

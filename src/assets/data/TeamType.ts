@@ -7,9 +7,9 @@ export interface AddressType {
 
 export interface TeamType {
   ID_Pro: string; // Professional ID
-  LastName: string; // Last Name
-  FirstName: string; // First Name
-  NomComplet: string; // Full Name (Nom complet)
+  LastName: string; // Nom de famille
+  FirstName: string; // Prénom
+  NomComplet: string; // Nom et prénom (Nom complet)
   Function: string; // Main Function
   PublicSpecific: string; // Public Specific
   Specialisation: string; // Primary Specialisation
@@ -19,7 +19,7 @@ export interface TeamType {
   WhoAmI: string; // Self-description
   Consultations: string; // Consultation details
   Address: AddressType; // Full Address
-  ContactMail: string; // Email
+  ContactMail: string; // E-mail
   PhoneNumber: string; // Phone number
   Hourly: string; // Hourly rate info
   About: string; // About section

@@ -23,7 +23,7 @@ const ListViewPage = () => {
                           <input
                             type="search"
                             className="form-control"
-                            placeholder="Search Agent"
+                            placeholder="Recherche Agent"
                             autoComplete="off"
                           />
                           <IconifyIcon

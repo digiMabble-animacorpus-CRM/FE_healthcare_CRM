@@ -1,6 +1,6 @@
 'use client';
 import ComponentContainerCard from '@/components/ComponentContainerCard';
-import { Card, CardBody, Pagination } from 'react-bootstrap';
+import { Pagination } from 'react-bootstrap';
 
 const DefaultPagination = () => {
   let items = [];
@@ -24,9 +24,9 @@ const DefaultPagination = () => {
     >
       <nav>
         <Pagination>
-          <Pagination.Prev>Previous</Pagination.Prev>
+          <Pagination.Prev>Précédent</Pagination.Prev>
           {items}
-          <Pagination.Next>Next</Pagination.Next>
+          <Pagination.Next>Suivant</Pagination.Next>
         </Pagination>
       </nav>
 
@@ -58,9 +58,9 @@ const RoundedPagination = () => {
     >
       <nav>
         <Pagination className="pagination-rounded">
-          <Pagination.Prev>Previous</Pagination.Prev>
+          <Pagination.Prev>Précédent</Pagination.Prev>
           {items}
-          <Pagination.Next>Next</Pagination.Next>
+          <Pagination.Next>Suivant</Pagination.Next>
         </Pagination>
       </nav>
       <nav aria-label="Page navigation example">
@@ -91,16 +91,16 @@ const PaginationAlignment = () => {
     >
       <nav aria-label="Page navigation example">
         <Pagination className="justify-content-center">
-          <Pagination.Prev>Previous</Pagination.Prev>
+          <Pagination.Prev>Précédent</Pagination.Prev>
           {items}
-          <Pagination.Next>Next</Pagination.Next>
+          <Pagination.Next>Suivant</Pagination.Next>
         </Pagination>
       </nav>
       <nav aria-label="Page navigation example">
         <Pagination className="justify-content-end mb-0">
-          <Pagination.Prev>Previous</Pagination.Prev>
+          <Pagination.Prev>Précédent</Pagination.Prev>
           {items}
-          <Pagination.Next>Next</Pagination.Next>
+          <Pagination.Next>Suivant</Pagination.Next>
         </Pagination>
       </nav>
     </ComponentContainerCard>

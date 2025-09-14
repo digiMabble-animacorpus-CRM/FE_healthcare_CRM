@@ -23,7 +23,7 @@ export const options: NextAuthOptions = {
       name: 'credentials',
       credentials: {
         email: {
-          label: 'Email:',
+          label: 'E-mail:',
           type: 'text',
           placeholder: 'Enter your username',
         },
@@ -39,7 +39,7 @@ export const options: NextAuthOptions = {
         if (filteredUser) {
           return filteredUser;
         } else {
-          throw new Error('Email or Password is not valid');
+          throw new Error('E-mail or Password is not valid');
         }
       },
     }),

@@ -1,14 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import avatar2 from '@/assets/images/users/avatar-2.jpg';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Card, CardBody, Button, Col, Row } from 'react-bootstrap';
-import axios from 'axios';
-import { API_BASE_PATH } from '@/context/constants';
+import { useEffect, useState } from 'react';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
 type ProfileDetailsProps = {
   team_id: string;
@@ -166,18 +164,18 @@ const ProfileDetails = () => {
 
           <Row className="my-4">
             <Col lg={6}>
-              <p className="fw-semibold mb-1">Email:</p>
+              <p className="fw-semibold mb-1">E-mail:</p>
               <p>{contact_email || '-'}</p>
             </Col>
             <Col lg={6}>
-              <p className="fw-semibold mb-1">Phone:</p>
+              <p className="fw-semibold mb-1">Téléphone:</p>
               <p>{contact_phone || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={6}>
-              <p className="fw-semibold mb-1">Office Address:</p>
+              <p className="fw-semibold mb-1">Adresse du bureau:</p>
               <p>{office_address || '-'}</p>
             </Col>
             <Col lg={6}>
@@ -188,22 +186,22 @@ const ProfileDetails = () => {
 
           <Row className="my-4">
             <Col lg={12}>
-              <p className="fw-semibold mb-1">About:</p>
+              <p className="fw-semibold mb-1">À propos:</p>
               <p>{about || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={3}>
-              <p className="fw-semibold mb-1">Languages Spoken:</p>
+              <p className="fw-semibold mb-1">Langues parlées:</p>
               <p>{languages_spoken.join(', ') || '-'}</p>
             </Col>
             <Col lg={3}>
-              <p className="fw-semibold mb-1">Payment Methods:</p>
+              <p className="fw-semibold mb-1">Méthodes de paiement:</p>
               <p>{payment_methods.join(', ') || '-'}</p>
             </Col>
             <Col lg={6}>
-              <p className="fw-semibold mb-1">Schedule:</p>
+              <p className="fw-semibold mb-1">Calendrier:</p>
               {schedule ? (
                 <div>
                   {schedule.text && <p>{schedule.text}</p>}
@@ -226,7 +224,7 @@ const ProfileDetails = () => {
 
           <Row className="my-4">
             <Col lg={12}>
-              <p className="fw-semibold mb-1">Diplomas / Training:</p>
+              <p className="fw-semibold mb-1">Diplômes / Formation:</p>
               {diplomas_and_training.length > 0 ? (
                 <ul>
                   {diplomas_and_training.map((item, idx) => (
@@ -241,7 +239,7 @@ const ProfileDetails = () => {
 
           <Row className="my-4">
             <Col lg={12}>
-              <p className="fw-semibold mb-1">Specializations:</p>
+              <p className="fw-semibold mb-1">Spécialisations:</p>
               {specializations.length > 0 ? (
                 <ul>
                   {specializations.map((item, idx) => (
@@ -256,14 +254,14 @@ const ProfileDetails = () => {
 
           <Row className="my-4">
             <Col lg={12}>
-              <p className="fw-semibold mb-1">Who Am I:</p>
+              <p className="fw-semibold mb-1">Qui suis-je:</p>
               <p>{who_am_i || '-'}</p>
             </Col>
           </Row>
 
           <Row className="my-4">
             <Col lg={12}>
-              <p className="fw-semibold mb-1">Website:</p>
+              <p className="fw-semibold mb-1">Site web:</p>
               {website ? (
                 <Link href={website} target="_blank" className="text-primary">
                   {website}
@@ -275,7 +273,7 @@ const ProfileDetails = () => {
           </Row>
           <Row className="my-4">
             <Col lg={12}>
-              <p className="fw-semibold mb-1">Frequently Asked Questions:</p>
+              <p className="fw-semibold mb-1">Questions fréquemment posées:</p>
               {frequently_asked_questions ? (
                 <ol style={{ paddingLeft: '1.2rem' }}>
                   {(() => {

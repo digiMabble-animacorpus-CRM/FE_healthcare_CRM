@@ -1,9 +1,8 @@
 "use client"
 
-import { useEffect } from 'react';
 import PageTitle from '@/components/PageTitle';
+import { useEffect } from 'react';
 import AddTherapist from '../../add-therapist/components/AddTherapist';
-import { Metadata } from 'next';
 
 const TherapistEditPage = ({ params }: { params: { id: string } }) => {
   useEffect(() => {

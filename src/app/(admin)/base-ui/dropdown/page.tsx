@@ -453,7 +453,7 @@ const DropdownMenuContent = () => {
           </DropdownToggle>
           <DropdownMenu as={'form'} className="dropdown-lg p-3">
             <div className="mb-3">
-              <FormLabel htmlFor="exampleDropdownFormEmail">Email address</FormLabel>
+              <FormLabel htmlFor="exampleDropdownFormEmail">E-mail address</FormLabel>
               <FormControl
                 type="email"
                 id="exampleDropdownFormEmail"

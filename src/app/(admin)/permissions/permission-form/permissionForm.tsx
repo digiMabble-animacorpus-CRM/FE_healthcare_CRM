@@ -57,13 +57,15 @@ const PermissionForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
         <Card>
           <CardHeader>
             <CardTitle as="h5">
-              {isEditMode ? 'Edit Permission Details' : 'Create New Permission'}
+              {isEditMode
+                ? 'Modifier les détails de l autorisation'
+                : 'Créer une nouvelle autorisation'}
             </CardTitle>
           </CardHeader>
 
           <CardBody>
             <div className="mb-4">
-              <h5 className="mb-3">Permission Information</h5>
+              <h5 className="mb-3">Informations sur les autorisations</h5>
               <Row>
                 <Col lg={6}>
                   <div className="mb-3">
@@ -71,8 +73,8 @@ const PermissionForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
                       required
                       control={control}
                       name="key"
-                      label="Enter Key"
-                      placeholder="Ex: dashboard-access"
+                      label="Entrer la clé"
+                      placeholder="Ex : accès au tableau de bord"
                     />
                   </div>
                 </Col>
@@ -83,8 +85,8 @@ const PermissionForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
                       required
                       control={control}
                       name="label"
-                      label="Enter Label"
-                      placeholder="Ex: Dashboard Access"
+                      label="Entrez l'étiquette"
+                      placeholder="Ex : accès au tableau de bord"
                     />
                   </div>
                 </Col>
@@ -95,7 +97,7 @@ const PermissionForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
                       control={control}
                       name="description"
                       label="Description"
-                      placeholder="Ex: Allows access to dashboard pages"
+                      placeholder="Ex : Permet d’accéder aux pages du tableau de bord"
                     />
                   </div>
                 </Col>
@@ -104,10 +106,10 @@ const PermissionForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
 
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">
-                {isEditMode ? 'Update' : 'Create'} Permission
+                {isEditMode ? 'Mise à jour' : 'Créer'} Autorisation
               </Button>
               <Button variant="secondary" onClick={() => router.back()}>
-                Cancel
+                Annuler
               </Button>
             </div>
           </CardBody>

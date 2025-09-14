@@ -36,7 +36,7 @@ const AgentAdd = () => {
                 <TextFormInput
                   control={control}
                   name="name"
-                  placeholder="Full Name"
+                  placeholder="Nom et prénom"
                   label="Agent Name"
                 />
               </div>
@@ -46,8 +46,8 @@ const AgentAdd = () => {
                 <TextFormInput
                   control={control}
                   name="email"
-                  placeholder="Enter Email"
-                  label="Agent Email"
+                  placeholder="Entrez votre adresse e-mail"
+                  label="Agent E-mail"
                 />
               </div>
             </Col>
@@ -217,7 +217,7 @@ const AgentAdd = () => {
           </Col>
           <Col lg={2}>
             <Button variant="danger" className="w-100">
-              Cancel
+            Annuler
             </Button>
           </Col>
         </Row>

@@ -2,9 +2,11 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState, useMemo } from 'react';
+import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -23,11 +25,9 @@ import {
   Toast,
   ToastContainer,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 
 const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const TherapistsListPage = () => {
   const [allTherapists, setAllTherapists] = useState<TherapistType[]>([]);
@@ -166,21 +166,21 @@ const TherapistsListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Therapist" title="Therapists List" />
+      <PageTitle subName="Thérapeute" title="Liste des thérapeutes" />
 
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Therapist List <small>({filteredTherapists.length} total)</small>
+                Liste de tous les thérapeutes <small>({filteredTherapists.length} Total)</small>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
                 <input
                   type="text"
                   className="form-control form-control-sm"
-                  placeholder="Search by name, email, number..."
+                  placeholder="Rechercher par nom, email, numéro..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -191,7 +191,7 @@ const TherapistsListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle className="btn btn-sm btn-primary dropdown-toggle text-white">
-                    {selectedBranch || 'Filter by Branch'}
+                    {selectedBranch || 'Filtrer par succursale'}
                   </DropdownToggle>
                   <DropdownMenu>
                     {BRANCHES.map((branch) => (
@@ -228,7 +228,7 @@ const TherapistsListPage = () => {
                   <Spinner animation="border" />
                 </div>
               ) : filteredTherapists.length === 0 ? (
-                <div className="text-center py-4 text-muted">No therapist found</div>
+                <div className="text-center py-4 text-muted">Aucun thérapeute trouvé</div>
               ) : (
                 <div className="table-responsive">
                   <table
@@ -237,13 +237,13 @@ const TherapistsListPage = () => {
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 50 }}>No</th>
-                        <th>Profile Pic</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>branch</th>
-                        <th>Specialization</th>
+                        <th style={{ width: 50 }}>Non</th>
+                        <th>Photo de profil</th>
+                        <th>Nom</th>
+                        <th>E-mail</th>
+                        <th>Téléphone</th>
+                        <th>Succursale</th>
+                        <th>Spécialisation</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -336,7 +336,7 @@ const TherapistsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    Previous
+                    Précédent
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }).map((_, idx) => (
@@ -356,7 +356,7 @@ const TherapistsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
-                    Next
+                    Suivant
                   </Button>
                 </li>
               </ul>
@@ -368,15 +368,15 @@ const TherapistsListPage = () => {
       {/* Delete Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this therapist?</Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce thérapeute ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

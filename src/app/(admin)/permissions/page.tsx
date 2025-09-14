@@ -83,13 +83,13 @@ const PermissionsListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Permissions" title="Permissions List" />
+      <PageTitle subName="Autorisations" title="Liste des autorisations" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Permissions
+                Toutes les autorisations
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -97,7 +97,7 @@ const PermissionsListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Search by key, label, description..."
+                    placeholder="Recherche par clé, étiquette, description..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -109,7 +109,7 @@ const PermissionsListPage = () => {
                   variant="primary"
                   onClick={() => router.push('/permissions/permission-form/create')}
                 >
-                  Create New Permission
+                  Créer une nouvelle autorisation
                 </Button>
               </div>
             </CardHeader>
@@ -124,15 +124,17 @@ const PermissionsListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>Key</th>
-                        <th>Label</th>
+                        <th>Non</th>
+                        <th>Clé</th>
+                        <th>Étiquette</th>
                         <th>Description</th>
-                        <th style={{ width: 100 }}>Actions</th>
+                        <th style={{ width: 100 }}>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {permissions.map((permission: PermissionType, idx: number) => (
                         <tr key={idx}>
+                          <td>{idx + 1}</td>
                           <td>{permission.key}</td>
                           <td>{permission.label}</td>
                           <td>{permission.description}</td>
@@ -177,7 +179,7 @@ const PermissionsListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      Précédent
                     </Button>
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
@@ -200,7 +202,7 @@ const PermissionsListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Suivant
                     </Button>
                   </li>
                 </ul>
@@ -212,17 +214,15 @@ const PermissionsListPage = () => {
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Delete</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this permission? This action cannot be undone.
-        </Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer cette autorisation ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={confirmDeletePermission}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

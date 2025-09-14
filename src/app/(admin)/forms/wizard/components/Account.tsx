@@ -22,7 +22,7 @@ const Account = () => {
         <Col lg={6}>
           <TextFormInput
             name="email"
-            label="Email"
+            label="E-mail"
             type="email"
             control={control}
             placeholder="Enter your email"

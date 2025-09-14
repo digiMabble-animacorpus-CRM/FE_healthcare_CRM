@@ -8,32 +8,38 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
   {
     key: 'dashboards',
-    label: 'Dashboards',
+    label: 'Tableau de bord',
     icon: 'ri:dashboard-2-line',
     url: '/dashboards/agent',
   },
 
   {
     key: 'appointments',
-    label: 'Appointments',
+    label: 'Rendez-vous',
     icon: 'ri-calendar-line',
     url: '/appointments/appointment-list',
   },
 
   {
+    key: 'chat',
+    label: 'Historique des discussions',
+    icon: 'ri:message-2-line',
+    url: '/chat',
+  },
+  {
     key: 'therapists',
-    label: 'Therapist',
+    label: 'Thérapeute',
     icon: 'ri-stethoscope-line',
     children: [
       {
         key: 'therapists-list',
-        label: 'Therapists List',
+        label: 'Liste des thérapeutes',
         url: '/therapists/therapists-list',
         parentKey: 'therapists',
       },
       {
         key: 'add-therapist',
-        label: 'Add Therapist',
+        label: 'Ajouter un thérapeute',
         url: '/therapists/add-therapist',
         parentKey: 'therapists',
       },
@@ -46,13 +52,13 @@ export const MENU_ITEMS: MenuItemType[] = [
     children: [
       {
         key: 'patient-list',
-        label: 'Patient List',
+        label: 'Liste des patients',
         url: '/patients/patient-list',
         parentKey: 'patients',
       },
       {
         key: 'add-patient',
-        label: 'Add Patient',
+        label: 'Ajouter un patient',
         url: '/patients/add-patient',
         parentKey: 'patients',
       },
@@ -60,18 +66,18 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
   {
     key: 'teams',
-    label: 'Teams',
+    label: 'Équipes',
     icon: 'ri-team-line',
     children: [
       {
         key: 'teams-list',
-        label: 'Teams List',
+        label: 'Liste des équipes',
         url: '/teams/teams-list',
         parentKey: 'teams',
       },
       {
         key: 'add-teams',
-        label: 'Add Teams',
+        label: 'Ajouter des équipes',
         url: '/teams/add-team/',
         parentKey: 'teams',
       },
@@ -80,36 +86,36 @@ export const MENU_ITEMS: MenuItemType[] = [
 
   {
     key: 'settings',
-    label: 'Settings',
+    label: 'Paramètres',
     isTitle: true,
   },
   {
     key: 'languages',
-    label: 'Languages',
+    label: 'Langages',
     icon: 'ri-translate',
     url: '/languages',
   },
   {
     key: 'StaffRoles',
-    label: 'Staff Roles',
+    label: 'Rôles du personnel',
     icon: 'ri-user-settings-line',
     url: '/staff-role',
   },
   {
     key: 'permissions',
-    label: 'Permissions',
+    label: 'Autorisations',
     icon: 'ri-shield-line',
     url: '/permissions',
   },
   {
     key: 'branchs',
-    label: 'Branches',
+    label: 'succursales',
     icon: 'ri-building-2-line',
     url: '/branches',
   },
   {
     key: 'department',
-    label: 'Department',
+    label: 'Département',
     icon: 'ri-organization-chart',
     url: '/department',
   },

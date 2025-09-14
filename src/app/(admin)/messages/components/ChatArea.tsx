@@ -1,5 +1,3 @@
-import data from '@emoji-mart/data';
-import EmojiPicker from '@emoji-mart/react';
 import clsx from 'clsx';
 
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -7,7 +5,6 @@ import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
 import {
   Button,
   Card,
-  CardHeader,
   Col,
   Dropdown,
   DropdownItem,
@@ -36,7 +33,6 @@ import small1 from '@/assets/images/small/img-1.jpg';
 import small2 from '@/assets/images/small/img-2.jpg';
 import small3 from '@/assets/images/small/img-3.jpg';
 import avatar10 from '@/assets/images/users/avatar-10.jpg';
-import TextFormInput from '@/components/from/TextFormInput';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -76,7 +72,7 @@ const MessageDropdown = ({ message, toUser }: { message: ChatMessageType; toUser
         </DropdownItem>
         <DropdownItem>
           <IconifyIcon icon="bx:trash" className="me-2" />
-          Delete
+          Supprimer
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
@@ -279,7 +275,7 @@ const ProfileDetail = ({ selectedUser }: { selectedUser: UserType }) => {
               <h4>{selectedUser.name}</h4>
               <Button variant="primary" size="sm" className="mt-1">
                 <IconifyIcon icon="bi:envelope" className="me-1" />
-                Send Email
+                Send E-mail
               </Button>
               <p className="text-muted mt-2 fs-14">
                 Last Interacted:
@@ -296,7 +292,7 @@ const ProfileDetail = ({ selectedUser }: { selectedUser: UserType }) => {
               <p className="mt-3 mb-1">
                 <strong className="icons-center">
                   <IconifyIcon icon="ri:phone-line" className="me-1" />
-                  Phone Number:
+                  Numéro de téléphone:
                 </strong>
               </p>
               <p>+32 {selectedUser.contact}</p>

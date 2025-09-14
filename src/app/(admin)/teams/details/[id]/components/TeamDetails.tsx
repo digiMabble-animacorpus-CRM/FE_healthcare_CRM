@@ -1,14 +1,14 @@
-import React, { useState } from 'react';
-import { Card, CardBody, Col, Row, Button, Badge, Collapse, Table } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { FaEnvelope, FaPhone, FaGlobe, FaMapMarkerAlt } from 'react-icons/fa';
+import { useState } from 'react';
+import { Badge, Button, Card, CardBody, Col, Collapse, Row, Table } from 'react-bootstrap';
+import { FaEnvelope, FaGlobe, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
 type FAQItem = { question: string; answer: string };
 
 const BRANCHES = [
-  { id: 1, name: 'Central London' },
-  { id: 2, name: 'East Side' },
-  { id: 3, name: 'North Branch' },
+  { id: 1, name: 'Gembloux - Orneau' },
+  { id: 2, name: 'Gembloux - Tout Vent' },
+  { id: 3, name: 'Namur' },
 ];
 
 type TeamDetailsCardProps = {
@@ -43,8 +43,6 @@ type TeamDetailsCardProps = {
 };
 
 const TeamDetails = ({
-  last_name,
-  first_name,
   full_name,
   job_1,
   job_2,
@@ -87,11 +85,14 @@ const TeamDetails = ({
           .split('\n')
           .map((line) => line.trim())
           .filter((line) => line.includes(':'))
-          .reduce((acc, line) => {
-            const [day, time] = line.split(':');
-            acc[day.trim()] = time.trim();
-            return acc;
-          }, {} as Record<string, string>)
+          .reduce(
+            (acc, line) => {
+              const [day, time] = line.split(':');
+              acc[day.trim()] = time.trim();
+              return acc;
+            },
+            {} as Record<string, string>,
+          )
       : (schedule as Record<string, string>) || {};
 
   // Convert frequently asked questions from object to array if needed
@@ -107,7 +108,8 @@ const TeamDetails = ({
       {/* Back Button */}
       <div className="d-flex justify-content-between mb-3">
         <Button variant="secondary" onClick={() => window.history.back()}>
-          <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back
+          <IconifyIcon icon="ri:arrow-left-line" className="me-1" />
+          Retour à la liste
         </Button>
       </div>
 
@@ -139,13 +141,13 @@ const TeamDetails = ({
                 {job_4 ? `/ ${job_4}` : ''}
               </p>
               <p className="mb-2">
-                <strong>Primary Specialization:</strong> {specialization_1 || '-'}
+                <strong>Spécialisation primaire:</strong> {specialization_1 || '-'}
               </p>
               <p className="mb-2">
-                <strong>Role:</strong> {role || '-'}
+                <strong>Rôle:</strong> {role || '-'}
               </p>
               <p className="mb-2">
-                <strong>Status:</strong> {status || '-'}
+                <strong>Statut:</strong> {status || '-'}
               </p>
               <div className="d-flex flex-column gap-2">
                 {contact_email && (
@@ -161,7 +163,12 @@ const TeamDetails = ({
                 {website && (
                   <div className="d-flex align-items-center gap-2">
                     <FaGlobe className="text-info" />{' '}
-                    <a href={website} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
+                    <a
+                      href={website}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-decoration-none"
+                    >
                       {website}
                     </a>
                   </div>
@@ -181,7 +188,7 @@ const TeamDetails = ({
       <Card className="mb-4">
         <CardBody>
           <div className="d-flex justify-content-between mb-2">
-            <h4>About</h4>
+            <h4>À propos</h4>
             <Button variant="link" size="sm" onClick={() => setAboutOpen(!aboutOpen)}>
               {aboutOpen ? 'Hide' : 'Show'}
             </Button>
@@ -198,12 +205,12 @@ const TeamDetails = ({
       {Object.keys(scheduleObj).length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Schedule</h4>
+            <h4>Calendrier</h4>
             <Table striped bordered>
               <thead>
                 <tr>
-                  <th>Day</th>
-                  <th>Time</th>
+                  <th>Jour</th>
+                  <th>Temps</th>
                 </tr>
               </thead>
               <tbody>
@@ -222,7 +229,7 @@ const TeamDetails = ({
       {/* Branches */}
       <Card className="mb-4">
         <CardBody>
-          <h4>Branches</h4>
+          <h4>Succursales</h4>
           <div className="d-flex flex-wrap gap-2">
             {(branches || []).map((branchId: number) => {
               const branch = BRANCHES.find((b) => b.id === branchId);
@@ -247,7 +254,7 @@ const TeamDetails = ({
       {languages_spoken.length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Languages Spoken</h4>
+            <h4>Langues parlées</h4>
             <div className="d-flex flex-wrap gap-2">
               {languages_spoken.map((lang, i) => (
                 <Badge key={i} bg="info" className="fs-13 text-dark px-2 py-1">
@@ -263,7 +270,7 @@ const TeamDetails = ({
       {payment_methods.length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Payment Methods</h4>
+            <h4>Méthodes de paiement</h4>
             <div className="d-flex flex-wrap gap-2">
               {payment_methods.map((method, i) => (
                 <Badge key={i} bg="primary" className="fs-12">
@@ -279,7 +286,7 @@ const TeamDetails = ({
       {diplomas_and_training.length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Education & Training</h4>
+            <h4>Éducation et formation</h4>
             <div className="d-flex flex-wrap gap-2">
               {diplomas_and_training.map((edu, i) => (
                 <Badge key={i} bg="info" className="fs-13 text-dark px-2 py-1">
@@ -295,7 +302,7 @@ const TeamDetails = ({
       {specializations.length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Specializations</h4>
+            <h4>Spécialisations</h4>
             <div className="d-flex flex-wrap gap-2">
               {specializations.map((spec, i) => (
                 <Badge key={i} bg="primary" className="fs-12">
@@ -328,8 +335,12 @@ const TeamDetails = ({
       <Card className="mb-4">
         <CardBody>
           <div className="d-flex justify-content-between mb-2">
-            <h4>Specific Audience</h4>
-            <Button variant="link" size="sm" onClick={() => setSpecificAudienceOpen(!specificAudienceOpen)}>
+            <h4>Public spécifique</h4>
+            <Button
+              variant="link"
+              size="sm"
+              onClick={() => setSpecificAudienceOpen(!specificAudienceOpen)}
+            >
               {specificAudienceOpen ? 'Hide' : 'Show'}
             </Button>
           </div>
@@ -344,7 +355,7 @@ const TeamDetails = ({
       {/* Who I Am */}
       <Card className="mb-4">
         <CardBody>
-          <h4>Who I Am</h4>
+          <h4>Qui suis-je</h4>
           <p>{who_am_i || '-'}</p>
         </CardBody>
       </Card>
@@ -352,7 +363,7 @@ const TeamDetails = ({
       {/* Calendar Links */}
       <Card className="mb-4">
         <CardBody>
-          <h4>Calendar Links</h4>
+          <h4>Liens du calendrier</h4>
           {calendar_links.length > 0 ? (
             <ul>
               {calendar_links.map((link, idx) => (
@@ -373,12 +384,12 @@ const TeamDetails = ({
       {faqArray.length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Frequently Asked Questions</h4>
+            <h4>Questions fréquemment posées</h4>
             <Table striped bordered>
               <thead>
                 <tr>
                   <th>Question</th>
-                  <th>Answer</th>
+                  <th>Répondre</th>
                 </tr>
               </thead>
               <tbody>

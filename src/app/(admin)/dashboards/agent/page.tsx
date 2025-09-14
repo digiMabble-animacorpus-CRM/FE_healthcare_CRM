@@ -5,11 +5,9 @@ import { Col, Row } from 'react-bootstrap';
 import AppointmentsOverview from './components/AppointmentsOverview';
 import BranchSummary from './components/BranchSummary';
 import DoctorProfile from './components/DoctorProfile';
-import Financials from './components/Financials';
 import PatientInsights from './components/PatientInsights';
 import PatientRecords from './components/PatientRecords';
 import PerformanceSnapshot from './components/PerformanceSnapshot';
-import ReportsTrends from './components/ReportsTrends';
 import TasksReminders from './components/TaskReminders';
 import TodayAppointments from './components/TodayAppointments';
 import WeeklySchedule from './components/WeeklySchedule';
@@ -27,7 +25,7 @@ const isAdmin = (role: Role) => ['admin', 'super_admin'].includes(role);
 const AgentPage = () => {
   return (
     <>
-      <PageTitle title="Dashboard" subName={isAdmin(role) ? 'Admin' : 'Doctor'} />
+      <PageTitle title="Tableau de bord" subName={isAdmin(role) ? 'Admin' : 'Doctor'} />
 
       {/* ========== ADMIN / SUPER ADMIN DASHBOARD ========== */}
       {isAdmin(role) && (
@@ -75,7 +73,7 @@ const AgentPage = () => {
                 time: '10:00',
                 patient: `Patient ${i + 1}`,
                 doctor: ['Dr. Martin', 'Dr. Clara', 'Dr. Paul'][i % 3],
-                branch: ['Orneau', 'Tout Vent', 'Namur'][i % 3],
+                branch: ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'][i % 3],
                 status: 'SCHEDULED',
               }))}
             />
@@ -95,42 +93,11 @@ const AgentPage = () => {
                   { label: '60+', value: 14 },
                 ],
                 topCities: [
-                  { city: 'Gembloux', count: 140 },
-                  { city: 'Namur', count: 120 },
-                  { city: 'Ottignies', count: 60 },
+                  { city: 'Gembloux - Orneau', count: 140 },
+                  { city: 'Gembloux - Tout Vent', count: 120 },
+                  { city: 'Namur', count: 60 },
                 ],
               }}
-            />
-          </Col>
-
-          <Col xs={12}>
-            <ReportsTrends
-              appointmentsSeries={[
-                { label: 'Appointments', points: [18, 24, 26, 19, 30, 27, 33, 29, 35, 31, 34, 38] },
-              ]}
-              patientGrowthSeries={[
-                { label: 'New Patients', points: [12, 14, 9, 16, 20, 18, 22, 24, 19, 23, 28, 31] },
-              ]}
-              revenueSeries={[
-                {
-                  label: 'Revenue (€)',
-                  points: [3500, 4200, 3900, 4300, 4700, 5100, 4900, 5200, 5600, 6000, 6100, 6500],
-                },
-              ]}
-              xLabels={[
-                'Jan',
-                'Feb',
-                'Mar',
-                'Apr',
-                'May',
-                'Jun',
-                'Jul',
-                'Aug',
-                'Sep',
-                'Oct',
-                'Nov',
-                'Dec',
-              ]}
             />
           </Col>
         </Row>

@@ -8,7 +8,6 @@ import { useMemo, useRef, useState } from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { ApexOptions } from 'apexcharts';
 import {
-  Button,
   Card,
   CardBody,
   CardHeader,
@@ -19,7 +18,7 @@ import {
   DropdownMenu,
   DropdownToggle,
   Row,
-  Spinner
+  Spinner,
 } from 'react-bootstrap';
 
 // Example avatars
@@ -30,7 +29,7 @@ import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
 import Calendar from './Calendar';
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
 
@@ -53,7 +52,7 @@ export type AppointmentsOverviewProps = {
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const CATEGORIES = [
   { id: 'consultation', name: 'Consultation', color: '#007bff' },
@@ -148,8 +147,8 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
       <Card>
         <CardHeader className="d-flex justify-content-between align-items-center border-0">
           <div>
-            <CardTitle as="h4">Appointments Overview</CardTitle>
-            <p className="text-muted mb-0">Weekly Summary</p>
+            <CardTitle as="h4">Aperçu des rendez-vous</CardTitle>
+            <p className="text-muted mb-0">Résumé hebdomadaire</p>
           </div>
 
           <div className="d-flex gap-2">
@@ -163,7 +162,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem onClick={() => setSelectedDoctor('All Doctors')}>
-                  All Doctors
+                  Tous les thérapeutes
                 </DropdownItem>
                 {allDoctors.map((doc) => (
                   <DropdownItem key={doc} onClick={() => setSelectedDoctor(doc)}>
@@ -183,7 +182,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem onClick={() => setSelectedBranch('All Branches')}>
-                  All Branches
+                  Toutes les succursales
                 </DropdownItem>
                 {allBranches.map((b) => (
                   <DropdownItem key={b} onClick={() => setSelectedBranch(b)}>
@@ -200,13 +199,13 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           <Row className="g-2 text-center mb-3">
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Total Appointments</p>
+                <p className="text-muted mb-1">Nombre total de rendez-vous</p>
                 <h5 className="text-dark mb-1">{filteredAppointments.length}</h5>
               </div>
             </Col>
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Completed</p>
+                <p className="text-muted mb-1">Complété</p>
                 <h5 className="text-dark mb-1">
                   {filteredAppointments.filter((a) => a.status === 'COMPLETED').length}
                 </h5>
@@ -214,7 +213,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
             </Col>
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Cancellations</p>
+                <p className="text-muted mb-1">Annulations</p>
                 <h5 className="text-dark mb-1">
                   {filteredAppointments.filter((a) => a.status === 'CANCELLED').length}
                 </h5>
@@ -254,7 +253,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
                     style={{ height: calendarHeight, overflowY: 'auto' }}
                   >
                     {filteredAppointments.length === 0 ? (
-                      <p className="text-muted">No appointments found.</p>
+                      <p className="text-muted">Aucun rendez-vous trouvé.</p>
                     ) : (
                       filteredAppointments.map((appt) => (
                         <div key={appt.id} className="border-bottom py-2">
@@ -275,9 +274,9 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           </Row>
 
           {/* Appointments Breakdown */}
-          <h5 className="mt-4 mb-2 text-primary fw-bold">Appointments Breakdown</h5>
+          <h5 className="mt-4 mb-2 text-primary fw-bold">Répartition des rendez-vous</h5>
           <p className="text-muted mb-3">
-            Showing appointments for <strong>{selectedDoctor}</strong>.
+            Affichage des rendez-vous pour <strong>{selectedDoctor}</strong>.
           </p>
 
           <Row className="g-3 mb-3">
@@ -313,7 +312,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           </Row>
 
           <p className="text-muted">
-            Showing appointments for <strong>{selectedBranch}</strong>.
+            Affichage des rendez-vous pour <strong>{selectedBranch}</strong>.
           </p>
           <Row className="g-3">
             {Object.keys(branchMap).map((branch, idx) => {
