@@ -5,14 +5,14 @@ import { useState } from 'react';
 import { Dropdown } from 'react-bootstrap';
 
 const branches = [
-  { label: 'ALL Branch', path: '/branches/orneau' },
+  { label: 'Branche TOUS', path: '/branches/orneau' },
   { label: 'Gembloux - Orneau', path: '/branches/orneau' },
   { label: 'Gembloux - Tout Vent', path: '/branches/tout-vent' },
-  { label: 'Anima Corpus Namur', path: '/branches/anima-corpus' },
+  { label: 'Namur', path: '/branches/anima-corpus' },
 ];
 
 const DropdownSelector = () => {
-  const [selected, setSelected] = useState('Choose a branch');
+  const [selected, setSelected] = useState('Choisissez une succursale');
   const router = useRouter();
 
   const handleSelect = (eventKey: string | null) => {

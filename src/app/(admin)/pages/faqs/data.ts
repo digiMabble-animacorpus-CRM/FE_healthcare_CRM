@@ -54,12 +54,12 @@ export const faqData = {
     {
       question: 'How do I contact customer support?',
       answer:
-        'You can contact our customer support team via email, phone, or live chat. Our representatives are available to assist you during business hours, Monday through Friday.',
+        'You can contact our customer support team via email, phone, or live chat. Our representatives are available to assist you during business hours, Lundi through Vendredi.',
     },
     {
       question: 'Is customer support available 24/7?',
       answer:
-        "Our customer support is available during regular business hours, Monday through Friday. However, you can leave us a message outside of these hours, and we'll respond to you as soon as possible.",
+        "Our customer support is available during regular business hours, Lundi through Vendredi. However, you can leave us a message outside of these hours, and we'll respond to you as soon as possible.",
     },
     {
       question: 'How long does it take to receive a response from customer support?',

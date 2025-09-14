@@ -31,9 +31,10 @@ const SignIn = () => {
                     <Image src={LogoLight} height={28} alt="logo light" />
                   </Link>
                 </div>
-                <h2 className="fw-bold text-uppercase text-center fs-18">Sign In</h2>
+                <h2 className="fw-bold text-uppercase text-center fs-18">Se connecter</h2>
                 <p className="text-muted text-center mt-1 mb-4">
-                  Enter your email address and password to access admin panel.
+                  Entrez votre adresse e-mail et votre mot de passe pour accéder au panneau
+                  d administration.
                 </p>
                 <div className="px-4">
                   <form className="authentication-form" onSubmit={login}>
@@ -41,18 +42,18 @@ const SignIn = () => {
                       <TextFormInput
                         control={control}
                         name="email"
-                        placeholder="Enter your email"
+                        placeholder="Entrez votre email"
                         className="bg-light bg-opacity-50 border-light py-2"
-                        label="Email"
+                        label="E-mail"
                       />
                     </div>
                     <div className="mb-3">
                       <TextFormInput
                         control={control}
                         name="password"
-                        placeholder="Enter your password"
+                        placeholder="Entrez votre mot de passe"
                         className="bg-light bg-opacity-50 border-light py-2"
-                        label="Password"
+                        label="Mot de passe"
                       />
                     </div>
                     <div className="mb-3">
@@ -61,7 +62,7 @@ const SignIn = () => {
                           href="/auth/reset-password"
                           className="float-end text-muted text-unline-dashed ms-1"
                         >
-                          Reset password
+                          Réinitialiser le mot de passe
                         </Link>
                       </div>
                     </div>
@@ -71,7 +72,7 @@ const SignIn = () => {
                         className="btn btn-primary py-2 fw-medium"
                         type="submit"
                       >
-                        Sign In
+                        Se connecter
                       </button>
                     </div>
                   </form>

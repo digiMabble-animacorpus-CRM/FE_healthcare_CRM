@@ -172,25 +172,26 @@ const PatientsListPage = () => {
           dismissible
           style={{ position: 'fixed', top: 20, right: 20, zIndex: 1050, minWidth: 200 }}
         >
-          Patient deleted successfully!
+          Patient supprimé avec succès !
         </Alert>
       )}
 
-      <PageTitle subName="Patient" title="Patient List" />
+      <PageTitle subName="Patient" title="Liste des patients" />
 
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Patient List <span className="text-muted">({filteredPatients.length})</span>
+                Liste de tous les patients{' '}
+                <span className="text-muted">({filteredPatients.length} Total)</span>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
                 <input
                   type="text"
                   className="form-control form-control-sm"
-                  placeholder="Search by name, email, number..."
+                  placeholder="Rechercher par nom, email, numéro..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -214,13 +215,13 @@ const PatientsListPage = () => {
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Age | Gender</th>
-                        <th>City</th>
-                        <th>Status</th>
+                        <th>Non</th>
+                        <th>Nom</th>
+                        <th>E-mail</th>
+                        <th>Téléphone</th>
+                        <th>Âge | Genre</th>
+                        <th>Ville</th>
+                        <th>Statut</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -285,7 +286,7 @@ const PatientsListPage = () => {
                       ) : (
                         <tr>
                           <td colSpan={8} className="text-center py-4 text-muted">
-                            No patient found
+                            Aucun patient trouvé
                           </td>
                         </tr>
                       )}
@@ -303,7 +304,7 @@ const PatientsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    Previous
+                    Précédent
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }).map((_, idx) => (
@@ -323,7 +324,7 @@ const PatientsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
-                    Next
+                    Suivant
                   </Button>
                 </li>
               </ul>
@@ -335,15 +336,15 @@ const PatientsListPage = () => {
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this patient?</Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce patient ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

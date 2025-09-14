@@ -46,7 +46,7 @@ const AgentPage = () => {
                 time: '10:00',
                 patient: `Patient ${i + 1}`,
                 doctor: ['Dr. Martin', 'Dr. Clara', 'Dr. Paul'][i % 3],
-                branch: ['Orneau', 'Tout Vent', 'Namur'][i % 3],
+                branch: ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'][i % 3],
                 status: 'SCHEDULED',
               }))}
             />
@@ -66,9 +66,9 @@ const AgentPage = () => {
                   { label: '60+', value: 14 },
                 ],
                 topCities: [
-                  { city: 'Gembloux', count: 140 },
-                  { city: 'Namur', count: 120 },
-                  { city: 'Ottignies', count: 60 },
+                  { city: 'Gembloux - Orneau', count: 140 },
+                  { city: 'Gembloux - Tout Vent', count: 120 },
+                  { city: 'Namur', count: 60 },
                 ],
               }}
             />

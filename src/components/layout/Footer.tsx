@@ -10,7 +10,7 @@ const Footer = () => {
       <Container fluid>
         <Row>
           <Col xs={12} className="text-center">
-            {currentYear} © Anima Corpus. Crafted by{' '}
+            {currentYear} © Anima Corpus. Fabriqué par{' '}
             <IconifyIcon
               icon="solar:hearts-bold-duotone"
               className="fs-18 align-middle text-danger"

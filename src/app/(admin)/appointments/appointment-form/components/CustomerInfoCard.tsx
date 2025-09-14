@@ -19,21 +19,24 @@ import * as yup from 'yup';
 
 // Yup validation schema
 const patientSchema = yup.object().shape({
-  firstname: yup.string().required('First name is required'),
-  lastname: yup.string().required('Last name is required'),
-  emails: yup.string().email('Please enter a valid email').required('Email is required'),
+  firstname: yup.string().required('Le prénom est obligatoire'),
+  lastname: yup.string().required('Le nom de famille est obligatoire'),
+  emails: yup
+    .string()
+    .email('Veuillez saisir une adresse e-mail valide')
+    .required('L adresse e-mail est obligatoire'),
   phones: yup
     .array()
-    .of(yup.string().required('Phone number is required'))
-    .min(1, 'At least one phone number is required'),
+    .of(yup.string().required('Le numéro de téléphone est requis'))
+    .min(1, 'Au moins un numéro de téléphone est requis'),
   birthdate: yup.date().nullable(),
-  legalgender: yup.string().required('Gender is required'),
-  city: yup.string().required('City is required'),
-  status: yup.string().required('Status is required'),
-  language: yup.string().required('Language is required'),
-  country: yup.string().required('Country is required'),
-  zipcode: yup.string().required('Zip code is required'),
-  street: yup.string().required('Address is required'),
+  legalgender: yup.string().required('Le sexe est requis'),
+  city: yup.string().required('La ville est obligatoire'),
+  status: yup.string().required('Le statut est requis'),
+  language: yup.string().required('La langue est requise'),
+  country: yup.string().required('Le pays est requis'),
+  zipcode: yup.string().required('Le code postal est requis'),
+  street: yup.string().required('L adresse est requise'),
   note: yup.string(),
 });
 
@@ -96,12 +99,12 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
         setErrorMsg(null);
         onSave?.(result);
       } else {
-        setErrorMsg('No patient found. Try adding new.');
+        setErrorMsg('Aucun patient trouvé. Essayez den ajouter un nouveau.');
         setFormData(emptyPatient);
         setMode('search');
       }
     } catch (err: any) {
-      setErrorMsg(err.message || 'Search failed');
+      setErrorMsg(err.message || 'La recherche a échoué');
     } finally {
       setLoading(false);
     }
@@ -220,7 +223,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               <input
                 type="text"
                 className="form-control"
-                placeholder="Search by Email, Phone"
+                placeholder="Search by E-mail, Phone"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
@@ -256,7 +259,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
             <Row>
               <Col md={6}>
                 <div className="mb-2">
-                  <strong>Email:</strong> {formData.emails || 'N/A'}
+                  <strong>E-mail:</strong> {formData.emails || 'N/A'}
                 </div>
                 <div className="mb-2">
                   <strong>Phone:</strong>{' '}
@@ -300,10 +303,10 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
 
             <div className="d-flex gap-2 mt-4">
               <Button size="sm" onClick={() => setMode('edit')}>
-                Edit
+                Modifier
               </Button>
               <Button size="sm" variant="outline-primary" onClick={handleReset}>
-                New Search
+                Nouveau Recherche
               </Button>
             </div>
           </div>
@@ -312,12 +315,12 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
         {/* 📝 Edit / New Patient Form */}
         {(mode === 'edit' || mode === 'new') && (
           <Form>
-            {/* Name + Email */}
+            {/* Name + E-mail */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
                   <Form.Label>
-                    First Name <span className="text-danger">*</span>
+                    Prénom <span className="text-danger">*</span>
                   </Form.Label>
                   <Form.Control
                     type="text"
@@ -333,7 +336,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               <Col md={6}>
                 <Form.Group>
                   <Form.Label>
-                    Last Name <span className="text-danger">*</span>
+                    Nom de famille <span className="text-danger">*</span>
                   </Form.Label>
                   <Form.Control
                     type="text"
@@ -352,7 +355,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               <Col md={6}>
                 <Form.Group>
                   <Form.Label>
-                    Email <span className="text-danger">*</span>
+                    E-mail <span className="text-danger">*</span>
                   </Form.Label>
                   <Form.Control
                     type="email"
@@ -405,8 +408,8 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
                     isInvalid={!!validationErrors.legalgender}
                   >
                     <option value="">Select</option>
-                    <option value="M">Male</option>
-                    <option value="F">Female</option>
+                    <option value="M">Mâle</option>
+                    <option value="F">Femelle</option>
                     <option value="O">Other</option>
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
@@ -438,7 +441,7 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
                     onChange={(e) => handleChange('language', e.target.value)}
                     isInvalid={!!validationErrors.language}
                   >
-                    <option value="">Select Language</option>
+                    <option value="">Sélectionnez la langue</option>
                     <option value="en">English</option>
                     <option value="fr">French</option>
                     <option value="nl">Dutch</option>
@@ -562,15 +565,15 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
                 variant="outline-secondary"
                 onClick={() => (mode === 'edit' ? setMode('view') : handleReset())}
               >
-                Cancel
+                Annuler
               </Button>
               <Button variant="primary" onClick={handleSave} disabled={loading}>
                 {loading ? (
                   <Spinner size="sm" animation="border" />
                 ) : mode === 'edit' ? (
-                  'Update'
+                  'Mettre à jour le patient'
                 ) : (
-                  'Add Patient'
+                  'Ajouter un patient'
                 )}
               </Button>
             </div>

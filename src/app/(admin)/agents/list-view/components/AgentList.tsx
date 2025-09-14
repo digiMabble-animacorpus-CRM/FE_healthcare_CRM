@@ -51,7 +51,7 @@ const AgentList = async () => {
                   <tr>
                     <th>Agent Photo &amp; Name</th>
                     <th>Address</th>
-                    <th>Email</th>
+                    <th>E-mail</th>
                     <th>Contact</th>
                     <th>Experience</th>
                     <th>Date</th>
@@ -125,7 +125,7 @@ const AgentList = async () => {
               <ul className="pagination justify-content-end mb-0">
                 <li className="page-item">
                   <Link className="page-link" href="">
-                    Previous
+                    Précédent
                   </Link>
                 </li>
                 <li className="page-item active">
@@ -145,7 +145,7 @@ const AgentList = async () => {
                 </li>
                 <li className="page-item">
                   <Link className="page-link" href="">
-                    Next
+                  Suivant
                   </Link>
                 </li>
               </ul>

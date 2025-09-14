@@ -302,7 +302,7 @@ const ChatLeftSidebar = ({ users, onUserSelect, selectedUser }: ChatUsersProps) 
                     <li>
                       <span role="button">
                         <IconifyIcon icon="bx:history" className="fs-16 me-2" />
-                        Chat History
+                        Historique des discussions
                       </span>
                     </li>
                   </ul>

@@ -233,7 +233,7 @@ const AppointmentFields = () => {
       {/* Department */}
       <Col md={6}>
         <Form.Group className="mb-3">
-          <Form.Label>Department</Form.Label>
+          <Form.Label>Département</Form.Label>
           <Form.Select {...register('departmentId')}>
             <option value="">Select Department</option>
             {departments.map((d) => (

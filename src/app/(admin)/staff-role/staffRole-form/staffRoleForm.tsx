@@ -82,22 +82,24 @@ const StaffRoleForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: P
         <Card>
           <CardHeader>
             <CardTitle as="h5">
-              {isEditMode ? 'Edit Staff Role Details' : 'Create New Staff Role'}
+              {isEditMode
+                ? 'Modifier les détails du rôle du personnel'
+                : 'Créer un nouveau rôle de personnel'}
             </CardTitle>
           </CardHeader>
 
           <CardBody>
             <div className="mb-4">
-              <h5 className="mb-3">Staff Role Information</h5>
+              <h5 className="mb-3">Informations sur le rôle du personnel</h5>
               <StaffRoleFormFields />
             </div>
 
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">
-                {isEditMode ? 'Update' : 'Create'} Staff Role
+                {isEditMode ? 'Mise à jour' : 'Créer'} Rôle du personnel
               </Button>
               <Button variant="secondary" onClick={() => router.back()}>
-                Cancel
+                Annuler
               </Button>
             </div>
           </CardBody>

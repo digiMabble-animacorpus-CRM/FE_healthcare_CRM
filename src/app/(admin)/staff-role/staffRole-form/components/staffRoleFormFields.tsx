@@ -25,7 +25,7 @@ const StaffRoleFormFields = () => {
     <>
       <div className="mb-3">
         <label className="form-label">
-          Tag Type <span className="text-danger">*</span>
+          Type de balise <span className="text-danger">*</span>
         </label>
         <Controller
           name="tag"
@@ -33,10 +33,10 @@ const StaffRoleFormFields = () => {
           render={({ field }) => (
             <FormSelect {...field}>
               <option value="" disabled>
-                -- Select Tag Type --
+                Sélectionnez le type de balise
               </option>
-              <option value="Role">Role</option>
-              <option value="AccessLevel">Access Level</option>
+              <option value="Role">Rôle</option>
+              <option value="AccessLevel">Niveau d accès</option>
             </FormSelect>
           )}
         />
@@ -51,8 +51,8 @@ const StaffRoleFormFields = () => {
           required
           control={control}
           name="label"
-          label="Label"
-          placeholder="Ex: Doctor"
+          label="Étiquette"
+          placeholder="Ex : Thérapeute"
         />
       </div>
 
@@ -60,14 +60,14 @@ const StaffRoleFormFields = () => {
         <TextFormInput
           control={control}
           name="description"
-          label="Role Description"
-          placeholder="Ex: Responsible for..."
+          label="Description du rôle"
+          placeholder="Ex : Responsable de..."
         />
       </div>
 
       <div className="mb-3">
         <label className="form-label">
-          Permissions <span className="text-danger">*</span>
+          Autorisations <span className="text-danger">*</span>
         </label>
         <Controller
           control={control}
@@ -97,21 +97,21 @@ const StaffRoleFormFields = () => {
         <FormCheck
           type="checkbox"
           id="internal"
-          label="Is Internal Role"
+          label="Est-ce un rôle interne"
           disabled={!isAccessLevel}
           {...register('internal')}
         />
         <FormCheck
           type="checkbox"
           id="requiresDetails"
-          label="Requires Additional Details"
+          label="Nécessite des détails supplémentaires"
           disabled={!isRole}
           {...register('requiresDetails')}
         />
         <FormCheck
           type="checkbox"
           id="requiresAvailability"
-          label="Requires Availability Info"
+          label="Nécessite des informations de disponibilité"
           disabled={!isRole}
           {...register('requiresAvailability')}
         />

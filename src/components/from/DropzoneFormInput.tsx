@@ -82,7 +82,7 @@ const DropzoneFormInput = ({
                               className="btn btn-sm btn-primary"
                               onClick={() => removeFile(file)}
                             >
-                              Delete
+                              Supprimer
                             </button>
                           </Col>
                         </Row>

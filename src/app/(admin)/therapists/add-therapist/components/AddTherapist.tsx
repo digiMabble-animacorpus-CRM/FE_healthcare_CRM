@@ -61,55 +61,55 @@ interface TherapistFormInputs {
 }
 
 const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
-  firstName: yup.string().required('First Name is required'),
-  lastName: yup.string().required('Last Name is required'),
-  fullName: yup.string().required('Full name is required'),
-  photo: yup.string().url('Must be a valid URL').nullable(),
-  contactEmail: yup.string().email('Invalid email').required('Email is required'),
+  firstName: yup.string().required('Le prénom est obligatoire'),
+  lastName: yup.string().required('Le nom de famille est obligatoire'),
+  fullName: yup.string().required('Le nom complet est requis'),
+  photo: yup.string().url('Doit être une URL valide').nullable(),
+  contactEmail: yup.string().email('E-mail invalide').required('L e-mail est requis'),
   contactPhone: yup
     .string()
-    .matches(/^\+?[0-9]{7,15}$/, 'Invalid phone')
-    .required('Phone number is required'),
-  inamiNumber: yup.string().required('INAMI Number is required'),
+    .matches(/^\+?[0-9]{7,15}$/, 'Téléphone invalide')
+    .required('Le numéro de téléphone est requis'),
+  inamiNumber: yup.string().required('Numéro INAMI is required'),
   aboutMe: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
   departmentId: yup
     .number()
     .nullable()
-    .typeError('Department is required')
-    .required('Department is required'),
+    .typeError('Le département est requis')
+    .required('Le département est requis'),
   specializationIds: yup
     .array()
     .of(yup.number().required())
-    .min(1, 'At least one specialization is required'),
+    .min(1, 'Au moins une spécialisation est requise'),
   branches: yup
     .array()
     .of(
       yup.object({
-        branch_id: yup.number().required('Branch is required'),
+        branch_id: yup.number().required('Une succursale est requise'),
         branch_name: yup.string().nullable().defined(),
         availability: yup
           .array()
           .of(
             yup.object({
-              day: yup.string().required('Day is required'),
-              startTime: yup.string().required('Start time is required'),
-              endTime: yup.string().required('End time is required'),
+              day: yup.string().required('La journée est obligatoire'),
+              startTime: yup.string().required('L`heure de début est requise'),
+              endTime: yup.string().required('L`heure de fin est requise'),
             }),
           )
-          .min(1, 'At least one availability slot is required')
-          .required('Availability is required'),
+          .min(1, 'Au moins un créneau de disponibilité est requis')
+          .required('La disponibilité est requise'),
       }),
     )
-    .min(1, 'At least one branch is required')
-    .required('Branches are required')
+    .min(1, 'Au moins une branche est requise')
+    .required('Des succursales sont nécessaires')
     .defined(),
-  languages: yup.array().of(yup.number().required()).min(1, 'At least one language is required'),
+  languages: yup.array().of(yup.number().required()).min(1, 'Au moins une langue est requise'),
   faq: yup.string().nullable(),
   paymentMethods: yup
     .array()
     .of(yup.string().required())
-    .min(1, 'At least one payment method is required'),
+    .min(1, 'Au moins un mode de paiement est requis'),
 });
 
 const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
@@ -436,7 +436,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       control,
       name: `branches.${nestIndex}.availability`,
     });
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
     return (
       <>
@@ -514,7 +514,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   return (
     <Card className="p-3 shadow-sm rounded">
       <CardBody>
-        <h5 className="mb-4">{therapistId ? 'Edit Therapist' : 'Add Therapist'}</h5>
+        <h5 className="mb-4">{therapistId ? 'Modifier le thérapeute' :'Ajouter un thérapeute'}</h5>
         <Form
           onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}
         >
@@ -522,11 +522,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>First Name</Form.Label>
+                <Form.Label>Prénom</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('firstName')}
-                  placeholder="Enter First Name"
+                  placeholder="Entre Prénom"
                   isInvalid={!!errors.firstName}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -536,11 +536,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Last Name</Form.Label>
+                <Form.Label>Nom de famille</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('lastName')}
-                  placeholder="Enter Last Name"
+                  placeholder="Entrez Nom de famille"
                   isInvalid={!!errors.lastName}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -554,11 +554,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Full Name</Form.Label>
+                <Form.Label>Nom et prénom</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('fullName')}
-                  placeholder="Full Name"
+                  placeholder="Nom et prénom"
                   readOnly
                 />
               </Form.Group>
@@ -579,15 +579,15 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
           </Row>
 
-          {/* Email, Phone */}
+          {/* E-mail, Phone */}
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>E-mail</Form.Label>
                 <Form.Control
                   type="email"
                   {...register('contactEmail')}
-                  placeholder="Enter Email"
+                  placeholder="Entrez votre adresse e-mail"
                   isInvalid={!!errors.contactEmail}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -597,11 +597,11 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Phone Number</Form.Label>
+                <Form.Label>Numéro de téléphone</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('contactPhone')}
-                  placeholder="Enter Phone Number"
+                  placeholder="Entrez le numéro de téléphone"
                   isInvalid={!!errors.contactPhone}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -611,15 +611,15 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
           </Row>
 
-          {/* INAMI Number, Degrees & Training */}
+          {/* Numéro INAMI, Diplômes et formations */}
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>INAMI Number</Form.Label>
+                <Form.Label>Numéro INAMI</Form.Label>
                 <Form.Control
                   type="text"
                   {...register('inamiNumber')}
-                  placeholder="Enter INAMI Number"
+                  placeholder="Enter Numéro INAMI"
                   isInvalid={!!errors.inamiNumber}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -629,12 +629,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Degrees & Training</Form.Label>
+                <Form.Label>Diplômes et formations</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
                   {...register('degreesTraining')}
-                  placeholder="Enter Degrees & Training"
+                  placeholder="Entrez Diplômes et formations"
                   isInvalid={!!errors.degreesTraining}
                 />
                 <Form.Control.Feedback type="invalid">
@@ -644,14 +644,14 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
           </Row>
 
-          {/* About Me */}
+          {/* Sur moi */}
           <Form.Group className="mb-3">
-            <Form.Label>About Me</Form.Label>
+            <Form.Label>Sur moi</Form.Label>
             <Form.Control
               as="textarea"
               rows={3}
               {...register('aboutMe')}
-              placeholder="Enter Description"
+              placeholder="Entrez la description"
               isInvalid={!!errors.aboutMe}
             />
             <Form.Control.Feedback type="invalid">{errors.aboutMe?.message}</Form.Control.Feedback>
@@ -661,9 +661,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Department</Form.Label>
+                <Form.Label>Département</Form.Label>
                 <Form.Select {...register('departmentId')} isInvalid={!!errors.departmentId}>
-                  <option value="">Select Department</option>
+                  <option value="">Sélectionnez un département</option>
                   {departments.map((d) => (
                     <option key={d.id} value={d.id}>
                       {d.name}
@@ -677,7 +677,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Specialization</Form.Label>
+                <Form.Label>Spécialisation</Form.Label>
                 <div>
                   {specializations.length ? (
                     specializations.map((s) => (
@@ -700,7 +700,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                       />
                     ))
                   ) : (
-                    <p className="text-muted">No specializations available</p>
+                    <p className="text-muted">Aucune spécialisation disponible</p>
                   )}
                 </div>
                 {errors.specializationIds && (
@@ -713,7 +713,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           </Row>
 
           {/* Branch & Availability */}
-          <h6>Branch & Availability</h6>
+          <h6>Succursale et disponibilité</h6>
           {branchFields.map((branch, index) => (
             <Card key={branch.id} className="mb-3 p-3">
               <Row className="align-items-center">
@@ -724,7 +724,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                       {...register(`branches.${index}.branch_id` as const)}
                       isInvalid={!!errors.branches?.[index]?.branch_id}
                     >
-                      <option value="">Select Branch</option>
+                      <option value="">Sélectionnez une succursale</option>
                       {branches.map((b) => (
                         <option key={b.branch_id} value={b.branch_id}>
                           {b.name}
@@ -743,7 +743,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                     className="mt-4"
                     onClick={() => removeBranch(index)}
                   >
-                    Remove Branch
+                    Supprimer la branche
                   </Button>
                 </Col>
               </Row>
@@ -762,7 +762,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               })
             }
           >
-            Add Branch
+            Ajouter une succursale
           </Button>
 
           {/* Languages + Payment Methods */}
@@ -802,7 +802,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Payment Methods</Form.Label>
+                <Form.Label>Méthodes de paiement</Form.Label>
                 {[
                   { id: 'cash', name: 'Cash' },
                   { id: 'card', name: 'Card' },
@@ -848,11 +848,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           </Form.Group>
 
           <Button variant="primary" type="submit">
-            {therapistId ? 'Update Therapist' : 'Save Therapist'}
+            {therapistId ? 'Mettre à jour le thérapeute' : 'Enregistrer le thérapeute'}
           </Button>
         </Form>
       </CardBody>
     </Card>
+    
   );
 };
 

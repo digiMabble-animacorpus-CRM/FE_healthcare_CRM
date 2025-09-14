@@ -106,7 +106,7 @@ const TherapistDetails = ({
         {/* Grid Details */}
         <Row className="mb-3">
           <Col md={6}>
-            <strong>INAMI Number:</strong> {data.inamiNumber || '-'}
+            <strong>Numéro INAMI:</strong> {data.inamiNumber || '-'}
           </Col>
           <Col md={6}>
             <strong>Department:</strong>{' '}
@@ -122,7 +122,7 @@ const TherapistDetails = ({
           </Col>
 
           <Col md={6}>
-            <strong>Payment Methods:</strong>{' '}
+            <strong>Méthodes de paiement:</strong>{' '}
             {data.paymentMethods?.length > 0 ? data.paymentMethods.join(', ') : '-'}
           </Col>
           {data.faq && (
@@ -159,7 +159,7 @@ const TherapistDetails = ({
         {/* About Section */}
         <div className="mt-4">
           <div className="d-flex justify-content-between mb-2">
-            <h5>About</h5>
+            <h5>À propos</h5>
             <Button variant="link" size="sm" onClick={() => setAboutOpen(!aboutOpen)}>
               {aboutOpen ? 'Hide' : 'Show'}
             </Button>
@@ -172,15 +172,15 @@ const TherapistDetails = ({
         </div>
         {data.degreesAndTraining && (
           <div className="mt-4">
-            <h5>Degrees & Training</h5>
+            <h5>Diplômes et formations</h5>
             <p>{data.degreesAndTraining}</p>
           </div>
         )}
         {data.specializations && data.specializations.length > 0 && (
           <div className="mt-4">
-            <h5>Specializations</h5>
+            <h5>Spécialisations</h5>
             <div className="d-flex gap-2 flex-wrap">
-              {data.specializations.map((spec: { id: any; name: any; }) => (
+              {data.specializations.map((spec: { id: any; name: any }) => (
                 <Badge key={spec.id ?? spec.name} bg="primary" className="fs-12">
                   {spec.name || specializationsMap[spec.id ?? 0] || spec.id}
                 </Badge>
@@ -191,7 +191,7 @@ const TherapistDetails = ({
         {/* Branches & Availability Table */}
         {data.branches && data.branches.length > 0 && (
           <div className="mt-4">
-            <h5>Branches & Availability</h5>
+            <h5>Succursales et disponibilité</h5>
             {data.branches.map((branch: BranchWithAvailability) => (
               <div key={branch.branch_id} className="mb-3 p-3 border rounded bg-light">
                 <h6>{branch.branch_name || '-'}</h6>
@@ -199,9 +199,9 @@ const TherapistDetails = ({
                   <Table bordered size="sm" className="mb-0">
                     <thead>
                       <tr>
-                        <th>Day</th>
-                        <th>Start Time</th>
-                        <th>End Time</th>
+                        <th>Jour</th>
+                        <th>Heure de début</th>
+                        <th>Heure de fin</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -215,7 +215,7 @@ const TherapistDetails = ({
                     </tbody>
                   </Table>
                 ) : (
-                  <p className="text-muted mb-0">No availability data</p>
+                  <p className="text-muted mb-0">Aucune donnée de disponibilité</p>
                 )}
               </div>
             ))}

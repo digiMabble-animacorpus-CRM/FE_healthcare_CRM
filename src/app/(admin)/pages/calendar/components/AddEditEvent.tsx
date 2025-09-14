@@ -91,16 +91,16 @@ const AddEditEvent = ({
               <Col xs={6}>
                 {isEditable && (
                   <button onClick={onRemoveEvent} type="button" className="btn btn-danger">
-                    Delete
+                    Supprimer
                   </button>
                 )}
               </Col>
               <Col xs={6} className="text-end">
                 <Button variant="light" type="button" className="me-1" onClick={toggle}>
-                  Cancel
+                  Annuler
                 </Button>
                 <Button variant="primary" type="submit">
-                  Save
+                  Sauvegarder
                 </Button>
               </Col>
             </Row>

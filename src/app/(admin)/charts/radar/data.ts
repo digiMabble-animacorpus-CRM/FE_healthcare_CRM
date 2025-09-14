@@ -32,7 +32,7 @@ export const polygonFillOpts: ApexOptions = {
       data: [20, 100, 40, 30, 50, 80, 33],
     },
   ],
-  labels: ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  labels: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
   plotOptions: {
     radar: {
       size: 140,

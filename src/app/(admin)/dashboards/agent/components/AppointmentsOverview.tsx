@@ -54,7 +54,7 @@ export type AppointmentsOverviewProps = {
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const CATEGORIES = [
   { id: 'consultation', name: 'Consultation', color: '#007bff' },
@@ -246,7 +246,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
             </Col>
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Completed</p>
+                <p className="text-muted mb-1">Complété</p>
                 <h5 className="text-dark mb-1">
                   {statsLoading ? <Spinner animation="border" size="sm" /> : appointmentStats?.completed ?? filteredAppointments.filter((a) => a.status === 'COMPLETED').length}
                 </h5>
