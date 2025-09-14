@@ -1,18 +1,10 @@
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
-import axios from 'axios';
+import PageTitle from '@/components/PageTitle';
 import { API_BASE_PATH } from '@/context/constants';
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Button,
-  Form,
-  Row,
-  Col,
-} from 'react-bootstrap';
+import axios from 'axios';
+import React, { useEffect, useRef, useState } from 'react';
+import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, Row } from 'react-bootstrap';
 
 type ApiChatItem = {
   session_id: string;
@@ -43,7 +35,6 @@ const ChatHistory: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   const chatBoxRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
-
 
   const formatDate = (isoDate: string) => {
     const [year, month, day] = isoDate.slice(0, 10).split('-');
@@ -89,7 +80,6 @@ const ChatHistory: React.FC = () => {
     fetchChats();
   }, []);
 
-
   useEffect(() => {
     Object.keys(chatBoxRefs.current).forEach((sid) => {
       const box = chatBoxRefs.current[sid];
@@ -121,7 +111,6 @@ const ChatHistory: React.FC = () => {
 
   if (loading) return <div>Loading chat history...</div>;
 
-
   const chatEntries = Object.entries(filteredChats);
   const totalPages = Math.ceil(chatEntries.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -134,7 +123,7 @@ const ChatHistory: React.FC = () => {
 
   return (
     <>
-      <h2 className="mb-4">Chat History</h2>
+      <PageTitle title="Historique des discussions" subName="Chat" />
       <Card>
         {/* Filters */}
         <CardHeader>
@@ -143,7 +132,7 @@ const ChatHistory: React.FC = () => {
               <Col md={5}>
                 <Form.Control
                   type="text"
-                  placeholder="Search by User Email ID"
+                  placeholder="Rechercher par identifiant de messagerie utilisateur"
                   value={filterEmail}
                   onChange={(e) => setFilterEmail(e.target.value)}
                 />
@@ -157,7 +146,7 @@ const ChatHistory: React.FC = () => {
               </Col>
               <Col md={3} className="d-flex">
                 <Button type="submit" variant="primary" className="w-100">
-                  Search
+                  Recherche
                 </Button>
               </Col>
             </Row>
@@ -171,15 +160,15 @@ const ChatHistory: React.FC = () => {
                 <Col md={4} key={sid} className="mb-4">
                   <Card className="h-100 shadow-sm">
                     <CardHeader className="bg-light">
-                      <strong>User Email ID : {chatData.email}</strong>
-                      <div className="text-muted small">
-                        Date : {formatDate(chatData.createdAt)}
-                      </div>
+                      <strong>Identifiant de messagerie de l utilisateur: {chatData.email}</strong>
+                      <div className="text-muted small">Date: {formatDate(chatData.createdAt)}</div>
                     </CardHeader>
                     <CardBody className="p-3">
                       <div
                         className="chat-box"
-                        ref={(el) => (chatBoxRefs.current[sid] = el)}
+                        ref={(el) => {
+                          chatBoxRefs.current[sid] = el;
+                        }}
                       >
                         {chatData.messages.length > 0 ? (
                           chatData.messages.map((msg, i) => (
@@ -197,9 +186,7 @@ const ChatHistory: React.FC = () => {
               ))
             ) : (
               <Col>
-                <div className="alert alert-warning text-center mb-0">
-                  No chats found
-                </div>
+                <div className="alert alert-warning text-center mb-0">No chats found</div>
               </Col>
             )}
           </Row>
@@ -215,15 +202,12 @@ const ChatHistory: React.FC = () => {
                   className="page-link"
                   onClick={() => handlePageChange(currentPage - 1)}
                 >
-                  Previous
+                  Précédent
                 </Button>
               </li>
 
               {Array.from({ length: totalPages }).map((_, idx) => (
-                <li
-                  key={idx}
-                  className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}
-                >
+                <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
                   <Button
                     variant="link"
                     className="page-link"
@@ -240,7 +224,7 @@ const ChatHistory: React.FC = () => {
                   className="page-link"
                   onClick={() => handlePageChange(currentPage + 1)}
                 >
-                  Next
+                  Suivant
                 </Button>
               </li>
             </ul>

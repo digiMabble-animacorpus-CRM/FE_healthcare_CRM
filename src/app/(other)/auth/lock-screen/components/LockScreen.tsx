@@ -21,7 +21,7 @@ const LockScreen = () => {
 
   const messageSchema = yup.object({
     name: yup.string().required('Please enter Name'),
-    email: yup.string().email().required('Please enter Email'),
+    email: yup.string().email().required('Please enter E-mail'),
     password: yup.string().required('Please enter password'),
   });
 
@@ -66,7 +66,7 @@ const LockScreen = () => {
                     </div>
                     <div className="mb-1 text-center d-grid">
                       <button className="btn btn-danger py-2" type="submit">
-                        Sign In
+                        Se connecter
                       </button>
                     </div>
                   </form>
@@ -76,7 +76,7 @@ const LockScreen = () => {
             <p className="mb-0 text-center text-white">
               Not you? return{' '}
               <Link href="/auth/sign-in" className="text-reset text-unline-dashed fw-bold ms-1">
-                Sign In
+                Se connecter
               </Link>
             </p>
           </Col>

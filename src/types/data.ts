@@ -157,7 +157,7 @@ export interface AppointmentType {
   cancelledReason?: string; // Reason if cancelled
 
   source?: AppointmentSource; // How appointment was booked
-  reminderSent?: boolean; // SMS/Email reminder flag
+  reminderSent?: boolean; // SMS/E-mail reminder flag
 
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
@@ -227,7 +227,7 @@ export type StaffRole =
   | 'Other';
 
 export type AvailabilitySlot = {
-  day: string; // "Monday"
+  day: string; // "Lundi"
   from: string; // "09:00"
   to: string; // "14:00"
 };
@@ -333,7 +333,8 @@ export type TherapistType = {
   consultations?: string | null;
   degreesAndTraining?: string | null;
   departmentId: number | null;
-  specializations?: any;
+  departmentName?: string | null;
+  specializations?: { id: number | null; name: string }[];
   branches: BranchWithAvailability[];
   languages: number[];
   faq?: string | null;

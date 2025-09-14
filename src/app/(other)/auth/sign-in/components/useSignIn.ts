@@ -45,7 +45,6 @@ const useSignIn = () => {
   type LoginFormFields = yup.InferType<typeof loginFormSchema>;
 
   const login = handleSubmit(async (values: LoginFormFields) => {
-    console.log('Form submitted with:', values);
     setLoading(true);
 
     const encryptedData = encryptAES({
@@ -81,13 +80,12 @@ const useSignIn = () => {
         //  Unified dashboard redirection
         push('/dashboards/agent');
 
-        showNotification({ message: 'Welcome to Anima Corpus CRM', variant: 'success' });
+        showNotification({ message: 'Bienvenue chez Anima Corpus CRM', variant: 'success' });
       } else {
-        showNotification({ message: data.message || 'Invalid credentials', variant: 'danger' });
+        showNotification({ message: data.message || 'Identifiants invalides', variant: 'danger' });
       }
     } catch (err) {
-      showNotification({ message: 'Something went wrong during login', variant: 'danger' });
-      console.error(' Error during login:', err);
+      showNotification({ message: 'Une erreur sest produite lors de la connexion', variant: 'danger' });
     }
 
     setLoading(false);

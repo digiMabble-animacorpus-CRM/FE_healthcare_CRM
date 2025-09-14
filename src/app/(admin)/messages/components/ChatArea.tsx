@@ -72,7 +72,7 @@ const MessageDropdown = ({ message, toUser }: { message: ChatMessageType; toUser
         </DropdownItem>
         <DropdownItem>
           <IconifyIcon icon="bx:trash" className="me-2" />
-          Delete
+          Supprimer
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>
@@ -275,7 +275,7 @@ const ProfileDetail = ({ selectedUser }: { selectedUser: UserType }) => {
               <h4>{selectedUser.name}</h4>
               <Button variant="primary" size="sm" className="mt-1">
                 <IconifyIcon icon="bi:envelope" className="me-1" />
-                Send Email
+                Send E-mail
               </Button>
               <p className="text-muted mt-2 fs-14">
                 Last Interacted:
@@ -292,7 +292,7 @@ const ProfileDetail = ({ selectedUser }: { selectedUser: UserType }) => {
               <p className="mt-3 mb-1">
                 <strong className="icons-center">
                   <IconifyIcon icon="ri:phone-line" className="me-1" />
-                  Phone Number:
+                  Numéro de téléphone:
                 </strong>
               </p>
               <p>+32 {selectedUser.contact}</p>

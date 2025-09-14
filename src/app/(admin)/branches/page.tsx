@@ -80,13 +80,13 @@ const BranchListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Branches" title="Branches List" />
+      <PageTitle subName="Succursales" title="Liste des succursales" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Branches List
+                Liste de toutes les succursales
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -94,7 +94,7 @@ const BranchListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Search by name..."
+                    placeholder="Rechercher par nom..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -106,7 +106,7 @@ const BranchListPage = () => {
                   variant="primary"
                   onClick={() => router.push('/branches/branch-form/create')}
                 >
-                  Add Branch
+                  Ajouter une succursale
                 </Button>
               </div>
             </CardHeader>
@@ -121,24 +121,16 @@ const BranchListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>
-                          <div className="form-check">
-                            <input type="checkbox" className="form-check-input" />
-                          </div>
-                        </th>
-                        <th>Branch Name</th>
-                        <th>Branch Code</th>
+                        <th>Non</th>
+                        <th>Nom de la succursale</th>
+                        <th>Code de succursale</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
                       {branches.map((branch: BranchType, idx: number) => (
                         <tr key={idx}>
-                          <td>
-                            <div className="form-check">
-                              <input type="checkbox" className="form-check-input" />
-                            </div>
-                          </td>
+                          <td>{idx + 1}</td>
                           <td>{branch.name}</td>
                           <td>{branch.code}</td>
                           <td>
@@ -182,7 +174,7 @@ const BranchListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      Précédent
                     </Button>
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
@@ -205,7 +197,7 @@ const BranchListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Suivant
                     </Button>
                   </li>
                 </ul>
@@ -217,17 +209,17 @@ const BranchListPage = () => {
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete this branch? This action cannot be undone.
+          Êtes-vous sûr de vouloir supprimer cette branche ? Cette action est irréversible.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

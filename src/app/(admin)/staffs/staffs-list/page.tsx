@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import PageTitle from "@/components/PageTitle";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import { useEffect, useState } from "react";
-import type { StaffType } from "@/types/data";
-import Image from "next/image";
-import dayjs from "dayjs";
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { useEffect, useState } from 'react';
+import type { StaffType } from '@/types/data';
+import Image from 'next/image';
+import dayjs from 'dayjs';
 import {
   Button,
   Card,
@@ -21,25 +21,21 @@ import {
   Modal,
   Row,
   Spinner,
-} from "react-bootstrap";
-import { useRouter } from "next/navigation";
-import { getAllStaff } from "@/helpers/staff";
-import avatar1 from "@/assets/images/users/avatar-1.jpg";
+} from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import { getAllStaff } from '@/helpers/staff';
+import avatar1 from '@/assets/images/users/avatar-1.jpg';
 
 const PAGE_LIMIT = 10;
-const BRANCHES = [
-  "Gembloux - Orneau",
-  "Gembloux - Tout Vent",
-  "Anima Corpus Namur",
-];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const StaffListPage = () => {
   const [staffList, setStaffList] = useState<StaffType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState<string>("all");
+  const [searchTerm, setSearchTerm] = useState('');
+  const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedStaffId, setSelectedStaffId] = useState<string | null>(null);
@@ -48,30 +44,30 @@ const StaffListPage = () => {
   const getDateRange = () => {
     const now = dayjs();
     switch (dateFilter) {
-      case "today":
+      case 'today':
         return {
-          from: now.startOf("day").toISOString(),
-          to: now.endOf("day").toISOString(),
+          from: now.startOf('day').toISOString(),
+          to: now.endOf('day').toISOString(),
         };
-      case "this_week":
+      case 'this_week':
         return {
-          from: now.startOf("week").toISOString(),
-          to: now.endOf("week").toISOString(),
+          from: now.startOf('week').toISOString(),
+          to: now.endOf('week').toISOString(),
         };
-      case "15_days":
+      case '15_days':
         return {
-          from: now.subtract(15, "day").startOf("day").toISOString(),
-          to: now.endOf("day").toISOString(),
+          from: now.subtract(15, 'day').startOf('day').toISOString(),
+          to: now.endOf('day').toISOString(),
         };
-      case "this_month":
+      case 'this_month':
         return {
-          from: now.startOf("month").toISOString(),
-          to: now.endOf("month").toISOString(),
+          from: now.startOf('month').toISOString(),
+          to: now.endOf('month').toISOString(),
         };
-      case "this_year":
+      case 'this_year':
         return {
-          from: now.startOf("year").toISOString(),
-          to: now.endOf("year").toISOString(),
+          from: now.startOf('year').toISOString(),
+          to: now.endOf('year').toISOString(),
         };
       default:
         return {};
@@ -88,12 +84,12 @@ const StaffListPage = () => {
         selectedBranch || undefined,
         from,
         to,
-        searchTerm
+        searchTerm,
       );
       setStaffList(response.data);
       setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error("Failed to fetch staff list:", error);
+      console.error('Failed to fetch staff list:', error);
     } finally {
       setLoading(false);
     }
@@ -107,12 +103,9 @@ const StaffListPage = () => {
     if (page !== currentPage) setCurrentPage(page);
   };
 
-  const handleView = (id: any) =>
-    router.push(`/staffs/staffs-details/${id}`);
-  const handleEdit = (id: any) =>
-    router.push(`/staffs/staffs-form/${id}/edit`);
-  const handlePermission = (id: string) =>
-    router.push(`/staffs/staffs-form/${id}/permission`);
+  const handleView = (id: any) => router.push(`/staffs/staffs-details/${id}`);
+  const handleEdit = (id: any) => router.push(`/staffs/staffs-form/${id}/edit`);
+  const handlePermission = (id: string) => router.push(`/staffs/staffs-form/${id}/permission`);
 
   const handleDelete = (id: string) => {
     setSelectedStaffId(id);
@@ -123,11 +116,11 @@ const StaffListPage = () => {
     if (!selectedStaffId) return;
     try {
       await fetch(`/api/therapists/${selectedStaffId}`, {
-        method: "DELETE",
+        method: 'DELETE',
       });
       fetchStaffList(currentPage);
     } catch (error) {
-      console.error("Failed to delete staff:", error);
+      console.error('Failed to delete staff:', error);
     } finally {
       setShowDeleteModal(false);
       setSelectedStaffId(null);
@@ -141,15 +134,13 @@ const StaffListPage = () => {
     let age = today.getFullYear() - birthDate.getFullYear();
     const hasBirthdayPassed =
       today.getMonth() > birthDate.getMonth() ||
-      (today.getMonth() === birthDate.getMonth() &&
-        today.getDate() >= birthDate.getDate());
+      (today.getMonth() === birthDate.getMonth() && today.getDate() >= birthDate.getDate());
 
     if (!hasBirthdayPassed) age--;
     return age;
   };
 
-  const formatGender = (gender: string): string =>
-    gender ? gender.charAt(0).toUpperCase() : "";
+  const formatGender = (gender: string): string => (gender ? gender.charAt(0).toUpperCase() : '');
 
   return (
     <>
@@ -162,11 +153,11 @@ const StaffListPage = () => {
                 All Doctor List
               </CardTitle>
               <div className="d-flex flex-wrap align-items-center gap-2">
-                <div style={{ minWidth: "200px" }}>
+                <div style={{ minWidth: '200px' }}>
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Search by name, email, number..."
+                    placeholder="Rechercher par nom, email, numéro..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -184,7 +175,7 @@ const StaffListPage = () => {
                       width={18}
                       className="me-1"
                     />
-                    {selectedBranch || "Filter by Branch"}
+                    {selectedBranch || 'Filtrer par succursale'}
                   </DropdownToggle>
                   <DropdownMenu>
                     {BRANCHES.map((branch) => (
@@ -218,22 +209,18 @@ const StaffListPage = () => {
                     className="btn btn-sm btn-outline-white d-flex align-items-center"
                     id="dateFilter"
                   >
-                    <IconifyIcon
-                      icon="mdi:calendar-clock"
-                      width={18}
-                      className="me-1"
-                    />
-                    {dateFilter === "all"
-                      ? "Filter by Date"
-                      : dateFilter.replace("_", " ").toUpperCase()}
+                    <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
+                    {dateFilter === 'all'
+                      ? 'Filter by Date'
+                      : dateFilter.replace('_', ' ').toUpperCase()}
                   </DropdownToggle>
                   <DropdownMenu>
                     {[
-                      { label: "Today", value: "today" },
-                      { label: "This Week", value: "this_week" },
-                      { label: "Last 15 Days", value: "15_days" },
-                      { label: "This Month", value: "this_month" },
-                      { label: "This Year", value: "this_year" },
+                      { label: 'Today', value: 'today' },
+                      { label: 'This Week', value: 'this_week' },
+                      { label: 'Last 15 Days', value: '15_days' },
+                      { label: 'This Month', value: 'this_month' },
+                      { label: 'This Year', value: 'this_year' },
                     ].map((f) => (
                       <DropdownItem
                         key={f.value}
@@ -246,11 +233,11 @@ const StaffListPage = () => {
                         {f.label}
                       </DropdownItem>
                     ))}
-                    {dateFilter !== "all" && (
+                    {dateFilter !== 'all' && (
                       <DropdownItem
                         className="text-danger"
                         onClick={() => {
-                          setDateFilter("all");
+                          setDateFilter('all');
                           setCurrentPage(1);
                         }}
                       >
@@ -273,8 +260,8 @@ const StaffListPage = () => {
                     <thead className="bg-light-subtle">
                       <tr>
                         <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
+                        <th>E-mail</th>
+                        <th>Téléphone</th>
                         <th>Age | Gender</th>
                         <th>Branch</th>
                         <th>Specialist</th>
@@ -297,13 +284,11 @@ const StaffListPage = () => {
                           <td>{staff?.email}</td>
                           <td>{staff?.phoneNumber}</td>
                           <td>
-                            {calculateAge(staff?.dob ?? "")} yrs |{" "}
-                            {formatGender(staff?.gender || "")}
+                            {calculateAge(staff?.dob ?? '')} yrs |{' '}
+                            {formatGender(staff?.gender || '')}
                           </td>
                           <td>
-                            {staff?.branchesDetailed
-                              .map((b: { code: any }) => b.code)
-                              .join(", ")}
+                            {staff?.branchesDetailed.map((b: { code: any }) => b.code).join(', ')}
                           </td>
                           <td>{staff?.role?.label}</td>
                           <td>
@@ -341,22 +326,18 @@ const StaffListPage = () => {
             <CardFooter>
               <nav>
                 <ul className="pagination justify-content-end mb-0">
-                  <li
-                    className={`page-item ${currentPage === 1 ? "disabled" : ""}`}
-                  >
+                  <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      Précédent
                     </Button>
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
                     <li
-                      className={`page-item ${
-                        currentPage === index + 1 ? "active" : ""
-                      }`}
+                      className={`page-item ${currentPage === index + 1 ? 'active' : ''}`}
                       key={index}
                     >
                       <Button
@@ -368,15 +349,13 @@ const StaffListPage = () => {
                       </Button>
                     </li>
                   ))}
-                  <li
-                    className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}
-                  >
+                  <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Suivant
                     </Button>
                   </li>
                 </ul>
@@ -386,23 +365,17 @@ const StaffListPage = () => {
         </Col>
       </Row>
 
-      <Modal
-        show={showDeleteModal}
-        onHide={() => setShowDeleteModal(false)}
-        centered
-      >
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this staff? This action cannot be undone.
-        </Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce personnel ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

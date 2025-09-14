@@ -48,7 +48,7 @@ const GridViewPage = () => {
           <ul className="pagination justify-content-end mb-0">
             <li className="page-item">
               <Link className="page-link" href="">
-                Previous
+                Précédent
               </Link>
             </li>
             <li className="page-item active">
@@ -68,7 +68,7 @@ const GridViewPage = () => {
             </li>
             <li className="page-item">
               <Link className="page-link" href="">
-                Next
+              Suivant
               </Link>
             </li>
           </ul>

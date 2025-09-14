@@ -81,10 +81,12 @@ const PatientDetails = ({
       {/* Top Buttons */}
       <div className="d-flex justify-content-between mb-3 gap-2 flex-wrap">
         <Button variant="link" onClick={() => router.push('/patients/patient-list')}>
-          <IconifyIcon icon="ri:arrow-left-line" /> Back to List
+          <IconifyIcon icon="ri:arrow-left-line" />
+          Retour à la liste
         </Button>
-        <Button variant="primary" onClick={() => alert('Book Appointment clicked!')}>
-          <IconifyIcon icon="ri:calendar-event-line" /> Book Appointment
+        <Button variant="primary">
+          <IconifyIcon icon="ri:calendar-event-line" />
+           Prendre rendez-vous
         </Button>
       </div>
 
@@ -110,7 +112,7 @@ const PatientDetails = ({
               <div>
                 <h3 className="fw-semibold mb-1">{name}</h3>
                 <p className="link-primary fw-medium fs-14">
-                  {birthdate} {gender ? `| ${gender}` : ''}
+                  {birthdate} | {gender ? `| ${gender}` : 'N/A'}
                 </p>
               </div>
             </div>
@@ -130,47 +132,47 @@ const PatientDetails = ({
           {/* Contact & Info */}
           <Row className="my-4 g-3">
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Email Address :</p>
-              <p className="mb-0">{email || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Adresse email:</p>
+              <p className="mb-0">{email || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Phone Number :</p>
-              <p className="mb-0">{phones?.join(', ') || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Numéro de téléphone:</p>
+              <p className="mb-0">{phones?.join(', ') || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">City :</p>
-              <p className="mb-0">{city || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Ville:</p>
+              <p className="mb-0">{city || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Country :</p>
-              <p className="mb-0">{country || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Pays:</p>
+              <p className="mb-0">{country || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Zip Code :</p>
-              <p className="mb-0">{zipcode || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Code postal:</p>
+              <p className="mb-0">{zipcode || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Language :</p>
-              <p className="mb-0">{language || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Langue:</p>
+              <p className="mb-0">{language || 'N/A'}</p>
             </Col>
           </Row>
 
           {/* IDs & Status */}
           <Row className="my-4 g-3">
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">SSIN :</p>
-              <p className="mb-0">{ssin || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">SSIN:</p>
+              <p className="mb-0">{ssin || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
-              <p className="mb-0">{[address, city, country].filter(Boolean).join(', ') || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Adresse:</p>
+              <p className="mb-0">{[address, city, country].filter(Boolean).join(', ') || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Description / Notes :</p>
-              <p className="mb-0">{note || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Description/Remarques:</p>
+              <p className="mb-0">{note || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Status :</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Statut:</p>
               <span
                 className={`badge bg-${status === 'ACTIVE' ? 'success' : 'danger'} text-white fs-12 px-2 py-1`}
               >
@@ -182,16 +184,16 @@ const PatientDetails = ({
           {/* Address & Notes */}
           <Row className="my-4 g-3">
             <Col lg={8}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Mutuality Number :</p>
-              <p className="mb-0">{mutualitynumber || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Numéro de Mutualité:</p>
+              <p className="mb-0">{mutualitynumber || 'N/A'}</p>
             </Col>
             <Col lg={4}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Mode of Register :</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Mode d enregistrement:</p>
               <p className="mb-0">Online</p>
             </Col>
             <Col lg={12}>
-              <p className="text-dark fw-semibold fs-16 mb-1">Mutuality Registration Number :</p>
-              <p className="mb-0">{mutualityregistrationnumber || '-'}</p>
+              <p className="text-dark fw-semibold fs-16 mb-1">Numéro de carte de résident:</p>
+              <p className="mb-0">{mutualityregistrationnumber || 'N/A'}</p>
             </Col>
           </Row>
         </CardBody>
@@ -201,8 +203,6 @@ const PatientDetails = ({
 };
 
 export default PatientDetails;
-
-
 
 //       {/* Weekly Inquiry & Transactions */}
 //       <Card className="mb-4">

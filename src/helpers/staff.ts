@@ -52,8 +52,6 @@ export const getAllStaff = async (
       ...(search ? { searchText: search } : {}),
     };
 
-    console.log('Filters (plain):', filters);
-
     const queryParams = new URLSearchParams(filters).toString();
 
     const response = await fetch(`${API_BASE_PATH}/staff?${queryParams}`, {
@@ -71,7 +69,6 @@ export const getAllStaff = async (
     }
 
     const jsonData = await response.json();
-    console.log('Response from server:', jsonData);
 
     const staffData: StaffType[] = Array.isArray(jsonData?.data)
       ? jsonData.data
@@ -97,7 +94,6 @@ export const getStaffById = async (staffId: string): Promise<StaffType | null> =
   }
 
   const url = `${API_BASE_PATH}/staff/${staffId}`;
-  console.log('Requesting staff by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -108,9 +104,7 @@ export const getStaffById = async (staffId: string): Promise<StaffType | null> =
       },
     });
 
-    console.log('Response status:', response.status);
     const result = await response.json();
-    console.log('Full API response:', result);
 
     if (!response.ok) {
       console.error('Failed to fetch staff:', result?.message || 'Unknown error');

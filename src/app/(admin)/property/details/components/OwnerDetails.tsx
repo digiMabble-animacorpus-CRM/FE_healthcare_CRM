@@ -137,10 +137,10 @@ const OwnerDetails = () => {
               <TextFormInput control={control} name="time" placeholder="12:00 PM" />
             </div>
             <div className="mb-3">
-              <TextFormInput control={control} name="name" placeholder="Your Full Name" />
+              <TextFormInput control={control} name="name" placeholder="Your Nom et prénom" />
             </div>
             <div className="mb-3">
-              <TextFormInput control={control} name="email" placeholder="Email" />
+              <TextFormInput control={control} name="email" placeholder="E-mail" />
             </div>
             <div className="mb-3">
               <TextFormInput control={control} name="number" placeholder="Number" />

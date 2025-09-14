@@ -2,12 +2,12 @@ import PageTitle from '@/components/PageTitle';
 import { Metadata } from 'next';
 import AddTeamPage from './components/AddTeam';
 
-export const metadata: Metadata = { title: 'Add Team Members' };
+export const metadata: Metadata = { title: 'Ajouter des membres de léquipe' };
 
 const TeamAddPage = () => {
   return (
     <>
-      <PageTitle title="Add Team" subName="" />
+      <PageTitle title="Ajouter une équipe" subName="" />
       <AddTeamPage isEdit={false} />
     </>
   );

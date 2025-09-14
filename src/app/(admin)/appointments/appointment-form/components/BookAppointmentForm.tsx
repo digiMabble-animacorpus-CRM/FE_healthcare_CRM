@@ -94,8 +94,6 @@ const BookAppointmentForm = ({
   }, [isEditMode, defaultValues, reset]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
-    console.log('📝 Appointment Form Data:', data);
-
     const payload = {
       patientId,
       branchId: data.branchId,
@@ -110,8 +108,6 @@ const BookAppointmentForm = ({
       description: data.description || '',
       ...(isEditMode ? { modifiedById } : { createdById }),
     };
-
-    console.log('📦 API Payload:', payload);
 
     try {
       setSaving(true);
@@ -129,8 +125,6 @@ const BookAppointmentForm = ({
 
       if (!res.ok) throw new Error('Failed to save appointment');
       const responseData = await res.json();
-
-      console.log('✅ Appointment Saved Response:', responseData);
 
       // ✅ reset form after successful submission
       reset();
@@ -152,7 +146,7 @@ const BookAppointmentForm = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card className="mb-4">
           <CardHeader className="d-flex justify-content-between align-items-center">
-            <CardTitle as="h6">{isEditMode ? 'Edit Appointment' : 'Book Appointment'}</CardTitle>
+            <CardTitle as="h6">{isEditMode ? 'Edit Appointment' : 'Prendre rendez-vous'}</CardTitle>
             {selectedCustomer && (
               <small className="text-muted">
                 Booking for:{' '}
@@ -173,7 +167,7 @@ const BookAppointmentForm = ({
                 ) : isEditMode ? (
                   'Update Appointment'
                 ) : (
-                  'Book Appointment'
+                  'Prendre rendez-vous'
                 )}
               </Button>
             </div>

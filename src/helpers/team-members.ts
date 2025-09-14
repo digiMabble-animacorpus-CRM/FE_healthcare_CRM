@@ -28,8 +28,6 @@ export const getAllTeamMembers = async (
       ...(search ? { searchText: search } : {}),
     };
 
-    console.log('Filters (plain):', filters);
-
     const queryParams = new URLSearchParams(filters).toString();
 
     const response = await fetch(`${API_BASE_PATH}/team-members?${queryParams}`, {
@@ -47,7 +45,6 @@ export const getAllTeamMembers = async (
     }
 
     const jsonData = await response.json();
-    console.log('Response from server:', jsonData);
 
     const teamData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
@@ -69,7 +66,6 @@ export const getTeamMemberById = async (team_member_id: any): Promise<TeamMember
   }
 
   const url = `${API_BASE_PATH}/team-members/${team_member_id}`;
-  console.log('Requesting team members by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -80,10 +76,7 @@ export const getTeamMemberById = async (team_member_id: any): Promise<TeamMember
       },
     });
 
-    console.log('Response status:', response.status);
-
     const result = await response.json();
-    console.log('Full API response:', result);
 
     if (!response.ok) {
       console.error('Failed to fetch team members:', result?.message || 'Unknown error');
@@ -178,12 +171,11 @@ export const updateTeamMember = async (
 };
 
 export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreatePayload => {
-  console.log('Input formData to transformToBackendDto:', formData);
 
   const BRANCHES = [
-    { id: 1, name: 'Central London' },
-    { id: 2, name: 'East Side' },
-    { id: 3, name: 'North Branch' },
+    { id: 1, name: 'Gembloux - Orneau' },
+    { id: 2, name: 'Gembloux - Tout Vent' },
+    { id: 3, name: 'Namur' },
   ];
 
   const status: 'active' | 'inactive' =

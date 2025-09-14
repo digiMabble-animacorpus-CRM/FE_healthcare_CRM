@@ -52,11 +52,10 @@ const DepartmentListPage = () => {
         (response.data || []).map((dept: any) => ({
           ...dept,
           _id: dept.id,
-        }))
+        })),
       );
       setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
-      console.log('Failed to fetch departments data:', error);
       // fallback mock data
       setDepartments([
         {
@@ -121,35 +120,31 @@ const DepartmentListPage = () => {
             Authorization: `Bearer ${token}`,
             'Content-Type': 'application/json',
           },
-        }
+        },
       );
 
       // update UI immediately
       setDepartments((prev) =>
-        prev.map((dept) =>
-          dept._id === id ? { ...dept, is_active: newStatus } : dept
-        )
+        prev.map((dept) => (dept._id === id ? { ...dept, is_active: newStatus } : dept)),
       );
     } catch (error) {
       console.error('Failed to update status:', error);
       // rollback UI if API fails
       setDepartments((prev) =>
-        prev.map((dept) =>
-          dept._id === id ? { ...dept, is_active: !newStatus } : dept
-        )
+        prev.map((dept) => (dept._id === id ? { ...dept, is_active: !newStatus } : dept)),
       );
     }
   };
 
   return (
     <>
-      <PageTitle subName="Departments" title="Departments List" />
+      <PageTitle subName="Départements" title="Liste des départements" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Departments List ({departments.length})
+                Liste de tous les départements ({departments.length} Total)
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -157,7 +152,7 @@ const DepartmentListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Search by name..."
+                    placeholder="Rechercher par nom..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -169,7 +164,7 @@ const DepartmentListPage = () => {
                   variant="primary"
                   onClick={() => router.push('/department/department-form/create')}
                 >
-                  Add Department
+                  Add Département
                 </Button>
               </div>
             </CardHeader>
@@ -185,9 +180,9 @@ const DepartmentListPage = () => {
                     <thead className="bg-light-subtle">
                       <tr>
                         <th style={{ width: 20 }}>No</th>
-                        <th>Department Name</th>
+                        <th>Département Name</th>
                         <th>Description</th>
-                        <th>Status</th>
+                        <th>Statut</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -253,7 +248,7 @@ const DepartmentListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Previous
+                      Précédent
                     </Button>
                   </li>
                   {[...Array(totalPages)].map((_, index) => (
@@ -276,7 +271,7 @@ const DepartmentListPage = () => {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Suivant
                     </Button>
                   </li>
                 </ul>
@@ -288,17 +283,15 @@ const DepartmentListPage = () => {
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Are you sure you want to delete this department?
-        </Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce département ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

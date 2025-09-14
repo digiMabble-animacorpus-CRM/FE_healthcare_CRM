@@ -80,7 +80,7 @@ const PatientInsights = ({
       <Card>
         {/* Card Header */}
         <CardHeader className="d-flex justify-content-between align-items-center border-0 pb-1">
-          <CardTitle>Patient Insights</CardTitle>
+          <CardTitle>Points de vue des patients</CardTitle>
           <Dropdown>
             <DropdownToggle
               as={'a'}
@@ -88,12 +88,12 @@ const PatientInsights = ({
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Week{' '}
+              Semaine{' '}
               <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
-              <DropdownItem>Week</DropdownItem>
-              <DropdownItem>Month</DropdownItem>
+              <DropdownItem>Semaine</DropdownItem>
+              <DropdownItem>Mois</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </CardHeader>
@@ -103,11 +103,11 @@ const PatientInsights = ({
           <Row className="mb-3 text-center">
             <Col>
               <div className="fw-semibold fs-4">{newPatientsWeek}</div>
-              <div className="text-muted">New Patients (week)</div>
+              <div className="text-muted">Nouveaux patients (Semaine)</div>
             </Col>
             <Col>
               <div className="fw-semibold fs-4">{newPatientsMonth}</div>
-              <div className="text-muted">New Patients (month)</div>
+              <div className="text-muted">Nouveaux patients (Mois)</div>
             </Col>
           </Row>
 
@@ -115,7 +115,7 @@ const PatientInsights = ({
           <Row className="g-3 mb-3">
             <Col md={6}>
               <div className="p-2 border rounded bg-light-subtle">
-                <h6>Gender</h6>
+                <h6>Genre</h6>
                 {Object.entries(demographics.gender).map(([key, value]) => (
                   <div className="mb-2" key={key}>
                     <div className="d-flex justify-content-between mb-1">
@@ -130,7 +130,7 @@ const PatientInsights = ({
 
             <Col md={6}>
               <div className="p-2 border rounded bg-light-subtle">
-                <h6>Branch</h6>
+                <h6>La Succursale</h6>
                 {demographics.topCities.map((c, idx) => (
                   <div className="mb-2" key={idx}>
                     <div className="d-flex justify-content-between mb-1">
@@ -152,7 +152,7 @@ const PatientInsights = ({
 
           {/* Age Distribution Widget */}
           <div className="p-2 border rounded bg-light-subtle">
-            <h6>Age Distribution</h6>
+            <h6>Répartition par âge</h6>
             <AgeDistributionWidget ageBuckets={demographics.ageBuckets} />
           </div>
         </CardBody>

@@ -39,7 +39,6 @@ const EditLanguagePage = ({ params }: Props) => {
 
   const onSubmitHandler = async (data: Omit<LanguageType, '_id'>) => {
     try {
-      console.log('Language updated', data);
       // await updateLanguage(params.id as string, data)
       router.push('/languages');
     } catch {

@@ -212,7 +212,7 @@ const BoxIcons = () => {
         <Card className="icon-box">
           <CardBody className="d-flex flex-column align-items-center justify-content-center">
             <IconifyIcon icon="bx:male-female" className="fs-2" />
-            <h5 className="mt-2 mb-0">Male Female</h5>
+            <h5 className="mt-2 mb-0">Mâle Femelle</h5>
           </CardBody>
         </Card>
         <Card className="icon-box">

@@ -78,7 +78,7 @@ export const monochromePieOpts: ApexOptions = {
     type: 'pie',
   },
   series: [25, 15, 44, 55, 41, 17],
-  labels: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+  labels: ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
   legend: {
     show: true,
     position: 'bottom',

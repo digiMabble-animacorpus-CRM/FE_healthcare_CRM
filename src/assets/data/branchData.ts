@@ -45,7 +45,7 @@ export const branches: BranchType[] = [
   {
     branch_id: 3, // ✅ Added
     _id: 'b3',
-    name: 'Anima Corpus Namur',
+    name: 'Namur',
     code: 'NAM',
     email: 'namur@animacorpus.com',
     phoneNumber: '+32 112233445',

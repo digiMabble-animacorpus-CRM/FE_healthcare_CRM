@@ -622,17 +622,19 @@ const AppointmentCalendarPage = () => {
 
   return (
     <>
-      <PageTitle subName="Appointments" title="Appointment Calendar" />
+      <PageTitle subName="Rendez-vous" title="Calendrier de rendez-vous" />
       <Row style={{ height: '100%' }}>
         <Card>
           <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
             <CardTitle as="h4" className="mb-0">
-              {calendarViewMode === 'calendar' ? 'Appointment Calendar' : 'Appointment List'}
-              <small className="text-muted ms-2">({appointments.length} appointments)</small>
+              {calendarViewMode === 'calendar'
+                ? 'Calendrier de rendez-vous'
+                : 'Liste de rendez-vous'}
+              <small className="text-muted ms-2">({appointments.length} rendez-vous)</small>
             </CardTitle>
             <Button variant="primary" onClick={() => router.push('/appointments/appointment-form')}>
               <Icon icon="mdi:plus" className="me-1" />
-              New Appointment
+              Nouveau rendez-vous
             </Button>
           </CardHeader>
         </Card>
@@ -675,7 +677,7 @@ const AppointmentCalendarPage = () => {
               className="w-100"
             >
               <Icon icon="mdi:refresh" className="me-1" />
-              Reset All Filters
+              Réinitialiser tous les filtres
             </Button>
           </div>
 
@@ -684,10 +686,10 @@ const AppointmentCalendarPage = () => {
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="mb-0">
                 <Icon icon="mdi:office-building" className="me-1" />
-                Branches
+                Succursales
               </h6>
               <Button variant="link" size="sm" onClick={() => toggleAllSelection('branches')}>
-                {selectedBranches.length === allBranches.length ? 'Deselect All' : 'Select All'}
+                {selectedBranches.length === allBranches.length ? 'Désélectionner tout' : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
@@ -726,12 +728,12 @@ const AppointmentCalendarPage = () => {
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="mb-0">
                 <Icon icon="mdi:domain" className="me-1" />
-                Departments
+                Départements
               </h6>
               <Button variant="link" size="sm" onClick={() => toggleAllSelection('departments')}>
                 {selectedDepartments.length === allDepartments.length
-                  ? 'Deselect All'
-                  : 'Select All'}
+                  ? 'Désélectionner tout'
+                  : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
@@ -739,7 +741,7 @@ const AppointmentCalendarPage = () => {
                 <Spinner animation="border" size="sm" />
               </div>
             ) : allDepartments.length === 0 ? (
-              <div className="text-muted small">No departments found</div>
+              <div className="text-muted small">Aucun département trouvé</div>
             ) : (
               allDepartments.map((dept) => (
                 <Form.Check
@@ -772,7 +774,7 @@ const AppointmentCalendarPage = () => {
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="mb-0">
                 <Icon icon="mdi:medical-bag" className="me-1" />
-                Specializations
+                Spécialisations
               </h6>
               <Button
                 variant="link"
@@ -780,8 +782,8 @@ const AppointmentCalendarPage = () => {
                 onClick={() => toggleAllSelection('specializations')}
               >
                 {selectedSpecializations.length === allSpecializations.length
-                  ? 'Deselect All'
-                  : 'Select All'}
+                  ? 'Désélectionner tout'
+                  : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
@@ -830,15 +832,15 @@ const AppointmentCalendarPage = () => {
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => handleViewChange('day')}>
                   <Icon icon="mdi:calendar-today" className="me-2 d-none d-sm-inline" />
-                  Day
+                  Jour
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => handleViewChange('week')}>
                   <Icon icon="mdi:calendar-week" className="me-2 d-none d-sm-inline" />
-                  Week
+                  Semaine
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => handleViewChange('month')}>
                   <Icon icon="mdi:calendar-month" className="me-2 d-none d-sm-inline" />
-                  Month
+                  Mois
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -848,8 +850,8 @@ const AppointmentCalendarPage = () => {
               <small className="text-muted">
                 {view === 'week' &&
                   `Week of ${selectedDate.startOf('week').format('MMM D')} - ${selectedDate.endOf('week').format('MMM D')}`}
-                {view === 'month' && `${appointments.length} appointments this month`}
-                {view === 'day' && `${appointments.length} appointments today`}
+                {view === 'month' && `${appointments.length} rendez-vous ce mois-ci`}
+                {view === 'day' && `${appointments.length} rendez-vous aujourd'hui`}
               </small>
             </div>
 
@@ -859,14 +861,14 @@ const AppointmentCalendarPage = () => {
                 onClick={() => setCalendarViewMode('calendar')}
               >
                 <Icon icon="mdi:calendar" className="me-1" />
-                <span className="d-none d-sm-inline">Calendar View</span>
+                <span className="d-none d-sm-inline">Vue du calendrier</span>
               </Button>
               <Button
                 variant={calendarViewMode === 'list' ? 'primary' : 'outline-primary'}
                 onClick={() => setCalendarViewMode('list')}
               >
                 <Icon icon="mdi:format-list-bulleted" className="me-1" />
-                <span className="d-none d-sm-inline">List View</span>
+                <span className="d-none d-sm-inline">Vue en liste</span>
               </Button>
             </ButtonGroup>
           </div>
@@ -874,7 +876,7 @@ const AppointmentCalendarPage = () => {
           {loading ? (
             <div className="d-flex justify-content-center align-items-center flex-grow-1">
               <Spinner animation="border" />
-              <span className="ms-2">Loading appointments...</span>
+              <span className="ms-2">Chargement des rendez-vous...</span>
             </div>
           ) : calendarViewMode === 'calendar' ? (
             <div className="flex-grow-1 border rounded overflow-hidden">
@@ -929,14 +931,14 @@ const AppointmentCalendarPage = () => {
           ) : (
             <div className="flex-grow-1 border rounded p-3 bg-white overflow-auto">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">Appointments List</h5>
+                <h5 className="mb-0">Liste des rendez-vous</h5>
                 <small className="text-muted">{appointments.length} results</small>
               </div>
               {appointments.length === 0 ? (
                 <div className="text-center py-5">
                   <Icon icon="mdi:calendar-remove" className="text-muted mb-3" />
                   <p className="text-muted">
-                    No appointments found for selected filters and date range.
+                    Aucun rendez-vous trouvé pour les filtres et la plage de dates sélectionnés.
                   </p>
                 </div>
               ) : (
@@ -985,19 +987,19 @@ const AppointmentCalendarPage = () => {
                               <div className="col-12 mb-1">
                                 <Icon icon="mdi:office-building" className="me-1 text-muted" />
                                 <small>
-                                  <strong>Branch:</strong> {event.branch}
+                                  <strong>La succursale:</strong> {event.branch}
                                 </small>
                               </div>
                               <div className="col-12 mb-1">
                                 <Icon icon="mdi:domain" className="me-1 text-muted" />
                                 <small>
-                                  <strong>Department:</strong> {event.department}
+                                  <strong>Département:</strong> {event.department}
                                 </small>
                               </div>
                               <div className="col-12 mb-1">
                                 <Icon icon="mdi:medical-bag" className="me-1 text-muted" />
                                 <small>
-                                  <strong>Specialization:</strong> {event.specialization}
+                                  <strong>Spécialisation:</strong> {event.specialization}
                                 </small>
                               </div>
                               {event.raw.participants.length > 0 && (
@@ -1027,7 +1029,7 @@ const AppointmentCalendarPage = () => {
         <Modal.Header closeButton>
           <Modal.Title>
             <Icon icon="mdi:calendar-account" className="me-2" />
-            Appointment Details
+            Détails du rendez-vous
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -1061,17 +1063,17 @@ const AppointmentCalendarPage = () => {
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:clock-outline" className="me-2 text-primary" />
-                  <strong>Time:</strong> {dayjs(selectedEvent.start).format('h:mm A')} -{' '}
+                  <strong>Temps:</strong> {dayjs(selectedEvent.start).format('h:mm A')} -{' '}
                   {dayjs(selectedEvent.end).format('h:mm A')}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:office-building" className="me-2 text-primary" />
-                  <strong>Branch:</strong>{' '}
+                  <strong>La succursale:</strong>{' '}
                   {selectedEvent.raw.original?.branch?.name || selectedEvent.branch}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:domain" className="me-2 text-primary" />
-                  <strong>Department:</strong>{' '}
+                  <strong>Département:</strong>{' '}
                   {selectedEvent.raw.original?.department?.name || selectedEvent.department}
                 </div>
               </div>
@@ -1079,13 +1081,13 @@ const AppointmentCalendarPage = () => {
               <div className="col-md-6">
                 <div className="mb-3">
                   <Icon icon="mdi:medical-bag" className="me-2 text-success" />
-                  <strong>Specialization:</strong>{' '}
+                  <strong>Spécialisation:</strong>{' '}
                   {selectedEvent.raw.original?.specialization?.specialization_type ||
                     selectedEvent.specialization}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:map-marker" className="me-2 text-success" />
-                  <strong>Location:</strong>{' '}
+                  <strong>Emplacement:</strong>{' '}
                   {selectedEvent.raw.original?.branch?.address ||
                     selectedEvent.raw.location ||
                     'Not specified'}
@@ -1097,7 +1099,7 @@ const AppointmentCalendarPage = () => {
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:email" className="me-2 text-success" />
-                  <strong>Email:</strong>{' '}
+                  <strong>E-mail:</strong>{' '}
                   {selectedEvent.raw.original?.branch?.email || 'Not specified'}
                 </div>
               </div>
@@ -1121,25 +1123,25 @@ const AppointmentCalendarPage = () => {
                 {selectedEvent.raw.original?.patient && (
                   <div className="mb-3">
                     <Icon icon="mdi:account-heart" className="me-2 text-danger" />
-                    <strong>Patient Details:</strong>
+                    <strong>Détails du patient:</strong>
                     <div className="ms-4 mt-2">
                       <p className="mb-1">
-                        <strong>Name:</strong> {selectedEvent.raw.original.patient.firstname}{' '}
+                        <strong>Nom:</strong> {selectedEvent.raw.original.patient.firstname}{' '}
                         {selectedEvent.raw.original.patient.lastname}
                       </p>
                       {selectedEvent.raw.original.patient.email && (
                         <p className="mb-1">
-                          <strong>Email:</strong> {selectedEvent.raw.original.patient.email}
+                          <strong>E-mail:</strong> {selectedEvent.raw.original.patient.email}
                         </p>
                       )}
                       {selectedEvent.raw.original.patient.phone && (
                         <p className="mb-1">
-                          <strong>Phone:</strong> {selectedEvent.raw.original.patient.phone}
+                          <strong>Téléphone:</strong> {selectedEvent.raw.original.patient.phone}
                         </p>
                       )}
                       {selectedEvent.raw.original.patient.age && (
                         <p className="mb-1">
-                          <strong>Age:</strong> {selectedEvent.raw.original.patient.age}
+                          <strong>Âge:</strong> {selectedEvent.raw.original.patient.age}
                         </p>
                       )}
                     </div>
@@ -1150,17 +1152,17 @@ const AppointmentCalendarPage = () => {
                 {(selectedEvent.raw.original?.therapist || selectedEvent.raw.original?.doctor) && (
                   <div className="mb-3">
                     <Icon icon="mdi:doctor" className="me-2 text-warning" />
-                    <strong>Healthcare Provider:</strong>
+                    <strong>Prestataire de santé:</strong>
                     <div className="ms-4 mt-2">
                       {selectedEvent.raw.original.therapist && (
                         <p className="mb-1">
-                          <strong>Therapist:</strong>{' '}
+                          <strong>Thérapeute:</strong>{' '}
                           {selectedEvent.raw.original.therapist.fullName}
                         </p>
                       )}
                       {selectedEvent.raw.original.doctor && (
                         <p className="mb-1">
-                          <strong>Doctor:</strong> {selectedEvent.raw.original.doctor.name}
+                          <strong>Médecin:</strong> {selectedEvent.raw.original.doctor.name}
                         </p>
                       )}
                     </div>
@@ -1170,7 +1172,7 @@ const AppointmentCalendarPage = () => {
                 {selectedEvent.raw.notes && (
                   <div className="mb-3">
                     <Icon icon="mdi:note-text" className="me-2 text-secondary" />
-                    <strong>Notes:</strong>
+                    <strong>Remarques:</strong>
                     <p className="mt-2 p-2 bg-light rounded">{selectedEvent.raw.notes}</p>
                   </div>
                 )}
@@ -1179,12 +1181,12 @@ const AppointmentCalendarPage = () => {
                 <div className="row mt-3">
                   <div className="col-md-6">
                     <small className="text-muted">
-                      <strong>Appointment ID:</strong> {selectedEvent.id}
+                      <strong>Numéro de rendez-vous:</strong> {selectedEvent.id}
                     </small>
                   </div>
                   <div className="col-md-6">
                     <small className="text-muted">
-                      <strong>Created:</strong>{' '}
+                      <strong>Créé:</strong>{' '}
                       {selectedEvent.raw.original?.created_at
                         ? dayjs(selectedEvent.raw.original.created_at).format('MMM D, YYYY')
                         : 'N/A'}
@@ -1193,7 +1195,7 @@ const AppointmentCalendarPage = () => {
                   {selectedEvent.raw.original?.purposeOfVisit && (
                     <div className="col-12 mt-2">
                       <small className="text-muted">
-                        <strong>Purpose of Visit:</strong>{' '}
+                        <strong>But de la visite:</strong>{' '}
                         {selectedEvent.raw.original.purposeOfVisit}
                       </small>
                     </div>
@@ -1204,14 +1206,14 @@ const AppointmentCalendarPage = () => {
           ) : (
             <div className="text-center py-4">
               <Icon icon="mdi:calendar-remove" className="text-muted mb-3" />
-              <p>No appointment selected.</p>
+              <p>Aucun rendez-vous sélectionné.</p>
             </div>
           )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
             <Icon icon="mdi:close" className="me-1" />
-            Close
+            Fermer
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1221,17 +1223,17 @@ const AppointmentCalendarPage = () => {
         <Modal.Header closeButton>
           <Modal.Title>
             <Icon icon="mdi:calendar-multiple" className="me-2" />
-            More Appointments
+            Plus de rendez-vous
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="mb-3">
-            <h6 className="text-muted">All appointments for this day:</h6>
+            <h6 className="text-muted">Tous les rendez-vous pour cette journée:</h6>
           </div>
           {moreEvents.length === 0 ? (
             <div className="text-center py-4">
               <Icon icon="mdi:calendar-remove" className="text-muted mb-3" />
-              <p>No additional appointments found.</p>
+              <p>Aucun rendez-vous supplémentaire trouvé.</p>
             </div>
           ) : (
             <div className="list-group">
@@ -1286,7 +1288,7 @@ const AppointmentCalendarPage = () => {
         <Modal.Footer>
           <Button variant="outline-secondary" onClick={() => setShowMoreModal(false)}>
             <Icon icon="mdi:close" className="me-1" />
-            Close
+            Fermer
           </Button>
         </Modal.Footer>
       </Modal>

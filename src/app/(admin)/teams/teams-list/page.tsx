@@ -26,7 +26,7 @@ import { useRouter } from 'next/navigation';
 import { getAllTeamMembers } from '@/helpers/team-members';
 
 const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const TeamsListPage = () => {
   const [allTeamMembers, setAllTeamMembers] = useState<TeamMemberType[]>([]);
@@ -50,11 +50,9 @@ const TeamsListPage = () => {
       if (!response.data || response.data.length === 0) {
         throw new Error('No data');
       }
-      console.log(response.data);
       setAllTeamMembers(response.data || []);
     } catch (err) {
       setError('Failed to fetch data');
-      console.error('Failed to fetch team members', err);
       setAllTeamMembers([]);
     } finally {
       setLoading(false);
@@ -85,11 +83,9 @@ const TeamsListPage = () => {
 
   const filteredTeamMembers = useMemo(() => {
     let data = [...allTeamMembers];
-
     if (selectedBranch) {
       data = data.filter((t) => t.office_address?.includes(selectedBranch));
     }
-
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       data = data.filter(
@@ -101,7 +97,6 @@ const TeamsListPage = () => {
           (t.contact_phone?.toLowerCase().includes(term) ?? false),
       );
     }
-
     return data;
   }, [allTeamMembers, selectedBranch, searchTerm, dateFilter]);
 
@@ -127,12 +122,12 @@ const TeamsListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedTeamId) return;
     try {
-      await fetch(`http://localhost:8080/api/v1/team-members/${selectedTeamId}`, {
+      await fetch(`http://164.92.220.65/api/v1/team-members/${selectedTeamId}`, {
         method: 'DELETE',
       });
       setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTeamId));
     } catch (err) {
-      console.error(err);
+      // error handling
     } finally {
       setShowDeleteModal(false);
       setSelectedTeamId(null);
@@ -145,28 +140,62 @@ const TeamsListPage = () => {
     setCurrentPage(page);
   };
 
-  const getPhotoUrl = (photo: string) => {
-    // Regex to extract URL from markdown style "filename (url)"
-    const match = photo.match(/\((https?:\/\/[^\s)]+)\)/);
-    return match ? match[1] : '';
+  // Helper for showing avatar fallback
+  const getProfileDisplay = (member: TeamMemberType) => {
+    const photoUrl = member.photo && member.photo.startsWith('http') ? member.photo : '';
+    if (photoUrl)
+      return (
+        <img
+          src={photoUrl}
+          alt="Profile"
+          style={{
+            width: '40px',
+            height: '40px',
+            objectFit: 'cover',
+            borderRadius: '50px',
+            background: '#f6f6f6',
+          }}
+        />
+      );
+    // Fallback: first letter in a colored circle
+    const initial = member.first_name ? member.first_name.trim().charAt(0).toUpperCase() : 'U';
+    return (
+      <div
+        style={{
+          width: 40,
+          height: 40,
+          borderRadius: '50%',
+          background: '#007bff',
+          color: '#fff',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          fontWeight: 600,
+          fontSize: 20,
+          textTransform: 'uppercase',
+        }}
+      >
+        {initial}
+      </div>
+    );
   };
 
   return (
     <>
-      <PageTitle subName="Teams" title="Teams List" />
+      <PageTitle subName="Teams" title="Liste des équipes" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Teams List
+                Liste de toutes les équipes <small>({filteredTeamMembers.length} Total)</small>
               </CardTitle>
-               {error && <div className="alert alert-danger text-center">{error}</div>}
+              {error && <div className="alert alert-danger text-center">{error}</div>}
               <div className="d-flex gap-2 align-items-center">
                 <input
                   type="text"
                   className="form-control form-control-sm"
-                  placeholder="Search by name, email, number..."
+                  placeholder="Rechercher par nom, email, numéro..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -177,7 +206,7 @@ const TeamsListPage = () => {
 
                 <Dropdown>
                   <DropdownToggle className="btn btn-sm btn-primary dropdown-toggle text-white">
-                    {selectedBranch || 'Filter by Branch'}
+                    {selectedBranch || 'Filtrer par succursale'}
                   </DropdownToggle>
                   <DropdownMenu>
                     {BRANCHES.map((branch) => (
@@ -221,76 +250,83 @@ const TeamsListPage = () => {
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 30 }}>
-                          <input type="checkbox" />
-                        </th>
+                        <th style={{ width: 30 }}>Non</th>
                         <th>Photo</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Branch</th>
-                        <th>Job Title</th>
-                        <th>Role</th>
-                        <th>Status</th>
+                        <th>Nom</th>
+                        <th>E-mail</th>
+                        <th>Téléphone</th>
+                        <th>Succursale</th>
+                        <th>Titre demploi</th>
+                        <th>Rôle</th>
+                        <th>Statut</th>
                         <th>Action</th>
                       </tr>
                     </thead>
-                    
                     <tbody>
-                      {currentData.map((item) => (
-                        <tr key={item.team_id}>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
-                          <td>
-                            <img
-                              src={item.photo}
-                              alt="Profile"
-                              style={{ width: '40px', height: '40px', objectFit: 'cover', borderRadius: '50px' }}
-                            />
-                          </td>
-                          <td>
-                            {item.first_name} {item.last_name}
-                          </td>
-                          <td>{item.contact_email}</td>
-                          <td>{item.contact_phone}</td>
-                          <td>{item.office_address}</td>
-                          <td>{item.job_1}</td>
-                          <td>
-                            {item.role === 'super_admin' ? 'Super Admin' : item.role === 'staff' ? 'Staff' : item.role === 'admin' ? 'Admin' : item.role}
-                          </td>
-                          <td>
-                            <Badge bg={item.status === 'active' ? 'success' : 'danger'} text="light" style={{ textTransform: 'capitalize' }}>
-                              {item.status}
-                            </Badge>
-                          </td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleView(item.team_id)}
-                              >
-                                <IconifyIcon icon="solar:eye-broken" />
-                              </Button>
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleEditClick(item.team_id.toString())}
-                              >
-                                <IconifyIcon icon="solar:pen-2-broken" />
-                              </Button>                      
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(item.team_id.toString())}
-                              >
-                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
-                              </Button>
-                            </div>
+                      {currentData.length === 0 ? (
+                        <tr>
+                          <td colSpan={10} className="text-center py-4 text-muted">
+                            No data found
                           </td>
                         </tr>
-                      ))}
+                      ) : (
+                        currentData.map((item, idx) => (
+                          <tr key={item.team_id}>
+                            <td>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
+                            <td>{getProfileDisplay(item)}</td>
+                            <td>
+                              {item.first_name} {item.last_name}
+                            </td>
+                            <td>{item.contact_email}</td>
+                            <td>{item.contact_phone}</td>
+                            <td>{item.office_address}</td>
+                            <td>{item.job_1}</td>
+                            <td>
+                              {item.role === 'super_admin'
+                                ? 'Super Admin'
+                                : item.role === 'staff'
+                                  ? 'Staff'
+                                  : item.role === 'admin'
+                                    ? 'Admin'
+                                    : item.role}
+                            </td>
+                            <td>
+                              <Badge
+                                bg={item.status === 'active' ? 'success' : 'danger'}
+                                text="light"
+                                style={{ textTransform: 'capitalize' }}
+                              >
+                                {item.status}
+                              </Badge>
+                            </td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={() => handleView(item.team_id)}
+                                >
+                                  <IconifyIcon icon="solar:eye-broken" />
+                                </Button>
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={() => handleEditClick(item.team_id.toString())}
+                                >
+                                  <IconifyIcon icon="solar:pen-2-broken" />
+                                </Button>
+                                <Button
+                                  variant="danger"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(item.team_id.toString())}
+                                >
+                                  <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -305,7 +341,7 @@ const TeamsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    Previous
+                    Précédent
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }).map((_, idx) => (
@@ -325,7 +361,7 @@ const TeamsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
-                    Next
+                    Suivant
                   </Button>
                 </li>
               </ul>
@@ -336,15 +372,15 @@ const TeamsListPage = () => {
 
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this therapist?</Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce membre de l équipe ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

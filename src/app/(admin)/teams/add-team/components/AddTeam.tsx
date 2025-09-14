@@ -25,23 +25,15 @@ export interface AddTeamProps {
   isEdit?: boolean;
 }
 
-const PERMISSIONS_MODULES = ['appointments', 'patients', 'billing', 'teams'];
+const PERMISSIONS_MODULES = ['Rendez-vous', 'patients', 'équipes'];
 const ACTIONS = ['view', 'create', 'edit', 'delete'];
-const SCHEDULE_DAYS = [
-  'monday',
-  'tuesday',
-  'wednesday',
-  'thursday',
-  'friday',
-  'saturday',
-  'sunday',
-];
-const LANGUAGES = ['English', 'French', 'Spanish'];
+const SCHEDULE_DAYS = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+const LANGUAGES = ['Anglais', 'Français', 'Néerlandais'];
 const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Bank Transfer'];
 const BRANCHES = [
-  { id: 1, name: 'Central London' },
-  { id: 2, name: 'East Side' },
-  { id: 3, name: 'North Branch' },
+  { id: 1, name: 'Gembloux - Orneau' },
+  { id: 2, name: 'Gembloux - Tout Vent' },
+  { id: 3, name: 'Namur' },
 ];
 
 function renderPermissions(
@@ -51,7 +43,7 @@ function renderPermissions(
 ) {
   return (
     <Form.Group>
-      <Form.Label>Permissions</Form.Label>
+      <Form.Label>Autorisations</Form.Label>
       {PERMISSIONS_MODULES.map((module) => (
         <div key={module} style={{ marginBottom: '1rem' }}>
           <strong>{module.charAt(0).toUpperCase() + module.slice(1)}:</strong>
@@ -84,7 +76,7 @@ function renderPermissions(
           : typeof errors.permissions === 'string'
             ? errors.permissions
             : Object.keys(errors.permissions || {}).length > 0
-              ? 'Select permission actions.'
+              ? 'Sélectionnez les actions d autorisation.'
               : ''}
       </Form.Text>
     </Form.Group>
@@ -125,7 +117,7 @@ function renderDynamicArrayField<K extends 'diplomas_and_training' | 'specializa
               }
               disabled={items.length === 1}
             >
-              Remove
+              Retirer
             </Button>
           </Col>
         </Row>
@@ -135,7 +127,7 @@ function renderDynamicArrayField<K extends 'diplomas_and_training' | 'specializa
         onClick={() => setValue(fieldName, [...items, ''])}
         className="mb-2"
       >
-        Add {fieldName === 'diplomas_and_training' ? 'Diploma/Training' : 'Specialization'}
+        Ajouter {fieldName === 'diplomas_and_training' ? 'Diplôme/Formation' : 'Spécialisation'}
       </Button>
       <Form.Text className="text-danger">
         {Array.isArray(errors[fieldName])
@@ -183,25 +175,28 @@ interface TeamMemberFormInputs {
 }
 
 const schema: yup.ObjectSchema<TeamMemberFormInputs> = yup.object({
-  last_name: yup.string().required('Last name is required'),
-  first_name: yup.string().required('First name is required'),
+  last_name: yup.string().required('Le nom de famille est obligatoire'),
+  first_name: yup.string().required('Le prénom est obligatoire'),
   full_name: yup.string().required(),
-  job_1: yup.string().required('Primary job is required'),
-  specific_audience: yup.string().required('Audience is required'),
-  specialization_1: yup.string().required('Primary specialization is required'),
+  job_1: yup.string().required('Un emploi principal est requis'),
+  specific_audience: yup.string().required('Le public est requis'),
+  specialization_1: yup.string().required('Une spécialisation primaire est requise'),
   job_2: yup.string().optional(),
   job_3: yup.string().optional(),
   job_4: yup.string().optional(),
-  who_am_i: yup.string().required('Biography is required'),
-  consultations: yup.string().required('Consultations are required'),
-  office_address: yup.string().required('Office address is required'),
-  contact_email: yup.string().email('Enter valid email').required('Email is required'),
-  contact_phone: yup.string().required('Phone is required'),
+  who_am_i: yup.string().required('La biographie est requise'),
+  consultations: yup.string().required('Des consultations sont nécessaires'),
+  office_address: yup.string().required('L adresse du bureau est requise'),
+  contact_email: yup
+    .string()
+    .email('Entrez une adresse e-mail valide')
+    .required('L adresse e-mail est obligatoire'),
+  contact_phone: yup.string().required('Le téléphone est requis'),
   schedule: yup
     .object()
     .test(
       'schedule-days',
-      'Please enter schedule for at least one day',
+      'Veuillez saisir un emploi du temps pour au moins une journée',
       (val) =>
         val &&
         typeof val === 'object' &&
@@ -209,53 +204,53 @@ const schema: yup.ObjectSchema<TeamMemberFormInputs> = yup.object({
           (someValue) => typeof someValue === 'string' && someValue.trim() !== '',
         ),
     )
-    .required('Schedule is required'),
-  about: yup.string().required('About is required'),
+    .required('Un horaire est requis'),
+  about: yup.string().required('À propos est requis'),
   languages_spoken: yup
     .array()
-    .of(yup.string().required('Enter a language'))
-    .min(1, 'Please select at least one language')
+    .of(yup.string().required('Entrez une langue'))
+    .min(1, 'Veuillez sélectionner au moins une langue')
     .default([]),
   payment_methods: yup
     .array()
-    .of(yup.string().required('Enter a payment method'))
-    .min(1, 'Please select at least one payment method')
+    .of(yup.string().required('Entrez un mode de paiement'))
+    .min(1, 'Veuillez sélectionner au moins un mode de paiement')
     .default([]),
   diplomas_and_training: yup
     .array()
-    .of(yup.string().required('Enter diploma/training'))
-    .min(1, 'Add at least one diploma/training')
+    .of(yup.string().required('Saisir le diplôme/la formation'))
+    .min(1, 'Ajouter au moins un diplôme/une formation')
     .default([]),
   specializations: yup
     .array()
-    .of(yup.string().required('Enter specialization'))
-    .min(1, 'Add at least one specialization')
+    .of(yup.string().required('Entrez la spécialisation'))
+    .min(1, 'Ajouter au moins une spécialisation')
     .default([]),
-  website: yup.string().url('Enter a valid website URL').required('Website is required'),
+  website: yup.string().url('Entrez une URL de site Web valide').required('Le site Web est requis'),
   frequently_asked_questions: yup.object().required(),
   calendar_links: yup
     .array()
-    .of(yup.string().required('Enter a calendar link').url('Enter a valid URL'))
-    .min(1, 'Add at least one calendar link')
+    .of(yup.string().required('Entrez un lien de calendrier').url('Entrez une URL valide'))
+    .min(1, 'Ajouter au moins un lien de calendrier')
     .default([]),
-  photo: yup.string().url('Enter a valid photo URL').required('Photo is required'),
+  photo: yup.string().url('Entrez une URL de photo valide').required('Une photo est requise'),
   role: yup
     .mixed<'super_admin' | 'admin' | 'staff'>()
     .oneOf(['super_admin', 'admin', 'staff'])
-    .required('Role is required'),
+    .required('Le rôle est requis'),
   status: yup
     .mixed<'active' | 'inactive'>()
     .oneOf(['active', 'inactive'])
-    .required('Status is required'),
+    .required('Le statut est requis'),
   branches: yup
     .array()
     .of(yup.number().required())
-    .min(1, 'Select at least one branch')
+    .min(1, 'Sélectionnez au moins une branche')
     .required()
     .default([]),
-  primary_branch_id: yup.number().required('Select a primary branch'),
+  primary_branch_id: yup.number().required('Sélectionnez une succursale principale'),
   permissions: yup.object().required(),
-  created_by_role: yup.string().required('Creator role required'),
+  created_by_role: yup.string().required('Rôle de créateur requis'),
 });
 
 function toCreatePayload(values: any): any {
@@ -517,12 +512,9 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           : null,
         branches: payload.branches?.map((b: any) => (typeof b === 'string' ? Number(b) : b)) || [],
       };
-      console.log('Update payload:', safeUpdatePayload);
-      console.log('Sanitized payload before sending:', safeUpdatePayload);
       success = await updateTeamMember(id, safeUpdatePayload);
     } else {
       const payload = toCreatePayload(formData);
-      console.log('Create payload:', payload);
       success = await createTeamMember(payload);
     }
 
@@ -546,14 +538,16 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
     <form onSubmit={handleSubmit(onSubmit)}>
       <Card className="mb-4">
         <CardHeader>
-          <CardTitle as="h4">{isEditMode ? 'Edit Team Member' : 'Add Team Member'}</CardTitle>
+          <CardTitle as="h4">
+            {isEditMode ? 'Modifier un membre de l équipe' : 'Ajouter un membre de l équipe'}
+          </CardTitle>
         </CardHeader>
         <CardBody>
           {/* Personal & Job Details */}
           <Row>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
-                <Form.Label>First Name</Form.Label>
+                <Form.Label>Prénom</Form.Label>
                 <Form.Control {...register('first_name')} isInvalid={!!errors.first_name} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.first_name?.message === 'string' ? errors.first_name.message : ''}
@@ -562,7 +556,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
-                <Form.Label>Last Name</Form.Label>
+                <Form.Label>Nom de famille</Form.Label>
                 <Form.Control {...register('last_name')} isInvalid={!!errors.last_name} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.last_name?.message === 'string' ? errors.last_name.message : ''}
@@ -571,7 +565,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
-                <Form.Label>Full Name</Form.Label>
+                <Form.Label>Nom et prénom</Form.Label>
                 <Form.Control {...register('full_name')} disabled />
               </Form.Group>
             </Col>
@@ -600,7 +594,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
-                <Form.Label>Primary Specialization</Form.Label>
+                <Form.Label>Spécialisation primaire</Form.Label>
                 <Form.Control
                   {...register('specialization_1')}
                   isInvalid={!!errors.specialization_1}
@@ -614,7 +608,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
-                <Form.Label>Job 2</Form.Label>
+                <Form.Label>Spécialisation secondaire 2</Form.Label>
                 <Form.Control {...register('job_2')} isInvalid={!!errors.job_2} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.job_2?.message === 'string' ? errors.job_2?.message : ''}
@@ -623,7 +617,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
-                <Form.Label>Job 3</Form.Label>
+                <Form.Label>Spécialisation secondaire 3</Form.Label>
                 <Form.Control {...register('job_3')} isInvalid={!!errors.job_3} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.job_3?.message === 'string' ? errors.job_3?.message : ''}
@@ -632,7 +626,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} lg={3} className="mb-3">
               <Form.Group>
-                <Form.Label>Job 4</Form.Label>
+                <Form.Label>Spécialisation secondaire 4</Form.Label>
                 <Form.Control {...register('job_4')} isInvalid={!!errors.job_4} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.job_4?.message === 'string' ? errors.job_4.message : ''}
@@ -645,7 +639,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           <Row>
             <Col md={6} lg={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Email</Form.Label>
+                <Form.Label>E-mail</Form.Label>
                 <Form.Control {...register('contact_email')} isInvalid={!!errors.contact_email} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.contact_email?.message === 'string'
@@ -656,7 +650,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} lg={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Phone</Form.Label>
+                <Form.Label>Téléphone</Form.Label>
                 <Form.Control {...register('contact_phone')} isInvalid={!!errors.contact_phone} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.contact_phone?.message === 'string'
@@ -667,7 +661,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={12} lg={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Office Address</Form.Label>
+                <Form.Label>Adresse du bureau</Form.Label>
                 <Form.Control {...register('office_address')} isInvalid={!!errors.office_address} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.office_address?.message === 'string'
@@ -682,7 +676,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           <Row>
             <Col md={4} className="mb-3">
               <Form.Group>
-                <Form.Label>About</Form.Label>
+                <Form.Label>À propos</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
@@ -712,7 +706,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Biography</Form.Label>
+                <Form.Label>Biographie</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
@@ -729,7 +723,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           {/* Schedule */}
           <Card className="mb-4">
             <CardHeader>
-              <CardTitle as="h6">Schedule</CardTitle>
+              <CardTitle as="h6">Calendrier</CardTitle>
             </CardHeader>
             <CardBody>
               <Row>
@@ -742,7 +736,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                         onChange={(e) =>
                           setValue('schedule', { ...schedule, [day]: e.target.value })
                         }
-                        placeholder="e.g. 9am-5pm"
+                        placeholder="e.g. 9am - 5pm"
                       />
                     </Form.Group>
                   </Col>
@@ -759,8 +753,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             <div style={{ display: 'flex', gap: '25rem', alignItems: 'center' }}>
               <Col md="auto">
                 <Form.Group>
-                  <Form.Label>Languages Spoken</Form.Label>
-                  <div style={{ display: 'flex', gap: '5rem' }}>
+                  <Form.Label>Langues parlées</Form.Label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
                     {LANGUAGES.map((lang) => (
                       <Form.Check
                         key={lang}
@@ -790,8 +784,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
               </Col>
               <Col md="auto">
                 <Form.Group>
-                  <Form.Label>Payment Methods</Form.Label>
-                  <div style={{ display: 'flex', gap: '5rem' }}>
+                  <Form.Label>Méthodes de paiement</Form.Label>
+                  <div style={{ display: 'flex', gap: '10px' }}>
                     {PAYMENT_METHODS.map((pm) => (
                       <Form.Check
                         key={pm}
@@ -826,13 +820,13 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Diplomas & Training</Form.Label>
+                <Form.Label>Diplômes & Formation</Form.Label>
                 {renderDynamicArrayField('diplomas_and_training', diplomas, setValue, errors)}
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Specializations</Form.Label>
+                <Form.Label>Spécialisations</Form.Label>
                 {renderDynamicArrayField('specializations', specializations, setValue, errors)}
               </Form.Group>
             </Col>
@@ -842,7 +836,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Calendar Links (comma separated URLs)</Form.Label>
+                <Form.Label>Liens du calendrier (URL séparées par des virgules)</Form.Label>
                 <Controller
                   control={control}
                   name="calendar_links"
@@ -869,8 +863,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Branches</Form.Label>
-                <div style={{ display: 'flex', gap: '5rem', flexWrap: 'wrap' }}>
+                <Form.Label>Succursales</Form.Label>
+                <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                   {BRANCHES.map((branch) => (
                     <Form.Check
                       key={branch.id}
@@ -898,7 +892,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Primary Branch</Form.Label>
+                <Form.Label>Branche principale</Form.Label>
                 <Controller
                   control={control}
                   name="primary_branch_id"
@@ -930,7 +924,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Created By Role</Form.Label>
+                <Form.Label>Créé par rôle</Form.Label>
                 <Form.Control
                   {...register('created_by_role')}
                   isInvalid={!!errors.created_by_role}
@@ -944,7 +938,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Website URL</Form.Label>
+                <Form.Label>URL du site Web</Form.Label>
                 <Form.Control {...register('website')} isInvalid={!!errors.website} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.website?.message === 'string' ? errors.website.message : ''}
@@ -955,7 +949,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Photo URL</Form.Label>
+                <Form.Label>URL des photos</Form.Label>
                 <Form.Control {...register('photo')} isInvalid={!!errors.photo} />
                 <Form.Control.Feedback type="invalid">
                   {typeof errors.photo?.message === 'string' ? errors.photo.message : ''}
@@ -967,7 +961,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           {/* FAQ */}
           <Card className="mb-4">
             <CardHeader>
-              <CardTitle as="h6">Frequently Asked Questions</CardTitle>
+              <CardTitle as="h6">Questions fréquemment posées</CardTitle>
             </CardHeader>
             <CardBody>
               {Object.entries(faqs).map(([question, answer], idx) => (
@@ -1009,7 +1003,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                         })
                       }
                     >
-                      Remove
+                      Retirer
                     </Button>
                   </Col>
                 </Row>
@@ -1021,7 +1015,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                 }
                 className="mt-2"
               >
-                Add FAQ
+                Ajouter une FAQ
               </Button>
               <Form.Text className="text-danger">
                 {typeof errors.frequently_asked_questions?.message === 'string'
@@ -1035,15 +1029,15 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Role</Form.Label>
+                <Form.Label>Rôle</Form.Label>
                 <Controller
                   control={control}
                   name="role"
                   render={({ field }) => (
                     <Form.Control as="select" className="form-select" {...field}>
-                      <option value="super_admin">Super Admin</option>
-                      <option value="admin">Admin</option>
-                      <option value="staff">Staff</option>
+                      <option value="super_admin">Super administrateur</option>
+                      <option value="admin">Administrateur</option>
+                      <option value="staff">Personnel</option>
                     </Form.Control>
                   )}
                 />
@@ -1054,7 +1048,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Status</Form.Label>
+                <Form.Label>Statut</Form.Label>
                 <Controller
                   control={control}
                   name="status"
@@ -1076,27 +1070,11 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
       <Row className="justify-content-end">
         <Col xs={12} md={3}>
           <Button type="submit" variant="primary" disabled={isSubmitting} className="w-100 mb-3">
-            Submit
+            Sauvegarder
           </Button>
           {isSubmitting && <Spinner animation="border" variant="primary" className="ms-2" />}
         </Col>
       </Row>
-      {Object.keys(errors).length > 0 && (
-        <div className="alert alert-danger mt-3">
-          <ul>
-            {Object.entries(errors).map(([k, v]) => (
-              <li key={k}>
-                {Array.isArray(v)
-                  ? v
-                      .map((e: any) => e.message)
-                      .filter(Boolean)
-                      .join(', ')
-                  : (v as any)?.message}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
     </form>
   );
 };

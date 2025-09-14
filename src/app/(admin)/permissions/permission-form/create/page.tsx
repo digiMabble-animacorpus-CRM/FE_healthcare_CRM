@@ -11,7 +11,6 @@ const CreatePermissionPage = () => {
   const handleCreate = async (data: Omit<PermissionType, '_id'>) => {
     try {
       // 🔧 Replace this with your real API integration
-      console.log('Creating Permission...', data);
       // await createPermissionAPI(data);
 
       toast.success('Permission created successfully!');

@@ -108,7 +108,7 @@ const FAQs = () => {
               <div className="icons-center gap-1">
                 <Button variant="success" type="button" className="mt-2">
                   <IconifyIcon icon="bx:envelope" className="me-2" />
-                  Email us your question
+                  E-mail us your question
                 </Button>
                 <Button variant="info" type="button" className="mt-2 ms-1">
                   <IconifyIcon icon="bxl:twitter" className="me-2" />

@@ -9,7 +9,7 @@ import { encryptAES } from '@/utils/encryption';
 
 export const signupSchema = yup.object({
   name: yup.string().required('Name is required'),
-  email: yup.string().email().required('Email is required'),
+  email: yup.string().email().required('E-mail is required'),
   password: yup.string().required('Password is required'),
 });
 
@@ -21,7 +21,6 @@ const useSignup = () => {
   const [loading, setLoading] = useState(false);
 
   const signup = async (formData: SignupFormFields) => {
-    console.log(' Signup data:', formData);
     setLoading(true);
 
     // Encrypt the payload
@@ -38,7 +37,6 @@ const useSignup = () => {
       });
 
       const data = await res.json();
-      console.log('Response:', data);
 
       if (res.ok && data.status) {
         localStorage.setItem('email_id', formData.email);

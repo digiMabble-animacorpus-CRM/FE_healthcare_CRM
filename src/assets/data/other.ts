@@ -82,12 +82,7 @@ export const therapistData: TherapistType[] = [
     languages: [], // ✅ Replace with IDs if using numeric language codes
     faq: 'Les nouveaux patients sont-ils acceptés ? Oui, Hajiba Bounouch accepte de nouveaux patients...',
     paymentMethods: [], // ✅ Empty array until payment methods are defined
-    specializations: [
-      'Psychologue clinicienne',
-      'Psychothérapeute systémique',
-      'Thérapie familiale et de couple',
-      'Numéro INAMI 70101702000',
-    ], // ✅ Converted to array
+    specializations: [], // ✅ Converted to array
   },
 ];
 
@@ -924,7 +919,7 @@ export const pricingData: PricingType[] = [
       '50 GB Storage',
       '900 GB Bandwidth',
       '1 Domain',
-      'Email Support',
+      'E-mail Support',
       '24x7 Support',
       '5 User',
     ],
@@ -939,7 +934,7 @@ export const pricingData: PricingType[] = [
       '500 GB Storage',
       '2.5 TB Bandwidth',
       '5 Domain',
-      'Email Support',
+      'E-mail Support',
       '24x7 Support',
       '10 User',
     ],
@@ -952,7 +947,7 @@ export const pricingData: PricingType[] = [
       '2 TB Storage',
       'Unlimited Bandwidth',
       '50 Domain',
-      'Email Support',
+      'E-mail Support',
       '24x7 Support',
       'Unlimited User',
     ],
