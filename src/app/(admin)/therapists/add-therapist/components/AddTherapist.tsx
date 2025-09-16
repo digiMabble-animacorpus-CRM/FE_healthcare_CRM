@@ -520,12 +520,15 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   };
 
   return (
-    <Card className="p-3 shadow-sm rounded">
-      <CardBody>
-        <h5 className="mb-4">{therapistId ? 'Modifier le thérapeute' : 'Ajouter un thérapeute'}</h5>
-        <Form
-          onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}
-        >
+    <Form onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}>
+      <Card className="p-3 shadow-sm rounded">
+        <CardBody>
+          <h5 className="mb-4">
+            {therapistId ? 'Modifier le thérapeute' : 'Ajouter un thérapeute'}
+          </h5>
+          {/* <Form
+          onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))} */}
+          {/* > */}
           {/* First name / Last name */}
           <Row>
             <Col md={6}>
@@ -855,12 +858,27 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             <Form.Control.Feedback type="invalid">{errors.faq?.message}</Form.Control.Feedback>
           </Form.Group>
 
-          <Button variant="primary" type="submit">
+          {/* Submit button fixed bottom */}
+          {/* <div
+            className="d-flex justify-content-end p-3 bg-white shadow"
+            style={{ position: 'sticky', bottom: 0, zIndex: 1000 }}
+          >
+            <Button variant="primary" type="submit" className="px-4 py-2 rounded-2">
+              {therapistId ? 'Mettre à jour le thérapeute' : 'Enregistrer le thérapeute'}
+            </Button>
+          </div>
+        </Form> */}
+        </CardBody>
+      </Card>
+
+      <Row>
+        <Col className="d-flex justify-content-end">
+          <Button variant="primary" type="submit" className="px-4 py-2">
             {therapistId ? 'Mettre à jour le thérapeute' : 'Enregistrer le thérapeute'}
           </Button>
-        </Form>
-      </CardBody>
-    </Card>
+        </Col>
+      </Row>
+    </Form>
   );
 };
 
