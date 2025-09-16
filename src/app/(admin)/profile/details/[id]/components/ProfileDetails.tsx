@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Card, CardBody, Col, Row } from 'react-bootstrap';
+import { Card, CardBody, Col, Row, Table } from 'react-bootstrap';
 
 type ProfileDetailsProps = {
   team_id: string;
@@ -36,9 +36,21 @@ type ProfileDetailsProps = {
   photo?: string;
 };
 
+const daysOfWeek = [
+  'lundi',
+  'mardi',
+  'mercredi',
+  'jeudi',
+  'vendredi',
+  'samedi',
+  'dimanche',
+];
+
 const ProfileDetails = () => {
   const router = useRouter();
-  const [profileData, setProfileData] = useState<ProfileDetailsProps | null>(null);
+  const [profileData, setProfileData] = useState<ProfileDetailsProps | null>(
+    null
+  );
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -56,7 +68,6 @@ const ProfileDetails = () => {
           },
         });
 
-        // Extract nested team object
         const apiProfile = res.data?.user?.team;
         if (!apiProfile) {
           console.error('No team object in API response');
@@ -121,6 +132,95 @@ const ProfileDetails = () => {
     schedule,
     photo,
   } = profileData;
+
+ 
+  const renderSchedule = (text: string) => {
+    const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+
+    const phoneMatch = text.match(/(\d{3,4}\/\d{2}\.\d{2}\.\d{2})/);
+    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
+
+
+    const branchPairs: { branch: string; address: string }[] = [];
+    for (let i = 0; i < lines.length - 1; i++) {
+      let current = lines[i];
+      const next = lines[i + 1];
+
+      if (
+        /Gembloux|Namur|Anima Corpus|Soul Body/i.test(current) &&
+        /\d{4}/.test(next) 
+      ) {
+  
+        current = current
+          .replace(/^.*?(Anima Corpus.*|Soul Body.*|Gembloux.*)$/i, '$1')
+          .trim();
+
+        branchPairs.push({ branch: current, address: next });
+        i++; 
+      }
+    }
+
+    return (
+      <div>
+        
+        <div className="mb-3">
+          {daysOfWeek.map((day) => {
+            const regex = new RegExp(day, 'i');
+            if (regex.test(text)) {
+              return (
+                <span
+                  key={day}
+                  className="badge bg-primary me-2 mb-2"
+                  style={{ fontSize: '0.85rem' }}
+                >
+                  {day.charAt(0).toUpperCase() + day.slice(1)}
+                </span>
+              );
+            }
+            return null;
+          })}
+        </div>
+
+        
+        <div className="mb-3">
+          {phoneMatch && (
+            <p>
+              <strong>Téléphone:</strong> {phoneMatch[0]}
+            </p>
+          )}
+          {emailMatch && (
+            <p>
+              <strong>Email:</strong> {emailMatch[0]}
+            </p>
+          )}
+        </div>
+
+       
+        {branchPairs.length > 0 && (
+          <div>
+            <h6 className="fw-semibold">Nos Cabinets :</h6>
+            <Table striped bordered hover responsive>
+              <thead>
+                <tr>
+                  <th>Branch</th>
+                  <th>Adresse</th>
+                </tr>
+              </thead>
+              <tbody>
+                {branchPairs.map((b, idx) => (
+                  <tr key={idx}>
+                    <td>{b.branch}</td>
+                    <td>{b.address}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div>
       {/* Profile Header */}
@@ -196,23 +296,7 @@ const ProfileDetails = () => {
             </Col>
             <Col lg={6}>
               <p className="fw-semibold mb-1">Calendrier:</p>
-              {schedule ? (
-                <div>
-                  {schedule.text && <p>{schedule.text}</p>}
-                  <ul style={{ paddingLeft: '1rem' }}>
-                    {Object.entries(schedule)
-                      .filter(([key]) => key !== 'text')
-                      .map(([day, timing], idx) => (
-                        <li key={idx}>
-                          <strong>{day.charAt(0).toUpperCase() + day.slice(1)}:</strong> {timing}
-                        </li>
-                      ))}
-                  </ul>
-                </div>
-              ) : (
-                <span>-</span>
-              )}
-              {/* <p>{schedule?.text || '-'}</p> */}
+              {schedule?.text ? renderSchedule(schedule.text) : <span>-</span>}
             </Col>
           </Row>
 
