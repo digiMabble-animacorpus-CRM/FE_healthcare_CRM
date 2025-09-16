@@ -309,14 +309,14 @@ const TeamsListPage = () => {
                                   <IconifyIcon icon="solar:eye-broken" />
                                 </Button>
                                 <Button
-                                  variant="light"
+                                  variant="soft-primary"
                                   size="sm"
                                   onClick={() => handleEditClick(item.team_id.toString())}
                                 >
                                   <IconifyIcon icon="solar:pen-2-broken" />
                                 </Button>
                                 <Button
-                                  variant="danger"
+                                  variant="soft-danger"
                                   size="sm"
                                   onClick={() => handleDeleteClick(item.team_id.toString())}
                                 >

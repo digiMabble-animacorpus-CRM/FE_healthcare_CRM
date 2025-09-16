@@ -266,14 +266,14 @@ const PatientsListPage = () => {
                                   <IconifyIcon icon="solar:eye-broken" />
                                 </Button>
                                 <Button
-                                  variant="secondary"
+                                  variant="soft-primary"
                                   size="sm"
                                   onClick={() => handleEditClick(item.id)}
                                 >
                                   <IconifyIcon icon="solar:pen-2-broken" />
                                 </Button>
                                 <Button
-                                  variant="danger"
+                                  variant="soft-danger"
                                   size="sm"
                                   onClick={() => handleDeleteClick(item.id)}
                                 >

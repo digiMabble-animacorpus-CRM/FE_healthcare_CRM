@@ -374,7 +374,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       <div className="mb-3 rounded">
         <Row className="justify-content-end g-2 mt-2">
           <Col lg={2}>
-            <Button variant="outline-primary" type="submit" className="w-100">
+            <Button variant="primary" type="submit" className="w-100">
               {isEditMode ? 'Mise à jour' : 'Créer'} Patient
             </Button>
           </Col>
