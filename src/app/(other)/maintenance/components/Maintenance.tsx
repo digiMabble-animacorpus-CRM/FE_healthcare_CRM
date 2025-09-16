@@ -1,6 +1,6 @@
 'use client';
-import logoDark from '@/assets/images/logo-dark.png';
-import logoLight from '@/assets/images/logo-light.png';
+import logoDark from '@/assets/images/logo-light2.png';
+import LogoLight from '@/assets/images/logo-light2.png';
 import maintenanceImg from '@/assets/images/maintenance.svg';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -31,10 +31,10 @@ const Maintenance = () => {
                     <div className="p-4">
                       <div className="mx-auto mb-5 text-center auth-logo">
                         <Link href="/dashboards/agent" className="logo-dark">
-                          <Image src={logoDark} height={32} alt="logo dark" />
+                          <Image src={logoDark} height={150} alt="logo dark" />
                         </Link>
                         <Link href="/dashboards/agent" className="logo-light">
-                          <Image src={logoLight} height={28} alt="logo light" />
+                          <Image src={LogoLight} height={150} alt="logo light" />
                         </Link>
                       </div>
                       <h2 className="fw-bold text-center lh-base">
