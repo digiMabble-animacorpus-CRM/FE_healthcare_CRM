@@ -93,6 +93,8 @@ export type PatientType = {
   mutualityregistrationnumber?: string;
   zipcode?: string;
   branch?: string;
+   therapistId?: number | null;
+  therapist?: TherapistShortType | null;
 };
 
 // src/types/data.ts
@@ -732,3 +734,27 @@ export interface DepartmentType {
 }
 
 // export { BranchWithAvailability };
+// types/data.ts
+
+export type TherapistShortType = {
+  therapistId: number | null;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string | null;
+  imageUrl: string | null;
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe?: string | null;
+  degreesTraining?: string | null;
+  inamiNumber?: string | null;
+  paymentMethods?: string | null;
+  faq?: string | null;
+  departmentId?: number | null;
+  //  departmentName?: string; 
+  availability?: any[];
+  isDelete?: boolean;
+  deletedAt?: string | null;
+};
+
+
