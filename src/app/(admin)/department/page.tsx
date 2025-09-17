@@ -54,6 +54,7 @@ const DepartmentListPage = () => {
           _id: dept.id,
         })),
       );
+      console.log('response.data:', response.data);
       setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
       // fallback mock data
