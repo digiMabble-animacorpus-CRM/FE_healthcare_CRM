@@ -26,6 +26,13 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri:message-2-line',
     url: '/chat',
   },
+
+  {
+    key: 'tickets',
+    label: 'Tickets',
+    icon: 'ri:ticket-2-line',
+    url: '/tickets',
+  },
   {
     key: 'therapists',
     label: 'Thérapeute',
