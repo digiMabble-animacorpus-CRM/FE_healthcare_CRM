@@ -96,12 +96,31 @@ const TeamDetails = ({
       : (schedule as Record<string, string>) || {};
 
   // Convert frequently asked questions from object to array if needed
-  const faqArray: FAQItem[] = Array.isArray(frequently_asked_questions)
-    ? frequently_asked_questions
-    : Object.entries(frequently_asked_questions || {}).map(([question, answer]) => ({
-        question,
-        answer,
-      }));
+  // Convert frequently asked questions into array
+
+  let faqArray: FAQItem[] = [];
+
+  if (Array.isArray(frequently_asked_questions)) {
+    // Case 1: Already array of {question, answer}
+    faqArray = frequently_asked_questions as FAQItem[];
+  } else if (
+    typeof frequently_asked_questions === 'object' &&
+    frequently_asked_questions !== null
+  ) {
+    // Case 2: Object { question: answer }
+    faqArray = Object.entries(frequently_asked_questions).map(([question, answer]) => ({
+      question,
+      answer: String(answer),
+    }));
+  } else if (typeof frequently_asked_questions === 'string') {
+    // Case 3: String with line breaks
+    faqArray = frequently_asked_questions.split(/\n/).reduce((acc: FAQItem[], line, idx, arr) => {
+      if (idx % 2 === 0 && line.trim() !== '') {
+        acc.push({ question: line.trim(), answer: arr[idx + 1]?.trim() || '' });
+      }
+      return acc;
+    }, []);
+  }
 
   return (
     <div>
@@ -244,7 +263,6 @@ const TeamDetails = ({
         })}
       </div>
 
-
       {/* Languages Spoken */}
       {languages_spoken.length > 0 && (
         <Card className="mb-4">
@@ -375,27 +393,20 @@ const TeamDetails = ({
         </CardBody>
       </Card>
 
-      {/* Frequently Asked Questions */}
       {faqArray.length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Questions fréquemment posées</h4>
-            <Table striped bordered>
-              <thead>
-                <tr>
-                  <th>Question</th>
-                  <th>Répondre</th>
-                </tr>
-              </thead>
-              <tbody>
-                {faqArray.map(({ question, answer }, idx) => (
-                  <tr key={idx}>
-                    <td>{question}</td>
-                    <td>{answer}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <h4>Questions fréquemment posées:</h4>
+            <ol style={{ paddingLeft: '1.2rem' }}>
+              {faqArray.map(({ question, answer }, idx) => (
+                <li key={idx} style={{ marginBottom: '1rem' }}>
+                  <div>
+                    <strong>{question}</strong>
+                  </div>
+                  <div>{answer}</div>
+                </li>
+              ))}
+            </ol>
           </CardBody>
         </Card>
       )}
