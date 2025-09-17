@@ -415,7 +415,7 @@ const TicketPage = () => {
                 </Col>
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Âge de l'enfant</Form.Label>
+                    <Form.Label>Âge de l enfant</Form.Label>
                     <Form.Control
                       type="number"
                       value={editTicket.child_age || 0}

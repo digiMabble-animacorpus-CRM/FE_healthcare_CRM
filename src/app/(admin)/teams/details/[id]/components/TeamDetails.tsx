@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { Badge, Button, Card, CardBody, Col, Collapse, Row, Table } from 'react-bootstrap';
 import { FaEnvelope, FaGlobe, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
-type FAQItem = { question: string; answer: string };
-
 const BRANCHES = [
   { id: 1, name: 'Gembloux - Orneau' },
   { id: 2, name: 'Gembloux - Tout Vent' },
   { id: 3, name: 'Namur' },
 ];
+
+type FAQItem = { question: string; answer: string };
 
 type TeamDetailsCardProps = {
   last_name: string;
@@ -33,7 +33,7 @@ type TeamDetailsCardProps = {
   diplomas_and_training: string[];
   specializations: string[];
   website: string;
-  frequently_asked_questions: Record<string, string> | FAQItem[];
+  frequently_asked_questions: string | Record<string, string> | FAQItem[];
   calendar_links: string[];
   photo: string;
   role?: string;
@@ -75,51 +75,42 @@ const TeamDetails = ({
   const [consultationOpen, setConsultationOpen] = useState(true);
   const [specificAudienceOpen, setSpecificAudienceOpen] = useState(true);
 
-  // Convert photo URL or fallback
   const photoUrl = photo?.match(/^https?:\/\//) ? photo : '/placeholder-avatar.jpg';
 
-  // Normalize schedule to object form if passed as { text: ... }
   const scheduleObj: Record<string, string> =
     typeof schedule === 'object' && 'text' in schedule && schedule.text
       ? schedule.text
           .split('\n')
           .map((line) => line.trim())
           .filter((line) => line.includes(':'))
-          .reduce(
-            (acc, line) => {
-              const [day, time] = line.split(':');
-              acc[day.trim()] = time.trim();
-              return acc;
-            },
-            {} as Record<string, string>,
-          )
+          .reduce((acc, line) => {
+            const [day, time] = line.split(':');
+            acc[day.trim()] = time.trim();
+            return acc;
+          }, {} as Record<string, string>)
       : (schedule as Record<string, string>) || {};
 
-  // Convert frequently asked questions from object to array if needed
-  // Convert frequently asked questions into array
-
+  // ✅ Normalize FAQ input
   let faqArray: FAQItem[] = [];
-
   if (Array.isArray(frequently_asked_questions)) {
-    // Case 1: Already array of {question, answer}
-    faqArray = frequently_asked_questions as FAQItem[];
+    faqArray = frequently_asked_questions;
   } else if (
     typeof frequently_asked_questions === 'object' &&
     frequently_asked_questions !== null
   ) {
-    // Case 2: Object { question: answer }
     faqArray = Object.entries(frequently_asked_questions).map(([question, answer]) => ({
       question,
       answer: String(answer),
     }));
   } else if (typeof frequently_asked_questions === 'string') {
-    // Case 3: String with line breaks
-    faqArray = frequently_asked_questions.split(/\n/).reduce((acc: FAQItem[], line, idx, arr) => {
-      if (idx % 2 === 0 && line.trim() !== '') {
-        acc.push({ question: line.trim(), answer: arr[idx + 1]?.trim() || '' });
-      }
-      return acc;
-    }, []);
+    faqArray = frequently_asked_questions
+      .split(/\n/)
+      .reduce((acc: FAQItem[], line: string, idx: number, arr: string[]) => {
+        if (idx % 2 === 0 && line.trim() !== '') {
+          acc.push({ question: line.trim(), answer: arr[idx + 1]?.trim() || '' });
+        }
+        return acc;
+      }, []);
   }
 
   return (
@@ -132,7 +123,7 @@ const TeamDetails = ({
         </Button>
       </div>
 
-      {/* Profile / Avatar and Basic Info */}
+      {/* Profile */}
       <Card className="mb-4 shadow-sm" style={{ backgroundColor: '#f8f9fa' }}>
         <CardBody>
           <Row className="align-items-center">
@@ -181,13 +172,8 @@ const TeamDetails = ({
                 )}
                 {website && (
                   <div className="d-flex align-items-center gap-2">
-                    <FaGlobe className="text-info" />{' '}
-                    <a
-                      href={website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-decoration-none"
-                    >
+                    <FaGlobe className="text-info" />
+                    <a href={website} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
                       {website}
                     </a>
                   </div>
@@ -393,6 +379,7 @@ const TeamDetails = ({
         </CardBody>
       </Card>
 
+      {/* FAQ */}
       {faqArray.length > 0 && (
         <Card className="mb-4">
           <CardBody>
@@ -400,9 +387,7 @@ const TeamDetails = ({
             <ol style={{ paddingLeft: '1.2rem' }}>
               {faqArray.map(({ question, answer }, idx) => (
                 <li key={idx} style={{ marginBottom: '1rem' }}>
-                  <div>
-                    <strong>{question}</strong>
-                  </div>
+                  <strong>{question}</strong>
                   <div>{answer}</div>
                 </li>
               ))}
@@ -415,3 +400,4 @@ const TeamDetails = ({
 };
 
 export default TeamDetails;
+
