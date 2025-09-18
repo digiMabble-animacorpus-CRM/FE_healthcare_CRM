@@ -1,9 +1,8 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -15,15 +14,16 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
+import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-import type { BranchType, LanguageType, PatientType } from '@/types/data';
-import TextFormInput from '@/components/from/TextFormInput';
-import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
-import { getAllLanguages } from '@/helpers/languages';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import TextFormInput from '@/components/from/TextFormInput';
 import { getAllBranch } from '@/helpers/branch';
+import { getAllLanguages } from '@/helpers/languages';
 import { createPatient, getPatientById, updatePatient } from '@/helpers/patient';
+import type { BranchType, LanguageType, PatientType } from '@/types/data';
 
 interface Props {
   params?: { id?: string };
@@ -45,30 +45,22 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     lastname: yup.string().required('Veuillez entrer votre nom de famille'),
     middlename: yup.string(),
     emails: yup.string().email('E-mail invalide').required('Veuillez saisir votre adresse e-mail'),
-    phones: yup
-      .array()
-      .of(yup.string().matches(/^\d{10}$/, 'Entrez un numéro de téléphone valide'))
-      .min(1, 'Veuillez fournir au moins un numéro de téléphone'),
+    phones: yup.array().of(yup.string().optional()),
 
     birthdate: yup.string().required('Veuillez saisir votre date de naissance'),
-    street: yup.string().required('Veuillez entrer l adresse'),
-    note: yup.string().required('Veuillez saisir une description'),
-    zipcode: yup.string().required('Veuillez entrer le code postal'),
-    legalgender: yup.string().required('Veuillez sélectionner le sexe'),
-    language: yup.string().required('Veuillez sélectionner la langue'),
-    city: yup.string().required('Veuillez sélectionner la ville'),
-    country: yup.string().required('Veuillez sélectionner un pays'),
+    street: yup.string().optional(),
+    note: yup.string().optional(),
+    zipcode: yup.string().optional(),
+    legalgender: yup.string().optional(),
+    language: yup.string().optional(),
+    city: yup.string().optional(),
+    country: yup.string().optional(),
     ssin: yup.string(),
-    status: yup.string().required('Veuillez sélectionner le statut'),
-    mutualitynumber: yup.string().required('Veuillez saisir le numéro de mutualité'),
-    mutualityregistrationnumber: yup
-      .string()
-      .required('Veuillez saisir le numéro de carte de résident'),
+    status: yup.string().optional(),
+    mutualitynumber: yup.string().optional(),
+    mutualityregistrationnumber: yup.string().optional(),
     branch: yup.string(),
-    tags: yup
-      .array()
-      .of(yup.string().required())
-      .min(1, 'Veuillez sélectionner au moins une balise'),
+    tags: yup.array().of(yup.string().optional()),
   })
   .required()
   .noUnknown(true);
@@ -248,9 +240,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.legalgender && (
-                <small className="text-danger">{errors.legalgender.message}</small>
-              )}
             </Col>
 
             {/* Language */}
@@ -272,7 +261,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.language && <small className="text-danger">{errors.language.message}</small>}
             </Col>
 
             <Col lg={6} className="mb-3">
@@ -313,7 +301,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                 placeholder="Entrez la ville"
                 type="text"
               />
-              {errors.city && <small className="text-danger">{errors.city.message}</small>}
             </Col>
 
             {/* Country */}
@@ -325,7 +312,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                 placeholder="Entrez le pays"
                 type="text"
               />
-              {errors.country && <small className="text-danger">{errors.country.message}</small>}
             </Col>
 
             <Col lg={6} className="mb-3">
@@ -348,7 +334,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.status && <small className="text-danger">{errors.status.message}</small>}
             </Col>
 
             <Col lg={6} className="mb-3">

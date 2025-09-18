@@ -6,10 +6,10 @@ export const branches: BranchType[] = [
     _id: 'b1',
     name: 'Gembloux - Orneau',
     code: 'ORN',
-    email: 'orneau@gembloux.com',
-    phoneNumber: '+32 123456789',
+    email: 'gembloux@animacorpus.be',
+    phoneNumber: '0492/40.18.77',
     address: {
-      street: '123 Orneau Street',
+      street: 'Place de l Orneau, 15',
       city: 'Gembloux',
       zip_code: '5030',
       country: 'Belgium',
@@ -24,10 +24,10 @@ export const branches: BranchType[] = [
     _id: 'b2',
     name: 'Gembloux - Tout Vent',
     code: 'TTV',
-    email: 'toutvent@gembloux.com',
-    phoneNumber: '+32 987654321',
+    email: 'gembloux@animacorpus.be',
+    phoneNumber: '0492/40.18.77',
     address: {
-      street: '456 Tout Vent Avenue',
+      street: 'Chaussée de namur, 47',
       city: 'Gembloux',
       zip_code: '5030',
       country: 'Belgium',
@@ -43,14 +43,14 @@ export const branches: BranchType[] = [
     createdAt: '2025-01-10T14:00:00.000Z',
   },
   {
-    branch_id: 3, // ✅ Added
+    branch_id: 5, // ✅ Added
     _id: 'b3',
     name: 'Namur',
     code: 'NAM',
     email: 'namur@animacorpus.com',
-    phoneNumber: '+32 112233445',
+    phoneNumber: '0492/40.18.77',
     address: {
-      street: '789 Namur Blvd',
+      street: 'Av. Cardinal Mercier, 46',
       city: 'Namur',
       zip_code: '5000',
       country: 'Belgium',

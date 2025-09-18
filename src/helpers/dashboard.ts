@@ -241,13 +241,10 @@ export interface BranchSummaryResponse {
 export const getBranchSummary = async () => {
   try {
     const token = localStorage.getItem('access_token');
-    console.log('Access token:', token);
     if (!token) {
       console.warn('No access token found.');
       return null;
     }
-
-    console.log(`Fetching branch summary from: ${API_BASE_PATH}/dashboard/branches/summary`);
     const response = await fetch(`${API_BASE_PATH}/dashboard/branches/summary`, {
       method: 'GET',
       headers: {
@@ -256,7 +253,6 @@ export const getBranchSummary = async () => {
       },
     });
 
-    console.log('Fetch response status:', response.status);
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Failed to fetch branch summary:', response.status, errorText);
@@ -264,14 +260,12 @@ export const getBranchSummary = async () => {
     }
 
     const result = await response.json();
-    console.log('Response JSON:', result);
 
     const dataArray = Array.isArray(result)
       ? result
       : Array.isArray(result.data)
         ? result.data
         : [];
-    console.log('Data array length:', dataArray.length);
 
     if (!dataArray.length) {
       console.warn('Branch summary API returned empty data');
@@ -286,8 +280,6 @@ export const getBranchSummary = async () => {
       appointmentsMonth: Number(item.appointments_count) ?? 0,
       revenueMonth: 0,
     }));
-
-    console.log('Mapped summaries:', summaries);
 
     return { summaries };
   } catch (error) {

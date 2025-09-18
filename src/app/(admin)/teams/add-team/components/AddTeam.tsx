@@ -33,7 +33,7 @@ const PAYMENT_METHODS = ['Cash', 'Credit Card', 'Bank Transfer'];
 const BRANCHES = [
   { id: 1, name: 'Gembloux - Orneau' },
   { id: 2, name: 'Gembloux - Tout Vent' },
-  { id: 3, name: 'Namur' },
+  { id: 5, name: 'Namur' },
 ];
 
 function renderPermissions(
@@ -92,7 +92,7 @@ function renderDynamicArrayField<K extends 'diplomas_and_training' | 'specializa
   return (
     <>
       {items?.map((value, idx) => (
-        <Row key={idx} className="mb-2">
+        <Row key={idx} className="m-2">
           <Col>
             <Form.Control
               value={value}
@@ -125,7 +125,7 @@ function renderDynamicArrayField<K extends 'diplomas_and_training' | 'specializa
       <Button
         variant="outline-primary"
         onClick={() => setValue(fieldName, [...items, ''])}
-        className="mb-2"
+        className="m-2"
       >
         Ajouter {fieldName === 'diplomas_and_training' ? 'Diplôme/Formation' : 'Spécialisation'}
       </Button>
@@ -142,158 +142,136 @@ function renderDynamicArrayField<K extends 'diplomas_and_training' | 'specializa
 }
 
 interface TeamMemberFormInputs {
-  last_name: string;
-  first_name: string;
-  full_name: string;
-  job_1: string;
-  specific_audience: string;
-  specialization_1: string;
+  last_name?: string;
+  first_name?: string;
+  full_name?: string;
+  job_1?: string;
+  specific_audience?: string;
+  specialization_1?: string;
   job_2?: string | null;
   job_3?: string | null;
   job_4?: string | null;
-  who_am_i: string;
-  consultations: string;
-  office_address: string;
-  contact_email: string;
-  contact_phone: string;
-  schedule: Record<string, string>;
-  about: string;
-  languages_spoken: string[];
-  payment_methods: string[];
-  diplomas_and_training: string[];
-  specializations: string[];
-  website: string;
-  frequently_asked_questions: Record<string, any>;
-  calendar_links: string[];
-  photo: string;
-  role: 'super_admin' | 'admin' | 'staff';
-  status: 'active' | 'inactive';
-  branches: number[];
-  primary_branch_id: number;
-  permissions: Record<string, any>;
-  created_by_role: string;
+  who_am_i?: string;
+  consultations?: string;
+  office_address?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  schedule?: Record<string, string>; // e.g., { monday: "9-5", tuesday: "" }
+  about?: string;
+  languages_spoken?: any; // ⬅ string array for languages
+  payment_methods?: any; // ⬅ string array for payment methods
+  diplomas_and_training?: any; // ⬅ string array for diplomas/training
+  specializations?: any; // ⬅ string array for specializations
+  website?: string;
+  frequently_asked_questions?: Record<string, string>; // ⬅ key-value pairs of Q&A
+  calendar_links?: any; // ⬅ string array for calendar URLs
+  photo?: string;
+  role?: 'super_admin' | 'admin' | 'staff';
+  status?: 'active' | 'inactive';
+  branches?: number[]; // ⬅ branch IDs
+  primary_branch_id?: number;
+  permissions?: Record<string, string[]>; // ⬅ e.g., { module: ['read','write'] }
+  created_by_role?: string;
 }
 
 const schema: yup.ObjectSchema<TeamMemberFormInputs> = yup.object({
   last_name: yup.string().required('Le nom de famille est obligatoire'),
   first_name: yup.string().required('Le prénom est obligatoire'),
   full_name: yup.string().required(),
-  job_1: yup.string().required('Un emploi principal est requis'),
-  specific_audience: yup.string().required('Le public est requis'),
-  specialization_1: yup.string().required('Une spécialisation primaire est requise'),
+  job_1: yup.string().optional(),
+  specific_audience: yup.string().optional(),
+  specialization_1: yup.string().optional(),
   job_2: yup.string().optional(),
   job_3: yup.string().optional(),
   job_4: yup.string().optional(),
-  who_am_i: yup.string().required('La biographie est requise'),
-  consultations: yup.string().required('Des consultations sont nécessaires'),
-  office_address: yup.string().required('L adresse du bureau est requise'),
+  who_am_i: yup.string().optional(),
+  consultations: yup.string().optional(),
+  office_address: yup.string().optional(),
   contact_email: yup
     .string()
     .email('Entrez une adresse e-mail valide')
     .required('L adresse e-mail est obligatoire'),
-  contact_phone: yup.string().required('Le téléphone est requis'),
-  schedule: yup
-    .object()
-    .test(
-      'schedule-days',
-      'Veuillez saisir un emploi du temps pour au moins une journée',
-      (val) =>
-        val &&
-        typeof val === 'object' &&
-        Object.values(val).some(
-          (someValue) => typeof someValue === 'string' && someValue.trim() !== '',
-        ),
-    )
-    .required('Un horaire est requis'),
-  about: yup.string().required('À propos est requis'),
-  languages_spoken: yup
-    .array()
-    .of(yup.string().required('Entrez une langue'))
-    .min(1, 'Veuillez sélectionner au moins une langue')
-    .default([]),
-  payment_methods: yup
-    .array()
-    .of(yup.string().required('Entrez un mode de paiement'))
-    .min(1, 'Veuillez sélectionner au moins un mode de paiement')
-    .default([]),
-  diplomas_and_training: yup
-    .array()
-    .of(yup.string().required('Saisir le diplôme/la formation'))
-    .min(1, 'Ajouter au moins un diplôme/une formation')
-    .default([]),
-  specializations: yup
-    .array()
-    .of(yup.string().required('Entrez la spécialisation'))
-    .min(1, 'Ajouter au moins une spécialisation')
-    .default([]),
-  website: yup.string().url('Entrez une URL de site Web valide').required('Le site Web est requis'),
-  frequently_asked_questions: yup.object().required(),
-  calendar_links: yup
-    .array()
-    .of(yup.string().required('Entrez un lien de calendrier').url('Entrez une URL valide'))
-    .min(1, 'Ajouter au moins un lien de calendrier')
-    .default([]),
-  photo: yup.string().url('Entrez une URL de photo valide').required('Une photo est requise'),
+  contact_phone: yup.string().optional(),
+  schedule: yup.object().optional(),
+  about: yup.string().optional(),
+  languages_spoken: yup.array().of(yup.string()).optional(),
+  payment_methods: yup.array().of(yup.string()).default([]),
+  diplomas_and_training: yup.array().of(yup.string()).default([]),
+  specializations: yup.array().of(yup.string()).default([]),
+  website: yup.string().optional(),
+  frequently_asked_questions: yup.object().optional(),
+  calendar_links: yup.array().of(yup.string()).default([]),
+  photo: yup.string().optional(),
   role: yup
     .mixed<'super_admin' | 'admin' | 'staff'>()
     .oneOf(['super_admin', 'admin', 'staff'])
-    .required('Le rôle est requis'),
-  status: yup
-    .mixed<'active' | 'inactive'>()
-    .oneOf(['active', 'inactive'])
-    .required('Le statut est requis'),
+    .optional(),
+  status: yup.mixed<'active' | 'inactive'>().oneOf(['active', 'inactive']).optional(),
   branches: yup
     .array()
     .of(yup.number().required())
     .min(1, 'Sélectionnez au moins une branche')
     .required()
     .default([]),
-  primary_branch_id: yup.number().required('Sélectionnez une succursale principale'),
-  permissions: yup.object().required(),
-  created_by_role: yup.string().required('Rôle de créateur requis'),
+  primary_branch_id: yup.number().optional(),
+  permissions: yup.object().optional(),
+  created_by_role: yup.string().optional(),
 });
 
+function trimValue(v: any) {
+  return typeof v === 'string' ? v.trim() : v;
+}
+
 function toCreatePayload(values: any): any {
-  const scheduleText = Object.entries(values.schedule)
+  const scheduleText = Object.entries(values.schedule || {})
     .filter(([_, v]) => typeof v === 'string' && v.trim() !== '')
-    .map(([day, v]) => `${day}: ${v}`)
+    .map(([day, v]) => `${day}: ${(v as string).trim()}`)
     .join('\n');
+
+  // --- Normalize languages and payments for payload ---
+  const normalizedLanguages =
+    Array.isArray(values.languages_spoken) &&
+    values.languages_spoken.map((l: string) => l.split('(')[0].trim());
+
+  const normalizedPayments =
+    Array.isArray(values.payment_methods) &&
+    values.payment_methods.map((p: string) => p.replace(/\r\n/g, '').trim());
 
   return {
     team_id: '',
-    last_name: values.last_name,
-    first_name: values.first_name,
-    full_name: values.full_name,
-    job_1: values.job_1,
-    specific_audience: values.specific_audience,
-    specialization_1: values.specialization_1,
-    job_2: values.job_2,
-    job_3: values.job_3,
-    job_4: values.job_4,
-    who_am_i: values.who_am_i,
-    consultations: values.consultations,
-    office_address: values.office_address,
-    contact_email: values.contact_email,
-    contact_phone: values.contact_phone,
+    last_name: trimValue(values.last_name),
+    first_name: trimValue(values.first_name),
+    full_name: trimValue(values.full_name),
+    job_1: trimValue(values.job_1),
+    specific_audience: trimValue(values.specific_audience),
+    specialization_1: trimValue(values.specialization_1),
+    job_2: trimValue(values.job_2),
+    job_3: trimValue(values.job_3),
+    job_4: trimValue(values.job_4),
+    who_am_i: trimValue(values.who_am_i),
+    consultations: trimValue(values.consultations),
+    office_address: trimValue(values.office_address),
+    contact_email: trimValue(values.contact_email),
+    contact_phone: trimValue(values.contact_phone),
     schedule: { text: scheduleText || null },
-    about: values.about,
-    languages_spoken: values.languages_spoken,
-    payment_methods: values.payment_methods,
-    diplomas_and_training: values.diplomas_and_training,
-    specializations: values.specializations,
-    website: values.website,
+    about: trimValue(values.about),
+    languages_spoken: normalizedLanguages || [],
+    payment_methods: normalizedPayments || [],
+    diplomas_and_training: values.diplomas_and_training.map(trimValue),
+    specializations: values.specializations.map(trimValue),
+    website: trimValue(values.website),
     frequently_asked_questions:
       typeof values.frequently_asked_questions === 'string'
         ? JSON.parse(values.frequently_asked_questions)
         : values.frequently_asked_questions || {},
-    calendar_links: values.calendar_links,
-    photo: values.photo,
+    calendar_links: values.calendar_links.map(trimValue),
+    photo: trimValue(values.photo),
     role: values.role,
     status: values.status,
     branches: values.branches,
     primary_branch: values.primary_branch_id,
     permissions: values.permissions,
-    created_by_role: values.created_by_role,
+    created_by_role: trimValue(values.created_by_role),
   };
 }
 
@@ -308,16 +286,18 @@ function toUpdatePayload(values: any, source: any): any {
     ...payload,
     branches: branchesAsNumbers,
     selected_branch: values.primary_branch_id,
-    // permissions: Object.keys(values.permissions || {}).flatMap((module) =>
-    //   Object.entries(values.permissions[module] || {}).map(([action, enabled]) => ({
-    //     action,
-    //     resource: module,
-    //     enabled,
-    //   }))
-    // ),
     permissions: values.permissions,
     created_by_role: source.role === 'super_admin' ? 'super_admin' : 'admin',
   };
+}
+
+function safeJsonParse<T>(str: string | undefined, fallback: T): T {
+  if (!str) return fallback;
+  try {
+    return JSON.parse(str);
+  } catch {
+    return fallback;
+  }
 }
 
 const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
@@ -392,6 +372,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
     }
 
     setLoading(true);
+
     getTeamMemberById(id)
       .then((data) => {
         if (!data) {
@@ -408,7 +389,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
 
         const parsedPermissions =
           typeof data.permissions === 'string'
-            ? JSON.parse(data.permissions)
+            ? safeJsonParse(data.permissions, {})
             : (data.permissions ?? {});
 
         const validRoles = ['super_admin', 'admin', 'staff'] as const;
@@ -416,6 +397,20 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
         const safeRole = validRoles.includes(roleFromData as any)
           ? (roleFromData as 'super_admin' | 'admin' | 'staff')
           : 'staff';
+
+        // --- Normalize languages and payments ---
+        const normalizedLanguages =
+          Array.isArray(data.languages_spoken) &&
+          data.languages_spoken.map((l: string) => l.split('(')[0].trim());
+        const normalizedPayments =
+          Array.isArray(data.payment_methods) &&
+          data.payment_methods.map((p: string) => p.replace(/\r\n/g, '').trim());
+
+        // --- Normalize branch IDs ---
+        const branchIds =
+          Array.isArray(data.branches) && data.branches.length > 0
+            ? data.branches.map((b: any) => Number(b.branch_id))
+            : [];
 
         reset({
           last_name: data.last_name ?? '',
@@ -445,8 +440,8 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
                 )
               : {},
           about: data.about ?? '',
-          languages_spoken: Array.isArray(data.languages_spoken) ? data.languages_spoken : [],
-          payment_methods: Array.isArray(data.payment_methods) ? data.payment_methods : [],
+          languages_spoken: normalizedLanguages || [],
+          payment_methods: normalizedPayments || [],
           diplomas_and_training: Array.isArray(data.diplomas_and_training)
             ? data.diplomas_and_training
             : [''],
@@ -461,9 +456,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
           photo: data.photo ?? '',
           role: safeRole,
           status: safeStatus,
-          branches: Array.isArray(data.branch_ids)
-            ? data.branch_ids.map((b: any) => (typeof b === 'string' ? Number(b) : b))
-            : [],
+          branches: branchIds,
           primary_branch_id:
             typeof data.primary_branch_id === 'number' ? data.primary_branch_id : BRANCHES[0].id,
           permissions: parsedPermissions,
@@ -472,7 +465,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
 
         setFaqs(
           typeof data.frequently_asked_questions === 'string'
-            ? JSON.parse(data.frequently_asked_questions)
+            ? safeJsonParse(data.frequently_asked_questions, {})
             : (data.frequently_asked_questions ?? {}),
         );
         setLoadedMember(data);

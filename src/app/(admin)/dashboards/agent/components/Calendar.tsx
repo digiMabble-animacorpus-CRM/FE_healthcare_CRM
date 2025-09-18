@@ -1,26 +1,20 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import FullCalendar from '@fullcalendar/react';
+import bootstrapPlugin from '@fullcalendar/bootstrap';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import interactionPlugin, { type DateClickArg, type DropArg } from '@fullcalendar/interaction';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import bootstrapPlugin from '@fullcalendar/bootstrap';
-import { Spinner, Alert } from 'react-bootstrap';
+import FullCalendar from '@fullcalendar/react';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import { useEffect, useState } from 'react';
+import { Alert, Spinner } from 'react-bootstrap';
 
-import { getCalendarAppointments, CalendarAppointment } from '@/helpers/dashboard'; // Adjust path
+import { CalendarAppointment, getCalendarAppointments } from '@/helpers/dashboard'; // Adjust path
 
 import type { CalendarProps } from '@/types/component-props';
 import type { EventClickArg, EventDropArg } from '@fullcalendar/core/index.js';
 
-const Calendar = ({
-  events,
-  onDateClick,
-  onDrop,
-  onEventClick,
-  onEventDrop,
-}: CalendarProps) => {
+const Calendar = ({ events, onDateClick, onDrop, onEventClick, onEventDrop }: CalendarProps) => {
   const handleDateClick = (arg: DateClickArg) => {
     onDateClick(arg);
   };
@@ -90,30 +84,29 @@ const CalendarContainer = () => {
   };
 
   useEffect(() => {
-  async function fetchAppointments() {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await getCalendarAppointments(params);
-      if (data && data.appointments) {
-        const eventsWithStringIds = data.appointments.map(event => ({
-          ...event,
-          id: String(event.id),
-        }));
-        setEvents(eventsWithStringIds);
-      } else {
-        setError('No appointments found.');
+    async function fetchAppointments() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getCalendarAppointments(params);
+        if (data && data.appointments) {
+          const eventsWithStringIds = data.appointments.map((event) => ({
+            ...event,
+            id: String(event.id),
+          }));
+          setEvents(eventsWithStringIds);
+        } else {
+          setError('No appointments found.');
+        }
+      } catch (err) {
+        setError('Failed to load appointments.');
+        console.error(err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Failed to load appointments.');
-      console.error(err);
-    } finally {
-      setLoading(false);
     }
-  }
-  fetchAppointments();
-}, []);
-
+    fetchAppointments();
+  }, []);
 
   // Handlers for calendar interactions
   const handleDateClick = (arg: DateClickArg) => {
@@ -138,7 +131,11 @@ const CalendarContainer = () => {
   }
 
   if (error) {
-    return <Alert variant="danger" className="m-3">{error}</Alert>;
+    return (
+      <Alert variant="danger" className="m-3">
+        {error}
+      </Alert>
+    );
   }
 
   return (
