@@ -1,11 +1,15 @@
 'use client';
 
+import '@/assets/scss/components/_edittogglebtn.scss';
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState, useMemo } from 'react';
+import { deletePatient, getAllPatient } from '@/helpers/patient';
 import type { PatientType } from '@/types/data';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -13,21 +17,12 @@ import {
   CardHeader,
   CardTitle,
   Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Modal,
   Row,
   Spinner,
-  Alert,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import '@/assets/scss/components/_edittogglebtn.scss';
-import { getAllPatient, deletePatient } from '@/helpers/patient';
 
 const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
 
 const PatientsListPage = () => {
   const [allPatients, setAllPatients] = useState<PatientType[]>([]);
@@ -39,6 +34,7 @@ const PatientsListPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+
   const router = useRouter();
 
   // Fetch patients
@@ -93,11 +89,12 @@ const PatientsListPage = () => {
 
     if (searchTerm.trim()) {
       const term = searchTerm.trim().toLowerCase();
-      data = data.filter((p) =>
-        (p?.firstname ?? '').toLowerCase().includes(term) ||
-        (p?.lastname ?? '').toLowerCase().includes(term) ||
-        (p?.emails ?? '').toLowerCase().includes(term) ||
-        (p?.phones ? p.phones.join(' ').toLowerCase() : '').includes(term)
+      data = data.filter(
+        (p) =>
+          (p?.firstname ?? '').toLowerCase().includes(term) ||
+          (p?.lastname ?? '').toLowerCase().includes(term) ||
+          (p?.emails ?? '').toLowerCase().includes(term) ||
+          (p?.phones ? p.phones.join(' ').toLowerCase() : '').includes(term),
       );
     }
 
@@ -175,25 +172,26 @@ const PatientsListPage = () => {
           dismissible
           style={{ position: 'fixed', top: 20, right: 20, zIndex: 1050, minWidth: 200 }}
         >
-          Patient deleted successfully!
+          Patient supprimé avec succès !
         </Alert>
       )}
 
-      <PageTitle subName="Patient" title="Patient List" />
+      <PageTitle subName="Patient" title="Liste des patients" />
 
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                All Patient List
+                Liste de tous les patients{' '}
+                <span className="text-muted">({filteredPatients.length} Total)</span>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
                 <input
                   type="text"
                   className="form-control form-control-sm"
-                  placeholder="Search by name, email, number..."
+                  placeholder="Rechercher par nom, email, numéro..."
                   value={searchTerm}
                   onChange={(e) => {
                     setSearchTerm(e.target.value);
@@ -201,76 +199,6 @@ const PatientsListPage = () => {
                   }}
                   style={{ minWidth: 200 }}
                 />
-
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-white">
-                    {selectedBranch || 'Filter by Branch'}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {BRANCHES.map((branch) => (
-                      <DropdownItem
-                        key={branch}
-                        onClick={() => {
-                          setSelectedBranch(branch);
-                          setCurrentPage(1);
-                        }}
-                        active={selectedBranch === branch}
-                      >
-                        {branch}
-                      </DropdownItem>
-                    ))}
-                    {selectedBranch && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Branch Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
-
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-outline-white">
-                    {dateFilter === 'all'
-                      ? 'Filter by Date'
-                      : dateFilter.replace('_', ' ').toUpperCase()}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {[
-                      { label: 'Today', value: 'today' },
-                      { label: 'This Week', value: 'this_week' },
-                      { label: 'Last 15 Days', value: '15_days' },
-                      { label: 'This Month', value: 'this_month' },
-                      { label: 'This Year', value: 'this_year' },
-                    ].map((f) => (
-                      <DropdownItem
-                        key={f.value}
-                        onClick={() => {
-                          setDateFilter(f.value);
-                          setCurrentPage(1);
-                        }}
-                        active={dateFilter === f.value}
-                      >
-                        {f.label}
-                      </DropdownItem>
-                    ))}
-                    {dateFilter !== 'all' && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setDateFilter('all');
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Date Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
               </div>
             </CardHeader>
 
@@ -283,77 +211,85 @@ const PatientsListPage = () => {
                 <div className="table-responsive">
                   <table
                     className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 1100 }}
+                    style={{ minWidth: 1000 }}
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 30 }}>
-                          <input type="checkbox" />
-                        </th>
-                        <th>Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>Age | Gender</th>
-                        <th>City</th>
-                        <th>Status</th>
+                        <th>Non</th>
+                        <th>Nom</th>
+                        <th>E-mail</th>
+                        <th>Téléphone</th>
+                        <th>Âge | Genre</th>
+                        <th>Ville</th>
+                        <th>Statut</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {currentData.map((item) => (
-                        <tr key={item.id}>
-                          <td>
-                            <input type="checkbox" />
-                          </td>
-                          <td>
-                            {item.firstname} {item.lastname}
-                          </td>
-                          <td>{item.emails ?? ''}</td>
-                          <td>
-                            {Array.isArray(item.phones)
-                              ? item.phones.join(', ')
-                              : item.phones || ''}
-                          </td>
-                          <td>
-                            {calculateAge(item.birthdate)}
-                            {item.legalgender ? ` yrs | ${formatGender(item.legalgender)}` : ' yrs'}
-                          </td>
-                          <td>{item.city}</td>
-                          <td>
-                            <span
-                              className={`badge bg-${item.status === 'ACTIVE' ? 'success' : 'secondary'} text-white`}
-                            >
-                              {item.status}
-                            </span>
-                          </td>
-                          <td>
-                            <div className="d-flex gap-2">
-                               <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleView(item.id)}
+                      {currentData.length > 0 ? (
+                        currentData.map((item, index) => (
+                          <tr key={item.id}>
+                            {/* Auto Increment ID */}
+                            <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
+                            <td>
+                              {item.firstname} {item.lastname}
+                            </td>
+                            <td>{item.emails ?? ''}</td>
+                            <td>
+                              {Array.isArray(item.phones)
+                                ? item.phones.join(', ')
+                                : item.phones || ''}
+                            </td>
+                            <td>
+                              {calculateAge(item.birthdate)}
+                              {item.legalgender
+                                ? ` yrs | ${formatGender(item.legalgender)}`
+                                : ' yrs'}
+                            </td>
+                            <td>{item.city}</td>
+                            <td>
+                              <span
+                                className={`badge bg-${
+                                  item.status === 'ACTIVE' ? 'success' : 'secondary'
+                                } text-white`}
                               >
-                                <IconifyIcon icon="solar:eye-broken" />
-                              </Button>
-                              <Button
-                                variant="secondary"
-                                size="sm"
-                                onClick={() => handleEditClick(item.id)}
-                              >
-                                <IconifyIcon icon="solar:pen-2-broken" />
-                              </Button>
-                              <Button
-                                variant="danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(item.id)}
-                              
-                              >
-                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
-                              </Button>
-                            </div>
+                                {item.status}
+                              </span>
+                            </td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={() => handleView(item.id)}
+                                >
+                                  <IconifyIcon icon="solar:eye-broken" />
+                                </Button>
+                                <Button
+                                  variant="soft-primary"
+                                  size="sm"
+                                  onClick={() => handleEditClick(item.id)}
+                                >
+                                  <IconifyIcon icon="solar:pen-2-broken" />
+                                </Button>
+                                <Button
+                                  variant="soft-danger"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(item.id)}
+                                >
+                                  <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={8} className="text-center py-4 text-muted">
+                            Aucun patient trouvé
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -368,7 +304,7 @@ const PatientsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage - 1)}
                   >
-                    Previous
+                    Précédent
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }).map((_, idx) => (
@@ -388,7 +324,7 @@ const PatientsListPage = () => {
                     className="page-link"
                     onClick={() => handlePageChange(currentPage + 1)}
                   >
-                    Next
+                    Suivant
                   </Button>
                 </li>
               </ul>
@@ -400,15 +336,15 @@ const PatientsListPage = () => {
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Confirm Deletion</Modal.Title>
+          <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Are you sure you want to delete this patient?</Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce patient ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Cancel
+            Annuler
           </Button>
           <Button variant="danger" onClick={handleConfirmDelete}>
-            Delete
+            Supprimer
           </Button>
         </Modal.Footer>
       </Modal>

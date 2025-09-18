@@ -1,7 +1,8 @@
 'use client';
 
-import { Card, CardBody, Row, Col, Button } from 'react-bootstrap';
+import React from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
 export type BranchSummaryItem = {
   branchId: number | string;
@@ -12,20 +13,21 @@ export type BranchSummaryItem = {
   revenueMonth: number; // currency handling left to consumer
 };
 
+type BranchSummaryProps = {
+  summaries: BranchSummaryItem[];
+};
+
 const num = (n: number) => new Intl.NumberFormat().format(n);
 
-const BranchSummary = ({
-  summaries,
-  onBranchClick,
-}: {
-  summaries: BranchSummaryItem[];
-  onBranchClick?: (branch: BranchSummaryItem) => void;
-}) => {
+const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries }) => {
+  if (!summaries || summaries.length === 0) {
+    return <div>No branch summaries available.</div>;
+  }
   return (
     <Row className="g-3">
       {summaries.map((b) => (
         <Col xl={4} key={b.branchId}>
-          <Card className="h-100">
+          <Card className="h-100" style={{ cursor: 'pointer' }}>
             <CardBody>
               <h5 className="mb-3">{b.branchName}</h5>
               <Row className="text-center g-3">
@@ -39,7 +41,7 @@ const BranchSummary = ({
                     />
                   </div>
                   <div className="fw-semibold fs-4">{num(b.doctors)}</div>
-                  <div className="text-muted">Doctors</div>
+                  <div className="text-muted">Thérapeutes</div>
                 </Col>
                 <Col>
                   <div className="avatar-md bg-success bg-opacity-10 rounded flex-centered mb-2">
@@ -63,28 +65,9 @@ const BranchSummary = ({
                     />
                   </div>
                   <div className="fw-semibold fs-4">{num(b.appointmentsMonth)}</div>
-                  <div className="text-muted">Appts (mo)</div>
+                  <div className="text-muted">Rendez-vous (mois)</div>
                 </Col>
               </Row>
-              <div className="mt-3 d-flex justify-content-between align-items-center">
-                <div className="text-center">
-                  <div className="avatar-md bg-info bg-opacity-10 rounded flex-centered mb-1">
-                    <IconifyIcon
-                      icon="mdi:currency-eur"
-                      width={24}
-                      height={24}
-                      className="text-info"
-                    />
-                  </div>
-                  <div className="fw-semibold">€ {num(b.revenueMonth)}</div>
-                  <div className="text-muted">Revenue (mo)</div>
-                </div>
-                {onBranchClick && (
-                  <Button size="sm" variant="outline-primary" onClick={() => onBranchClick(b)}>
-                    View
-                  </Button>
-                )}
-              </div>
             </CardBody>
           </Card>
         </Col>

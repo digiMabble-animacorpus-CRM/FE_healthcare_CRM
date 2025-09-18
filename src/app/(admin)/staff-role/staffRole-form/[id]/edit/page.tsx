@@ -39,7 +39,6 @@ const EditStaffRolePage = ({ params }: Props) => {
 
   const onSubmitHandler = async (data: Omit<StaffRoleType, '_id'>) => {
     try {
-      console.log('StaffRole updated', data);
       // await updateStaffRole(params.id as string, data)
       // router.push("/StaffRoles");
     } catch {

@@ -1,7 +1,7 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import { encryptAES, decryptAES } from '@/utils/encryption';
+import { decryptAES } from '@/utils/encryption';
 
 export interface PatientUpdatePayload {
   name?: string;
@@ -47,8 +47,6 @@ export const getAllPatient = async (
       ...(search ? { searchText: search } : {}),
     };
 
-    console.log('Filters (plain):', filters);
-
     const queryParams = new URLSearchParams(filters).toString();
 
     const response = await fetch(`${API_BASE_PATH}/patients?${queryParams}`, {
@@ -66,7 +64,6 @@ export const getAllPatient = async (
     }
 
     const jsonData = await response.json();
-    console.log('Response from server:', jsonData);
 
     const patientData: any[] = Array.isArray(jsonData?.data)
       ? jsonData.data
@@ -85,7 +82,6 @@ export const getAllPatient = async (
 };
 
 export const getPatientById = async (patientId: any): Promise<any | null> => {
-  console.log(patientId);
   const token = localStorage.getItem('access_token');
   if (!token) {
     console.warn('No access token found.');
@@ -93,7 +89,6 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
   }
 
   const url = `${API_BASE_PATH}/patients/${patientId}`;
-  console.log('Requesting patient by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -104,10 +99,7 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
       },
     });
 
-    console.log('Response status:', response.status);
     const result = await response.json();
-    console.log('Full API response:', result);
-
     if (!response.ok) {
       console.error('Failed to fetch patient:', result?.message || 'Unknown error');
       return null;
@@ -133,7 +125,6 @@ export const findPatient = async (value: string): Promise<any | null> => {
   }
 
   const url = `${API_BASE_PATH}/patients/find/${encodeURIComponent(value)}`;
-  console.log('Finding patient:', url);
 
   try {
     const response = await fetch(url, {
@@ -145,7 +136,6 @@ export const findPatient = async (value: string): Promise<any | null> => {
     });
 
     const result = await response.json();
-    console.log('Find patient response:', result);
 
     if (!response.ok) {
       console.error('Failed to fetch patient:', result?.message || 'Unknown error');
@@ -158,7 +148,6 @@ export const findPatient = async (value: string): Promise<any | null> => {
     return null;
   }
 };
-
 
 export const createPatient = async (payload: any): Promise<boolean> => {
   try {
@@ -229,9 +218,6 @@ export const updatePatient = async (
       ...payload,
     };
 
-    //  console.log("PATCH URL:", `${API_BASE_PATH}/patients/${id}`);
-    // console.log("PATCH BODY:", JSON.stringify(safePayload, null, 2));
-
     const response = await fetch(`${API_BASE_PATH}/patients/${id}`, {
       method: 'PATCH',
       headers: {
@@ -242,7 +228,6 @@ export const updatePatient = async (
     });
 
     const result = await response.json();
-    // console.log("Update response:", result);
 
     if (!response.ok || !result.status) {
       console.error('Update failed:', result.message || 'Unknown error');
@@ -279,9 +264,6 @@ export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   };
 };
 
-
-
-
 export const deletePatient = async (id: string | number): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -308,20 +290,6 @@ export const deletePatient = async (id: string | number): Promise<boolean> => {
     return false;
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 export const getAllRoles = async (): Promise<any[]> => {
   try {
@@ -367,6 +335,4 @@ export const getAllAccessLevels = async (): Promise<any[]> => {
     console.error(' Error fetching access levels:', error);
     return [];
   }
-
-
 };

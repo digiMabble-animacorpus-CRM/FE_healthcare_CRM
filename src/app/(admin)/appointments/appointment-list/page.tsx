@@ -1,44 +1,48 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import { useEffect, useState, useRef, useCallback, SetStateAction } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import isBetween from 'dayjs/plugin/isBetween';
+import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 dayjs.extend(isBetween);
 
+import { API_BASE_PATH } from '@/context/constants';
+import { Icon } from '@iconify/react';
+import '@toast-ui/calendar/dist/toastui-calendar.min.css';
+import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 import {
   Button,
-  Col,
-  Row,
-  Spinner,
-  Form,
-  Dropdown,
   ButtonGroup,
-  Modal,
   Card,
   CardHeader,
   CardTitle,
+  Col,
+  Dropdown,
+  Form,
+  Modal,
+  Row,
+  Spinner,
 } from 'react-bootstrap';
-import '@toast-ui/calendar/dist/toastui-calendar.min.css';
-import { Icon } from '@iconify/react';
-import dynamic from 'next/dynamic';
-import { API_BASE_PATH } from '@/context/constants';
-import { useRouter } from 'next/navigation';
 
-const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
+const TuiCalendar = dynamic(() => import('@/components/TuiCalendarWrapper'), {
   ssr: false,
-  loading: () => <div>Loading calendar...</div>
 });
 
-type CalendarInstance = {
-  getInstance: () => any; 
-};
+// const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
+//   ssr: false,
+//   loading: () => <div>Loading calendar...</div>,
+// });
 
-import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+// type CalendarInstance = {
+//   getInstance: () => any;
+// };
+
+// import TuiCalendar from '@/components/TuiCalendarWrapper';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import TuiCalendar from '@/components/TuiCalendarWrapper';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 
 interface Branch {
   branch_id: number;
@@ -124,35 +128,69 @@ const AppointmentCalendarPage = () => {
   const [calendarInstance, setCalendarInstance] = useState<any | null>(null);
 
   const calendarRef = useRef<{
-    getInstance(): any; setDate: (date: Date) => void 
-}>(null);
-
-
+    getInstance(): any;
+    setDate: (date: Date) => void;
+  }>(null);
 
   const router = useRouter();
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('access_token');
+      setToken(storedToken);
+    }
+  }, []);
 
   // Enhanced color palettes for different categories
   const BRANCH_COLORS = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+    '#FF6B6B',
+    '#4ECDC4',
+    '#45B7D1',
+    '#96CEB4',
+    '#FFEAA7',
+    '#DDA0DD',
+    '#98D8C8',
+    '#F7DC6F',
+    '#BB8FCE',
+    '#85C1E9',
   ];
 
   const DEPARTMENT_COLORS = [
-    '#6C5CE7', '#A29BFE', '#74B9FF', '#00CEC9', '#55A3FF',
-    '#FDCB6E', '#E17055', '#FD79A8', '#FDCB6E', '#E84393'
+    '#6C5CE7',
+    '#A29BFE',
+    '#74B9FF',
+    '#00CEC9',
+    '#55A3FF',
+    '#FDCB6E',
+    '#E17055',
+    '#FD79A8',
+    '#FDCB6E',
+    '#E84393',
   ];
 
   const SPECIALIZATION_COLORS = [
-    '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1',
-    '#e83e8c', '#fd7e14', '#20c997', '#17a2b8', '#6c757d',
-    '#6610f2', '#d63384', '#0dcaf0', '#198754', '#ff6b35'
+    '#007bff',
+    '#28a745',
+    '#ffc107',
+    '#dc3545',
+    '#6f42c1',
+    '#e83e8c',
+    '#fd7e14',
+    '#20c997',
+    '#17a2b8',
+    '#6c757d',
+    '#6610f2',
+    '#d63384',
+    '#0dcaf0',
+    '#198754',
+    '#ff6b35',
   ];
 
   const assignColorsToItems = <T extends { [key: string]: any }>(
     items: T[],
     colors: string[],
-    idKey: string
+    idKey: string,
   ): T[] =>
     items.map((item, index) => ({
       ...item,
@@ -174,7 +212,6 @@ const AppointmentCalendarPage = () => {
       calendarRef.current.setDate(new Date(2026, 0, 1));
     }
   }, []);
-
 
   // Handle calendar navigation
   // const handleCalendarNav = (action: 'today' | 'prev' | 'next') => {
@@ -199,22 +236,25 @@ const AppointmentCalendarPage = () => {
   //   }
   // };
 
-  const handleDateChange = useCallback((newDate: Dayjs | null) => {
-    if (newDate) {
-      setSelectedDate(newDate);
-      setCalendarDate(newDate);
+  const handleDateChange = useCallback(
+    (newDate: Dayjs | null) => {
+      if (newDate) {
+        setSelectedDate(newDate);
+        setCalendarDate(newDate);
 
-      // Sync with Toast UI Calendar
-      if (calendarRef.current) {
-        calendarRef.current.setDate(newDate.toDate()); // Call setDate on the child component
-      }
+        // Sync with Toast UI Calendar
+        if (calendarRef.current) {
+          calendarRef.current.setDate(newDate.toDate()); // Call setDate on the child component
+        }
 
-      // Auto-switch to day view when clicking on a specific date
-      if (view === 'month') {
-        setView('day');
+        // Auto-switch to day view when clicking on a specific date
+        if (view === 'month') {
+          setView('day');
+        }
       }
-    }
-  }, [view]);
+    },
+    [view],
+  );
 
   // Sync calendar on navigation and view changes
   // useEffect(() => {
@@ -244,7 +284,7 @@ const AppointmentCalendarPage = () => {
           const branches: Branch[] = normalizeApiResponse(data);
           const branchesWithColors = assignColorsToItems(branches, BRANCH_COLORS, 'branch_id');
           setAllBranches(branchesWithColors);
-          setSelectedBranches(branchesWithColors.map(b => b.branch_id));
+          setSelectedBranches(branchesWithColors.map((b) => b.branch_id));
         }
 
         // Departments
@@ -256,7 +296,7 @@ const AppointmentCalendarPage = () => {
           const departments: Department[] = normalizeApiResponse(data);
           const departmentsWithColors = assignColorsToItems(departments, DEPARTMENT_COLORS, 'id');
           setAllDepartments(departmentsWithColors);
-          setSelectedDepartments(departmentsWithColors.map(d => d.id));
+          setSelectedDepartments(departmentsWithColors.map((d) => d.id));
         }
 
         // Specializations
@@ -266,9 +306,13 @@ const AppointmentCalendarPage = () => {
         if (specializationsRes.ok) {
           const data = await specializationsRes.json();
           const specializations: Specialization[] = normalizeApiResponse(data);
-          const specializationsWithColors = assignColorsToItems(specializations, SPECIALIZATION_COLORS, 'specialization_id');
+          const specializationsWithColors = assignColorsToItems(
+            specializations,
+            SPECIALIZATION_COLORS,
+            'specialization_id',
+          );
           setAllSpecializations(specializationsWithColors);
-          setSelectedSpecializations(specializationsWithColors.map(s => s.specialization_id));
+          setSelectedSpecializations(specializationsWithColors.map((s) => s.specialization_id));
         }
       } catch (err) {
         // Handle error silently or add proper error handling
@@ -323,9 +367,13 @@ const AppointmentCalendarPage = () => {
           const isPast = appointmentStart.isBefore(now);
 
           // Find colors from our loaded data
-          const branchColor = allBranches.find(b => b.branch_id === appt.branch_id)?.color || BRANCH_COLORS[0];
-          const departmentColor = allDepartments.find(d => d.id === appt.department_id)?.color || DEPARTMENT_COLORS[0];
-          const specializationColor = allSpecializations.find(s => s.specialization_id === appt.specialization_id)?.color || SPECIALIZATION_COLORS[0];
+          const branchColor =
+            allBranches.find((b) => b.branch_id === appt.branch_id)?.color || BRANCH_COLORS[0];
+          const departmentColor =
+            allDepartments.find((d) => d.id === appt.department_id)?.color || DEPARTMENT_COLORS[0];
+          const specializationColor =
+            allSpecializations.find((s) => s.specialization_id === appt.specialization_id)?.color ||
+            SPECIALIZATION_COLORS[0];
 
           let bgColor = specializationColor;
           let borderColor = specializationColor;
@@ -365,7 +413,9 @@ const AppointmentCalendarPage = () => {
           // Extract participant names
           const participants = [];
           if (appt.patient?.firstname || appt.patient?.lastname) {
-            participants.push(`${appt.patient.firstname || ''} ${appt.patient.lastname || ''}`.trim());
+            participants.push(
+              `${appt.patient.firstname || ''} ${appt.patient.lastname || ''}`.trim(),
+            );
           }
           if (appt.therapist?.fullName) {
             participants.push(appt.therapist.fullName);
@@ -379,8 +429,11 @@ const AppointmentCalendarPage = () => {
 
           const result = {
             id: String(appt.id),
-            calendarId: String(specialization?.specialization_id || appt.specialization_id || 'unknown'),
-            title: `${specialization?.specialization_type || 'Unknown'} - ${appt.patient?.firstname || ''} ${appt.patient?.lastname || ''}`.trim(),
+            calendarId: String(
+              specialization?.specialization_id || appt.specialization_id || 'unknown',
+            ),
+            title:
+              `${specialization?.specialization_type || 'Unknown'} - ${appt.patient?.firstname || ''} ${appt.patient?.lastname || ''}`.trim(),
             category: 'time',
             start: start?.toISOString() || '',
             end: end?.toISOString() || '',
@@ -429,25 +482,27 @@ const AppointmentCalendarPage = () => {
     if (view === 'month') {
       const start = selectedDate.startOf('month');
       const end = selectedDate.endOf('month');
-      dateFiltered = allAppointments.filter(appt =>
-        appt.start && dayjs(appt.start).isBetween(start, end, null, '[]')
+      dateFiltered = allAppointments.filter(
+        (appt) => appt.start && dayjs(appt.start).isBetween(start, end, null, '[]'),
       );
     } else if (view === 'week') {
       const start = selectedDate.startOf('week');
       const end = selectedDate.endOf('week');
-      dateFiltered = allAppointments.filter(appt =>
-        appt.start && dayjs(appt.start).isBetween(start, end, null, '[]')
+      dateFiltered = allAppointments.filter(
+        (appt) => appt.start && dayjs(appt.start).isBetween(start, end, null, '[]'),
       );
     } else if (view === 'day') {
-      dateFiltered = allAppointments.filter(appt =>
-        appt.start && dayjs(appt.start).isSame(selectedDate, 'day')
+      dateFiltered = allAppointments.filter(
+        (appt) => appt.start && dayjs(appt.start).isSame(selectedDate, 'day'),
       );
     }
 
     // Enhanced filtering logic with null safety
-    const finalFiltered = dateFiltered.filter(appt => {
+    const finalFiltered = dateFiltered.filter((appt) => {
       const branchId = appt.raw.original?.branch_id || appt.raw.original?.branch?.branch_id;
-      const specId = appt.raw.original?.specialization_id || appt.raw.original?.specialization?.specialization_id;
+      const specId =
+        appt.raw.original?.specialization_id ||
+        appt.raw.original?.specialization?.specialization_id;
       const deptId = appt.raw.original?.department_id || appt.raw.original?.department?.id;
 
       // If IDs are missing (undefined), include them in all filters
@@ -470,7 +525,7 @@ const AppointmentCalendarPage = () => {
   ]);
 
   // Enhanced calendars configuration with proper colors
-  const calendars = allSpecializations.map(spec => ({
+  const calendars = allSpecializations.map((spec) => ({
     id: String(spec.specialization_id),
     name: spec.specialization_type,
     color: '#ffffff',
@@ -480,20 +535,20 @@ const AppointmentCalendarPage = () => {
   }));
 
   const handleBranchChange = (branchId: number) => {
-    setSelectedBranches(prev =>
-      prev.includes(branchId) ? prev.filter(id => id !== branchId) : [...prev, branchId]
+    setSelectedBranches((prev) =>
+      prev.includes(branchId) ? prev.filter((id) => id !== branchId) : [...prev, branchId],
     );
   };
 
   const handleSpecializationChange = (specId: number) => {
-    setSelectedSpecializations(prev =>
-      prev.includes(specId) ? prev.filter(id => id !== specId) : [...prev, specId]
+    setSelectedSpecializations((prev) =>
+      prev.includes(specId) ? prev.filter((id) => id !== specId) : [...prev, specId],
     );
   };
 
   const handleDepartmentChange = (deptId: number) => {
-    setSelectedDepartments(prev =>
-      prev.includes(deptId) ? prev.filter(id => id !== deptId) : [...prev, deptId]
+    setSelectedDepartments((prev) =>
+      prev.includes(deptId) ? prev.filter((id) => id !== deptId) : [...prev, deptId],
     );
   };
 
@@ -516,9 +571,9 @@ const AppointmentCalendarPage = () => {
   };
 
   const resetAllFilters = () => {
-    setSelectedBranches(allBranches.map(b => b.branch_id));
-    setSelectedSpecializations(allSpecializations.map(s => s.specialization_id));
-    setSelectedDepartments(allDepartments.map(d => d.id));
+    setSelectedBranches(allBranches.map((b) => b.branch_id));
+    setSelectedSpecializations(allSpecializations.map((s) => s.specialization_id));
+    setSelectedDepartments(allDepartments.map((d) => d.id));
     setSelectedDate(dayjs());
     setCalendarDate(dayjs());
     setView('month');
@@ -534,15 +589,17 @@ const AppointmentCalendarPage = () => {
   const toggleAllSelection = (type: 'branches' | 'specializations' | 'departments') => {
     if (type === 'branches') {
       setSelectedBranches(
-        selectedBranches.length === allBranches.length ? [] : allBranches.map(b => b.branch_id)
+        selectedBranches.length === allBranches.length ? [] : allBranches.map((b) => b.branch_id),
       );
     } else if (type === 'specializations') {
       setSelectedSpecializations(
-        selectedSpecializations.length === allSpecializations.length ? [] : allSpecializations.map(s => s.specialization_id)
+        selectedSpecializations.length === allSpecializations.length
+          ? []
+          : allSpecializations.map((s) => s.specialization_id),
       );
     } else if (type === 'departments') {
       setSelectedDepartments(
-        selectedDepartments.length === allDepartments.length ? [] : allDepartments.map(d => d.id)
+        selectedDepartments.length === allDepartments.length ? [] : allDepartments.map((d) => d.id),
       );
     }
   };
@@ -550,34 +607,44 @@ const AppointmentCalendarPage = () => {
   // Helper function to get status badge color
   const getStatusBadgeColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'confirmed': return 'success';
-      case 'pending': return 'warning';
-      case 'cancelled': return 'danger';
-      case 'completed': return 'primary';
-      default: return 'secondary';
+      case 'confirmed':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'cancelled':
+        return 'danger';
+      case 'completed':
+        return 'primary';
+      default:
+        return 'secondary';
     }
   };
 
   return (
     <>
-      <PageTitle subName="Appointments" title="Appointment Calendar" />
-      <Row style={{ height: '100%' }} >
+      <PageTitle subName="Rendez-vous" title="Calendrier de rendez-vous" />
+      <Row style={{ height: '100%' }}>
         <Card>
           <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
             <CardTitle as="h4" className="mb-0">
-              {calendarViewMode === 'calendar' ? 'Appointment Calendar' : 'Appointment List'}
-              <small className="text-muted ms-2">({appointments.length} appointments)</small>
+              {calendarViewMode === 'calendar'
+                ? 'Calendrier de rendez-vous'
+                : 'Liste de rendez-vous'}
+              <small className="text-muted ms-2">({appointments.length} rendez-vous)</small>
             </CardTitle>
             <Button variant="primary" onClick={() => router.push('/appointments/appointment-form')}>
               <Icon icon="mdi:plus" className="me-1" />
-              New Appointment
+              Nouveau rendez-vous
             </Button>
           </CardHeader>
         </Card>
 
         {/* Enhanced Sidebar */}
-        <Col md={3} style={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }}>
-          <div className="p-2 border rounded mb-3" style={{ background: 'white' }} >
+        <Col
+          md={3}
+          style={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }}
+        >
+          <div className="p-2 border rounded mb-3" style={{ background: 'white' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
                 value={selectedDate}
@@ -585,27 +652,32 @@ const AppointmentCalendarPage = () => {
                 showDaysOutsideCurrentMonth
                 fixedWeekNumber={6}
                 sx={{
-                  width: "100%",
-                  maxWidth: "100%",
+                  width: '100%',
+                  maxWidth: '100%',
                   minWidth: 0,
-                  overflow: "hidden",
-                  "& .MuiPickersCalendarHeader-root": { px: 1, mb: 0.5 },
-                  "& .MuiPickersCalendarHeader-label": { fontSize: "0.9rem" },
-                  "& .MuiPickersArrowSwitcher-root .MuiIconButton-root": {
+                  overflow: 'hidden',
+                  '& .MuiPickersCalendarHeader-root': { px: 1, mb: 0.5 },
+                  '& .MuiPickersCalendarHeader-label': { fontSize: '0.9rem' },
+                  '& .MuiPickersArrowSwitcher-root .MuiIconButton-root': {
                     p: 0.5,
                   },
-                  "& .MuiDayCalendar-weekDayLabel": { fontSize: "0.75rem" },
-                  "& .MuiPickersDay-root": { fontSize: "0.75rem" },
-                  "& .MuiDayCalendar-monthContainer": { mx: 0.5 },
+                  '& .MuiDayCalendar-weekDayLabel': { fontSize: '0.75rem' },
+                  '& .MuiPickersDay-root': { fontSize: '0.75rem' },
+                  '& .MuiDayCalendar-monthContainer': { mx: 0.5 },
                 }}
               />
             </LocalizationProvider>
           </div>
 
           <div className="mb-3">
-            <Button variant="outline-secondary" size="sm" onClick={resetAllFilters} className="w-100">
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={resetAllFilters}
+              className="w-100"
+            >
               <Icon icon="mdi:refresh" className="me-1" />
-              Reset All Filters
+              Réinitialiser tous les filtres
             </Button>
           </div>
 
@@ -614,16 +686,18 @@ const AppointmentCalendarPage = () => {
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="mb-0">
                 <Icon icon="mdi:office-building" className="me-1" />
-                Branches
+                Succursales
               </h6>
               <Button variant="link" size="sm" onClick={() => toggleAllSelection('branches')}>
-                {selectedBranches.length === allBranches.length ? 'Deselect All' : 'Select All'}
+                {selectedBranches.length === allBranches.length ? 'Désélectionner tout' : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
-              <div className="text-center"><Spinner animation="border" size="sm" /></div>
+              <div className="text-center">
+                <Spinner animation="border" size="sm" />
+              </div>
             ) : (
-              allBranches.map(branch => (
+              allBranches.map((branch) => (
                 <Form.Check
                   key={branch.branch_id}
                   type="checkbox"
@@ -636,7 +710,7 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: branch.color,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       {branch.name}
@@ -654,18 +728,22 @@ const AppointmentCalendarPage = () => {
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="mb-0">
                 <Icon icon="mdi:domain" className="me-1" />
-                Departments
+                Départements
               </h6>
               <Button variant="link" size="sm" onClick={() => toggleAllSelection('departments')}>
-                {selectedDepartments.length === allDepartments.length ? 'Deselect All' : 'Select All'}
+                {selectedDepartments.length === allDepartments.length
+                  ? 'Désélectionner tout'
+                  : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
-              <div className="text-center"><Spinner animation="border" size="sm" /></div>
+              <div className="text-center">
+                <Spinner animation="border" size="sm" />
+              </div>
             ) : allDepartments.length === 0 ? (
-              <div className="text-muted small">No departments found</div>
+              <div className="text-muted small">Aucun département trouvé</div>
             ) : (
-              allDepartments.map(dept => (
+              allDepartments.map((dept) => (
                 <Form.Check
                   key={dept.id}
                   type="checkbox"
@@ -678,7 +756,7 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: dept.color,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       {dept.name}
@@ -696,16 +774,24 @@ const AppointmentCalendarPage = () => {
             <div className="d-flex justify-content-between align-items-center mb-2">
               <h6 className="mb-0">
                 <Icon icon="mdi:medical-bag" className="me-1" />
-                Specializations
+                Spécialisations
               </h6>
-              <Button variant="link" size="sm" onClick={() => toggleAllSelection('specializations')}>
-                {selectedSpecializations.length === allSpecializations.length ? 'Deselect All' : 'Select All'}
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => toggleAllSelection('specializations')}
+              >
+                {selectedSpecializations.length === allSpecializations.length
+                  ? 'Désélectionner tout'
+                  : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
-              <div className="text-center"><Spinner animation="border" size="sm" /></div>
+              <div className="text-center">
+                <Spinner animation="border" size="sm" />
+              </div>
             ) : (
-              allSpecializations.map(spec => (
+              allSpecializations.map((spec) => (
                 <Form.Check
                   key={spec.specialization_id}
                   type="checkbox"
@@ -718,7 +804,7 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: spec.color,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       {spec.specialization_type}
@@ -740,19 +826,21 @@ const AppointmentCalendarPage = () => {
                 <Icon icon={`mdi:calendar-${view}`} className="me-1" />
                 {view.charAt(0).toUpperCase() + view.slice(1)}
               </Button>
-              <Dropdown.Toggle split variant="outline-primary" size="sm" ><IconifyIcon icon="ri:arrow-down-s-line" className="fs-18" /></Dropdown.Toggle>
+              <Dropdown.Toggle split variant="outline-primary" size="sm">
+                <IconifyIcon icon="ri:arrow-down-s-line" className="fs-18" />
+              </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => handleViewChange('day')}>
                   <Icon icon="mdi:calendar-today" className="me-2 d-none d-sm-inline" />
-                  Day
+                  Jour
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => handleViewChange('week')}>
                   <Icon icon="mdi:calendar-week" className="me-2 d-none d-sm-inline" />
-                  Week
+                  Semaine
                 </Dropdown.Item>
                 <Dropdown.Item onClick={() => handleViewChange('month')}>
                   <Icon icon="mdi:calendar-month" className="me-2 d-none d-sm-inline" />
-                  Month
+                  Mois
                 </Dropdown.Item>
               </Dropdown.Menu>
             </Dropdown>
@@ -760,9 +848,10 @@ const AppointmentCalendarPage = () => {
             <div className="text-center">
               <h5 className="mb-0">{selectedDate.format('MMMM D, YYYY')}</h5>
               <small className="text-muted">
-                {view === 'week' && `Week of ${selectedDate.startOf('week').format('MMM D')} - ${selectedDate.endOf('week').format('MMM D')}`}
-                {view === 'month' && `${appointments.length} appointments this month`}
-                {view === 'day' && `${appointments.length} appointments today`}
+                {view === 'week' &&
+                  `Week of ${selectedDate.startOf('week').format('MMM D')} - ${selectedDate.endOf('week').format('MMM D')}`}
+                {view === 'month' && `${appointments.length} rendez-vous ce mois-ci`}
+                {view === 'day' && `${appointments.length} rendez-vous aujourd'hui`}
               </small>
             </div>
 
@@ -772,14 +861,14 @@ const AppointmentCalendarPage = () => {
                 onClick={() => setCalendarViewMode('calendar')}
               >
                 <Icon icon="mdi:calendar" className="me-1" />
-                <span className="d-none d-sm-inline">Calendar View</span>
+                <span className="d-none d-sm-inline">Vue du calendrier</span>
               </Button>
               <Button
                 variant={calendarViewMode === 'list' ? 'primary' : 'outline-primary'}
                 onClick={() => setCalendarViewMode('list')}
               >
                 <Icon icon="mdi:format-list-bulleted" className="me-1" />
-                <span className="d-none d-sm-inline">List View</span>
+                <span className="d-none d-sm-inline">Vue en liste</span>
               </Button>
             </ButtonGroup>
           </div>
@@ -787,7 +876,7 @@ const AppointmentCalendarPage = () => {
           {loading ? (
             <div className="d-flex justify-content-center align-items-center flex-grow-1">
               <Spinner animation="border" />
-              <span className="ms-2">Loading appointments...</span>
+              <span className="ms-2">Chargement des rendez-vous...</span>
             </div>
           ) : calendarViewMode === 'calendar' ? (
             <div className="flex-grow-1 border rounded overflow-hidden">
@@ -803,7 +892,10 @@ const AppointmentCalendarPage = () => {
                 events={appointments}
                 isReadOnly
                 onClickEvent={handleEventClick}
-                onClickMore={(e: { event: { stop: () => void; }; events: SetStateAction<any[]>; }) => {
+                onClickMore={(e: {
+                  event: { stop: () => void };
+                  events: SetStateAction<any[]>;
+                }) => {
                   // ✅ Prevent Toast UI’s built-in popup
                   e.event.stop();
 
@@ -811,15 +903,14 @@ const AppointmentCalendarPage = () => {
                   setMoreEvents(e.events);
                   setShowMoreModal(true);
                 }}
-
                 month={{
                   startDayOfWeek: 0,
                   daynames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                   visibleWeeksCount: 6,
                   moreLayerSize: {
                     width: '300px',
-                    height: 'auto'
-                  }
+                    height: 'auto',
+                  },
                 }}
                 week={{
                   startDayOfWeek: 0,
@@ -828,27 +919,31 @@ const AppointmentCalendarPage = () => {
                   hourEnd: 20,
                 }}
                 timezone={{
-                  zones: [{
-                    timezoneName: 'Asia/Kolkata',
-                    displayLabel: 'IST',
-                  }]
+                  zones: [
+                    {
+                      timezoneName: 'Asia/Kolkata',
+                      displayLabel: 'IST',
+                    },
+                  ],
                 }}
               />
             </div>
           ) : (
             <div className="flex-grow-1 border rounded p-3 bg-white overflow-auto">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="mb-0">Appointments List</h5>
+                <h5 className="mb-0">Liste des rendez-vous</h5>
                 <small className="text-muted">{appointments.length} results</small>
               </div>
               {appointments.length === 0 ? (
                 <div className="text-center py-5">
                   <Icon icon="mdi:calendar-remove" className="text-muted mb-3" />
-                  <p className="text-muted">No appointments found for selected filters and date range.</p>
+                  <p className="text-muted">
+                    Aucun rendez-vous trouvé pour les filtres et la plage de dates sélectionnés.
+                  </p>
                 </div>
               ) : (
                 <div className="row">
-                  {appointments.map(event => {
+                  {appointments.map((event) => {
                     const isToday = dayjs(event.start).isSame(dayjs(), 'day');
                     const isPast = dayjs(event.start).isBefore(dayjs());
 
@@ -869,7 +964,7 @@ const AppointmentCalendarPage = () => {
                                     height: 16,
                                     backgroundColor: event.bgColor,
                                     marginRight: 8,
-                                    borderRadius: '3px'
+                                    borderRadius: '3px',
                                   }}
                                 />
                                 <strong className="text-truncate">{event.title}</strong>
@@ -882,7 +977,8 @@ const AppointmentCalendarPage = () => {
                             <div className="mb-2">
                               <small className="text-muted">
                                 <Icon icon="mdi:clock-outline" className="me-1" />
-                                {dayjs(event.start).format('MMM D, YYYY h:mm A')} - {dayjs(event.end).format('h:mm A')}
+                                {dayjs(event.start).format('MMM D, YYYY h:mm A')} -{' '}
+                                {dayjs(event.end).format('h:mm A')}
                                 {isToday && <span className="badge bg-info ms-2">Today</span>}
                               </small>
                             </div>
@@ -890,20 +986,29 @@ const AppointmentCalendarPage = () => {
                             <div className="row text-sm">
                               <div className="col-12 mb-1">
                                 <Icon icon="mdi:office-building" className="me-1 text-muted" />
-                                <small><strong>Branch:</strong> {event.branch}</small>
+                                <small>
+                                  <strong>La succursale:</strong> {event.branch}
+                                </small>
                               </div>
                               <div className="col-12 mb-1">
                                 <Icon icon="mdi:domain" className="me-1 text-muted" />
-                                <small><strong>Department:</strong> {event.department}</small>
+                                <small>
+                                  <strong>Département:</strong> {event.department}
+                                </small>
                               </div>
                               <div className="col-12 mb-1">
                                 <Icon icon="mdi:medical-bag" className="me-1 text-muted" />
-                                <small><strong>Specialization:</strong> {event.specialization}</small>
+                                <small>
+                                  <strong>Spécialisation:</strong> {event.specialization}
+                                </small>
                               </div>
                               {event.raw.participants.length > 0 && (
                                 <div className="col-12">
                                   <Icon icon="mdi:account-group" className="me-1 text-muted" />
-                                  <small><strong>Participants:</strong> {event.raw.participants.join(', ')}</small>
+                                  <small>
+                                    <strong>Participants:</strong>{' '}
+                                    {event.raw.participants.join(', ')}
+                                  </small>
                                 </div>
                               )}
                             </div>
@@ -924,7 +1029,7 @@ const AppointmentCalendarPage = () => {
         <Modal.Header closeButton>
           <Modal.Title>
             <Icon icon="mdi:calendar-account" className="me-2" />
-            Appointment Details
+            Détails du rendez-vous
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
@@ -939,11 +1044,13 @@ const AppointmentCalendarPage = () => {
                       height: 20,
                       backgroundColor: selectedEvent.bgColor,
                       marginRight: 12,
-                      borderRadius: '4px'
+                      borderRadius: '4px',
                     }}
                   />
                   <h5 className="mb-0">{selectedEvent.title}</h5>
-                  <span className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto`}>
+                  <span
+                    className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto`}
+                  >
                     {selectedEvent.raw.status || 'Unknown'}
                   </span>
                 </div>
@@ -956,34 +1063,44 @@ const AppointmentCalendarPage = () => {
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:clock-outline" className="me-2 text-primary" />
-                  <strong>Time:</strong> {dayjs(selectedEvent.start).format('h:mm A')} - {dayjs(selectedEvent.end).format('h:mm A')}
+                  <strong>Temps:</strong> {dayjs(selectedEvent.start).format('h:mm A')} -{' '}
+                  {dayjs(selectedEvent.end).format('h:mm A')}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:office-building" className="me-2 text-primary" />
-                  <strong>Branch:</strong> {selectedEvent.raw.original?.branch?.name || selectedEvent.branch}
+                  <strong>La succursale:</strong>{' '}
+                  {selectedEvent.raw.original?.branch?.name || selectedEvent.branch}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:domain" className="me-2 text-primary" />
-                  <strong>Department:</strong> {selectedEvent.raw.original?.department?.name || selectedEvent.department}
+                  <strong>Département:</strong>{' '}
+                  {selectedEvent.raw.original?.department?.name || selectedEvent.department}
                 </div>
               </div>
 
               <div className="col-md-6">
                 <div className="mb-3">
                   <Icon icon="mdi:medical-bag" className="me-2 text-success" />
-                  <strong>Specialization:</strong> {selectedEvent.raw.original?.specialization?.specialization_type || selectedEvent.specialization}
+                  <strong>Spécialisation:</strong>{' '}
+                  {selectedEvent.raw.original?.specialization?.specialization_type ||
+                    selectedEvent.specialization}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:map-marker" className="me-2 text-success" />
-                  <strong>Location:</strong> {selectedEvent.raw.original?.branch?.address || selectedEvent.raw.location || 'Not specified'}
+                  <strong>Emplacement:</strong>{' '}
+                  {selectedEvent.raw.original?.branch?.address ||
+                    selectedEvent.raw.location ||
+                    'Not specified'}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:phone" className="me-2 text-success" />
-                  <strong>Contact:</strong> {selectedEvent.raw.original?.branch?.phone || 'Not specified'}
+                  <strong>Contact:</strong>{' '}
+                  {selectedEvent.raw.original?.branch?.phone || 'Not specified'}
                 </div>
                 <div className="mb-3">
                   <Icon icon="mdi:email" className="me-2 text-success" />
-                  <strong>Email:</strong> {selectedEvent.raw.original?.branch?.email || 'Not specified'}
+                  <strong>E-mail:</strong>{' '}
+                  {selectedEvent.raw.original?.branch?.email || 'Not specified'}
                 </div>
               </div>
 
@@ -1006,24 +1123,25 @@ const AppointmentCalendarPage = () => {
                 {selectedEvent.raw.original?.patient && (
                   <div className="mb-3">
                     <Icon icon="mdi:account-heart" className="me-2 text-danger" />
-                    <strong>Patient Details:</strong>
+                    <strong>Détails du patient:</strong>
                     <div className="ms-4 mt-2">
                       <p className="mb-1">
-                        <strong>Name:</strong> {selectedEvent.raw.original.patient.firstname} {selectedEvent.raw.original.patient.lastname}
+                        <strong>Nom:</strong> {selectedEvent.raw.original.patient.firstname}{' '}
+                        {selectedEvent.raw.original.patient.lastname}
                       </p>
                       {selectedEvent.raw.original.patient.email && (
                         <p className="mb-1">
-                          <strong>Email:</strong> {selectedEvent.raw.original.patient.email}
+                          <strong>E-mail:</strong> {selectedEvent.raw.original.patient.email}
                         </p>
                       )}
                       {selectedEvent.raw.original.patient.phone && (
                         <p className="mb-1">
-                          <strong>Phone:</strong> {selectedEvent.raw.original.patient.phone}
+                          <strong>Téléphone:</strong> {selectedEvent.raw.original.patient.phone}
                         </p>
                       )}
                       {selectedEvent.raw.original.patient.age && (
                         <p className="mb-1">
-                          <strong>Age:</strong> {selectedEvent.raw.original.patient.age}
+                          <strong>Âge:</strong> {selectedEvent.raw.original.patient.age}
                         </p>
                       )}
                     </div>
@@ -1034,16 +1152,17 @@ const AppointmentCalendarPage = () => {
                 {(selectedEvent.raw.original?.therapist || selectedEvent.raw.original?.doctor) && (
                   <div className="mb-3">
                     <Icon icon="mdi:doctor" className="me-2 text-warning" />
-                    <strong>Healthcare Provider:</strong>
+                    <strong>Prestataire de santé:</strong>
                     <div className="ms-4 mt-2">
                       {selectedEvent.raw.original.therapist && (
                         <p className="mb-1">
-                          <strong>Therapist:</strong> {selectedEvent.raw.original.therapist.fullName}
+                          <strong>Thérapeute:</strong>{' '}
+                          {selectedEvent.raw.original.therapist.fullName}
                         </p>
                       )}
                       {selectedEvent.raw.original.doctor && (
                         <p className="mb-1">
-                          <strong>Doctor:</strong> {selectedEvent.raw.original.doctor.name}
+                          <strong>Médecin:</strong> {selectedEvent.raw.original.doctor.name}
                         </p>
                       )}
                     </div>
@@ -1053,7 +1172,7 @@ const AppointmentCalendarPage = () => {
                 {selectedEvent.raw.notes && (
                   <div className="mb-3">
                     <Icon icon="mdi:note-text" className="me-2 text-secondary" />
-                    <strong>Notes:</strong>
+                    <strong>Remarques:</strong>
                     <p className="mt-2 p-2 bg-light rounded">{selectedEvent.raw.notes}</p>
                   </div>
                 )}
@@ -1062,18 +1181,22 @@ const AppointmentCalendarPage = () => {
                 <div className="row mt-3">
                   <div className="col-md-6">
                     <small className="text-muted">
-                      <strong>Appointment ID:</strong> {selectedEvent.id}
+                      <strong>Numéro de rendez-vous:</strong> {selectedEvent.id}
                     </small>
                   </div>
                   <div className="col-md-6">
                     <small className="text-muted">
-                      <strong>Created:</strong> {selectedEvent.raw.original?.created_at ? dayjs(selectedEvent.raw.original.created_at).format('MMM D, YYYY') : 'N/A'}
+                      <strong>Créé:</strong>{' '}
+                      {selectedEvent.raw.original?.created_at
+                        ? dayjs(selectedEvent.raw.original.created_at).format('MMM D, YYYY')
+                        : 'N/A'}
                     </small>
                   </div>
                   {selectedEvent.raw.original?.purposeOfVisit && (
                     <div className="col-12 mt-2">
                       <small className="text-muted">
-                        <strong>Purpose of Visit:</strong> {selectedEvent.raw.original.purposeOfVisit}
+                        <strong>But de la visite:</strong>{' '}
+                        {selectedEvent.raw.original.purposeOfVisit}
                       </small>
                     </div>
                   )}
@@ -1083,14 +1206,14 @@ const AppointmentCalendarPage = () => {
           ) : (
             <div className="text-center py-4">
               <Icon icon="mdi:calendar-remove" className="text-muted mb-3" />
-              <p>No appointment selected.</p>
+              <p>Aucun rendez-vous sélectionné.</p>
             </div>
           )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
             <Icon icon="mdi:close" className="me-1" />
-            Close
+            Fermer
           </Button>
         </Modal.Footer>
       </Modal>
@@ -1100,17 +1223,17 @@ const AppointmentCalendarPage = () => {
         <Modal.Header closeButton>
           <Modal.Title>
             <Icon icon="mdi:calendar-multiple" className="me-2" />
-            More Appointments
+            Plus de rendez-vous
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
           <div className="mb-3">
-            <h6 className="text-muted">All appointments for this day:</h6>
+            <h6 className="text-muted">Tous les rendez-vous pour cette journée:</h6>
           </div>
           {moreEvents.length === 0 ? (
             <div className="text-center py-4">
               <Icon icon="mdi:calendar-remove" className="text-muted mb-3" />
-              <p>No additional appointments found.</p>
+              <p>Aucun rendez-vous supplémentaire trouvé.</p>
             </div>
           ) : (
             <div className="list-group">
@@ -1133,14 +1256,15 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: event.bgColor,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       <div>
                         <h6 className="mb-1">{event.title}</h6>
                         <small className="text-muted">
                           <Icon icon="mdi:clock-outline" className="me-1" />
-                          {dayjs(event.start).format('h:mm A')} - {dayjs(event.end).format('h:mm A')}
+                          {dayjs(event.start).format('h:mm A')} -{' '}
+                          {dayjs(event.end).format('h:mm A')}
                         </small>
                       </div>
                     </div>
@@ -1164,7 +1288,7 @@ const AppointmentCalendarPage = () => {
         <Modal.Footer>
           <Button variant="outline-secondary" onClick={() => setShowMoreModal(false)}>
             <Icon icon="mdi:close" className="me-1" />
-            Close
+            Fermer
           </Button>
         </Modal.Footer>
       </Modal>

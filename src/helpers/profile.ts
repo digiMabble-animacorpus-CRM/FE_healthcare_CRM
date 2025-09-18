@@ -1,8 +1,8 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import { encryptAES, decryptAES } from '@/utils/encryption';
 import type { ProfileCreatePayload, ProfileType } from '@/types/data';
+import { decryptAES, encryptAES } from '@/utils/encryption';
 
 export interface ProfileUpdatePayload {
   name?: string;
@@ -48,8 +48,6 @@ export const getAllProfiles = async (
       ...(search ? { searchText: search } : {}),
     };
 
-    console.log('Filters (plain):', filters);
-
     const queryParams = new URLSearchParams(filters).toString();
 
     const response = await fetch(`${API_BASE_PATH}/staff?${queryParams}`, {
@@ -67,7 +65,6 @@ export const getAllProfiles = async (
     }
 
     const jsonData = await response.json();
-    console.log('Response from server:', jsonData);
 
     const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
@@ -89,7 +86,6 @@ export const getProfileById = async (therapistId: any): Promise<ProfileType | nu
   }
 
   const url = `${API_BASE_PATH}/staff/${therapistId}`;
-  console.log('Requesting therapist by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -100,10 +96,7 @@ export const getProfileById = async (therapistId: any): Promise<ProfileType | nu
       },
     });
 
-    console.log('Response status:', response.status);
-
     const result = await response.json();
-    console.log('Full API response:', result);
 
     if (!response.ok) {
       console.error('Failed to fetch therapist:', result?.message || 'Unknown error');

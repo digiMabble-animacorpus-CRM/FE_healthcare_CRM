@@ -67,7 +67,7 @@ const PropertyAddCard = () => {
             </Col>
             <Col lg={6}>
               <Button variant="danger" className="w-100">
-                Cancel
+              Annuler
               </Button>
             </Col>
           </Row>

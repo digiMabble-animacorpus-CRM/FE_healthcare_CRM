@@ -10,8 +10,6 @@ const CreateLanguagePage = () => {
 
   const handleCreate = async (data: Omit<LanguageType, '_id'>) => {
     try {
-      // 🔧 Replace with your actual API call here:
-      console.log('Creating Language...', data);
       // await createLanguageAPI(data);
 
       toast.success('Language created successfully!');

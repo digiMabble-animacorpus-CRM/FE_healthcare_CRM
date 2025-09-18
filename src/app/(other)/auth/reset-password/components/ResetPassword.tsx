@@ -78,13 +78,15 @@ const ResetPassword = () => {
                     <Image src={LogoLight} height={28} alt="logo light" />
                   </Link>
                 </div>
-                <h2 className="fw-bold text-uppercase text-center fs-18">Reset Password</h2>
+                <h2 className="fw-bold text-uppercase text-center fs-18">
+                  Réinitialiser le mot de passe
+                </h2>
                 <p className="text-muted text-center mt-1 mb-4">
                   {token
-                    ? 'Enter your new password to reset your account.'
-                    : 'Enter your email address and we’ll send you an email with instructions to reset your password.'}
+                    ? 'Entrez votre nouveau mot de passe pour réinitialiser votre compte.'
+                    : 'Saisissez votre adresse e-mail et nous vous enverrons un e-mail contenant des instructions pour réinitialiser votre mot de passe..'}
                 </p>
-                <div className="px-4">
+                <div className="px-4 mb-5">
                   <form onSubmit={handleSubmit(onSubmit)} className="authentication-form">
                     <div className="mb-3">
                       {token ? (
@@ -93,16 +95,16 @@ const ResetPassword = () => {
                             control={control}
                             name="password"
                             type="password"
-                            label="New Password"
-                            placeholder="Enter new password"
+                            label="Nouveau mot de passe"
+                            placeholder="Entrez le nouveau mot de passe"
                             className="bg-light bg-opacity-50 border-light py-2"
                           />
                           <TextFormInput
                             control={control}
                             name="confirmPassword"
                             type="password"
-                            label="Confirm Password"
-                            placeholder="Re-enter new password"
+                            label="Confirmez le mot de passe"
+                            placeholder="Ré-entrer le nouveau mot de passe"
                             className="bg-light bg-opacity-50 border-light py-2"
                           />
                         </>
@@ -111,8 +113,8 @@ const ResetPassword = () => {
                           control={control}
                           name="email"
                           type="email"
-                          label="Email"
-                          placeholder="Enter your email"
+                          label="E-mail"
+                          placeholder="Entrez votre email"
                           className="bg-light bg-opacity-50 border-light py-2"
                         />
                       )}
@@ -123,19 +125,21 @@ const ResetPassword = () => {
                         className="btn btn-danger py-2 fw-medium"
                         type="submit"
                       >
-                        {token ? 'Set New Password' : 'Reset Password'}
+                        {token
+                          ? 'Définir un nouveau mot de passe'
+                          : 'Réinitialiser le mot de passe'}
                       </button>
                     </div>
                   </form>
                 </div>
+                <p className="mb-0 text-center">
+                  Retour à{' '}
+                  <Link href="/auth/sign-in" className="text-reset text-unline-dashed fw-bold ms-1">
+                    Se connecter
+                  </Link>
+                </p>
               </CardBody>
             </Card>
-            <p className="mb-0 text-center text-white">
-              Back to{' '}
-              <Link href="/auth/sign-in" className="text-reset text-unline-dashed fw-bold ms-1">
-                Sign In
-              </Link>
-            </p>
           </Col>
         </Row>
       </Container>

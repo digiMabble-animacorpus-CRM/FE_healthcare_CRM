@@ -58,13 +58,13 @@ const LanguageForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Pr
         <Card>
           <CardHeader>
             <CardTitle as="h5">
-              {isEditMode ? 'Edit Language Details' : 'Create New Language'}
+              {isEditMode ? 'Modifier la langue' : 'Créer une nouvelle langue'}
             </CardTitle>
           </CardHeader>
 
           <CardBody>
             <div className="mb-4">
-              <h5 className="mb-3">Language Information</h5>
+              <h5 className="mb-3">Informations linguistiques</h5>
               <Row>
                 <Col lg={6}>
                   <div className="mb-3">
@@ -72,8 +72,8 @@ const LanguageForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Pr
                       required
                       control={control}
                       name="key"
-                      label="Enter Key"
-                      placeholder="Ex: en-US"
+                      label="Entrer la clé"
+                      placeholder="Ex: en-UK"
                     />
                   </div>
                 </Col>
@@ -84,8 +84,8 @@ const LanguageForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Pr
                       required
                       control={control}
                       name="label"
-                      label="Enter Language"
-                      placeholder="Ex: English (US)"
+                      label="Entrez la langue"
+                      placeholder="Ex: English (UK)"
                     />
                   </div>
                 </Col>
@@ -94,10 +94,10 @@ const LanguageForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Pr
 
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">
-                {isEditMode ? 'Update' : 'Create'} Language
+                {isEditMode ? 'Mise à jour' : 'Créer'} Langue
               </Button>
               <Button variant="secondary" onClick={() => router.back()}>
-                Cancel
+                Annuler
               </Button>
             </div>
           </CardBody>

@@ -13,10 +13,11 @@ import {
   DropdownMenu,
   DropdownToggle,
 } from 'react-bootstrap';
-import { API_BASE_PATH } from "@/context/constants";
+import { API_BASE_PATH } from '@/context/constants';
 
 const ProfileDropdown = () => {
   const [fullName, setFullName] = useState<string>('User');
+  const [avatarUrl, setAvatarUrl] = useState<string>(avatar1.src); // Default to local image
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -31,10 +32,12 @@ const ProfileDropdown = () => {
           },
         });
 
-        if ( res.data?.user?.team.full_name) {
-          setFullName( res.data?.user?.team.full_name);
+        if (res.data?.user?.team.full_name) {
+          setFullName(res.data.user.team.full_name);
         }
-        // console.log('Full name:', res.data?.user?.team.full_name);
+        if (res.data?.user?.team.photo) {
+          setAvatarUrl(res.data.user.team.photo); // Use API photo field
+        }
       } catch (error) {
         console.error('Error fetching profile:', error);
       }
@@ -55,29 +58,31 @@ const ProfileDropdown = () => {
         aria-expanded="false"
       >
         <span className="d-flex align-items-center">
-          <Image className="rounded-circle" width={32} src={avatar1} alt="avatar" />
+          <Image className="rounded-circle" width={32} height={32} src={avatarUrl} alt="avatar" />
         </span>
       </DropdownToggle>
       <DropdownMenu className="dropdown-menu-end">
         <DropdownHeader as={'h6'} className="dropdown-header">
-          Welcome {fullName}!
+          Bienvenue {fullName}!
         </DropdownHeader>
         <DropdownItem as={Link} href="/profile/details">
-          <IconifyIcon icon="solar:calendar-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">My Profile</span>
+          {/* <IconifyIcon icon="solar:user-broken" className="align-middle me-2 fs-18" /> */}
+          <IconifyIcon icon="mdi:account" className="align-middle me-2 fs-18" />
+
+          <span className="align-middle">Mon profil</span>
         </DropdownItem>
-        <DropdownItem as={Link} href="/pages/pricing">
+        <DropdownItem as={Link} href="/maintenance">
           <IconifyIcon icon="solar:wallet-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">Help & Support</span>
+          <span className="align-middle">Aide et assistance</span>
         </DropdownItem>
-        <DropdownItem as={Link} href="/support/faqs">
+        <DropdownItem as={Link} href="/maintenance">
           <IconifyIcon icon="solar:help-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">Privacy & Conditions</span>
+          <span className="align-middle">Confidentialité et conditions</span>
         </DropdownItem>
         <div className="dropdown-divider my-1" />
         <DropdownItem as={Link} className=" text-danger" href="/auth/sign-in">
           <IconifyIcon icon="solar:logout-3-broken" className="align-middle me-2 fs-18" />
-          <span className="align-middle">Logout</span>
+          <span className="align-middle">Déconnexion</span>
         </DropdownItem>
       </DropdownMenu>
     </Dropdown>

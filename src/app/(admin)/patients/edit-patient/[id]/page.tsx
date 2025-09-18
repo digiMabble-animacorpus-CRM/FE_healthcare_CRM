@@ -1,15 +1,13 @@
-import FileUpload from '@/components/FileUpload';
+import AddPatient from '@/app/(admin)/patients/add-patient/components/AddPatient';
 import PageTitle from '@/components/PageTitle';
-import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
-import AddPatient from "@/app/(admin)/patients/add-patient/components/AddPatient";
 
 export const metadata: Metadata = { title: 'Customers Add' };
 
 const PatientEditPage = ({ params }: { params: { id: string } }) => {
   return (
     <>
-      <PageTitle title="Edit Enquiry" subName="" />
+      <PageTitle title="Edit Patient" subName="" />
       <AddPatient params={params} />
     </>
   );

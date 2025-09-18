@@ -36,7 +36,7 @@ const Profile = () => {
             <Col md={6}>
               <TextFormInput
                 name="fName"
-                label="First Name"
+                label="Prénom"
                 placeholder="Chris"
                 containerClassName="mb-3"
                 control={control}
@@ -45,7 +45,7 @@ const Profile = () => {
             <Col md={6}>
               <TextFormInput
                 name="lName"
-                label="Last Name"
+                label="Nom de famille"
                 placeholder="Keller"
                 containerClassName="mb-3"
                 control={control}

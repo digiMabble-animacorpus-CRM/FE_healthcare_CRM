@@ -4,7 +4,17 @@ import { useEffect, useMemo, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Form, Row, Spinner } from 'react-bootstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Form,
+  Row,
+  Spinner,
+} from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 
 import type { BranchType, LanguageType, PatientType } from '@/types/data';
@@ -31,33 +41,34 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     primarypatientrecordid: yup.string(),
 
     // required fields
-    firstname: yup.string().required('Please enter first name'),
-    lastname: yup.string().required('Please enter last name'),
+    firstname: yup.string().required('Veuillez saisir votre prénom'),
+    lastname: yup.string().required('Veuillez entrer votre nom de famille'),
     middlename: yup.string(),
-    emails: yup.string().email('Invalid email').required('Please enter email'),
-   phones: yup
-  .array()
-  .of(
-    yup
-      .string()
-      .matches(/^\d{10}$/, 'Enter valid 10-digit number')
-  )
-  .min(1, 'Please provide at least one phone number'),
+    emails: yup.string().email('E-mail invalide').required('Veuillez saisir votre adresse e-mail'),
+    phones: yup
+      .array()
+      .of(yup.string().matches(/^\d{10}$/, 'Entrez un numéro de téléphone valide'))
+      .min(1, 'Veuillez fournir au moins un numéro de téléphone'),
 
-    birthdate: yup.string().required('Please enter Date of birth'),
-    street: yup.string().required('Please enter address'),
-    note: yup.string().required('Please enter description'),
-    zipcode: yup.string().required('Please enter Zipcode'),
-    legalgender: yup.string().required('Please select gender'),
-    language: yup.string().required('Please select language'),
-    city: yup.string().required('Please select city'),
-    country: yup.string().required('Please select country'),
+    birthdate: yup.string().required('Veuillez saisir votre date de naissance'),
+    street: yup.string().required('Veuillez entrer l adresse'),
+    note: yup.string().required('Veuillez saisir une description'),
+    zipcode: yup.string().required('Veuillez entrer le code postal'),
+    legalgender: yup.string().required('Veuillez sélectionner le sexe'),
+    language: yup.string().required('Veuillez sélectionner la langue'),
+    city: yup.string().required('Veuillez sélectionner la ville'),
+    country: yup.string().required('Veuillez sélectionner un pays'),
     ssin: yup.string(),
-    status: yup.string().required('Please select status'),
-    mutualitynumber: yup.string().required('Please enter mutuality number'),
-    mutualityregistrationnumber: yup.string().required('Please enter mutuality registration number'),
+    status: yup.string().required('Veuillez sélectionner le statut'),
+    mutualitynumber: yup.string().required('Veuillez saisir le numéro de mutualité'),
+    mutualityregistrationnumber: yup
+      .string()
+      .required('Veuillez saisir le numéro de carte de résident'),
     branch: yup.string(),
-    tags: yup.array().of(yup.string().required()).min(1, 'Please select at least one tag'),
+    tags: yup
+      .array()
+      .of(yup.string().required())
+      .min(1, 'Veuillez sélectionner au moins une balise'),
   })
   .required()
   .noUnknown(true);
@@ -163,74 +174,76 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     <Form onSubmit={handleSubmit(onSubmit)}>
       <Card>
         <CardHeader>
-          <CardTitle as="h4">{isEditMode ? 'Edit Patient' : 'Add Patient'}</CardTitle>
+          <CardTitle as="h4">{isEditMode ? 'Modifier le patient' : 'Ajouter un patient'}</CardTitle>
         </CardHeader>
         <CardBody>
           <Row>
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="firstname"
-                label="First Name"
-                placeholder="Enter First Name"
+                label="Prénom"
+                placeholder="Entre Prénom"
               />
             </Col>
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="lastname"
-                label="Last Name"
-                placeholder="Enter Last Name"
+                label="Nom de famille"
+                placeholder="Entrez Nom de famille"
               />
             </Col>
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="middlename"
-                label="Middle Name"
-                placeholder="Enter Middle Name"
+                label="Deuxième prénom"
+                placeholder="Entrez le deuxième prénom"
               />
             </Col>
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="emails"
-                label="Email"
-                placeholder="Enter Email"
+                label="E-mail"
+                placeholder="Entrez votre adresse e-mail"
               />
             </Col>
 
             {/* Phones */}
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name={`phones.0`}
-                label="Phone Number"
-                placeholder="Enter Phone Number"
+                label="Numéro de téléphone"
+                placeholder="Entrez le numéro de téléphone"
                 type="number"
               />
-              {errors.phones && (
-                <small className="text-danger">{(errors.phones as any)?.[0]?.message}</small>
-              )}
             </Col>
 
-            <Col lg={6}>
-              <TextFormInput control={control} name="birthdate" label="Date of Birth" type="date" />
+            <Col lg={6} className="mb-3">
+              <TextFormInput
+                control={control}
+                name="birthdate"
+                label="Date de naissance"
+                type="date"
+              />
             </Col>
 
             {/* Gender */}
-            <Col lg={6}>
-              <label className="form-label">Gender</label>
+            <Col lg={6} className="mb-3">
+              <label className="form-label">Genre</label>
               <Controller
                 control={control}
                 name="legalgender"
                 render={({ field }) => (
                   <ChoicesFormInput className="form-control" {...field}>
                     <option value="" disabled hidden>
-                      Select Gender
+                      Sélectionnez le sexe
                     </option>
-                    <option value="male">Male</option>
-                    <option value="female">Female</option>
+                    <option value="male">Mâle</option>
+                    <option value="female">Femelle</option>
                     <option value="others">Others</option>
                   </ChoicesFormInput>
                 )}
@@ -241,7 +254,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
             </Col>
 
             {/* Language */}
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <label className="form-label">Language</label>
               <Controller
                 control={control}
@@ -249,7 +262,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                 render={({ field }) => (
                   <ChoicesFormInput className="form-control" {...field}>
                     <option value="" disabled hidden>
-                      Select Language
+                      Sélectionnez la langue
                     </option>
                     {allLanguages.map((lang) => (
                       <option key={lang.key} value={lang.key}>
@@ -262,21 +275,21 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               {errors.language && <small className="text-danger">{errors.language.message}</small>}
             </Col>
 
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextAreaFormInput
                 control={control}
                 name="street"
-                label="Address"
-                placeholder="Enter Address"
+                label="Adresse"
+                placeholder="Entrez l'adresse"
                 rows={3}
               />
             </Col>
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextAreaFormInput
                 control={control}
                 name="note"
                 label="Description"
-                placeholder="Enter Description"
+                placeholder="Entrez la description"
                 rows={3}
               />
             </Col>
@@ -285,66 +298,50 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput
                 control={control}
                 name="zipcode"
-                label="Zip-Code"
-                placeholder="Enter Zip-Code"
+                label="Code Postal"
+                placeholder="Entrez le code postal"
                 type="number"
               />
             </Col>
 
             {/* City */}
             <Col lg={4}>
-              <label className="form-label">City</label>
-              <Controller
+              <TextFormInput
                 control={control}
                 name="city"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select City
-                    </option>
-                    <option value="London">London</option>
-                    <option value="Paris">Paris</option>
-                    <option value="New York">New York</option>
-                  </ChoicesFormInput>
-                )}
+                label="Ville"
+                placeholder="Entrez la ville"
+                type="text"
               />
               {errors.city && <small className="text-danger">{errors.city.message}</small>}
             </Col>
 
             {/* Country */}
             <Col lg={4}>
-              <label className="form-label">Country</label>
-              <Controller
+              <TextFormInput
                 control={control}
                 name="country"
-                render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
-                    <option value="" disabled hidden>
-                      Select Country
-                    </option>
-                    <option value="UK">United Kingdom</option>
-                    <option value="FR">France</option>
-                    <option value="IN">India</option>
-                  </ChoicesFormInput>
-                )}
+                label="Pays"
+                placeholder="Entrez le pays"
+                type="text"
               />
               {errors.country && <small className="text-danger">{errors.country.message}</small>}
             </Col>
 
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput control={control} name="ssin" label="SSIN" placeholder="Enter SSIN" />
             </Col>
 
             {/* Status */}
-            <Col lg={6}>
-              <label className="form-label">Status</label>
+            <Col lg={6} className="mb-3">
+              <label className="form-label">Statut</label>
               <Controller
                 control={control}
                 name="status"
                 render={({ field }) => (
                   <ChoicesFormInput className="form-control" {...field}>
                     <option value="" disabled hidden>
-                      Select Status
+                      Sélectionnez le statut
                     </option>
                     <option value="ACTIVE">Active</option>
                     <option value="INACTIVE">Inactive</option>
@@ -354,20 +351,20 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               {errors.status && <small className="text-danger">{errors.status.message}</small>}
             </Col>
 
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="mutualitynumber"
-                label="Mutuality Number"
-                placeholder="Enter Mutuality Number"
+                label="Numéro de Mutualité"
+                placeholder="Entrez le numéro de mutualité"
               />
             </Col>
-            <Col lg={6}>
+            <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="mutualityregistrationnumber"
-                label="Mutuality Registration Number"
-                placeholder="Enter Mutuality Registration Number"
+                label="Numéro de carte de résident"
+                placeholder="Entrez le numéro de carte de résident"
               />
             </Col>
           </Row>
@@ -377,13 +374,13 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       <div className="mb-3 rounded">
         <Row className="justify-content-end g-2 mt-2">
           <Col lg={2}>
-            <Button variant="outline-primary" type="submit" className="w-100">
-              {isEditMode ? 'Update' : 'Create'} Patient
+            <Button variant="primary" type="submit" className="w-100">
+              {isEditMode ? 'Mise à jour' : 'Créer'} Patient
             </Button>
           </Col>
           <Col lg={2}>
             <Button variant="danger" className="w-100" onClick={() => router.back()}>
-              Cancel
+              Annuler
             </Button>
           </Col>
         </Row>

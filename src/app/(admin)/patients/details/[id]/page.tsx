@@ -1,3 +1,4 @@
+// PatientDetailsPage.tsx
 'use client';
 
 import PageTitle from '@/components/PageTitle';
@@ -84,13 +85,76 @@ const PatientDetailsPage = () => {
 
   useEffect(() => {
     if (!id) return;
+    const transformPatientPayload = (data: any) => ({
+      ...data,
+      phones: data.phones.filter((p: string) => p.trim() !== ''),
+      therapistId: data.therapistId ? Number(data.therapistId) : null,
+    });
 
     const fetchPatient = async () => {
       setLoading(true);
       try {
-        const patient = await getPatientById(id);
-        if (!patient) throw new Error('Failed to fetch patient');
-        setData(patient);
+        const rawPatient = await getPatientById(id);
+        if (!rawPatient) throw new Error('Failed to fetch patient');
+
+        // 🔥 Transform raw API response → PatientType
+        const transformedPatient: PatientType = {
+          id: rawPatient.id ?? null,
+          firstname: rawPatient.firstname || '',
+          lastname: rawPatient.lastname || '',
+          middlename: rawPatient.middlename || '',
+          ssin: rawPatient.ssin || '',
+          legalgender: rawPatient.legalgender || '',
+          language: rawPatient.language || '',
+          birthdate: rawPatient.birthdate || null,
+          primarypatientrecordid: rawPatient.primarypatientrecordid || '',
+          note: rawPatient.note || '',
+          status: rawPatient.status || 'INACTIVE',
+          mutualitynumber: rawPatient.mutualitynumber || '',
+          mutualityregistrationnumber: rawPatient.mutualityregistrationnumber || '',
+          emails: rawPatient.emails || '',
+          country: rawPatient.country || '',
+          city: rawPatient.city || '',
+          street: rawPatient.street || '',
+          zipcode: rawPatient.zipcode || '',
+          number: rawPatient.number || '',
+          phones: Array.isArray(rawPatient.phones) ? rawPatient.phones : [],
+          // created_at: rawPatient.created_at || null,
+          // is_delete: rawPatient.is_delete || false,
+          // deleted_at: rawPatient.deleted_at || null,
+
+          // 🔥 Therapist mapping
+          therapistId: rawPatient.therapistId ?? null,
+          therapist: rawPatient.therapist
+            ? {
+                therapistId: rawPatient.therapist.therapistId ?? null,
+                firstName: rawPatient.therapist.firstName || '',
+                lastName: rawPatient.therapist.lastName || '',
+                fullName: `${rawPatient.therapist.firstName || ''} ${
+                  rawPatient.therapist.lastName || ''
+                }`.trim(),
+                photo: rawPatient.therapist.photo || null,
+                imageUrl: rawPatient.therapist.imageUrl || rawPatient.therapist.photo || null,
+                contactEmail: rawPatient.therapist.contactEmail || '',
+                contactPhone: rawPatient.therapist.contactPhone || '',
+                aboutMe: rawPatient.therapist.aboutMe || null,
+                degreesTraining:
+                  rawPatient.therapist.degreesTraining || rawPatient.therapist.degreesAndTraining,
+                inamiNumber: rawPatient.therapist.inamiNumber || '',
+                paymentMethods: rawPatient.therapist.paymentMethods || null,
+                faq: rawPatient.therapist.faq || null,
+                departmentId: rawPatient.therapist.departmentId || null,
+                
+                availability: Array.isArray(rawPatient.therapist.availability)
+                  ? rawPatient.therapist.availability
+                  : [],
+                isDelete: rawPatient.therapist.isDelete || false,
+                deletedAt: rawPatient.therapist.deletedAt || null,
+              }
+            : null,
+        };
+
+        setData(transformedPatient);
       } catch (error) {
         console.error(error);
         alert('Failed to load patient details');
@@ -108,7 +172,7 @@ const PatientDetailsPage = () => {
 
   return (
     <>
-      <PageTitle subName="Healthcare" title="Patient Overview" />
+      <PageTitle subName="Healthcare" title="Aperçu des patients" />
       <PatientDetails
         id={data.id}
         name={`${data.firstname} ${data.lastname}`}
@@ -116,7 +180,8 @@ const PatientDetailsPage = () => {
         birthdate={
           data.birthdate
             ? `${data.birthdate} | ${data.legalgender || ''} | ${calculateAge(data.birthdate)} yrs`
-            : ''}
+            : ''
+        }
         email={data.emails}
         phones={
           Array.isArray(data.phones)
@@ -128,6 +193,11 @@ const PatientDetailsPage = () => {
         address={data.street}
         city={data.city}
         country={data.country}
+        zipcode={data.zipcode} // ✅ new
+        language={data.language} // ✅ new
+        ssin={data.ssin} // ✅ new
+        mutualitynumber={data.mutualitynumber} // ✅ new
+        mutualityregistrationnumber={data.mutualityregistrationnumber} // ✅ new
         status={data.status === 'ACTIVE' ? 'ACTIVE' : 'INACTIVE'}
         note={data.note}
         weeklyInquiry={defaultWeeklyInquiry}
@@ -135,6 +205,7 @@ const PatientDetailsPage = () => {
         transactionHistory={defaultTransactionHistory}
         feedbacks={defaultFeedbacks}
         files={defaultFiles}
+        therapist={data.therapist || null}
       />
     </>
   );

@@ -3,7 +3,7 @@
       "id": "conv_001",
       "lead_id": "lead_001",
       "agent_id": "agent_001",
-      "channel": "Email",
+      "channel": "E-mail",
       "message": "Hello, I'm interested in the 2BHK near Rue Royale.",
       "timestamp": "2025-04-18T09:00:00"
     },

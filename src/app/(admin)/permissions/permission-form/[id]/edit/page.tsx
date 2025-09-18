@@ -39,7 +39,6 @@ const EditPermissionPage = ({ params }: Props) => {
 
   const onSubmitHandler = async (data: Omit<PermissionType, '_id'>) => {
     try {
-      console.log('Permission updated', data);
       // await updatePermission(params.id as string, data);
       router.push('/permissions');
     } catch {

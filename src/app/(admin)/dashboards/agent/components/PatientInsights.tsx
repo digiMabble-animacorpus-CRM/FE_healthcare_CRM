@@ -1,8 +1,10 @@
 'use client';
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import dynamic from 'next/dynamic';
+import { getPatientsDashboardData } from '@/helpers/dashboard'; // Adjust path as needed
+import { useEffect, useState } from 'react';
 import {
+  Alert,
   Card,
   CardBody,
   CardHeader,
@@ -14,17 +16,57 @@ import {
   DropdownToggle,
   ProgressBar,
   Row,
+  Spinner,
 } from 'react-bootstrap';
-
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
-  ssr: false,
-});
-
+import { FaChild, FaFemale, FaMale } from 'react-icons/fa';
 
 type Demographics = {
   gender: { male: number; female: number; other: number };
   ageBuckets: { label: string; value: number }[];
   topCities: { city: string; count: number }[];
+};
+
+const AgeDistributionWidget = ({
+  ageBuckets,
+}: {
+  ageBuckets: { label: string; value: number }[];
+}) => {
+  const total = ageBuckets.reduce((sum, a) => sum + a.value, 0);
+
+  const getIcon = (label: string) => {
+    if (label.toLowerCase().includes('kid')) return FaChild;
+    if (label.toLowerCase().includes('men')) return FaMale;
+    if (label.toLowerCase().includes('woman') || label.toLowerCase().includes('female'))
+      return FaFemale;
+    return FaChild; // fallback
+  };
+
+  return (
+    <Row className="g-3">
+      {ageBuckets.map((bucket) => {
+        const percent = total ? Math.round((bucket.value / total) * 100) : 0;
+        const Icon = getIcon(bucket.label);
+        return (
+          <Col lg={4} key={bucket.label}>
+            <div className="border rounded p-3 d-flex align-items-center gap-3">
+              <div className="avatar-md flex-centered bg-light rounded-circle">
+                <Icon size={30} className="text-primary" />
+              </div>
+              <div className="flex-grow-1">
+                <p className="mb-1 text-muted">{bucket.label}</p>
+                <p className="fs-18 text-dark fw-medium">
+                  {bucket.value} <span className="text-muted fs-14">({percent}%)</span>
+                </p>
+                <div className="progress" style={{ height: 10 }}>
+                  <div className="progress-bar bg-warning" style={{ width: `${percent}%` }} />
+                </div>
+              </div>
+            </div>
+          </Col>
+        );
+      })}
+    </Row>
+  );
 };
 
 const PatientInsights = ({
@@ -36,35 +78,12 @@ const PatientInsights = ({
   newPatientsMonth: number;
   demographics: Demographics;
 }) => {
-  // Age chart setup
-  const ageChartOptions = {
-    chart: {
-      type: 'bar' as const,
-      toolbar: { show: false },
-    },
-    plotOptions: {
-      bar: { horizontal: true, borderRadius: 4 },
-    },
-    dataLabels: { enabled: false },
-    xaxis: {
-      categories: demographics.ageBuckets.map((a) => a.label),
-    },
-    colors: ['#0d6efd'],
-  };
-
-  const ageChartSeries = [
-    {
-      name: 'Patients',
-      data: demographics.ageBuckets.map((a) => a.value),
-    },
-  ];
-
   return (
     <Col xl={12} lg={12}>
       <Card>
         {/* Card Header */}
         <CardHeader className="d-flex justify-content-between align-items-center border-0 pb-1">
-          <CardTitle>Patient Insights</CardTitle>
+          <CardTitle>Points de vue des patients</CardTitle>
           <Dropdown>
             <DropdownToggle
               as={'a'}
@@ -72,12 +91,12 @@ const PatientInsights = ({
               data-bs-toggle="dropdown"
               aria-expanded="false"
             >
-              Week{' '}
+              Semaine{' '}
               <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
-              <DropdownItem>Week</DropdownItem>
-              <DropdownItem>Month</DropdownItem>
+              <DropdownItem>Semaine</DropdownItem>
+              <DropdownItem>Mois</DropdownItem>
             </DropdownMenu>
           </Dropdown>
         </CardHeader>
@@ -87,11 +106,11 @@ const PatientInsights = ({
           <Row className="mb-3 text-center">
             <Col>
               <div className="fw-semibold fs-4">{newPatientsWeek}</div>
-              <div className="text-muted">New Patients (week)</div>
+              <div className="text-muted">Nouveaux patients (Semaine)</div>
             </Col>
             <Col>
               <div className="fw-semibold fs-4">{newPatientsMonth}</div>
-              <div className="text-muted">New Patients (month)</div>
+              <div className="text-muted">Nouveaux patients (Mois)</div>
             </Col>
           </Row>
 
@@ -99,7 +118,7 @@ const PatientInsights = ({
           <Row className="g-3 mb-3">
             <Col md={6}>
               <div className="p-2 border rounded bg-light-subtle">
-                <h6>Gender</h6>
+                <h6>Genre</h6>
                 {Object.entries(demographics.gender).map(([key, value]) => (
                   <div className="mb-2" key={key}>
                     <div className="d-flex justify-content-between mb-1">
@@ -114,7 +133,7 @@ const PatientInsights = ({
 
             <Col md={6}>
               <div className="p-2 border rounded bg-light-subtle">
-                <h6>Top Cities</h6>
+                <h6>La Succursale</h6>
                 {demographics.topCities.map((c, idx) => (
                   <div className="mb-2" key={idx}>
                     <div className="d-flex justify-content-between mb-1">
@@ -134,15 +153,10 @@ const PatientInsights = ({
             </Col>
           </Row>
 
-          {/* Age Distribution Chart */}
+          {/* Age Distribution Widget */}
           <div className="p-2 border rounded bg-light-subtle">
-            <h6>Age Distribution</h6>
-            <ReactApexChart
-              options={ageChartOptions}
-              series={ageChartSeries}
-              type="bar"
-              height={180}
-            />
+            <h6>Répartition par âge</h6>
+            <AgeDistributionWidget ageBuckets={demographics.ageBuckets} />
           </div>
         </CardBody>
       </Card>
@@ -150,4 +164,65 @@ const PatientInsights = ({
   );
 };
 
-export default PatientInsights;
+const PatientInsightsContainer = (props: any) => {
+  const [dashboardData, setDashboardData] = useState<{
+    newPatientsWeek: number;
+    newPatientsMonth: number;
+    demographics: Demographics;
+  } | null>(null);
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchDashboardData() {
+      setLoading(true);
+      setError(null);
+      try {
+        const data = await getPatientsDashboardData();
+        if (data) {
+          setDashboardData(data);
+        } else {
+          setError('Échec du chargement des données du tableau de bord des patients.');
+        }
+      } catch (err) {
+        setError('Une erreur est survenue lors du chargement.');
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchDashboardData();
+  }, []);
+
+  if (loading) {
+    return (
+      <Col xl={12} lg={12} className="text-center my-5">
+        <Spinner animation="border" />
+      </Col>
+    );
+  }
+
+  if (error) {
+    return (
+      <Col xl={12} lg={12} className="my-5">
+        <Alert variant="danger">{error}</Alert>
+      </Col>
+    );
+  }
+
+  if (!dashboardData) {
+    return null;
+  }
+
+  return (
+    <PatientInsights
+      newPatientsWeek={dashboardData.newPatientsWeek}
+      newPatientsMonth={dashboardData.newPatientsMonth}
+      demographics={dashboardData.demographics}
+    />
+  );
+};
+
+export default PatientInsightsContainer;

@@ -1,21 +1,14 @@
-"use client";
+'use client';
 
-import { FormProvider, useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import * as yup from "yup";
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Button,
-  Spinner,
-} from "react-bootstrap";
-import { API_BASE_PATH } from "@/context/constants";
-import type { PatientType } from "@/types/data";
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // ✅ for navigation
-import AppointmentFields from "./AppointmentFields";
+import { API_BASE_PATH } from '@/context/constants';
+import type { PatientType } from '@/types/data';
+import { yupResolver } from '@hookform/resolvers/yup';
+import { useRouter } from 'next/navigation'; // ✅ for navigation
+import { useEffect, useState } from 'react';
+import { Button, Card, CardBody, CardHeader, CardTitle, Spinner } from 'react-bootstrap';
+import { FormProvider, useForm } from 'react-hook-form';
+import * as yup from 'yup';
+import AppointmentFields from './AppointmentFields';
 
 // ---------------- Types ----------------
 export type AppointmentFormValues = {
@@ -31,13 +24,13 @@ export type AppointmentFormValues = {
 };
 
 const schema = yup.object({
-  branchId: yup.number().required("Select branch"),
-  departmentId: yup.number().required("Select department"),
-  specializationId: yup.number().required("Select specialization"),
-  therapistId: yup.number().required("Select therapist"),
-  date: yup.string().required("Select date"),
-  time: yup.string().required("Select time"),
-  purposeOfVisit: yup.string().required("Enter purpose of visit"),
+  branchId: yup.number().required('Select branch'),
+  departmentId: yup.number().required('Select department'),
+  specializationId: yup.number().required('Select specialization'),
+  therapistId: yup.number().required('Select therapist'),
+  date: yup.string().required('Select date'),
+  time: yup.string().required('Select time'),
+  purposeOfVisit: yup.string().required('Enter purpose of visit'),
   description: yup.string().optional(),
 });
 
@@ -66,8 +59,7 @@ const BookAppointmentForm = ({
 }: Props) => {
   const [saving, setSaving] = useState(false);
   const router = useRouter(); // ✅ router for navigation
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   const methods = useForm<AppointmentFormValues>({
     resolver: yupResolver(schema),
@@ -76,10 +68,10 @@ const BookAppointmentForm = ({
       departmentId: defaultValues?.departmentId ?? 0,
       specializationId: defaultValues?.specializationId ?? 0,
       therapistId: defaultValues?.therapistId ?? 0,
-      date: defaultValues?.date ?? "",
-      time: defaultValues?.time ?? "",
-      purposeOfVisit: defaultValues?.purposeOfVisit ?? "",
-      description: defaultValues?.description ?? "",
+      date: defaultValues?.date ?? '',
+      time: defaultValues?.time ?? '',
+      purposeOfVisit: defaultValues?.purposeOfVisit ?? '',
+      description: defaultValues?.description ?? '',
     },
   });
 
@@ -93,17 +85,15 @@ const BookAppointmentForm = ({
         departmentId: defaultValues.departmentId ?? 0,
         specializationId: defaultValues.specializationId ?? 0,
         therapistId: defaultValues.therapistId ?? 0,
-        date: defaultValues.date ?? "",
-        time: defaultValues.time ?? "",
-        purposeOfVisit: defaultValues.purposeOfVisit ?? "",
-        description: defaultValues.description ?? "",
+        date: defaultValues.date ?? '',
+        time: defaultValues.time ?? '',
+        purposeOfVisit: defaultValues.purposeOfVisit ?? '',
+        description: defaultValues.description ?? '',
       });
     }
   }, [isEditMode, defaultValues, reset]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
-    console.log("📝 Appointment Form Data:", data);
-
     const payload = {
       patientId,
       branchId: data.branchId,
@@ -113,45 +103,39 @@ const BookAppointmentForm = ({
       date: data.date,
       startTime: toISODateTime(data.date, data.time),
       endTime: toISODateTime(data.date, getEndTime(data.time)),
-      status: isEditMode ? undefined : "pending",
+      status: isEditMode ? undefined : 'pending',
       purposeOfVisit: data.purposeOfVisit,
-      description: data.description || "",
+      description: data.description || '',
       ...(isEditMode ? { modifiedById } : { createdById }),
     };
-
-    console.log("📦 API Payload:", payload);
 
     try {
       setSaving(true);
       const res = await fetch(
-        `${API_BASE_PATH}/appointments${
-          isEditMode && appointmentId ? `/${appointmentId}` : ""
-        }`,
+        `${API_BASE_PATH}/appointments${isEditMode && appointmentId ? `/${appointmentId}` : ''}`,
         {
-          method: isEditMode ? "PUT" : "POST",
+          method: isEditMode ? 'PUT' : 'POST',
           headers: {
-            "Content-Type": "application/json",
+            'Content-Type': 'application/json',
             ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
           body: JSON.stringify(payload),
-        }
+        },
       );
 
-      if (!res.ok) throw new Error("Failed to save appointment");
+      if (!res.ok) throw new Error('Failed to save appointment');
       const responseData = await res.json();
-
-      console.log("✅ Appointment Saved Response:", responseData);
 
       // ✅ reset form after successful submission
       reset();
 
       // ✅ navigate to list page
-      router.push("/appointments/appointment-list");
+      router.push('/appointments/appointment-list');
 
       // Optional: run parent handler
       onSubmitHandler?.(data);
     } catch (error) {
-      console.error("❌ API Error:", error);
+      console.error('❌ API Error:', error);
     } finally {
       setSaving(false);
     }
@@ -162,16 +146,12 @@ const BookAppointmentForm = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card className="mb-4">
           <CardHeader className="d-flex justify-content-between align-items-center">
-            <CardTitle as="h6">
-              {isEditMode ? "Edit Appointment" : "Book Appointment"}
-            </CardTitle>
+            <CardTitle as="h6">{isEditMode ? 'Edit Appointment' : 'Prendre rendez-vous'}</CardTitle>
             {selectedCustomer && (
               <small className="text-muted">
-                Booking for:{" "}
+                Booking for:{' '}
                 <strong>
-                  {selectedCustomer.firstname ||
-                    selectedCustomer.emails ||
-                    selectedCustomer.phones}
+                  {selectedCustomer.firstname || selectedCustomer.emails || selectedCustomer.phones}
                 </strong>
               </small>
             )}
@@ -185,9 +165,9 @@ const BookAppointmentForm = ({
                 {saving ? (
                   <Spinner animation="border" size="sm" />
                 ) : isEditMode ? (
-                  "Update Appointment"
+                  'Update Appointment'
                 ) : (
-                  "Book Appointment"
+                  'Prendre rendez-vous'
                 )}
               </Button>
             </div>
@@ -200,7 +180,7 @@ const BookAppointmentForm = ({
 
 /** Helper: generate end time (+30min) */
 function getEndTime(startTime: string) {
-  const [hour, minute] = startTime.split(":").map(Number);
+  const [hour, minute] = startTime.split(':').map(Number);
   const date = new Date();
   date.setHours(hour, minute);
   date.setMinutes(date.getMinutes() + 30);

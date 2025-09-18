@@ -1,6 +1,6 @@
 'use client';
-import logoDark from '@/assets/images/logo-dark.png';
-import logoLight from '@/assets/images/logo-light.png';
+import logoDark from '@/assets/images/logo-light2.png';
+import LogoLight from '@/assets/images/logo-light2.png';
 import maintenanceImg from '@/assets/images/maintenance.svg';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -31,20 +31,24 @@ const Maintenance = () => {
                     <div className="p-4">
                       <div className="mx-auto mb-5 text-center auth-logo">
                         <Link href="/dashboards/agent" className="logo-dark">
-                          <Image src={logoDark} height={32} alt="logo dark" />
+                          <Image src={logoDark} height={150} alt="logo dark" />
                         </Link>
                         <Link href="/dashboards/agent" className="logo-light">
-                          <Image src={logoLight} height={28} alt="logo light" />
+                          <Image src={LogoLight} height={150} alt="logo light" />
                         </Link>
                       </div>
                       <h2 className="fw-bold text-center lh-base">
-                        We are currently performing maintenance
+                        nous y travaillons actuellement
                       </h2>
                       <p className="text-muted text-center mt-1 mb-4">
-                        We&apos;re making the system more awesome. We&apos;ll be back shortly.
+                        Nous améliorons le système. À bientôt !
                       </p>
                       <div className="text-center">
-                        <Button variant="danger">Contact Us</Button>
+                        <Link href="/dashboards/agent" passHref legacyBehavior>
+                          <Button variant="danger" as="a">
+                            aller au tableau de bord
+                          </Button>
+                        </Link>
                       </div>
                     </div>
                   </Col>

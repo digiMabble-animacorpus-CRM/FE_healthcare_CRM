@@ -48,7 +48,7 @@ const CustomerGridCard = ({ user, status, propertyOwn, propertyView, invest }: C
             </div>
           </div>
           <p className="text-muted fw-medium fs-14 mb-1">
-            <span className="text-dark me-1">Email Address : </span> {user?.email}
+            <span className="text-dark me-1">E-mail Address : </span> {user?.email}
           </p>
           <p className="text-muted fw-medium fs-14 mb-1">
             <span className="text-dark me-1">Contact Number : </span> {user?.contact}

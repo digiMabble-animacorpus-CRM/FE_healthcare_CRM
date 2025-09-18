@@ -2,12 +2,11 @@
 import logoDark from '@/assets/images/logo-dark.png';
 import LogoLight from '@/assets/images/logo-light.png';
 import TextFormInput from '@/components/from/TextFormInput';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { yupResolver } from '@hookform/resolvers/yup';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect } from 'react';
-import { Button, Card, CardBody, Col, Container, Row } from 'react-bootstrap';
+import { Card, CardBody, Col, Container, Row } from 'react-bootstrap';
 import { useForm } from 'react-hook-form';
 import * as yup from 'yup';
 import useSignup from './useSignup';
@@ -22,7 +21,7 @@ const SignUp = () => {
 
   const messageSchema = yup.object({
     name: yup.string().required('Please enter Name'),
-    email: yup.string().email().required('Please enter Email'),
+    email: yup.string().email().required('Please enter E-mail'),
     password: yup.string().required('Please enter password'),
   });
 
@@ -46,14 +45,14 @@ const SignUp = () => {
                     <Image src={LogoLight} height={28} alt="logo light" />
                   </Link>
                 </div>
-                <h2 className="fw-bold text-uppercase text-center fs-18">Free Account</h2>
+                <h2 className="fw-bold text-uppercase text-center fs-18">Compte gratuit</h2>
                 <p className="text-muted text-center mt-1 mb-4">
-                  New to our platform? Sign up now! It only takes a minute.
+                  Nouveau sur notre plateforme ? Inscrivez-vous dès maintenant! Cela ne prend qu une
+                  minute.
                 </p>
                 <div className="px-4">
                   <form
                     onSubmit={handleSubmit((data) => {
-                      console.log('🚀 Submitting form with:', data);
                       signup(data);
                     })}
                     className="authentication-form"
@@ -62,40 +61,40 @@ const SignUp = () => {
                       <TextFormInput
                         control={control}
                         name="name"
-                        placeholder="Enter your Name"
+                        placeholder="Entrez votre nom"
                         className="bg-light bg-opacity-50 border-light py-2"
-                        label="Name"
+                        label="Nom"
                       />
                     </div>
                     <div className="mb-3">
                       <TextFormInput
                         control={control}
                         name="email"
-                        placeholder="Enter your email"
+                        placeholder="Entrez votre email"
                         className="bg-light bg-opacity-50 border-light py-2"
-                        label="Email"
+                        label="E-mail"
                       />
                     </div>
                     <div className="mb-3">
                       <TextFormInput
                         control={control}
                         name="password"
-                        placeholder="Enter your password"
+                        placeholder="Entrez votre mot de passe"
                         className="bg-light bg-opacity-50 border-light py-2"
-                        label="Password"
+                        label="Mot de passe"
                       />
                     </div>
                     <div className="mb-3">
                       <div className="form-check">
                         <input type="checkbox" className="form-check-input" id="checkbox-signin" />
                         <label className="form-check-label" htmlFor="checkbox-signin">
-                          I accept Terms and Condition
+                          J accepte les termes et conditions
                         </label>
                       </div>
                     </div>
                     <div className="mb-1 text-center d-grid">
                       <button className="btn btn-danger py-2" type="submit">
-                        Create Account
+                        Créer un compte
                       </button>
                     </div>
                   </form>
@@ -117,9 +116,9 @@ const SignUp = () => {
               </CardBody>
             </Card>
             <p className="mb-0 text-center text-white">
-              I already have an account{' '}
+              J ai déjà un compte{' '}
               <Link href="/auth/sign-in" className="text-reset text-unline-dashed fw-bold ms-1">
-                Sign In
+                Se connecter
               </Link>
             </p>
           </Col>

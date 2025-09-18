@@ -1,11 +1,11 @@
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import Image from 'next/image';
-import contactlessImg from '@/assets/images/contactless-payment.png';
-import chipImg from '@/assets/images/chip.png';
 import mastercardImg from '@/assets/images/card/mastercard.svg';
-import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
+import chipImg from '@/assets/images/chip.png';
+import contactlessImg from '@/assets/images/contactless-payment.png';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { currency } from '@/context/constants';
+import Image from 'next/image';
 import Link from 'next/link';
+import { Card, CardBody, CardHeader, CardTitle } from 'react-bootstrap';
 
 const Transactions = () => {
   return (

@@ -1,7 +1,6 @@
+import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
 import { StaticImageData } from 'next/image';
 import { BootstrapVariantType } from './component-props';
-import { file } from 'googleapis/build/src/apis/file';
-import { Key, ReactNode } from 'react';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -94,6 +93,8 @@ export type PatientType = {
   mutualityregistrationnumber?: string;
   zipcode?: string;
   branch?: string;
+   therapistId?: number | null;
+  therapist?: TherapistShortType | null;
 };
 
 // src/types/data.ts
@@ -113,7 +114,7 @@ export interface FamilyMember {
   gender?: string;
 }
 
-export type CustomerStatus = "new" | "active" | "inactive" | "closed";
+export type CustomerStatus = 'new' | 'active' | 'inactive' | 'closed';
 
 export interface CustomerEnquiriesType {
   _id: string;
@@ -138,7 +139,6 @@ export interface CustomerEnquiriesType {
   modeOfRegister: string;
 }
 
-
 export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_show';
 
 export type AppointmentSource = 'phone' | 'website' | 'walk_in' | 'referral' | 'other';
@@ -159,28 +159,26 @@ export interface AppointmentType {
   cancelledReason?: string; // Reason if cancelled
 
   source?: AppointmentSource; // How appointment was booked
-  reminderSent?: boolean; // SMS/Email reminder flag
+  reminderSent?: boolean; // SMS/E-mail reminder flag
 
   createdAt: string; // ISO timestamp
   updatedAt: string; // ISO timestamp
 }
 
 export type BranchType = {
+  branch_id: number;
   _id: string;
-
   name: string;
   code?: string;
   email?: string;
   phoneNumber?: string;
   address?: Address;
   status: 'active' | 'inactive';
-
   createdBy: string;
   updatedBy: {
     staffId: string;
     updatedAt: string;
   }[];
-
   createdAt: string;
 };
 
@@ -231,7 +229,7 @@ export type StaffRole =
   | 'Other';
 
 export type AvailabilitySlot = {
-  day: string; // "Monday"
+  day: string; // "Lundi"
   from: string; // "09:00"
   to: string; // "14:00"
 };
@@ -321,53 +319,28 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  therapistId: Key | null | undefined;
-  // therapistId: string;
-  name: ReactNode;
-  branches: any;
-  _id: string;
-  agendaLink: any;
-  email: any;
-  phoneNumber: any;
-  education: string[];
-  // therapistId: string;
-  id: string;
-  frequently_asked_questions: any;
-  languages_spoken(languages_spoken: any): unknown;
-  _key: number;
-  idPro: number;
+  centerAddress: any;
+  appointmentStart: any;
+  imageUrl?: string | null;
+  jobTitle: string;
+  therapistId: string | number | null | undefined;
   firstName: string;
   lastName: string;
   fullName: string;
-  photo: string;
-  jobTitle: string;
-  targetAudience?: string | null;
-  specialization1?: string | null;
-  specialization2?: string | null;
-  aboutMe: string;
-  about?: string | null;
-  consultations: string;
-  centerAddress: string;
-  centerEmail: string;
-  centerPhoneNumber: string;
+  photo?: string | null;
   contactEmail: string;
   contactPhone: string;
-  schedule: string;
-  spokenLanguages: string[]; // ✅ fixed
-  paymentMethods?: string;
-  degreesAndTraining: string;
-  specializations: string[];
-  website: string;
-  faq: string;
-  agendaLinks: string | null;
-  rosaLink?: string | null;
-  googleAgendaLink?: string | null;
-  appointmentStart?: string | null;
-  appointmentEnd?: string | null;
-  appointmentAlert?: string | null;
-  availability?: any | null;
-  tags?: any;
-  imageUrl?: string;
+  inamiNumber: string;
+  aboutMe?: string | null;
+  consultations?: string | null;
+  degreesAndTraining?: string | null;
+  departmentId: number | null;
+  departmentName?: string | null;
+  specializations?: { id: number | null; name: string }[];
+  branches: BranchWithAvailability[];
+  languages: number[];
+  faq?: string | null;
+  paymentMethods: string[];
 };
 
 export type TherapistCreatePayload = {
@@ -696,23 +669,23 @@ export type TeamMemberType = {
   schedule: {
     text: string | null;
   };
-  about?: string | null;
+  about: string;
   languages_spoken: string[]; // always an array
   payment_methods: string[]; // always an array
   diplomas_and_training: string[]; // always an array
   specializations: string[]; // always an array
-  website?: string;
-  frequently_asked_questions?: string | Record<string, any> | null; // JSON string or object
+  website: string;
+  frequently_asked_questions: any; // JSON string or object
   calendar_links: string[]; // always an array
   photo: string;
   branch_ids?: (string | number)[]; // array of strings or numbers
   primary_branch_id: number;
   permissions: Record<string, any>; // object for permissions
   role: string;
-  status: "active" | "inactive" | string;
+  status: 'active' | 'inactive' | string;
   created_by_role?: string;
+  branches: any;
 };
-
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency
@@ -745,7 +718,7 @@ export type TeamMemberCreatePayload = {
   branches?: (string | number)[];
   selected_branch?: string | number | null;
   role: string;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
   primaryBranchId: number;
   permissions: Record<string, any>;
   createdByRole: string;
@@ -759,4 +732,29 @@ export interface DepartmentType {
   createdAt?: string;
   updatedAt?: string;
 }
+
+// export { BranchWithAvailability };
+// types/data.ts
+
+export type TherapistShortType = {
+  therapistId: number | null;
+  firstName: string;
+  lastName: string;
+  fullName: string;
+  photo: string | null;
+  imageUrl: string | null;
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe?: string | null;
+  degreesTraining?: string | null;
+  inamiNumber?: string | null;
+  paymentMethods?: string | null;
+  faq?: string | null;
+  departmentId?: number | null;
+  //  departmentName?: string; 
+  availability?: any[];
+  isDelete?: boolean;
+  deletedAt?: string | null;
+};
+
 

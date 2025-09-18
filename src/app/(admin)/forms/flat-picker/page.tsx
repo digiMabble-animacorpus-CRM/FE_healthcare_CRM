@@ -1,9 +1,9 @@
-import { Card, CardBody, CardTitle, Col, Container, Row } from 'react-bootstrap';
 import ComponentContainerCard from '@/components/ComponentContainerCard';
+import { Card, CardBody, CardTitle, Col, Row } from 'react-bootstrap';
 // import CustomFlatpickr from '@/components/CustomFlatpickr';
+import PageTitle from '@/components/PageTitle';
 import UIExamplesList from '@/components/UIExamplesList';
 import type { Metadata } from 'next';
-import PageTitle from '@/components/PageTitle';
 
 export const metadata: Metadata = { title: 'Flatpicker' };
 

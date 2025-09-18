@@ -1,38 +1,22 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
-import dayjs, { Dayjs } from 'dayjs';
-import Image from 'next/image';
-import { Icon } from '@iconify/react';
-// import ReactApexChart from 'react-apexcharts';
-import { ApexOptions } from 'apexcharts';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import {
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Row,
-  Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
-  Button,
-  ButtonGroup,
-  Spinner,
-} from 'react-bootstrap';
+import { useEffect, useRef, useState } from 'react';
+import { Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
 
-// Example avatars
 import avatar1 from '@/assets/images/users/avatar-1.jpg';
 import avatar2 from '@/assets/images/users/avatar-2.jpg';
 import avatar3 from '@/assets/images/users/avatar-3.jpg';
 import avatar4 from '@/assets/images/users/avatar-4.jpg';
-import Calendar from './Calendar';
-import useCalendar from '@/app/(admin)/pages/calendar/useCalendar';
+import {
+  AppointmentDistributionItem,
+  AppointmentStats,
+  getAppointmentDistribution,
+  getAppointmentStats,
+} from '@/helpers/dashboard';
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
 
@@ -55,50 +39,97 @@ export type AppointmentsOverviewProps = {
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Anima Corpus Namur'];
-
-const CATEGORIES = [
-  { id: 'consultation', name: 'Consultation', color: '#007bff' },
-  { id: 'followup', name: 'Follow-up', color: '#28a745' },
-  { id: 'therapy', name: 'Therapy', color: '#ffc107' },
-  { id: 'surgery', name: 'Surgery', color: '#dc3545' },
-];
+const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
   const [selectedDoctor, setSelectedDoctor] = useState<string>('All Doctors');
   const [selectedBranch, setSelectedBranch] = useState<string>('All Branches');
   const [chartMode, setChartMode] = useState<'doctor' | 'branch'>('doctor');
-  const [view, setView] = useState<'month' | 'week' | 'day'>('month');
-  const [calendarViewMode, setCalendarViewMode] = useState<'calendar' | 'list'>('calendar');
-  const [calendarHeight] = useState('750px');
+  // const [view, setView] = useState<'month' | 'week' | 'day'>('month');
+  // const [calendarViewMode, setCalendarViewMode] = useState<'calendar' | 'list'>('calendar');
+  // const [calendarHeight] = useState('750px');
   const [loading] = useState(false);
+  const [appointmentStats, setAppointmentStats] = useState<AppointmentStats | null>(null);
+  const [statsLoading, setStatsLoading] = useState<boolean>(false);
+
+  const [distributionData, setDistributionData] = useState<AppointmentDistributionItem[]>([]);
+  const [distributionTotal, setDistributionTotal] = useState<number>(0);
 
   const calendarRef = useRef<any>(null);
 
-  // Filter appointments
-  const filteredAppointments = useMemo(() => {
-    return upcoming.filter(
-      (a) =>
-        (selectedDoctor === 'All Doctors' || a.doctor === selectedDoctor) &&
-        (selectedBranch === 'All Branches' || a.branch === selectedBranch),
-    );
-  }, [selectedDoctor, selectedBranch, upcoming]);
+  // Date range for API calls
+  const startDate = dayjs().startOf('week').format('YYYY-MM-DD');
+  const endDate = dayjs().endOf('week').format('YYYY-MM-DD');
 
-  // Aggregates
-  const doctorMap: Record<string, number> = {};
-  const branchMap: Record<string, number> = {};
-  filteredAppointments.forEach((a) => {
-    doctorMap[a.doctor] = (doctorMap[a.doctor] || 0) + 1;
-    branchMap[a.branch] = (branchMap[a.branch] || 0) + 1;
-  });
-  const totalAppointments = filteredAppointments.length || 1;
+  // TODO: Map selectedDoctor/selectedBranch to IDs if you have
+  const doctorId = selectedDoctor !== 'All Doctors' ? undefined : undefined;
+  const branchId = selectedBranch !== 'All Branches' ? undefined : undefined;
 
-  // Chart
-  const chartCategories = chartMode === 'doctor' ? Object.keys(doctorMap) : Object.keys(branchMap);
-  const chartData = chartCategories.map((key) =>
-    chartMode === 'doctor' ? doctorMap[key] : branchMap[key],
-  );
+  // Fetch appointment stats
+  useEffect(() => {
+    const fetchStats = async () => {
+      setStatsLoading(true);
+      try {
+        const response = await getAppointmentStats({
+          startDate,
+          endDate,
+          doctorId,
+          branchId,
+          timeFilter: 'thisWeek',
+        });
+        if (response?.stats) setAppointmentStats(response.stats);
+        else setAppointmentStats(null);
+      } catch {
+        setAppointmentStats(null);
+      } finally {
+        setStatsLoading(false);
+      }
+    };
+    fetchStats();
+  }, [selectedDoctor, selectedBranch, startDate, endDate]);
 
+  // Fetch appointment distribution
+  useEffect(() => {
+    const fetchDistribution = async () => {
+      try {
+        const response = await getAppointmentDistribution({
+          startDate,
+          endDate,
+          doctorId,
+          branchId,
+          timeFilter: 'thisWeek',
+          groupBy: chartMode,
+        });
+        if (response) {
+          setDistributionData(response.distribution);
+          setDistributionTotal(response.totalAppointments || 1);
+        } else {
+          setDistributionData([]);
+          setDistributionTotal(1);
+        }
+      } catch {
+        setDistributionData([]);
+        setDistributionTotal(1);
+      }
+    };
+    fetchDistribution();
+  }, [selectedDoctor, selectedBranch, startDate, endDate, chartMode]);
+
+  // Compute total count for percentage calculations
+  const totalAppointments = Array.isArray(distributionData)
+    ? distributionData.reduce((sum, item) => sum + item.count, 0) || 1
+    : 1;
+
+  // Dropdown source lists from upcoming appointments
+  const allDoctors = Array.from(new Set(upcoming.map((a) => a.doctor)));
+  const allBranches = Array.from(new Set(upcoming.map((a) => a.branch)));
+
+  // Prepare chart data from distributionData
+  const chartCategories = distributionData.map((item) => item.name);
+  const chartData = distributionData.map((item) => item.count);
+
+  /*
+  // Chart options and series for ApexCharts
   const chartOptions: ApexOptions = {
     chart: { id: 'appointments-chart', toolbar: { show: false } },
     xaxis: {
@@ -114,49 +145,21 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
     yaxis: { title: { text: 'Appointments' } },
   };
   const chartSeries = [{ name: 'Appointments', data: chartData }];
-
-  // Dropdown lists
-  const allDoctors = Array.from(new Set(upcoming.map((a) => a.doctor)));
-  const allBranches = Array.from(new Set(upcoming.map((a) => a.branch)));
-
-  // Calendar events
-  const calendars = CATEGORIES.map((c) => ({
-    id: c.id,
-    name: c.name,
-    color: '#fff',
-    bgColor: c.color,
-    dragBgColor: c.color,
-    borderColor: c.color,
-  }));
-
-  const {
-    createNewEvent,
-    eventData,
-    events,
-    isEditable,
-    onAddEvent,
-    onCloseModal,
-    onDateClick,
-    onDrop,
-    onEventClick,
-    onEventDrop,
-    onRemoveEvent,
-    onUpdateEvent,
-    show,
-  } = useCalendar();
+  */
 
   return (
     <Col lg={12}>
       <Card>
         <CardHeader className="d-flex justify-content-between align-items-center border-0">
           <div>
-            <CardTitle as="h4">Appointments Overview</CardTitle>
-            <p className="text-muted mb-0">Weekly Summary</p>
+            <CardTitle as="h4">Aperçu des rendez-vous</CardTitle>
+            <p className="text-muted mb-0">Résumé hebdomadaire</p>
           </div>
 
+          {/*
           <div className="d-flex gap-2">
             {/* Doctor Dropdown */}
-            <Dropdown>
+          {/* <Dropdown>
               <DropdownToggle
                 as="a"
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
@@ -165,7 +168,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem onClick={() => setSelectedDoctor('All Doctors')}>
-                  All Doctors
+                  Tous les thérapeutes
                 </DropdownItem>
                 {allDoctors.map((doc) => (
                   <DropdownItem key={doc} onClick={() => setSelectedDoctor(doc)}>
@@ -173,10 +176,10 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> */}
 
-            {/* Branch Dropdown */}
-            <Dropdown>
+          {/* Branch Dropdown */}
+          {/* <Dropdown>
               <DropdownToggle
                 as="a"
                 className="btn btn-sm btn-outline-light rounded content-none icons-center"
@@ -185,7 +188,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               </DropdownToggle>
               <DropdownMenu className="dropdown-menu-end">
                 <DropdownItem onClick={() => setSelectedBranch('All Branches')}>
-                  All Branches
+                  Toutes les succursales
                 </DropdownItem>
                 {allBranches.map((b) => (
                   <DropdownItem key={b} onClick={() => setSelectedBranch(b)}>
@@ -193,8 +196,10 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
                   </DropdownItem>
                 ))}
               </DropdownMenu>
-            </Dropdown>
+            </Dropdown> */}
+          {/*
           </div>
+          */}
         </CardHeader>
 
         <CardBody>
@@ -202,87 +207,66 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           <Row className="g-2 text-center mb-3">
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Total Appointments</p>
-                <h5 className="text-dark mb-1">{filteredAppointments.length}</h5>
-              </div>
-            </Col>
-            <Col lg={4}>
-              <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Completed</p>
+                <p className="text-muted mb-1">Nombre total de rendez-vous</p>
                 <h5 className="text-dark mb-1">
-                  {filteredAppointments.filter((a) => a.status === 'COMPLETED').length}
+                  {statsLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    (appointmentStats?.totalAppointments ?? totalAppointments)
+                  )}
                 </h5>
               </div>
             </Col>
             <Col lg={4}>
               <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Cancellations</p>
+                <p className="text-muted mb-1">Complété</p>
                 <h5 className="text-dark mb-1">
-                  {filteredAppointments.filter((a) => a.status === 'CANCELLED').length}
+                  {statsLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    (appointmentStats?.completed ?? 0)
+                  )}
+                </h5>
+              </div>
+            </Col>
+            <Col lg={4}>
+              <div className="border bg-light-subtle p-2 rounded">
+                <p className="text-muted mb-1">Annulations</p>
+                <h5 className="text-dark mb-1">
+                  {statsLoading ? (
+                    <Spinner animation="border" size="sm" />
+                  ) : (
+                    (appointmentStats?.cancellations ?? 0)
+                  )}
                 </h5>
               </div>
             </Col>
           </Row>
 
-          {/* Chart + Calendar */}
+          {/*
+          // Chart + Calendar
           <Row className="g-3">
             <Col lg={6}>
-              <Row className="mb-2">
-                <Col>
-                  <Button
-                    size="sm"
-                    variant={chartMode === 'doctor' ? 'primary' : 'outline-primary'}
-                    onClick={() => setChartMode('doctor')}
-                    className="me-2"
-                  >
-                    Doctor-wise
-                  </Button>
-                  <Button
-                    size="sm"
-                    variant={chartMode === 'branch' ? 'primary' : 'outline-primary'}
-                    onClick={() => setChartMode('branch')}
-                  >
-                    Branch-wise
-                  </Button>
-                </Col>
-              </Row>
-              <ReactApexChart
-                options={chartOptions}
-                series={chartSeries}
-                type="area"
-                height={250}
-              />
+              <ReactApexChart options={chartOptions} series={chartSeries} type="area" height={250} />
             </Col>
 
             <Col lg={6} style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              {/* Calendar / List */}
               <div style={{ flex: 1, minHeight: 0 }}>
                 {loading ? (
                   <div className="text-center py-5">
                     <Spinner animation="border" />
                   </div>
                 ) : calendarViewMode === 'calendar' ? (
-                  <Calendar
-                    events={events}
-                    onDateClick={onDateClick}
-                    onDrop={onDrop}
-                    onEventClick={onEventClick}
-                    onEventDrop={onEventDrop}
-                  />
+                  <Calendar />
                 ) : (
-                  <div
-                    className="p-3 border rounded bg-white"
-                    style={{ height: calendarHeight, overflowY: 'auto' }}
-                  >
-                    {filteredAppointments.length === 0 ? (
-                      <p className="text-muted">No appointments found.</p>
+                  <div className="p-3 border rounded bg-white" style={{ height: calendarHeight, overflowY: 'auto' }}>
+                    {upcoming.length === 0 ? (
+                      <p className="text-muted">Aucun rendez-vous trouvé.</p>
                     ) : (
-                      filteredAppointments.map((appt) => (
+                      upcoming.map((appt) => (
                         <div key={appt.id} className="border-bottom py-2">
                           <strong>{appt.patient}</strong>
-                          <div>
-                            {dayjs(`${appt.date}T${appt.time}`).format('MMM D, YYYY h:mm A')}
-                          </div>
+                          <div>{dayjs(`${appt.date}T${appt.time}`).format('MMM D, YYYY h:mm A')}</div>
                           <small className="text-muted">
                             {appt.doctor} - {appt.branch}
                           </small>
@@ -295,76 +279,48 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
             </Col>
           </Row>
 
-          {/* Appointments Breakdown */}
-          <h5 className="mt-4 mb-2 text-primary fw-bold">Appointments Breakdown</h5>
+
+          // Appointments Breakdown
+          <h5 className="mt-4 mb-2 text-primary fw-bold">Répartition des rendez-vous</h5>
           <p className="text-muted mb-3">
-            Showing appointments for <strong>{selectedDoctor}</strong> and{' '}
-            <strong>{selectedBranch}</strong>.
+            Affichage des rendez-vous pour{' '}
+            <strong>{chartMode === 'doctor' ? selectedDoctor : selectedBranch}</strong>.
           </p>
 
-          <Row className="g-3">
-            {Object.keys(doctorMap).map((doc, idx) => {
-              const value = doctorMap[doc];
-              const percent = Math.round((value / totalAppointments) * 100);
-              const avatar = AVATARS[idx % AVATARS.length];
-              return (
-                <Col lg={3} key={doc}>
-                  <div className="border rounded p-2 d-flex align-items-center gap-3">
-                    <div className="avatar-md flex-centered bg-light rounded-circle">
-                      <Image
-                        src={avatar}
-                        alt={doc}
-                        width={40}
-                        height={40}
-                        className="rounded-circle"
-                      />
-                    </div>
-                    <div className="flex-grow-1">
-                      <p className="mb-1 text-muted">{doc}</p>
-                      <p className="fs-18 text-dark fw-medium">
-                        {value} <span className="text-muted fs-14">({percent}%)</span>
-                      </p>
-                      <div className="progress" style={{ height: 10 }}>
-                        <div className="progress-bar bg-primary" style={{ width: `${percent}%` }} />
+          {distributionLoading ? (
+            <Spinner animation="border" />
+          ) : (
+            <Row className="g-3 mb-3">
+              {distributionData.map((item, idx) => {
+                const percent = Math.round((item.count / totalAppointments) * 100);
+                const avatar = AVATARS[idx % AVATARS.length];
+                return (
+                  <Col lg={3} key={item.id}>
+                    <div className="border rounded p-2 d-flex align-items-center gap-3">
+                      <div className="avatar-md flex-centered bg-light rounded-circle">
+                        <Image src={avatar} alt={item.name} width={40} height={40} className="rounded-circle" />
+                      </div>
+                      <div className="flex-grow-1">
+                        <p className="mb-1 text-muted">{item.name}</p>
+                        <p className="fs-18 text-dark fw-medium">
+                          {item.count} <span className="text-muted fs-14">({percent}%)</span>
+                        </p>
+                        <div className="progress" style={{ height: 10 }}>
+                          <div
+                            className={`progress-bar ${
+                              chartMode === 'doctor' ? 'bg-primary' : 'bg-warning'
+                            }`}
+                            style={{ width: `${percent}%` }}
+                          />
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </Col>
-              );
-            })}
-          </Row>
-
-          <Row className="g-3 mt-2">
-            {Object.keys(branchMap).map((branch, idx) => {
-              const value = branchMap[branch];
-              const percent = Math.round((value / totalAppointments) * 100);
-              const avatar = AVATARS[(idx + 2) % AVATARS.length];
-              return (
-                <Col lg={3} key={branch}>
-                  <div className="border rounded p-2 d-flex align-items-center gap-3">
-                    <div className="avatar-md flex-centered bg-light rounded-circle">
-                      <Image
-                        src={avatar}
-                        alt={branch}
-                        width={40}
-                        height={40}
-                        className="rounded-circle"
-                      />
-                    </div>
-                    <div className="flex-grow-1">
-                      <p className="mb-1 text-muted">{branch}</p>
-                      <p className="fs-18 text-dark fw-medium">
-                        {value} <span className="text-muted fs-14">({percent}%)</span>
-                      </p>
-                      <div className="progress" style={{ height: 10 }}>
-                        <div className="progress-bar bg-warning" style={{ width: `${percent}%` }} />
-                      </div>
-                    </div>
-                  </div>
-                </Col>
-              );
-            })}
-          </Row>
+                  </Col>
+                );
+              })}
+            </Row>
+          )}
+          */}
         </CardBody>
       </Card>
     </Col>

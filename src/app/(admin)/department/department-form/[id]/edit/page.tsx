@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
-import DepartmentForm, { DepartmentFormValues } from '../../departmentForm';
 import { API_BASE_PATH } from '@/context/constants';
 import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
+import DepartmentForm, { DepartmentFormValues } from '../../departmentForm';
 
 export interface Props {
   defaultValues?: Partial<DepartmentFormValues>;
@@ -19,7 +19,6 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
   const [defaultValues, setDefaultValues] = useState<
     Partial<DepartmentFormValues & { department_id?: string }>
   >({});
-  const isEditMode = Boolean(params.id);
 
   useEffect(() => {
     if (!params.id) {
@@ -45,7 +44,7 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
             name: department.name || '',
             description: department.description || '',
             is_active: department.is_active ?? true,
-            _id: department.id, // If your form expects _id
+            department_id: department.id, // Use department_id as expected by the type
           });
         }
       } catch (err) {
@@ -59,26 +58,28 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
     fetchData();
   }, [params.id]);
 
-  const onSubmitHandler = async (
-    data: DepartmentFormValues & { department_id?: string }
-  ) => {
+  const onSubmitHandler = async (data: DepartmentFormValues & { department_id?: string }) => {
     if (!params.id) return;
 
     try {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No access token found');
 
-      await axios.patch(`${API_BASE_PATH}/departments/${params.id}`, {
-        name: data.name,
-        description: data.description,
-        is_active: data.is_active,
-      }, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      await axios.patch(
+        `${API_BASE_PATH}/departments/${params.id}`,
+        {
+          name: data.name,
+          description: data.description,
+          is_active: data.is_active,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
 
-      // toast.success('Department updated successfully!');
+      toast.success('Department updated successfully!');
       router.push('/department');
     } catch (error) {
       console.error(error);
@@ -89,11 +90,7 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
   if (loading) return <div>Loading department details...</div>;
 
   return (
-    <DepartmentForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
+    <DepartmentForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
   );
 };
 

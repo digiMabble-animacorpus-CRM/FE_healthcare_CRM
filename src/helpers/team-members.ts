@@ -1,8 +1,8 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import { encryptAES, decryptAES } from '@/utils/encryption';
 import type { TeamMemberCreatePayload, TeamMemberType } from '@/types/data';
+import { decryptAES } from '@/utils/encryption';
 
 export const getAllTeamMembers = async (
   page: number = 1,
@@ -28,8 +28,6 @@ export const getAllTeamMembers = async (
       ...(search ? { searchText: search } : {}),
     };
 
-    console.log('Filters (plain):', filters);
-
     const queryParams = new URLSearchParams(filters).toString();
 
     const response = await fetch(`${API_BASE_PATH}/team-members?${queryParams}`, {
@@ -47,7 +45,6 @@ export const getAllTeamMembers = async (
     }
 
     const jsonData = await response.json();
-    console.log('Response from server:', jsonData);
 
     const teamData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
@@ -69,7 +66,6 @@ export const getTeamMemberById = async (team_member_id: any): Promise<TeamMember
   }
 
   const url = `${API_BASE_PATH}/team-members/${team_member_id}`;
-  console.log('Requesting team members by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -80,10 +76,7 @@ export const getTeamMemberById = async (team_member_id: any): Promise<TeamMember
       },
     });
 
-    console.log('Response status:', response.status);
-
     const result = await response.json();
-    console.log('Full API response:', result);
 
     if (!response.ok) {
       console.error('Failed to fetch team members:', result?.message || 'Unknown error');
@@ -151,60 +144,53 @@ export const updateTeamMember = async (
       selected_branch: payload.selected_branch ? Number(payload.selected_branch) : null,
     };
 
-    const encryptedId = encryptAES(String(id));
-    const encryptedPayload = encryptAES(safePayload);
-
     const response = await fetch(
-      `${API_BASE_PATH}/team-members/${encodeURIComponent(encryptedId)}`,
+      `${API_BASE_PATH}/team-members/${encodeURIComponent(String(id))}`,
       {
         method: 'PATCH',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: encryptedPayload }),
+        body: JSON.stringify(safePayload), // sending plain JSON without encryption
       },
     );
 
     const result = await response.json();
 
     if (!response.ok || !result.status) {
-      console.error(' Update failed:', result.message || 'Unknown error');
+      console.error('Update failed:', result.message || 'Unknown error');
       return false;
     }
 
     return true;
   } catch (error) {
-    console.error(' Error updating team members:', error);
+    console.error('Error updating team members:', error);
     return false;
   }
 };
 
-
 export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreatePayload => {
 
-  console.log('Input formData to transformToBackendDto:', formData);
-
   const BRANCHES = [
-  { id: 1, name: 'Central London' },
-  { id: 2, name: 'East Side' },
-  { id: 3, name: 'North Branch' },
+    { id: 1, name: 'Gembloux - Orneau' },
+    { id: 2, name: 'Gembloux - Tout Vent' },
+    { id: 3, name: 'Namur' },
   ];
-  
-  const status: "active" | "inactive" = 
-  formData.status && (formData.status === "active" || formData.status === "inactive")
-    ? formData.status
-    : "active"; // or some default
 
-  const primaryBranchId = (typeof formData.primary_branch_id === 'number') 
-  ? formData.primary_branch_id 
-  : BRANCHES[0].id;
+  const status: 'active' | 'inactive' =
+    formData.status && (formData.status === 'active' || formData.status === 'inactive')
+      ? formData.status
+      : 'active'; // or some default
 
-  const parsedPermissions: Record<string, any> = 
-  typeof formData.permissions === 'string'
-    ? JSON.parse(formData.permissions)
-    : formData.permissions || {};
-  
+  const primaryBranchId =
+    typeof formData.primary_branch_id === 'number' ? formData.primary_branch_id : BRANCHES[0].id;
+
+  const parsedPermissions: Record<string, any> =
+    typeof formData.permissions === 'string'
+      ? JSON.parse(formData.permissions)
+      : formData.permissions || {};
+
   return {
     teamId: String(formData.team_id || ''),
     fullName: formData.full_name,
@@ -212,7 +198,7 @@ export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreat
     lastName: formData.last_name,
     job1: formData.job_1,
     job2: formData.job_2,
-    job3: formData.job_3, 
+    job3: formData.job_3,
     job4: formData.job_4,
     specificAudience: formData.specific_audience,
     whoAmI: formData.who_am_i ?? '',
@@ -239,7 +225,7 @@ export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreat
     calendarLinks: formData.calendar_links,
     photo: formData.photo,
     branches: Array.isArray(formData.branch_ids)
-      ? formData.branch_ids.map(b => (typeof b === 'string' ? Number(b) : b))
+      ? formData.branch_ids.map((b) => (typeof b === 'string' ? Number(b) : b))
       : [],
     selected_branch: formData.primary_branch_id,
     role: formData.role || '',

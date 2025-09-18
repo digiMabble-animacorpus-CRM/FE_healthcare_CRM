@@ -1194,7 +1194,7 @@ const TableWithAvatars = () => {
             <tr>
               <th scope="col">Name</th>
               <th scope="col">Title</th>
-              <th scope="col">Email</th>
+              <th scope="col">E-mail</th>
               <th scope="col">Role</th>
               <th scope="col">Action</th>
             </tr>
@@ -1254,7 +1254,7 @@ const TableWithCheckboxes = () => {
               </th>
               <th scope="col">Name</th>
               <th scope="col">Title</th>
-              <th scope="col">Email</th>
+              <th scope="col">E-mail</th>
               <th scope="col">Role</th>
               <th scope="col">Action</th>
             </tr>

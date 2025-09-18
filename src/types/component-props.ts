@@ -62,7 +62,7 @@ export type CalendarProps = {
   onEventClick: (arg: EventClickArg) => void;
   onDrop: (arg: DropArg) => void;
   onEventDrop: (arg: EventDropArg) => void;
-  events: EventInput[];
+  events: any[];
 };
 
 export type UIExamplesListProps = { examples: { label: string; link: string }[] };

@@ -30,8 +30,8 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
 
     availability: [
-      { day: 'Monday', from: '09:00', to: '13:00' },
-      { day: 'Wednesday', from: '10:00', to: '14:00' },
+      { day: 'Lundi', from: '09:00', to: '13:00' },
+      { day: 'Mercredi', from: '10:00', to: '14:00' },
     ],
 
     tags: ['general', 'pediatrics'],
@@ -85,8 +85,8 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
 
     availability: [
-      { day: 'Tuesday', from: '08:00', to: '12:00' },
-      { day: 'Friday', from: '14:00', to: '18:00' },
+      { day: 'Mardi', from: '08:00', to: '12:00' },
+      { day: 'Vendredi', from: '14:00', to: '18:00' },
     ],
 
     tags: ['injection', 'pediatrics'],
@@ -315,8 +315,8 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
 
     availability: [
-      { day: 'Tuesday', from: '09:00', to: '13:00' },
-      { day: 'Thursday', from: '14:00', to: '18:00' },
+      { day: 'Mardi', from: '09:00', to: '13:00' },
+      { day: 'Jeudi', from: '14:00', to: '18:00' },
     ],
 
     tags: ['skin', 'allergies'],

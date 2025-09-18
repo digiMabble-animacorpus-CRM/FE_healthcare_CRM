@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useFormContext, Controller } from "react-hook-form";
-import { Form, Row, Col, Button } from "react-bootstrap";
-import Calendar from "react-calendar";
-import "react-calendar/dist/Calendar.css";
-import dayjs from "dayjs";
-import { API_BASE_PATH } from "@/context/constants";
+import { API_BASE_PATH } from '@/context/constants';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
+import { Button, Col, Form, Row } from 'react-bootstrap';
+import Calendar from 'react-calendar';
+import 'react-calendar/dist/Calendar.css';
+import { Controller, useFormContext } from 'react-hook-form';
 
 interface Branch {
   branch_id: number;
@@ -49,19 +49,16 @@ const AppointmentFields = () => {
   const [departments, setDepartments] = useState<Department[]>([]);
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(
-    null
-  );
+  const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
-  const branchId = watch("branchId");
-  const departmentId = watch("departmentId");
-  const specializationId = watch("specializationId");
-  const selectedDate = watch("date");
+  const branchId = watch('branchId');
+  const departmentId = watch('departmentId');
+  const specializationId = watch('specializationId');
+  const selectedDate = watch('date');
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   // helper
   const safeArray = (res: any): any[] => {
@@ -93,19 +90,18 @@ const AppointmentFields = () => {
       setSpecializations([]);
       setTherapists([]);
       setSelectedTherapist(null);
-      setValue("departmentId", "");
-      setValue("specializationId", "");
-      setValue("therapistId", "");
-      setValue("date", "");
-      setValue("time", "");
+      setValue('departmentId', '');
+      setValue('specializationId', '');
+      setValue('therapistId', '');
+      setValue('date', '');
+      setValue('time', '');
       return;
     }
     async function loadDepartments() {
       try {
-        const res = await fetch(
-          `${API_BASE_PATH}/departments?branchId=${branchId}`,
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await fetch(`${API_BASE_PATH}/departments?branchId=${branchId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         setDepartments(safeArray(data));
       } catch {
@@ -121,10 +117,10 @@ const AppointmentFields = () => {
       setSpecializations([]);
       setTherapists([]);
       setSelectedTherapist(null);
-      setValue("specializationId", "");
-      setValue("therapistId", "");
-      setValue("date", "");
-      setValue("time", "");
+      setValue('specializationId', '');
+      setValue('therapistId', '');
+      setValue('date', '');
+      setValue('time', '');
       return;
     }
     async function loadSpecializations() {
@@ -146,9 +142,9 @@ const AppointmentFields = () => {
     if (!branchId || !departmentId || !specializationId) {
       setTherapists([]);
       setSelectedTherapist(null);
-      setValue("therapistId", "");
-      setValue("date", "");
-      setValue("time", "");
+      setValue('therapistId', '');
+      setValue('date', '');
+      setValue('time', '');
       return;
     }
     async function loadTherapists() {
@@ -168,22 +164,19 @@ const AppointmentFields = () => {
   // therapist change
   const handleTherapistChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const therapistId = Number(e.target.value);
-    const therapist =
-      therapists.find((t) => t.therapistId === therapistId) || null;
+    const therapist = therapists.find((t) => t.therapistId === therapistId) || null;
     setSelectedTherapist(therapist);
-    setValue("therapistId", therapistId);
-    setValue("date", "");
-    setValue("time", "");
+    setValue('therapistId', therapistId);
+    setValue('date', '');
+    setValue('time', '');
     setTimeSlots([]);
   };
 
   // generate slots
   useEffect(() => {
     if (!selectedTherapist || !selectedDate) return;
-    const dayName = dayjs(selectedDate).format("dddd");
-    const dayAvailability = selectedTherapist.availability?.find(
-      (a) => a.day === dayName
-    );
+    const dayName = dayjs(selectedDate).format('dddd');
+    const dayAvailability = selectedTherapist.availability?.find((a) => a.day === dayName);
     if (!dayAvailability) {
       setTimeSlots([]);
       return;
@@ -191,24 +184,24 @@ const AppointmentFields = () => {
 
     const baseDate = dayjs(selectedDate);
     let current = baseDate
-      .hour(Number(dayAvailability.startTime.split(":")[0]))
-      .minute(Number(dayAvailability.startTime.split(":")[1]))
+      .hour(Number(dayAvailability.startTime.split(':')[0]))
+      .minute(Number(dayAvailability.startTime.split(':')[1]))
       .second(0);
 
     const end = baseDate
-      .hour(Number(dayAvailability.endTime.split(":")[0]))
-      .minute(Number(dayAvailability.endTime.split(":")[1]))
+      .hour(Number(dayAvailability.endTime.split(':')[0]))
+      .minute(Number(dayAvailability.endTime.split(':')[1]))
       .second(0);
 
     const now = dayjs();
     const slots: string[] = [];
     while (current.isBefore(end)) {
-      const slotStart = current.format("HH:mm");
-      const slotEnd = current.add(30, "minute").format("HH:mm");
-      if (baseDate.isAfter(now, "day") || current.isAfter(now)) {
+      const slotStart = current.format('HH:mm');
+      const slotEnd = current.add(30, 'minute').format('HH:mm');
+      if (baseDate.isAfter(now, 'day') || current.isAfter(now)) {
         slots.push(`${slotStart} - ${slotEnd}`);
       }
-      current = current.add(30, "minute");
+      current = current.add(30, 'minute');
     }
     setTimeSlots(slots);
   }, [selectedDate, selectedTherapist]);
@@ -216,7 +209,7 @@ const AppointmentFields = () => {
   // disable unavailable days
   const tileDisabled = ({ date }: { date: Date }) => {
     if (!selectedTherapist?.availability) return false;
-    const dayName = dayjs(date).format("dddd");
+    const dayName = dayjs(date).format('dddd');
     return !selectedTherapist.availability.some((a) => a.day === dayName);
   };
 
@@ -226,7 +219,7 @@ const AppointmentFields = () => {
       <Col md={6}>
         <Form.Group className="mb-3">
           <Form.Label>Branch</Form.Label>
-          <Form.Select {...register("branchId")}>
+          <Form.Select {...register('branchId')}>
             <option value="">Select Branch</option>
             {branches.map((b) => (
               <option key={b.branch_id} value={b.branch_id}>
@@ -240,8 +233,8 @@ const AppointmentFields = () => {
       {/* Department */}
       <Col md={6}>
         <Form.Group className="mb-3">
-          <Form.Label>Department</Form.Label>
-          <Form.Select {...register("departmentId")}>
+          <Form.Label>Département</Form.Label>
+          <Form.Select {...register('departmentId')}>
             <option value="">Select Department</option>
             {departments.map((d) => (
               <option key={d.id} value={d.id}>
@@ -256,7 +249,7 @@ const AppointmentFields = () => {
       <Col md={6}>
         <Form.Group className="mb-3">
           <Form.Label>Specialization</Form.Label>
-          <Form.Select {...register("specializationId")}>
+          <Form.Select {...register('specializationId')}>
             <option value="">Select Specialization</option>
             {specializations.map((s) => (
               <option key={s.specialization_id} value={s.specialization_id}>
@@ -271,10 +264,7 @@ const AppointmentFields = () => {
       <Col md={6}>
         <Form.Group className="mb-3">
           <Form.Label>Therapist</Form.Label>
-          <Form.Select
-            {...register("therapistId")}
-            onChange={handleTherapistChange}
-          >
+          <Form.Select {...register('therapistId')} onChange={handleTherapistChange}>
             <option value="">Select Therapist</option>
             {therapists.map((t) => (
               <option key={t.therapistId} value={t.therapistId}>
@@ -301,19 +291,17 @@ const AppointmentFields = () => {
                 onChange={(date) => {
                   const formattedDate =
                     date instanceof Date && !isNaN(date.getTime())
-                      ? dayjs(date).format("YYYY-MM-DD")
-                      : "";
+                      ? dayjs(date).format('YYYY-MM-DD')
+                      : '';
                   field.onChange(formattedDate);
-                  setValue("date", formattedDate);
-                  trigger("date");
+                  setValue('date', formattedDate);
+                  trigger('date');
                 }}
               />
             )}
           />
           {errors.date && (
-            <Form.Text className="text-danger">
-              {String(errors.date?.message)}
-            </Form.Text>
+            <Form.Text className="text-danger">{String(errors.date?.message)}</Form.Text>
           )}
         </div>
       </Col>
@@ -324,16 +312,16 @@ const AppointmentFields = () => {
           <Form.Label>Select Time</Form.Label>
           <div className="d-flex flex-wrap gap-2">
             {timeSlots.map((slot) => {
-              const [start] = slot.split(" - "); // only save start time
+              const [start] = slot.split(' - '); // only save start time
               return (
                 <Button
                   key={slot}
-                  variant={selectedTime === start ? "primary" : "outline-primary"}
+                  variant={selectedTime === start ? 'primary' : 'outline-primary'}
                   size="sm"
                   onClick={() => {
                     setSelectedTime(start);
-                    setValue("time", start);
-                    trigger("time");
+                    setValue('time', start);
+                    trigger('time');
                   }}
                 >
                   {slot}
@@ -342,9 +330,7 @@ const AppointmentFields = () => {
             })}
           </div>
           {errors.time && (
-            <Form.Text className="text-danger">
-              {String(errors.time?.message)}
-            </Form.Text>
+            <Form.Text className="text-danger">{String(errors.time?.message)}</Form.Text>
           )}
         </div>
       </Col>
@@ -353,7 +339,7 @@ const AppointmentFields = () => {
       <Col md={12}>
         <Form.Group className="mb-3">
           <Form.Label>Purpose of Visit</Form.Label>
-          <Form.Control type="text" {...register("purposeOfVisit")} />
+          <Form.Control type="text" {...register('purposeOfVisit')} />
         </Form.Group>
       </Col>
 
@@ -361,7 +347,7 @@ const AppointmentFields = () => {
       <Col md={12}>
         <Form.Group className="mb-3">
           <Form.Label>Description</Form.Label>
-          <Form.Control as="textarea" rows={3} {...register("description")} />
+          <Form.Control as="textarea" rows={3} {...register('description')} />
         </Form.Group>
       </Col>
     </Row>

@@ -1,16 +1,18 @@
-import FileUpload from '@/components/FileUpload';
+"use client"
+
 import PageTitle from '@/components/PageTitle';
-import { Col, Row } from 'react-bootstrap';
-import { Metadata } from 'next';
+import { useEffect } from 'react';
 import AddTherapist from '../../add-therapist/components/AddTherapist';
 
-export const metadata: Metadata = { title: 'Therpaist Add' };
-
 const TherapistEditPage = ({ params }: { params: { id: string } }) => {
+  useEffect(() => {
+    console.log('TherapistEditPage id param:', params.id);
+  }, [params.id]);
+
   return (
     <>
-      <PageTitle title="Edit Therpaist" subName="" />
-      <AddTherapist params={params} />
+      <PageTitle title="Edit Therapist" subName="" />
+      <AddTherapist therapistId={params.id} />
     </>
   );
 };

@@ -31,8 +31,8 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
 
     availability: [
-      { day: 'Monday', from: '09:00', to: '13:00' },
-      { day: 'Wednesday', from: '10:00', to: '14:00' },
+      { day: 'Lundi', from: '09:00', to: '13:00' },
+      { day: 'Mercredi', from: '10:00', to: '14:00' },
     ],
 
     tags: ['general', 'pediatrics'],
@@ -88,8 +88,8 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
 
     availability: [
-      { day: 'Tuesday', from: '08:00', to: '12:00' },
-      { day: 'Friday', from: '14:00', to: '18:00' },
+      { day: 'Mardi', from: '08:00', to: '12:00' },
+      { day: 'Vendredi', from: '14:00', to: '18:00' },
     ],
 
     tags: ['injection', 'pediatrics'],
@@ -269,8 +269,8 @@ export const staffData: StaffType[] = [
     registrationNumber: '65313860650', // From specializations
     certificationFiles: [],
     availability: [
-      { day: 'Tuesday', from: '13:00', to: '18:00' },
-      { day: 'Wednesday', from: '09:00', to: '18:00' },
+      { day: 'Mardi', from: '13:00', to: '18:00' },
+      { day: 'Mercredi', from: '09:00', to: '18:00' },
     ],
     tags: ['children', 'autism', 'motor-skills', 'independence'],
     status: 'active',
@@ -311,8 +311,8 @@ export const staffData: StaffType[] = [
     registrationNumber: '', // Not clearly available
     certificationFiles: [],
     availability: [
-      { day: 'Friday', from: '09:00', to: '18:00' },
-      { day: 'Saturday', from: '09:00', to: '18:00' },
+      { day: 'Vendredi', from: '09:00', to: '18:00' },
+      { day: 'Samedi', from: '09:00', to: '18:00' },
     ],
     tags: [
       'enfants',
@@ -408,8 +408,8 @@ export const staffData: StaffType[] = [
     registrationNumber: '', // Not available
     certificationFiles: [],
     availability: [
-      { day: 'Monday', from: '10:00', to: '18:00' },
-      { day: 'Tuesday', from: '10:00', to: '17:30' },
+      { day: 'Lundi', from: '10:00', to: '18:00' },
+      { day: 'Mardi', from: '10:00', to: '17:30' },
     ],
     tags: [
       'enfants',
@@ -633,22 +633,22 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
     availability: [
       {
-        day: 'Tuesday',
+        day: 'Mardi',
         from: '08:00',
         to: '14:00',
       },
       {
-        day: 'Friday',
+        day: 'Vendredi',
         from: '08:00',
         to: '20:30',
       },
       {
-        day: 'Wednesday',
+        day: 'Mercredi',
         from: '08:00',
         to: '18:00',
       },
       {
-        day: 'Thursday',
+        day: 'Jeudi',
         from: '08:00',
         to: '18:00',
       },
@@ -757,22 +757,22 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
     availability: [
       {
-        day: 'Tuesday',
+        day: 'Mardi',
         from: '09:00',
         to: '18:30',
       },
       {
-        day: 'Thursday',
+        day: 'Jeudi',
         from: '09:00',
         to: '16:00',
       },
       {
-        day: 'Friday',
+        day: 'Vendredi',
         from: '09:00',
         to: '16:00',
       },
       {
-        day: 'Monday',
+        day: 'Lundi',
         from: '09:00',
         to: '13:00',
       },
@@ -827,17 +827,17 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
     availability: [
       {
-        day: 'Monday',
+        day: 'Lundi',
         from: '14:30',
         to: '20:30',
       },
       {
-        day: 'Thursday',
+        day: 'Jeudi',
         from: '09:00',
         to: '14:00',
       },
       {
-        day: 'Friday',
+        day: 'Vendredi',
         from: '09:00',
         to: '14:00',
       },
@@ -894,12 +894,12 @@ export const staffData: StaffType[] = [
     certificationFiles: [],
     availability: [
       {
-        day: 'Tuesday',
+        day: 'Mardi',
         from: '14:30',
         to: '18:00',
       },
       {
-        day: 'Wednesday',
+        day: 'Mercredi',
         from: '09:00',
         to: '18:00',
       },

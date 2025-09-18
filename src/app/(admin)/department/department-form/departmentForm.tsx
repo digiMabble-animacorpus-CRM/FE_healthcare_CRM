@@ -11,7 +11,6 @@ import { API_BASE_PATH } from '@/context/constants';
 
 export interface DepartmentFormValues {
   name: string;
-  _id?: string;
   description?: string;
   is_active: boolean;
 }
@@ -87,29 +86,29 @@ const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
         <Card>
           <CardHeader>
             <CardTitle as="h5">
-              {isEditMode ? 'Edit Department Details' : 'Create New Department'}
+              {isEditMode ? 'Modifier les détails du service' : 'Créer un nouveau département'}
             </CardTitle>
           </CardHeader>
 
           <CardBody>
             <Row className="mb-4">
-              <Col lg={6}>
+              <Col lg={6} className='mb-3'>
                 <TextFormInput
                   required
                   control={control}
                   name="name"
-                  label="Department Name"
-                  placeholder="Ex: Department Name"
+                  label="Nom du département"
+                  placeholder="Entrez le nom du département"
                 />
               </Col>
 
-              <Col lg={12}>
+              <Col lg={12} className='mb-3'>
                 <Form.Group>
                   <Form.Label>Description</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
-                    placeholder="Ex: Department Description"
+                    placeholder="Entrez la description du département"
                     {...register('description')}
                   />
                 </Form.Group>
@@ -121,10 +120,10 @@ const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
 
             <div className="mt-4 d-flex gap-3 justify-content-end">
               <Button type="submit" variant="primary">
-                {isEditMode ? 'Update' : 'Create'} Department
+                {isEditMode ? 'Mise à jour' : 'Créer'} Département
               </Button>
-              <Button variant="secondary" onClick={() => router.back()}>
-                Cancel
+              <Button variant="danger" onClick={() => router.back()}>
+              Annuler
               </Button>
             </div>
           </CardBody>

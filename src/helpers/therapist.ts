@@ -1,7 +1,7 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import { encryptAES, decryptAES } from '@/utils/encryption';
+import { decryptAES } from '@/utils/encryption';
 // import type { TherapistCreatePayload, TherapistType } from '@/types/data';
 export interface TherapistUpdatePayload {
   name?: string;
@@ -46,7 +46,6 @@ export const getAllTherapists = async (
       ...(to ? { toDate: to } : {}),
       ...(search ? { searchText: search } : {}),
     };
-console.log('Filters (plain):', filters);
 
     const queryParams = new URLSearchParams(filters).toString();
 
@@ -65,9 +64,8 @@ console.log('Filters (plain):', filters);
     }
 
     const jsonData = await response.json();
-    console.log('Response from server:', jsonData);
 
-     const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
+    const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
 
     return {
       data: therapistData,
@@ -87,7 +85,6 @@ export const getTherapistById = async (therapistId: any): Promise<any | null> =>
   }
 
   const url = `${API_BASE_PATH}/therapists/${therapistId}`;
-  console.log('Requesting therapist by ID:', url);
 
   try {
     const response = await fetch(url, {
@@ -98,9 +95,7 @@ export const getTherapistById = async (therapistId: any): Promise<any | null> =>
       },
     });
 
-    console.log('Response status:', response.status);
     const result = await response.json();
-    console.log('Full API response:', result);
 
     if (!response.ok) {
       console.error('Failed to fetch therapist:', result?.message || 'Unknown error');
@@ -181,7 +176,6 @@ export const updateTherapist = async (
   }
 };
 
-
 export const transformToBackendDto = (formData: any): TherapistUpdatePayload => {
   return {
     name: formData.name,
@@ -230,10 +224,9 @@ export const transformToBackendDto = (formData: any): TherapistUpdatePayload => 
 //     return false;
 //   }
 // };
-import axios from "axios";
+import axios from 'axios';
 export const deleteTherapist = async (id: string) => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("access_token") : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   try {
     await axios.delete(`${API_BASE_PATH}/therapists/${id}`, {
@@ -243,7 +236,7 @@ export const deleteTherapist = async (id: string) => {
     });
     return true;
   } catch (err) {
-    console.error("Delete therapist error:", err);
+    console.error('Delete therapist error:', err);
     return false;
   }
 };

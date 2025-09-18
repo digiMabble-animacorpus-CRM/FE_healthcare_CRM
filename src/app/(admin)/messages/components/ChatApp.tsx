@@ -1,12 +1,11 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { Col, Offcanvas } from 'react-bootstrap';
+import { Col } from 'react-bootstrap';
 
+import { useChatContext } from '@/context/useChatContext';
 import { getAllUsers, getUserById } from '@/helpers/data';
 import type { UserType } from '@/types/data';
 import ChatArea from './ChatArea';
-import ChatLeftSidebar from './ChatLeftSidebar';
-import { useChatContext } from '@/context/useChatContext';
 
 const fetchSingleUser = async (id: UserType['id']) => {
   const data = await getUserById(id);
