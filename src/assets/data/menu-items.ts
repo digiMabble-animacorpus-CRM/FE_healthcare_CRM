@@ -26,12 +26,24 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri:message-2-line',
     url: '/chat',
   },
-
   {
     key: 'tickets',
     label: 'Tickets',
     icon: 'ri:ticket-2-line',
-    url: '/tickets',
+    children: [
+      {
+        key: 'new-request',
+        label: 'New request',
+        url: '/tickets',
+        parentKey: 'tickets',
+      },
+      {
+        key: 'appointment-management',
+        label: 'Appointment management',
+        url: '/appointment-management',
+        parentKey: 'tickets',
+      },
+    ],
   },
   {
     key: 'therapists',
