@@ -8,10 +8,16 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Col, Form, Row } from '
 
 type ApiChatItem = {
   session_id: string;
-  email: string;
-  message_type: 'human' | 'ai';
-  message_content: string;
-  created_at: string;
+  email: string | null;
+  created_at?: string;
+  message_type?: 'human' | 'ai'; // Old format
+  message_content:
+    | string
+    | {
+        type: 'human' | 'ai';
+        content: string;
+        [key: string]: any;
+      };
 };
 
 type GroupedChats = {
@@ -37,6 +43,7 @@ const ChatHistory: React.FC = () => {
   const chatBoxRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   const formatDate = (isoDate: string) => {
+    if (!isoDate) return '';
     const [year, month, day] = isoDate.slice(0, 10).split('-');
     return `${day}-${month}-${year}`;
   };
@@ -56,16 +63,24 @@ const ChatHistory: React.FC = () => {
           const sid = item.session_id;
           if (!grouped[sid]) {
             grouped[sid] = {
-              email: item.email,
-              createdAt: item.created_at,
+              email: item.email || 'N/A',
+              createdAt: item.created_at || new Date().toISOString(),
               messages: [],
             };
           }
 
-          grouped[sid].messages.push({
-            type: item.message_type,
-            content: item.message_content,
-          });
+          // ✅ Handle both old and new formats
+          const type =
+            item.message_type ||
+            (typeof item.message_content === 'object' && item.message_content.type) ||
+            'human';
+
+          const content =
+            (typeof item.message_content === 'string'
+              ? item.message_content
+              : item.message_content?.content) || '';
+
+          grouped[sid].messages.push({ type, content });
         }
 
         setChats(grouped);
@@ -92,14 +107,12 @@ const ChatHistory: React.FC = () => {
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
 
-    let filtered: GroupedChats = {};
+    const filtered: GroupedChats = {};
     Object.entries(chats).forEach(([sid, chatData]) => {
       const chatDate = chatData.createdAt?.slice(0, 10) ?? '';
-
       const matchDate = !filterDate || chatDate === filterDate;
       const matchEmail =
         !filterEmail || chatData.email.toLowerCase().includes(filterEmail.toLowerCase());
-
       if (matchDate && matchEmail) {
         filtered[sid] = chatData;
       }
@@ -264,7 +277,7 @@ const ChatHistory: React.FC = () => {
           border-bottom-left-radius: 0;
         }
         .chat-message.ai .bubble {
-          background-color: #f9f5ff; /* Updated AI message color */
+          background-color: #f9f5ff;
           color: #333;
           border-bottom-right-radius: 0;
         }
