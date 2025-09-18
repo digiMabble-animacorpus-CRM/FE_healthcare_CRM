@@ -2,6 +2,8 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import {
   Button,
@@ -12,34 +14,28 @@ import {
   CardTitle,
   Col,
   Row,
-  Spinner,
-  Modal,
-  Form,
+  Spinner
 } from 'react-bootstrap';
-import axios from 'axios';
-import { API_BASE_PATH } from '@/context/constants';
 
 const PAGE_LIMIT = 10;
 
-type TicketType = {
+type AppointmentManagementType = {
   id: number;
-  description: string;
-  is_for_child: boolean;
-  child_name: string | null;
-  child_age: number;
+  action: string;
+  therapist_name: string;
+  appointment_date: string;
+  appointment_time: string;
+  preferred_new_date: string;
+  preferred_new_time: string;
   location: string;
-  specialty: string;
-  phone: string;
-  email: string;
-  address: string;
   created_at: string;
   first_name: string;
-  last_name: string;
-  status?: string; // new field
 };
 
-const TicketPage = () => {
-  const [tickets, setTickets] = useState<TicketType[]>([]);
+const AppointmentManagementPage = () => {
+  const [appointmentManagement, setAppointmentManagement] = useState<AppointmentManagementType[]>(
+    [],
+  );
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
@@ -47,13 +43,13 @@ const TicketPage = () => {
 
   // Edit modal state
   const [showEditModal, setShowEditModal] = useState(false);
-  const [editTicket, setEditTicket] = useState<TicketType | null>(null);
+  const [editTicket, setEditTicket] = useState<AppointmentManagementType | null>(null);
 
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTicketId, setDeleteTicketId] = useState<number | null>(null);
 
-  const fetchTickets = async (page: number) => {
+  const fetchAppointmentManagement = async (page: number) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('access_token');
@@ -69,18 +65,17 @@ const TicketPage = () => {
         },
       });
 
-      const data: TicketType[] = response.data.new_requests || [];
+      const data: AppointmentManagementType[] = response.data.appointment_management || [];
       // add default status = "New"
       const enriched = data.map((t) => ({
         ...t,
-        status: t.status || 'New',
       }));
 
-      setTickets(enriched);
+      setAppointmentManagement(enriched);
       setTotalPages(Math.ceil((data.length || 0) / PAGE_LIMIT));
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
-      setTickets([]);
+      setAppointmentManagement([]);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -88,7 +83,7 @@ const TicketPage = () => {
   };
 
   useEffect(() => {
-    fetchTickets(currentPage);
+    fetchAppointmentManagement(currentPage);
   }, [currentPage, searchTerm]);
 
   const handlePageChange = (page: number) => {
@@ -97,87 +92,87 @@ const TicketPage = () => {
     }
   };
 
-  const handleEditClick = async (id: number) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      const response = await axios.get(`${API_BASE_PATH}/new-requests/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+  // const handleEditClick = async (id: number) => {
+  //   try {
+  //     const token = localStorage.getItem('access_token');
+  //     const response = await axios.get(`${API_BASE_PATH}/new-requests/${id}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
 
-      const ticket = response.data;
-      setEditTicket({
-        ...ticket,
-        status: ticket.status || 'New',
-      });
-      setShowEditModal(true);
-    } catch (error) {
-      console.error('Failed to fetch ticket details:', error);
-    }
-  };
+  //     const ticket = response.data;
+  //     setEditTicket({
+  //       ...ticket,
+  //       status: ticket.status || 'New',
+  //     });
+  //     setShowEditModal(true);
+  //   } catch (error) {
+  //     console.error('Failed to fetch ticket details:', error);
+  //   }
+  // };
 
-  const handleSaveEdit = async () => {
-    if (!editTicket) return;
+  // const handleSaveEdit = async () => {
+  //   if (!editTicket) return;
 
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.patch(
-        `${API_BASE_PATH}/new-requests/${editTicket.id}`,
-        editTicket,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+  //   try {
+  //     const token = localStorage.getItem('access_token');
+  //     await axios.patch(
+  //       `${API_BASE_PATH}/new-requests/${editTicket.id}`,
+  //       editTicket,
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${token}`,
+  //           'Content-Type': 'application/json',
+  //         },
+  //       },
+  //     );
 
-      // update list
-      setTickets((prev) =>
-        prev.map((t) => (t.id === editTicket.id ? editTicket : t)),
-      );
-      setShowEditModal(false);
-    } catch (error) {
-      console.error('Failed to update ticket:', error);
-    }
-  };
+  //     // update list
+  //     setAppointmentManagement((prev) =>
+  //       prev.map((t) => (t.id === editTicket.id ? editTicket : t)),
+  //     );
+  //     setShowEditModal(false);
+  //   } catch (error) {
+  //     console.error('Failed to update ticket:', error);
+  //   }
+  // };
 
-  const handleDeleteClick = (id: number) => {
-    setDeleteTicketId(id);
-    setShowDeleteModal(true);
-  };
+  // const handleDeleteClick = (id: number) => {
+  //   setDeleteTicketId(id);
+  //   setShowDeleteModal(true);
+  // };
 
-  const handleConfirmDelete = async () => {
-    if (!deleteTicketId) return;
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.delete(`${API_BASE_PATH}/new-requests/${deleteTicketId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+  // const handleConfirmDelete = async () => {
+  //   if (!deleteTicketId) return;
+  //   try {
+  //     const token = localStorage.getItem('access_token');
+  //     await axios.delete(`${API_BASE_PATH}/new-requests/${deleteTicketId}`, {
+  //       headers: {
+  //         Authorization: `Bearer ${token}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //     });
 
-      setTickets((prev) => prev.filter((t) => t.id !== deleteTicketId));
-    } catch (error) {
-      console.error('Failed to delete ticket:', error);
-    } finally {
-      setShowDeleteModal(false);
-      setDeleteTicketId(null);
-    }
-  };
+  //     setAppointmentManagement((prev) => prev.filter((t) => t.id !== deleteTicketId));
+  //   } catch (error) {
+  //     console.error('Failed to delete ticket:', error);
+  //   } finally {
+  //     setShowDeleteModal(false);
+  //     setDeleteTicketId(null);
+  //   }
+  // };
 
   return (
     <>
-      <PageTitle subName="Billets" title="Liste des Billets" />
+      <PageTitle subName="Gestion des rendez-vous" title="Liste des Gestion des rendez-vous" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                Liste de tous les Billets ({tickets.length} Total)
+                Liste de tous les Gestion des rendez-vous ({appointmentManagement.length} Total)
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -206,62 +201,60 @@ const TicketPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>No</th>
+                        <th>Non</th>
                         <th>Nom</th>
-                        <th>E-mail</th>
-                        <th>Téléphone</th>
-                        <th>Spécialité</th>
-                        <th>Lieu</th>
-                        <th>Enfant</th>
-                        <th>Âge</th>
-                        <th>Description</th>
-                        <th>Status</th>
-                        <th>Créé le</th>
+                        <th>Emplacement</th>
+                        <th>Nom du thérapeute</th>
+                        <th>Date de rendez-vous</th>
+                        <th>Heure de rendez-vous</th>
+                        <th>Nouvelle date préférée</th>
+                        <th>Nouvelle heure préférée</th>
+                        <th>Statut</th>
+                        <th>Créé à</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {tickets.map((ticket: TicketType, idx: number) => (
-                        <tr key={ticket.id}>
-                          <td>{idx + 1}</td>
-                          <td>
-                            {ticket.first_name} {ticket.last_name}
-                          </td>
-                          <td>{ticket.email}</td>
-                          <td>{ticket.phone}</td>
-                          <td>{ticket.specialty}</td>
-                          <td>{ticket.location}</td>
-                          <td>{ticket.is_for_child ? ticket.child_name || '-' : '-'}</td>
-                          <td>{ticket.is_for_child ? ticket.child_age : '-'}</td>
-                          <td>{ticket.description}</td>
-                          <td>{ticket.status}</td>
-                          <td>{new Date(ticket.created_at).toLocaleString()}</td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                variant="soft-primary"
-                                size="sm"
-                                onClick={() => handleEditClick(ticket.id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:pen-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
-                              <Button
-                                variant="soft-danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(ticket.id)}
-                              >
-                                <IconifyIcon
-                                  icon="solar:trash-bin-minimalistic-2-broken"
-                                  className="align-middle fs-18"
-                                />
-                              </Button>
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
+                      {appointmentManagement.map(
+                        (ticket: AppointmentManagementType, idx: number) => (
+                          <tr key={ticket.id}>
+                            <td>{idx + 1}</td>
+                            <td>{ticket.first_name}</td>
+                            <td>{ticket.location}</td>
+                            <td>{ticket.therapist_name}</td>
+                            <td>{ticket.appointment_date}</td>
+                            <td>{ticket.appointment_time}</td>
+                            <td>{ticket.preferred_new_date}</td>
+                            <td>{ticket.preferred_new_time}</td>
+                            <td>{ticket.action}</td>
+                            <td>{new Date(ticket.created_at).toLocaleString()}</td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="soft-primary"
+                                  size="sm"
+                                  // onClick={() => handleEditClick(ticket.id)}
+                                >
+                                  <IconifyIcon
+                                    icon="solar:pen-2-broken"
+                                    className="align-middle fs-18"
+                                  />
+                                </Button>
+                                <Button
+                                  variant="soft-danger"
+                                  size="sm"
+                                  // onClick={() => handleDeleteClick(ticket.id)}
+                                >
+                                  <IconifyIcon
+                                    icon="solar:trash-bin-minimalistic-2-broken"
+                                    className="align-middle fs-18"
+                                  />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ),
+                      )}
                     </tbody>
                   </table>
                 </div>
@@ -311,7 +304,7 @@ const TicketPage = () => {
       </Row>
 
       {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg">
+      {/* <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg">
         <Modal.Header closeButton>
           <Modal.Title>Modifier Ticket</Modal.Title>
         </Modal.Header>
@@ -487,10 +480,10 @@ const TicketPage = () => {
             Sauvegarder
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
 
       {/* Delete Modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+      {/* <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
@@ -503,9 +496,9 @@ const TicketPage = () => {
             Supprimer
           </Button>
         </Modal.Footer>
-      </Modal>
+      </Modal> */}
     </>
   );
 };
 
-export default TicketPage;
+export default AppointmentManagementPage;

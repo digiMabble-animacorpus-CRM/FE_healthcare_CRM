@@ -30,13 +30,3 @@ export type TabMenuItem = {
   icon: string;
   tab: ReactNode;
 };
-
-// const menuItems = [
-//   {
-//     key: 'dashboard',
-//     label: 'Dashboard',
-//     icon: <DashboardIcon />,
-//     url: '/dashboard',
-//   },
-//   // ...other items
-// ]
