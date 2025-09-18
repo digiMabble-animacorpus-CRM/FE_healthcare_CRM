@@ -2,6 +2,8 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
 import { useEffect, useState } from 'react';
 import {
   Button,
@@ -12,12 +14,8 @@ import {
   CardTitle,
   Col,
   Row,
-  Spinner,
-  Modal,
-  Form,
+  Spinner
 } from 'react-bootstrap';
-import axios from 'axios';
-import { API_BASE_PATH } from '@/context/constants';
 
 const PAGE_LIMIT = 10;
 
@@ -32,7 +30,6 @@ type AppointmentManagementType = {
   location: string;
   created_at: string;
   first_name: string;
-  status?: string; // new field
 };
 
 const AppointmentManagementPage = () => {
@@ -72,7 +69,6 @@ const AppointmentManagementPage = () => {
       // add default status = "New"
       const enriched = data.map((t) => ({
         ...t,
-        status: t.status || 'New',
       }));
 
       setAppointmentManagement(enriched);
@@ -170,13 +166,13 @@ const AppointmentManagementPage = () => {
 
   return (
     <>
-      <PageTitle subName="AppointmentManagement" title="Liste des AppointmentManagement" />
+      <PageTitle subName="Gestion des rendez-vous" title="Liste des Gestion des rendez-vous" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                Liste de tous les AppointmentManagement ({appointmentManagement.length} Total)
+                Liste de tous les Gestion des rendez-vous ({appointmentManagement.length} Total)
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -205,18 +201,17 @@ const AppointmentManagementPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Location</th>
-                        <th>Therapist Name</th>
-                        <th>Appointment Date</th>
-                        <th>Appointment Time</th>
-                        <th>Preferred New Date</th>
-                        <th>Preferred New Time</th>
-                        <th>Created At</th>
-                        <th>Status</th>
+                        <th>Non</th>
+                        <th>Nom</th>
+                        <th>Emplacement</th>
+                        <th>Nom du thérapeute</th>
+                        <th>Date de rendez-vous</th>
+                        <th>Heure de rendez-vous</th>
+                        <th>Nouvelle date préférée</th>
+                        <th>Nouvelle heure préférée</th>
+                        <th>Statut</th>
+                        <th>Créé à</th>
                         <th>Action</th>
-                        <th>Button</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -231,7 +226,6 @@ const AppointmentManagementPage = () => {
                             <td>{ticket.appointment_time}</td>
                             <td>{ticket.preferred_new_date}</td>
                             <td>{ticket.preferred_new_time}</td>
-                            <td>{ticket.status}</td>
                             <td>{ticket.action}</td>
                             <td>{new Date(ticket.created_at).toLocaleString()}</td>
                             <td>

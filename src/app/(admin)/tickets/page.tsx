@@ -171,13 +171,13 @@ const TicketPage = () => {
 
   return (
     <>
-      <PageTitle subName="Tickets" title="Liste des Tickets" />
+      <PageTitle subName="Billets" title="Liste des Billets" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                Liste de tous les Tickets ({tickets.length} Total)
+                Liste de tous les Billets ({tickets.length} Total)
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -208,7 +208,7 @@ const TicketPage = () => {
                       <tr>
                         <th>No</th>
                         <th>Nom</th>
-                        <th>Email</th>
+                        <th>E-mail</th>
                         <th>Téléphone</th>
                         <th>Spécialité</th>
                         <th>Lieu</th>

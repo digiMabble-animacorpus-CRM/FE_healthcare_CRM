@@ -28,18 +28,18 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
   {
     key: 'tickets',
-    label: 'Tickets',
+    label: 'Billets',
     icon: 'ri:ticket-2-line',
     children: [
       {
         key: 'new-request',
-        label: 'New request',
+        label: 'Nouvelle demande',
         url: '/tickets',
         parentKey: 'tickets',
       },
       {
         key: 'appointment-management',
-        label: 'Appointment management',
+        label: 'Gestion des rendez-vous',
         url: '/appointment-management',
         parentKey: 'tickets',
       },
