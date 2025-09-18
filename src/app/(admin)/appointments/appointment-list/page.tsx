@@ -24,6 +24,7 @@ import { Icon } from '@iconify/react';
 import dynamic from 'next/dynamic';
 import { API_BASE_PATH } from '@/context/constants';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
   ssr: false,
@@ -31,7 +32,7 @@ const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
 });
 
 type CalendarInstance = {
-  getInstance: () => any; 
+  getInstance: () => any;
 };
 
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -122,10 +123,12 @@ const AppointmentCalendarPage = () => {
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [moreEvents, setMoreEvents] = useState<any[]>([]);
   const [calendarInstance, setCalendarInstance] = useState<any | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const calendarRef = useRef<{
-    getInstance(): any; setDate: (date: Date) => void 
-}>(null);
+    getInstance(): any; setDate: (date: Date) => void
+  }>(null);
 
 
 
@@ -558,6 +561,36 @@ const AppointmentCalendarPage = () => {
     }
   };
 
+  // Delete appointment function
+  const handleDeleteAppointment = async () => {
+    if (!selectedEvent || !token) return;
+
+    try {
+      setDeleting(true);
+      const response = await fetch(`${API_BASE_PATH}/appointments/${selectedEvent.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Remove the deleted appointment from state
+        setAllAppointments(prev => prev.filter(appt => appt.id !== selectedEvent.id));
+        setShowDeleteModal(false);
+        setShowModal(false)
+        setSelectedEvent(null);
+      } else {
+        console.error('Failed to delete appointment');
+      }
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <>
       <PageTitle subName="Rendez-vous" title="Calendrier de rendez-vous" />
@@ -802,8 +835,6 @@ const AppointmentCalendarPage = () => {
             </div>
           ) : calendarViewMode === 'calendar' ? (
             <div className="flex-grow-1 border rounded overflow-hidden">
-              {/* <button onClick={handleSetDate}>Set Date to Jan 2026</button>
-              <TuiCalendar ref={calendarRef} /> */}
               <TuiCalendar
                 ref={calendarRef}
                 height={calendarHeight}
@@ -888,8 +919,8 @@ const AppointmentCalendarPage = () => {
                                 <strong className="text-truncate">{event.title}</strong>
                               </div>
                               <span className={`badge bg-${getStatusBadgeColor(event.raw.status)}`}>
-                                {event.raw.status || 'Unknown'}
-                              </span>
+                                  {event.raw.status || 'Unknown'}
+                                </span>
                             </div>
 
                             <div className="mb-2">
@@ -953,8 +984,8 @@ const AppointmentCalendarPage = () => {
           {selectedEvent ? (
             <div className="row">
               <div className="col-12 mb-4">
-                <div className="d-flex align-items-center mb-3">
-                  <span
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  {/* <span
                     style={{
                       display: 'inline-block',
                       width: 20,
@@ -963,11 +994,35 @@ const AppointmentCalendarPage = () => {
                       marginRight: 12,
                       borderRadius: '4px'
                     }}
-                  />
+                  /> */}
                   <h5 className="mb-0">{selectedEvent.title}</h5>
-                  <span className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto`}>
-                    {selectedEvent.raw.status || 'Unknown'}
-                  </span>
+
+                  <div className="d-flex align-items-center">
+                    <span className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto me-1`}>
+                      {selectedEvent.raw.status || 'Unknown'}
+                    </span>
+                    {/* Edit Button */}
+                    <Link
+                      href={`/appointments/appointment-form/edit?id=${selectedEvent.id}`}
+                      className="btn btn-sm btn-outline-primary me-1"
+                      title="Edit Appointment"
+                    >
+                      <Icon icon="mdi:pencil" />
+                    </Link>
+                    {/* Delete Button */}
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      title="Delete Appointment"
+                      onClick={() => {
+                        setSelectedEvent(selectedEvent);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <Icon icon="mdi:delete" />
+                    </Button>
+                  </div>
+
                 </div>
               </div>
 
@@ -1125,12 +1180,6 @@ const AppointmentCalendarPage = () => {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
-            <Icon icon="mdi:close" className="me-1" />
-            Fermer
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       {/* Modal for "More" events in month view */}
@@ -1203,6 +1252,46 @@ const AppointmentCalendarPage = () => {
           <Button variant="outline-secondary" onClick={() => setShowMoreModal(false)}>
             <Icon icon="mdi:close" className="me-1" />
             Fermer
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <Icon icon="mdi:alert-circle-outline" className="me-2 text-danger" />
+            Confirmer la suppression
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Êtes-vous sûr de vouloir supprimer ce rendez-vous?</p>
+          <p className="mb-0">
+            <strong>Titre:</strong> {selectedEvent?.title}
+          </p>
+          <p className="mb-0">
+            <strong>Date:</strong> {selectedEvent ? dayjs(selectedEvent.start).format('MMMM D, YYYY') : ''}
+          </p>
+          <p className="mb-0">
+            <strong>Heure:</strong> {selectedEvent ? dayjs(selectedEvent.start).format('h:mm A') : ''} - {selectedEvent ? dayjs(selectedEvent.end).format('h:mm A') : ''}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={deleting}>
+            Annuler
+          </Button>
+          <Button variant="danger" onClick={handleDeleteAppointment} disabled={deleting}>
+            {deleting ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Suppression...
+              </>
+            ) : (
+              <>
+                <Icon icon="mdi:delete" className="me-1" />
+                Supprimer
+              </>
+            )}
           </Button>
         </Modal.Footer>
       </Modal>
