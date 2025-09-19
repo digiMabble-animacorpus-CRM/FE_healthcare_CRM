@@ -1,6 +1,8 @@
+// /appointments/components/AppointmentFields/index.tsx
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
+import type { BranchType, DepartmentType, SpecializationType, TherapistType, AvailabilityType } from '../types/appointment';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
@@ -8,34 +10,11 @@ import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { Controller, useFormContext } from 'react-hook-form';
 
-interface Branch {
-  branch_id: number;
-  name: string;
+interface AppointmentFieldsProps {
+  mode?: 'create' | 'edit';
 }
 
-interface Department {
-  id: number;
-  name: string;
-}
-
-interface Specialization {
-  specialization_id: number;
-  specialization_type: string;
-}
-
-interface Availability {
-  day: string;
-  startTime: string;
-  endTime: string;
-}
-
-interface Therapist {
-  therapistId: number;
-  fullName: string;
-  availability: Availability[];
-}
-
-const AppointmentFields = () => {
+const AppointmentFields = ({ mode = 'create' }: AppointmentFieldsProps) => {
   const {
     register,
     setValue,
@@ -45,11 +24,11 @@ const AppointmentFields = () => {
     formState: { errors },
   } = useFormContext();
 
-  const [branches, setBranches] = useState<Branch[]>([]);
-  const [departments, setDepartments] = useState<Department[]>([]);
-  const [specializations, setSpecializations] = useState<Specialization[]>([]);
-  const [therapists, setTherapists] = useState<Therapist[]>([]);
-  const [selectedTherapist, setSelectedTherapist] = useState<Therapist | null>(null);
+  const [branches, setBranches] = useState<BranchType[]>([]);
+  const [departments, setDepartments] = useState<DepartmentType[]>([]);
+  const [specializations, setSpecializations] = useState<SpecializationType[]>([]);
+  const [therapists, setTherapists] = useState<TherapistType[]>([]);
+  const [selectedTherapist, setSelectedTherapist] = useState<TherapistType | null>(null);
   const [timeSlots, setTimeSlots] = useState<string[]>([]);
   const [selectedTime, setSelectedTime] = useState<string | null>(null);
 
@@ -60,14 +39,12 @@ const AppointmentFields = () => {
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
-  // helper
   const safeArray = (res: any): any[] => {
     if (Array.isArray(res)) return res;
     if (res && Array.isArray(res.data)) return res.data;
     return [];
   };
 
-  // load branches
   useEffect(() => {
     async function loadBranches() {
       try {
@@ -83,7 +60,6 @@ const AppointmentFields = () => {
     if (token) loadBranches();
   }, [token]);
 
-  // load departments
   useEffect(() => {
     if (!branchId) {
       setDepartments([]);
@@ -111,7 +87,6 @@ const AppointmentFields = () => {
     loadDepartments();
   }, [branchId]);
 
-  // load specializations
   useEffect(() => {
     if (!branchId || !departmentId) {
       setSpecializations([]);
@@ -137,7 +112,6 @@ const AppointmentFields = () => {
     loadSpecializations();
   }, [branchId, departmentId]);
 
-  // load therapists
   useEffect(() => {
     if (!branchId || !departmentId || !specializationId) {
       setTherapists([]);
@@ -161,7 +135,14 @@ const AppointmentFields = () => {
     loadTherapists();
   }, [branchId, departmentId, specializationId]);
 
-  // therapist change
+  useEffect(() => {
+    if (mode === 'edit' && watch('therapistId')) {
+      const therapistId = watch('therapistId');
+      const therapist = therapists.find((t) => t.therapistId === therapistId) || null;
+      setSelectedTherapist(therapist);
+    }
+  }, [mode, therapists, watch]);
+
   const handleTherapistChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const therapistId = Number(e.target.value);
     const therapist = therapists.find((t) => t.therapistId === therapistId) || null;
@@ -172,7 +153,6 @@ const AppointmentFields = () => {
     setTimeSlots([]);
   };
 
-  // generate slots
   useEffect(() => {
     if (!selectedTherapist || !selectedDate) return;
     const dayName = dayjs(selectedDate).format('dddd');
@@ -206,7 +186,6 @@ const AppointmentFields = () => {
     setTimeSlots(slots);
   }, [selectedDate, selectedTherapist]);
 
-  // disable unavailable days
   const tileDisabled = ({ date }: { date: Date }) => {
     if (!selectedTherapist?.availability) return false;
     const dayName = dayjs(date).format('dddd');
@@ -215,7 +194,6 @@ const AppointmentFields = () => {
 
   return (
     <Row>
-      {/* Branch */}
       <Col md={6}>
         <Form.Group className="mb-3">
           <Form.Label>Branch</Form.Label>
@@ -230,7 +208,6 @@ const AppointmentFields = () => {
         </Form.Group>
       </Col>
 
-      {/* Department */}
       <Col md={6}>
         <Form.Group className="mb-3">
           <Form.Label>Département</Form.Label>
@@ -245,7 +222,6 @@ const AppointmentFields = () => {
         </Form.Group>
       </Col>
 
-      {/* Specialization */}
       <Col md={6}>
         <Form.Group className="mb-3">
           <Form.Label>Specialization</Form.Label>
@@ -260,7 +236,6 @@ const AppointmentFields = () => {
         </Form.Group>
       </Col>
 
-      {/* Therapist */}
       <Col md={6}>
         <Form.Group className="mb-3">
           <Form.Label>Therapist</Form.Label>
@@ -275,7 +250,6 @@ const AppointmentFields = () => {
         </Form.Group>
       </Col>
 
-      {/* Date */}
       <Col lg={6}>
         <div className="mb-3">
           <Form.Label>Appointment Date</Form.Label>
@@ -306,13 +280,12 @@ const AppointmentFields = () => {
         </div>
       </Col>
 
-      {/* Time Slots */}
       <Col lg={6}>
         <div className="mb-3">
           <Form.Label>Select Time</Form.Label>
           <div className="d-flex flex-wrap gap-2">
             {timeSlots.map((slot) => {
-              const [start] = slot.split(' - '); // only save start time
+              const [start] = slot.split(' - ');
               return (
                 <Button
                   key={slot}
@@ -335,7 +308,6 @@ const AppointmentFields = () => {
         </div>
       </Col>
 
-      {/* Purpose */}
       <Col md={12}>
         <Form.Group className="mb-3">
           <Form.Label>Purpose of Visit</Form.Label>
@@ -343,7 +315,6 @@ const AppointmentFields = () => {
         </Form.Group>
       </Col>
 
-      {/* Description */}
       <Col md={12}>
         <Form.Group className="mb-3">
           <Form.Label>Description</Form.Label>

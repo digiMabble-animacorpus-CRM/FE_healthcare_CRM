@@ -603,7 +603,7 @@ const AppointmentCalendarPage = () => {
                 : 'Liste de rendez-vous'}
               <small className="text-muted ms-2">({appointments.length} rendez-vous)</small>
             </CardTitle>
-            <Button variant="primary" onClick={() => router.push('/appointments/appointment-form')}>
+            <Button variant="primary" onClick={() => router.push('/appointments/appointment-form/new')}>
               <Icon icon="mdi:plus" className="me-1" />
               Nouveau rendez-vous
             </Button>
@@ -919,8 +919,8 @@ const AppointmentCalendarPage = () => {
                                 <strong className="text-truncate">{event.title}</strong>
                               </div>
                               <span className={`badge bg-${getStatusBadgeColor(event.raw.status)}`}>
-                                  {event.raw.status || 'Unknown'}
-                                </span>
+                                {event.raw.status || 'Unknown'}
+                              </span>
                             </div>
 
                             <div className="mb-2">
@@ -1003,7 +1003,7 @@ const AppointmentCalendarPage = () => {
                     </span>
                     {/* Edit Button */}
                     <Link
-                      href={`/appointments/appointment-form/edit?id=${selectedEvent.id}`}
+                      href={`/appointments/appointment-form/edit/${selectedEvent.id}`}
                       className="btn btn-sm btn-outline-primary me-1"
                       title="Edit Appointment"
                     >
