@@ -105,6 +105,7 @@ export default function EditAppointmentPage() {
       {customer?.id && (
         <BookAppointmentForm
           patientId={customer.id}
+          modifiedById={user?.team_id ? String(user.team_id) : ''}
           createdById={user?.team_id ? String(user.team_id) : ''}
           onSubmitHandler={handleAppointmentSubmit}
           selectedCustomer={customer}
