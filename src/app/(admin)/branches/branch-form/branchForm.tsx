@@ -3,9 +3,23 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'react-bootstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+  Form,
+  Spinner,
+} from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
+import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
+import { useState } from 'react';
+import { toast } from 'react-toastify';
 
 export interface BranchFormValues {
   name: string;
@@ -24,13 +38,13 @@ const schema = yup.object({
 });
 
 interface Props {
-  defaultValues?: Partial<BranchFormValues & { _id?: string }>;
+  defaultValues?: Partial<BranchFormValues & { branch_id?: string }>;
   isEditMode?: boolean;
-  onSubmitHandler: (data: BranchFormValues & { _id?: string }) => Promise<void>;
 }
 
-const BranchForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
+const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
   const router = useRouter();
+  const [submitting, setSubmitting] = useState(false);
 
   const methods = useForm<BranchFormValues>({
     resolver: yupResolver(schema),
@@ -46,12 +60,42 @@ const BranchForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Prop
   const { handleSubmit, control, register } = methods;
 
   const handleFormSubmit = async (data: BranchFormValues) => {
-    const payload =
-      isEditMode && (defaultValues as any)?._id
-        ? { ...data, _id: (defaultValues as any)._id }
-        : data;
+    try {
+      setSubmitting(true);
+      const token = localStorage.getItem('access_token');
+      if (!token) throw new Error('No access token found');
 
-    await onSubmitHandler(payload);
+      if (isEditMode && defaultValues?.branch_id) {
+        // UPDATE branch
+        await axios.patch(
+          `${API_BASE_PATH}/branches/${defaultValues.branch_id}`,
+          data,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          }
+        );
+        toast.success('Succursale mise à jour avec succès');
+      } else {
+        // CREATE branch
+        await axios.post(`${API_BASE_PATH}/branches`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        toast.success('Succursale créée avec succès');
+      }
+
+      router.push('/branches');
+    } catch (error) {
+      console.error(error);
+      toast.error(' Une erreur est survenue');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -117,8 +161,17 @@ const BranchForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Prop
             </Row>
 
             <div className="mt-4 d-flex gap-3 justify-content-end">
-              <Button type="submit" variant="primary">
-                {isEditMode ? 'Mise à jour' : 'Créer'} Succursale
+              <Button type="submit" variant="primary" disabled={submitting}>
+                {submitting ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    En cours...
+                  </>
+                ) : isEditMode ? (
+                  'Mise à jour Succursale'
+                ) : (
+                  'Créer Succursale'
+                )}
               </Button>
               <Button variant="secondary" onClick={() => router.back()}>
                 Annuler
