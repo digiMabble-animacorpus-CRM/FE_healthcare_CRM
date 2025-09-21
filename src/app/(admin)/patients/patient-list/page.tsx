@@ -41,7 +41,7 @@ const PatientsListPage = () => {
   const fetchPatients = async () => {
     setLoading(true);
     try {
-      const response = await getAllPatient(1, 10000);
+      const response = await getAllPatient(1, 1000);
       setAllPatients(response.data || []);
     } catch (err) {
       console.error('Failed to fetch patients', err);
