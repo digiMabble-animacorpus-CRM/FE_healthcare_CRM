@@ -123,7 +123,8 @@ const PatientDetails = ({
               <div>
                 <h3 className="fw-semibold mb-1">{name}</h3>
                 <p className="link-primary fw-medium fs-14">
-                  {birthdate} | {gender ? `| ${gender}` : 'N/A'}
+                  {birthdate}
+                  {gender ? ` | ${gender}` : ''}
                 </p>
               </div>
             </div>

@@ -179,7 +179,7 @@ const PatientDetailsPage = () => {
         // 👇 Now showing Age along with DOB + Gender
         birthdate={
           data.birthdate
-            ? `${data.birthdate} | ${data.legalgender || ''} | ${calculateAge(data.birthdate)} yrs`
+            ? `${data.birthdate || 'N\A'} | ${data.legalgender || 'N\A'} | ${calculateAge(data.birthdate ||'N\A')} yrs`
             : ''
         }
         email={data.emails}
