@@ -3,6 +3,8 @@
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useRouter } from 'next/navigation';
 import { Card, CardBody, Col, Row, Button } from 'react-bootstrap';
+import type { TherapistShortType } from '@/types/data';
+import { FaEnvelope, FaPhone } from 'react-icons/fa';
 
 type WeeklyInquiryType = { week: string; inquiries: number };
 type TransactionStatType = {
@@ -46,6 +48,12 @@ export type PatientDetailsCardProps = {
   transactionHistory?: TransactionHistoryType[];
   feedbacks?: FeedbackType[];
   files?: FileType[];
+
+  // 🔥 Added therapist
+  therapist?: TherapistShortType | null;
+
+  departmentsMap?: Record<number, string>; // optional mapping of deptId -> name
+  specializationsMap?: Record<number, string>; // optional mapping of specId -> name
 };
 
 const PatientDetails = ({
@@ -70,6 +78,9 @@ const PatientDetails = ({
   transactionHistory = [],
   feedbacks = [],
   files = [],
+  therapist,
+  departmentsMap = {},
+  specializationsMap = {},
 }: PatientDetailsCardProps) => {
   const router = useRouter();
   const handleEditClick = (id: any) => {
@@ -86,12 +97,12 @@ const PatientDetails = ({
         </Button>
         <Button variant="primary">
           <IconifyIcon icon="ri:calendar-event-line" />
-           Prendre rendez-vous
+          Prendre rendez-vous
         </Button>
       </div>
 
       {/* Profile Section */}
-      <Card className="mb-4">
+      <Card className="mb-4 shadow-lg">
         <CardBody>
           <div className="d-flex flex-wrap align-items-start justify-content-between gap-3 mt-3">
             <div className="d-flex align-items-center gap-3">
@@ -196,6 +207,55 @@ const PatientDetails = ({
               <p className="mb-0">{mutualityregistrationnumber || 'N/A'}</p>
             </Col>
           </Row>
+
+          {/* 🔥 Therapist Section */}
+          {therapist && (
+            <Row className="my-4 g-3">
+              <Col lg={12}>
+                <h5 className="text-dark fw-semibold fs-16 mb-2">Thérapeute assigné</h5>
+                <Card className="border p-3">
+                  <div className="d-flex align-items-center gap-3">
+                    {therapist.imageUrl ? (
+                      <img
+                        src={therapist.imageUrl}
+                        alt={therapist.fullName || 'NA'}
+                        className="rounded-circle"
+                        style={{ width: '60px', height: '60px', objectFit: 'cover' }}
+                      />
+                    ) : (
+                      <div
+                        className="rounded-circle d-flex align-items-center justify-content-center"
+                        style={{
+                          width: '60px',
+                          height: '60px',
+                          backgroundColor: '#6f42c1',
+                          color: '#fff',
+                          fontSize: '20px',
+                          fontWeight: 'bold',
+                        }}
+                      >
+                        {therapist.fullName ? therapist.fullName[0].toUpperCase() : 'T'}
+                      </div>
+                    )}
+                    <div>
+                      <h6 className="mb-1">{therapist.fullName || 'NA'}</h6>
+                      {therapist.contactEmail && (
+                        <p className="mb-0">
+                          <FaEnvelope className="me-1 text-primary" />{' '}
+                          {therapist.contactEmail || 'NA'}
+                        </p>
+                      )}
+                      {therapist.contactPhone && (
+                        <p className="mb-0">
+                          <FaPhone className="me-1 text-success" /> {therapist.contactPhone || 'NA'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                </Card>
+              </Col>
+            </Row>
+          )}
         </CardBody>
       </Card>
     </div>

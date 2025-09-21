@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { Badge, Button, Card, CardBody, Col, Collapse, Row, Table } from 'react-bootstrap';
 import { FaEnvelope, FaGlobe, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
-type FAQItem = { question: string; answer: string };
-
 const BRANCHES = [
   { id: 1, name: 'Gembloux - Orneau' },
   { id: 2, name: 'Gembloux - Tout Vent' },
   { id: 3, name: 'Namur' },
 ];
+
+type FAQItem = { question: string; answer: string };
 
 type TeamDetailsCardProps = {
   last_name: string;
@@ -33,13 +33,24 @@ type TeamDetailsCardProps = {
   diplomas_and_training: string[];
   specializations: string[];
   website: string;
-  frequently_asked_questions: Record<string, string> | FAQItem[];
+  frequently_asked_questions: string | Record<string, string> | FAQItem[];
   calendar_links: string[];
   photo: string;
   role?: string;
   status?: string;
-  branches: number[];
+  branches: branch[];
   primary_branch_id: number;
+};
+
+type branch = {
+  branch_id: string;
+  name: string;
+  address: string;
+  email: string;
+  phone: string;
+  location: string;
+  is_active: boolean;
+  created_at: string;
 };
 
 const TeamDetails = ({
@@ -75,10 +86,8 @@ const TeamDetails = ({
   const [consultationOpen, setConsultationOpen] = useState(true);
   const [specificAudienceOpen, setSpecificAudienceOpen] = useState(true);
 
-  // Convert photo URL or fallback
   const photoUrl = photo?.match(/^https?:\/\//) ? photo : '/placeholder-avatar.jpg';
 
-  // Normalize schedule to object form if passed as { text: ... }
   const scheduleObj: Record<string, string> =
     typeof schedule === 'object' && 'text' in schedule && schedule.text
       ? schedule.text
@@ -95,13 +104,28 @@ const TeamDetails = ({
           )
       : (schedule as Record<string, string>) || {};
 
-  // Convert frequently asked questions from object to array if needed
-  const faqArray: FAQItem[] = Array.isArray(frequently_asked_questions)
-    ? frequently_asked_questions
-    : Object.entries(frequently_asked_questions || {}).map(([question, answer]) => ({
-        question,
-        answer,
-      }));
+  // ✅ Normalize FAQ input
+  let faqArray: FAQItem[] = [];
+  if (Array.isArray(frequently_asked_questions)) {
+    faqArray = frequently_asked_questions;
+  } else if (
+    typeof frequently_asked_questions === 'object' &&
+    frequently_asked_questions !== null
+  ) {
+    faqArray = Object.entries(frequently_asked_questions).map(([question, answer]) => ({
+      question,
+      answer: String(answer),
+    }));
+  } else if (typeof frequently_asked_questions === 'string') {
+    faqArray = frequently_asked_questions
+      .split(/\n/)
+      .reduce((acc: FAQItem[], line: string, idx: number, arr: string[]) => {
+        if (idx % 2 === 0 && line.trim() !== '') {
+          acc.push({ question: line.trim(), answer: arr[idx + 1]?.trim() || '' });
+        }
+        return acc;
+      }, []);
+  }
 
   return (
     <div>
@@ -113,72 +137,100 @@ const TeamDetails = ({
         </Button>
       </div>
 
-      {/* Profile / Avatar and Basic Info */}
+      {/* Profile */}
       <Card className="mb-4 shadow-sm" style={{ backgroundColor: '#f8f9fa' }}>
         <CardBody>
-          <Row className="align-items-center">
-            <Col lg={2} className="d-flex justify-content-center">
-              <div
-                className="rounded-circle d-flex align-items-center justify-content-center"
-                style={{
-                  width: '100px',
-                  height: '100px',
-                  backgroundColor: '#0d6efd',
-                  color: '#fff',
-                  fontSize: '36px',
-                  fontWeight: 'bold',
-                }}
-              >
-                {full_name ? full_name[0].toUpperCase() : 'T'}
-              </div>
+          <Row>
+            {/* Left Column */}
+            <Col lg={6}>
+              <Row className="align-items-center mb-3">
+                <Col xs="auto">
+                  <div
+                    className="rounded-circle d-flex align-items-center justify-content-center"
+                    style={{
+                      width: '100px',
+                      height: '100px',
+                      backgroundColor: '#0d6efd',
+                      color: '#fff',
+                      fontSize: '36px',
+                      fontWeight: 'bold',
+                    }}
+                  >
+                    {full_name ? full_name[0].toUpperCase() : 'T'}
+                  </div>
+                </Col>
+                <Col>
+                  <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
+                    {full_name}
+                  </h2>
+                  <p className="text-muted mb-1">
+                    <strong>Emploi:</strong> {job_1 || '-'}
+                    {job_2 ? ` / ${job_2}` : ''}
+                    {job_3 ? ` / ${job_3}` : ''}
+                    {job_4 ? ` / ${job_4}` : ''}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Spécialisation primaire:</strong> {specialization_1 || '-'}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Rôle:</strong> {role || '-'}
+                  </p>
+                  <p className="mb-1">
+                    <strong>Statut:</strong> {status || '-'}
+                  </p>
+                  <div className="d-flex flex-column gap-2">
+                    {contact_email && (
+                      <div className="d-flex align-items-center gap-2">
+                        <FaEnvelope className="text-primary" /> <span>{contact_email.trim()}</span>
+                      </div>
+                    )}
+                    {contact_phone && (
+                      <div className="d-flex align-items-center gap-2">
+                        <FaPhone className="text-success" /> <span>{contact_phone.trim()}</span>
+                      </div>
+                    )}
+                    {website && (
+                      <div className="d-flex align-items-center gap-2">
+                        <FaGlobe className="text-info" />
+                        <a
+                          href={website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-decoration-none"
+                        >
+                          {website}
+                        </a>
+                      </div>
+                    )}
+                  </div>
+                </Col>
+              </Row>
             </Col>
-            <Col lg={10}>
-              <h2 className="fw-bold mb-1" style={{ color: '#0d6efd' }}>
-                {full_name}
-              </h2>
-              <p className="text-muted mb-1">
-                {job_1 || '-'} {job_2 ? `/ ${job_2}` : ''} {job_3 ? `/ ${job_3}` : ''}{' '}
-                {job_4 ? `/ ${job_4}` : ''}
-              </p>
-              <p className="mb-2">
-                <strong>Spécialisation primaire:</strong> {specialization_1 || '-'}
-              </p>
-              <p className="mb-2">
-                <strong>Rôle:</strong> {role || '-'}
-              </p>
-              <p className="mb-2">
-                <strong>Statut:</strong> {status || '-'}
-              </p>
-              <div className="d-flex flex-column gap-2">
-                {contact_email && (
-                  <div className="d-flex align-items-center gap-2">
-                    <FaEnvelope className="text-primary" /> <span>{contact_email}</span>
+
+            {/* Right Column */}
+            <Col lg={6}>
+              {office_address && (
+                <div className="mb-3">
+                  <div className="d-flex align-items-center gap-2 mb-1">
+                    <FaMapMarkerAlt className="text-warning" />
+                    <strong>Adresse du bureau principal:</strong>
                   </div>
-                )}
-                {contact_phone && (
-                  <div className="d-flex align-items-center gap-2">
-                    <FaPhone className="text-success" /> <span>{contact_phone}</span>
+                  <div className="d-flex flex-column gap-1 ms-4">
+                    {office_address
+                      .split('\n')
+                      .map((line) => line.trim())
+                      .filter(Boolean)
+                      .map((line, idx) => (
+                        <div key={idx}>{line}</div>
+                      ))}
                   </div>
-                )}
-                {website && (
-                  <div className="d-flex align-items-center gap-2">
-                    <FaGlobe className="text-info" />{' '}
-                    <a
-                      href={website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-decoration-none"
-                    >
-                      {website}
-                    </a>
-                  </div>
-                )}
-                {office_address && (
-                  <div className="d-flex align-items-center gap-2">
-                    <FaMapMarkerAlt className="text-warning" /> <span>{office_address}</span>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
+              {branches?.length > 0 && (
+                <div>
+                  <strong>Succursales disponibles:</strong> {branches.map((b) => b.name).join(', ')}
+                </div>
+              )}
             </Col>
           </Row>
         </CardBody>
@@ -225,25 +277,6 @@ const TeamDetails = ({
           </CardBody>
         </Card>
       )}
-
-      {/* Branches */}
-      <div className="d-flex flex-wrap gap-2">
-        {(branches || []).map((branch: any) => {
-          const isPrimary = branch.branch_id === primary_branch_id;
-          return (
-            <Badge
-              key={branch.branch_id}
-              bg={isPrimary ? 'success' : 'secondary'}
-              className="fs-13 text-white px-2 py-1"
-              title={branch.name || 'Unknown'}
-            >
-              {branch.name || branch.branch_id}
-              {isPrimary ? ' (Primary)' : ''}
-            </Badge>
-          );
-        })}
-      </div>
-
 
       {/* Languages Spoken */}
       {languages_spoken.length > 0 && (
@@ -375,27 +408,19 @@ const TeamDetails = ({
         </CardBody>
       </Card>
 
-      {/* Frequently Asked Questions */}
+      {/* FAQ */}
       {faqArray.length > 0 && (
         <Card className="mb-4">
           <CardBody>
-            <h4>Questions fréquemment posées</h4>
-            <Table striped bordered>
-              <thead>
-                <tr>
-                  <th>Question</th>
-                  <th>Répondre</th>
-                </tr>
-              </thead>
-              <tbody>
-                {faqArray.map(({ question, answer }, idx) => (
-                  <tr key={idx}>
-                    <td>{question}</td>
-                    <td>{answer}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+            <h4>Questions fréquemment posées:</h4>
+            <ol style={{ paddingLeft: '1.2rem' }}>
+              {faqArray.map(({ question, answer }, idx) => (
+                <li key={idx} style={{ marginBottom: '1rem' }}>
+                  <strong>{question}</strong>
+                  <div>{answer}</div>
+                </li>
+              ))}
+            </ol>
           </CardBody>
         </Card>
       )}

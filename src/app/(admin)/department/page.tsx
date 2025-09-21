@@ -2,8 +2,11 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState } from 'react';
+import { API_BASE_PATH } from '@/context/constants';
 import type { DepartmentType } from '@/types/data';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -16,9 +19,6 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import axios from 'axios';
-import { API_BASE_PATH } from '@/context/constants';
 
 const PAGE_LIMIT = 10;
 
@@ -54,7 +54,6 @@ const DepartmentListPage = () => {
           _id: dept.id,
         })),
       );
-      console.log('response.data:', response.data);
       setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
       // fallback mock data
