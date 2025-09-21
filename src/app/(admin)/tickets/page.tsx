@@ -57,7 +57,7 @@ const TicketPage = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.get(`${API_BASE_PATH}/new-requests`, {
+      const response = await axios.get(`${API_BASE_PATH}/new-requests-appointment-management`, {
         params: {
           page,
           limit: PAGE_LIMIT,
@@ -123,21 +123,15 @@ const TicketPage = () => {
 
     try {
       const token = localStorage.getItem('access_token');
-      await axios.patch(
-        `${API_BASE_PATH}/new-requests/${editTicket.id}`,
-        editTicket,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+      await axios.patch(`${API_BASE_PATH}/new-requests/${editTicket.id}`, editTicket, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-      );
+      });
 
       // update list
-      setTickets((prev) =>
-        prev.map((t) => (t.id === editTicket.id ? editTicket : t)),
-      );
+      setTickets((prev) => prev.map((t) => (t.id === editTicket.id ? editTicket : t)));
       setShowEditModal(false);
     } catch (error) {
       console.error('Failed to update ticket:', error);
@@ -325,9 +319,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="text"
                       value={editTicket.first_name}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, first_name: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, first_name: e.target.value })}
                     />
                   </Form.Group>
                 </Col>
@@ -337,9 +329,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="text"
                       value={editTicket.last_name}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, last_name: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, last_name: e.target.value })}
                     />
                   </Form.Group>
                 </Col>
@@ -352,9 +342,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="email"
                       value={editTicket.email}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, email: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, email: e.target.value })}
                     />
                   </Form.Group>
                 </Col>
@@ -364,9 +352,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="text"
                       value={editTicket.phone}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, phone: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, phone: e.target.value })}
                     />
                   </Form.Group>
                 </Col>
@@ -379,9 +365,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="text"
                       value={editTicket.specialty}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, specialty: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, specialty: e.target.value })}
                     />
                   </Form.Group>
                 </Col>
@@ -391,9 +375,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="text"
                       value={editTicket.location}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, location: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, location: e.target.value })}
                     />
                   </Form.Group>
                 </Col>
@@ -406,9 +388,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="text"
                       value={editTicket.child_name || ''}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, child_name: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, child_name: e.target.value })}
                       disabled={!editTicket.is_for_child}
                     />
                   </Form.Group>
@@ -454,9 +434,7 @@ const TicketPage = () => {
                     <Form.Control
                       type="text"
                       value={editTicket.address}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, address: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, address: e.target.value })}
                     />
                   </Form.Group>
                 </Col>
@@ -465,9 +443,7 @@ const TicketPage = () => {
                     <Form.Label>Status</Form.Label>
                     <Form.Select
                       value={editTicket.status}
-                      onChange={(e) =>
-                        setEditTicket({ ...editTicket, status: e.target.value })
-                      }
+                      onChange={(e) => setEditTicket({ ...editTicket, status: e.target.value })}
                     >
                       <option value="New">New</option>
                       <option value="In Progress">In Progress</option>
