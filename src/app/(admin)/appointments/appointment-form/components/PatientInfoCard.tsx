@@ -1,4 +1,4 @@
-// /appointments/components/CustomerInfoCard/index.tsx
+// /appointments/components/PatientInfoCard/index.tsx
 'use client';
 
 import { createPatient, findPatient, updatePatient } from '@/helpers/patient';
@@ -67,19 +67,19 @@ const emptyPatient: PatientType = {
   deleted_at: null,
 };
 
-interface CustomerInfoCardProps {
+interface PatientInfoCardProps {
   onSave?: (patient: PatientType) => void;
   onReset?: () => void;
   initialData?: PatientType;
   mode?: 'search' | 'view' | 'edit' | 'new';
 }
 
-const CustomerInfoCard = ({ 
+const PatientInfoCard = ({ 
   onSave, 
   onReset, 
   initialData, 
   mode: initialMode = 'search' 
-}: CustomerInfoCardProps) => {
+}: PatientInfoCardProps) => {
   const [formData, setFormData] = useState<PatientType>(emptyPatient);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
@@ -593,4 +593,4 @@ const CustomerInfoCard = ({
   );
 };
 
-export default CustomerInfoCard;
+export default PatientInfoCard;

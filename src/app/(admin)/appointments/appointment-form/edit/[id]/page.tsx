@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
-const CustomerInfoCard = dynamic(() => import('../../components/CustomerInfoCard'), { ssr: false });
+const PatientInfoCard = dynamic(() => import('../../components/PatientInfoCard'), { ssr: false });
 const BookAppointmentForm = dynamic(() => import('../../components/BookAppointmentForm'), {
   ssr: false,
 });
@@ -17,7 +17,7 @@ interface UserType {
 }
 
 export default function EditAppointmentPage() {
-  const [customer, setCustomer] = useState<PatientType | null>(null);
+  const [patient, setPatient] = useState<PatientType | null>(null);
   const [appointment, setAppointment] = useState<AppointmentType | null>(null);
   console.log(appointment,"appointment")
   const [user, setUser] = useState<UserType | null>(null);
@@ -58,7 +58,7 @@ export default function EditAppointmentPage() {
         setAppointment(data.data);
         
         if (data.data.patient) {
-          setCustomer(data.data.patient);
+          setPatient(data.data.patient);
         }
       } else {
         console.error('Failed to fetch appointment data');
@@ -96,19 +96,19 @@ export default function EditAppointmentPage() {
     <div className="p-3">
       <h1 className="text-2xl font-bold mb-4">Edit Appointment</h1>
       
-      <CustomerInfoCard
-        onSave={setCustomer}
+      <PatientInfoCard
+        onSave={setPatient}
         initialData={appointment.patient}
         mode="view"
       />
 
-      {customer?.id && (
+      {patient?.id && (
         <BookAppointmentForm
-          patientId={customer.id}
+          patientId={patient.id}
           modifiedById={user?.team_id ? String(user.team_id) : ''}
           createdById={user?.team_id ? String(user.team_id) : ''}
           onSubmitHandler={handleAppointmentSubmit}
-          selectedCustomer={customer}
+          selectedPatient={patient}
           mode="edit"
           appointmentData={appointment}
           appointmentId={appointment.id}

@@ -29,7 +29,7 @@ interface Props {
   patientId: string;
   createdById: string;
   modifiedById?: string;
-  selectedCustomer?: PatientType;
+  selectedPatient?: PatientType;
   appointmentData?: AppointmentType;
 }
 
@@ -40,7 +40,7 @@ const BookAppointmentForm = ({
   patientId,
   createdById,
   modifiedById,
-  selectedCustomer,
+  selectedPatient,
   appointmentData,
 }: Props) => {
   const [saving, setSaving] = useState(false);
@@ -177,11 +177,11 @@ const BookAppointmentForm = ({
         <Card className="mb-4">
           <CardHeader className="d-flex justify-content-between align-items-center">
             <CardTitle as="h6">{mode === 'edit' ? 'Edit Appointment' : 'Prendre rendez-vous'}</CardTitle>
-            {selectedCustomer && (
+            {selectedPatient && (
               <small className="text-muted">
                 {mode === 'edit' ? 'Editing appointment for: ' : 'Booking for: '}
                 <strong>
-                  {selectedCustomer.firstname} {selectedCustomer.lastname}
+                  {selectedPatient.firstname} {selectedPatient.lastname}
                 </strong>
               </small>
             )}

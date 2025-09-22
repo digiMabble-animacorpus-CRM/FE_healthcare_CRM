@@ -5,7 +5,7 @@ import type { PatientType } from '../types/appointment';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
-const CustomerInfoCard = dynamic(() => import('../components/CustomerInfoCard'), { ssr: false });
+const PatientInfoCard = dynamic(() => import('../components/PatientInfoCard'), { ssr: false });
 const BookAppointmentForm = dynamic(() => import('../components/BookAppointmentForm'), {
   ssr: false,
 });
@@ -15,7 +15,7 @@ interface UserType {
 }
 
 export default function NewAppointmentPage() {
-  const [customer, setCustomer] = useState<PatientType | null>(null);
+  const [patient, setPatient] = useState<PatientType | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [resetTrigger, setResetTrigger] = useState(0);
@@ -33,13 +33,13 @@ export default function NewAppointmentPage() {
     }
   }, []);
 
-  const handleCustomerSave = (saved: PatientType) => {
+  const handlePatientSave = (saved: PatientType) => {
     console.log(saved,"saved")
-    setCustomer(saved);
+    setPatient(saved);
   };
 
   const handleReset = () => {
-    setCustomer(null);
+    setPatient(null);
     setResetTrigger((prev) => prev + 1);
   };
 
@@ -53,18 +53,18 @@ export default function NewAppointmentPage() {
     <div className="p-3">
       <h1 className="text-2xl font-bold mb-4">Create New Appointment</h1>
       
-      <CustomerInfoCard
-        onSave={handleCustomerSave}
+      <PatientInfoCard
+        onSave={handlePatientSave}
         onReset={handleReset}
         key={resetTrigger}
       />
 
-      {customer?.id && (
+      {patient?.id && (
         <BookAppointmentForm
-          patientId={customer.id}
+          patientId={patient.id}
           createdById={user?.team_id ? String(user.team_id) : ''}
           onSubmitHandler={handleAppointmentSubmit}
-          selectedCustomer={customer}
+          selectedPatient={patient}
           mode="create"
         />
       )}
