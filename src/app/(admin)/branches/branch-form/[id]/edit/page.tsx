@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import BranchForm, { BranchFormValues } from '../../branchForm';
 import { API_BASE_PATH } from '@/context/constants';
+import { Alert, Spinner } from 'react-bootstrap';
 
 interface Props {
   params: { id?: string };
@@ -13,7 +14,10 @@ interface Props {
 const EditBranchPage = ({ params }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-  const [defaultValues, setDefaultValues] = useState<Partial<BranchFormValues & { branch_id?: string }>>({});
+  const [defaultValues, setDefaultValues] = useState<
+    Partial<BranchFormValues & { branch_id?: string }>
+  >({});
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const isEditMode = Boolean(params.id);
 
   useEffect(() => {
@@ -76,22 +80,41 @@ const EditBranchPage = ({ params }: Props) => {
 
       if (!res.ok) throw new Error('Failed to update branch');
 
-      toast.success('Branch updated successfully!');
-      router.push('/branches');
+      // toast.success('Branch updated successfully!');
+      setSuccessMessage('✅ Branch updated successfully!');
+      // Optional: redirect after a short delay
+      setTimeout(() => {
+        router.push('/branches');
+      }, 2000);
     } catch (error) {
       console.error(error);
-      toast.error('Error updating branch');
+      // toast.error('Error updating branch');
     }
   };
 
-  if (loading) return <div>Loading branch details...</div>;
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center p-5">
+        <Spinner animation="border" role="status" className="me-2" />
+        <span>Loading branch details...</span>
+      </div>
+    );
+  }
 
   return (
-    <BranchForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
+    <div>
+      {successMessage && (
+        <Alert variant="success" className="mb-3">
+          {successMessage}
+        </Alert>
+      )}
+
+      <BranchForm
+        defaultValues={defaultValues}
+        isEditMode
+        onSubmitHandler={onSubmitHandler}
+      />
+    </div>
   );
 };
 

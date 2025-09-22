@@ -1,13 +1,14 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import { Badge } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState, useMemo } from 'react';
+import { getAllTeamMembers } from '@/helpers/team-members';
 import type { TeamMemberType } from '@/types/data';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
-  Button,
+  Badge, Button,
   Card,
   CardBody,
   CardFooter,
@@ -20,10 +21,8 @@ import {
   DropdownToggle,
   Modal,
   Row,
-  Spinner,
+  Spinner
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import { getAllTeamMembers } from '@/helpers/team-members';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
@@ -274,12 +273,14 @@ const TeamsListPage = () => {
                           <tr key={item.team_id}>
                             <td>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
                             <td>{getProfileDisplay(item)}</td>
-                            <td>
-                              {item.first_name} {item.last_name}
-                            </td>
+                            <td>{item.full_name}</td>
                             <td>{item.contact_email}</td>
                             <td>{item.contact_phone}</td>
-                            <td>{item.office_address}</td>
+                            <td>
+                              {Array.isArray(item.branches)
+                                ? item.branches.map((b) => b.name).join(', ')
+                                : ''}
+                            </td>
                             <td>{item.job_1}</td>
                             <td>
                               {item.role === 'super_admin'

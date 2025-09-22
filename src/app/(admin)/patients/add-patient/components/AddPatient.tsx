@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import * as yup from 'yup';
+import { useRouter } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import {
+  Alert,
   Button,
   Card,
   CardBody,
@@ -15,15 +15,16 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
+import { Controller, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
-import type { BranchType, LanguageType, PatientType } from '@/types/data';
-import TextFormInput from '@/components/from/TextFormInput';
-import TextAreaFormInput from '@/components/from/TextAreaFormInput';
 import ChoicesFormInput from '@/components/from/ChoicesFormInput';
-import { getAllLanguages } from '@/helpers/languages';
+import TextAreaFormInput from '@/components/from/TextAreaFormInput';
+import TextFormInput from '@/components/from/TextFormInput';
 import { getAllBranch } from '@/helpers/branch';
+import { getAllLanguages } from '@/helpers/languages';
 import { createPatient, getPatientById, updatePatient } from '@/helpers/patient';
+import type { BranchType, LanguageType, PatientType } from '@/types/data';
 
 interface Props {
   params?: { id?: string };
@@ -45,30 +46,23 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     lastname: yup.string().required('Veuillez entrer votre nom de famille'),
     middlename: yup.string(),
     emails: yup.string().email('E-mail invalide').required('Veuillez saisir votre adresse e-mail'),
-    phones: yup
-      .array()
-      .of(yup.string().matches(/^\d{10}$/, 'Entrez un numéro de téléphone valide'))
-      .min(1, 'Veuillez fournir au moins un numéro de téléphone'),
 
+    phones: yup.array().of(yup.string().optional()),
     birthdate: yup.string().required('Veuillez saisir votre date de naissance'),
-    street: yup.string().required('Veuillez entrer l adresse'),
-    note: yup.string().required('Veuillez saisir une description'),
-    zipcode: yup.string().required('Veuillez entrer le code postal'),
-    legalgender: yup.string().required('Veuillez sélectionner le sexe'),
-    language: yup.string().required('Veuillez sélectionner la langue'),
-    city: yup.string().required('Veuillez sélectionner la ville'),
-    country: yup.string().required('Veuillez sélectionner un pays'),
+
+    street: yup.string().optional(),
+    note: yup.string().optional(),
+    zipcode: yup.string().optional(),
+    legalgender: yup.string().optional(),
+    language: yup.string().optional(),
+    city: yup.string().optional(),
+    country: yup.string().optional(),
     ssin: yup.string(),
-    status: yup.string().required('Veuillez sélectionner le statut'),
-    mutualitynumber: yup.string().required('Veuillez saisir le numéro de mutualité'),
-    mutualityregistrationnumber: yup
-      .string()
-      .required('Veuillez saisir le numéro de carte de résident'),
+    status: yup.string().optional(),
+    mutualitynumber: yup.string().optional(),
+    mutualityregistrationnumber: yup.string().optional(),
     branch: yup.string(),
-    tags: yup
-      .array()
-      .of(yup.string().required())
-      .min(1, 'Veuillez sélectionner au moins une balise'),
+    tags: yup.array().of(yup.string().optional()),
   })
   .required()
   .noUnknown(true);
@@ -78,6 +72,9 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   const isEditMode = !!params?.id;
 
   const [loading, setLoading] = useState<boolean>(isEditMode);
+  const [successMessage, setSuccessMessage] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');
+
   const [defaultValues, setDefaultValues] = useState<Partial<PatientType>>({
     createdAt: '',
     _id: '',
@@ -116,7 +113,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     defaultValues,
   });
 
-  // Fetch patient for edit mode
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
@@ -138,28 +134,33 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   }, [isEditMode, params?.id, reset]);
 
   const onSubmit = async (data: Partial<PatientType>) => {
-    // only phones array, no number field
+    setSuccessMessage('');
+    setErrorMessage('');
     const payload = {
       ...data,
       phones: data.phones?.filter((p) => p.trim() !== '') ?? [],
     };
 
-    if (isEditMode && params?.id) {
-      const success = await updatePatient(params.id, payload as any);
-      if (success) {
-        alert('Patient updated successfully');
-        router.back();
+    try {
+      if (isEditMode && params?.id) {
+        const success = await updatePatient(params.id, payload as any);
+        if (success) {
+          setSuccessMessage(' Patient mis à jour avec succès !');
+          setTimeout(() => router.back(), 2000);
+        } else {
+          setErrorMessage(' Échec de la mise à jour du patient');
+        }
       } else {
-        alert('Failed to update patient');
+        const success = await createPatient(payload as any);
+        if (success) {
+          setSuccessMessage(' Patient créé avec succès !');
+          setTimeout(() => router.back(), 2000);
+        } else {
+          setErrorMessage(' Échec de la création du patient');
+        }
       }
-    } else {
-      const success = await createPatient(payload as any);
-      if (success) {
-        alert('Patient created successfully');
-        router.back();
-      } else {
-        alert('Failed to create patient');
-      }
+    } catch (error) {
+      setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
     }
   };
 
@@ -170,9 +171,25 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       </div>
     );
 
+  const renderLabel = (label: string, required = false) => (
+    <span>
+      {label} {required && <span className="text-danger">*</span>}
+    </span>
+  );
+
   return (
     <Form onSubmit={handleSubmit(onSubmit)}>
       <Card>
+        {successMessage && (
+          <Alert variant="success" className="mb-3">
+            {successMessage}
+          </Alert>
+        )}
+        {errorMessage && (
+          <Alert variant="danger" className="mb-3">
+            {errorMessage}
+          </Alert>
+        )}
         <CardHeader>
           <CardTitle as="h4">{isEditMode ? 'Modifier le patient' : 'Ajouter un patient'}</CardTitle>
         </CardHeader>
@@ -182,7 +199,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput
                 control={control}
                 name="firstname"
-                label="Prénom"
+                label={renderLabel('Prénom', true)}
                 placeholder="Entre Prénom"
               />
             </Col>
@@ -190,7 +207,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput
                 control={control}
                 name="lastname"
-                label="Nom de famille"
+                label={renderLabel('Nom de famille', true)}
                 placeholder="Entrez Nom de famille"
               />
             </Col>
@@ -198,7 +215,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput
                 control={control}
                 name="middlename"
-                label="Deuxième prénom"
+                label={renderLabel('Deuxième prénom')}
                 placeholder="Entrez le deuxième prénom"
               />
             </Col>
@@ -206,34 +223,29 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput
                 control={control}
                 name="emails"
-                label="E-mail"
+                label={renderLabel('E-mail', true)}
                 placeholder="Entrez votre adresse e-mail"
               />
             </Col>
-
-            {/* Phones */}
             <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name={`phones.0`}
-                label="Numéro de téléphone"
+                label={renderLabel('Numéro de téléphone')}
                 placeholder="Entrez le numéro de téléphone"
                 type="number"
               />
             </Col>
-
             <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="birthdate"
-                label="Date de naissance"
+                label={renderLabel('Date de naissance', true)}
                 type="date"
               />
             </Col>
-
-            {/* Gender */}
             <Col lg={6} className="mb-3">
-              <label className="form-label">Genre</label>
+              <label className="form-label">{renderLabel('Genre')}</label>
               <Controller
                 control={control}
                 name="legalgender"
@@ -248,14 +260,9 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.legalgender && (
-                <small className="text-danger">{errors.legalgender.message}</small>
-              )}
             </Col>
-
-            {/* Language */}
             <Col lg={6} className="mb-3">
-              <label className="form-label">Language</label>
+              <label className="form-label">{renderLabel('Language')}</label>
               <Controller
                 control={control}
                 name="language"
@@ -272,14 +279,13 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.language && <small className="text-danger">{errors.language.message}</small>}
             </Col>
 
             <Col lg={6} className="mb-3">
               <TextAreaFormInput
                 control={control}
                 name="street"
-                label="Adresse"
+                label={renderLabel('Adresse')}
                 placeholder="Entrez l'adresse"
                 rows={3}
               />
@@ -288,7 +294,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextAreaFormInput
                 control={control}
                 name="note"
-                label="Description"
+                label={renderLabel('Description')}
                 placeholder="Entrez la description"
                 rows={3}
               />
@@ -298,43 +304,41 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput
                 control={control}
                 name="zipcode"
-                label="Code Postal"
+                label={renderLabel('Code Postal')}
                 placeholder="Entrez le code postal"
                 type="number"
               />
             </Col>
-
-            {/* City */}
             <Col lg={4}>
               <TextFormInput
                 control={control}
                 name="city"
-                label="Ville"
+                label={renderLabel('Ville')}
                 placeholder="Entrez la ville"
                 type="text"
               />
-              {errors.city && <small className="text-danger">{errors.city.message}</small>}
             </Col>
-
-            {/* Country */}
             <Col lg={4}>
               <TextFormInput
                 control={control}
                 name="country"
-                label="Pays"
+                label={renderLabel('Pays')}
                 placeholder="Entrez le pays"
                 type="text"
               />
-              {errors.country && <small className="text-danger">{errors.country.message}</small>}
             </Col>
 
             <Col lg={6} className="mb-3">
-              <TextFormInput control={control} name="ssin" label="SSIN" placeholder="Enter SSIN" />
+              <TextFormInput
+                control={control}
+                name="ssin"
+                label={renderLabel('SSIN')}
+                placeholder="Enter SSIN"
+              />
             </Col>
 
-            {/* Status */}
             <Col lg={6} className="mb-3">
-              <label className="form-label">Statut</label>
+              <label className="form-label">{renderLabel('Statut')}</label>
               <Controller
                 control={control}
                 name="status"
@@ -348,14 +352,13 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                   </ChoicesFormInput>
                 )}
               />
-              {errors.status && <small className="text-danger">{errors.status.message}</small>}
             </Col>
 
             <Col lg={6} className="mb-3">
               <TextFormInput
                 control={control}
                 name="mutualitynumber"
-                label="Numéro de Mutualité"
+                label={renderLabel('Numéro de Mutualité')}
                 placeholder="Entrez le numéro de mutualité"
               />
             </Col>
@@ -363,7 +366,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <TextFormInput
                 control={control}
                 name="mutualityregistrationnumber"
-                label="Numéro de carte de résident"
+                label={renderLabel('Numéro de carte de résident')}
                 placeholder="Entrez le numéro de carte de résident"
               />
             </Col>

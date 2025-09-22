@@ -2,7 +2,7 @@ import PageTitle from '@/components/PageTitle';
 import { Metadata } from 'next';
 import AddPatient from './components/AddPatient';
 
-export const metadata: Metadata = { title: 'Customers Add' };
+export const metadata: Metadata = { title: 'Patient Add' };
 
 const CustomerAddPage = () => {
   return (

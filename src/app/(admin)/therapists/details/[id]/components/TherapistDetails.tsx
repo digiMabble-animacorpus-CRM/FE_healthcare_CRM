@@ -193,7 +193,7 @@ const TherapistDetails = ({
           <div className="mt-4">
             <h5>Succursales et disponibilité</h5>
             {data.branches.map((branch: BranchWithAvailability) => (
-              <div key={branch.branch_id} className="mb-3 p-3 border rounded bg-light">
+              <div key={branch.branch_id} className="mb-3 p-3 border rounded">
                 <h6>{branch.branch_name || '-'}</h6>
                 {branch.availability && branch.availability.length > 0 ? (
                   <Table bordered size="sm" className="mb-0">

@@ -1,8 +1,8 @@
 'use client';
 
+import { getBranchSummary } from '@/helpers/dashboard';
 import React, { useEffect, useState } from 'react';
 import BranchSummary, { BranchSummaryItem } from './BranchSummary';
-import { getBranchSummary } from '@/helpers/dashboard';
 
 const BranchSummaryContainer: React.FC = () => {
   const [summaries, setSummaries] = useState<BranchSummaryItem[]>([]);
@@ -10,9 +10,7 @@ const BranchSummaryContainer: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    console.log('BranchSummaryContainer useEffect triggered');;
     const fetchData = async () => {
-      console.log('BranchSummaryContainer rendered with summaries:', summaries);
       setLoading(true);
       setError(null);
       try {

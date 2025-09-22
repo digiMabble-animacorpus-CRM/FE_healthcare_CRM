@@ -31,15 +31,15 @@ interface Language {
 }
 
 export interface Availability {
-  day: string;
-  startTime: string;
-  endTime: string;
+  day?: string;
+  startTime?: string;
+  endTime?: string;
 }
 
 export interface BranchWithAvailability {
-  branch_id: number;
-  branch_name: string | null;
-  availability: Availability[];
+  branch_id?: number;
+  branch_name?: string | null;
+  availability?: Availability[];
 }
 
 interface TherapistFormInputs {
@@ -49,28 +49,25 @@ interface TherapistFormInputs {
   photo?: string | null;
   contactEmail: string;
   contactPhone?: string;
-  inamiNumber: string;
+  inamiNumber?: any;
   aboutMe?: string | null;
   degreesTraining?: string | null;
   departmentId?: number | null;
   specializationIds?: number[];
   branches?: BranchWithAvailability[];
-  languages?: number[]; // selected language IDs
+  languages?: any[]; // selected language IDs
   faq?: string | null;
-  paymentMethods?: string[];
+  paymentMethods?: any[];
 }
 
 const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   firstName: yup.string().required('Le prénom est obligatoire'),
   lastName: yup.string().required('Le nom de famille est obligatoire'),
-  fullName: yup.string().required('Le nom complet est requis'),
-  photo: yup.string().url('Doit être une URL valide').nullable(),
+  fullName: yup.string().optional(),
+  photo: yup.string().optional(),
   contactEmail: yup.string().email('E-mail invalide').required('L e-mail est requis'),
-  contactPhone: yup
-    .string()
-    .matches(/^\+?[0-9]{7,15}$/, 'Téléphone invalide')
-    .required('Le numéro de téléphone est requis'),
-  inamiNumber: yup.string().required('Numéro INAMI is required'),
+  contactPhone: yup.string().required('Le numéro de téléphone est requis'),
+  inamiNumber: yup.string().optional(),
   aboutMe: yup.string().nullable(),
   degreesTraining: yup.string().nullable(),
   departmentId: yup
@@ -86,30 +83,25 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     .array()
     .of(
       yup.object({
-        branch_id: yup.number().required('Une succursale est requise'),
+        branch_id: yup.number().optional(),
         branch_name: yup.string().nullable().defined(),
         availability: yup
           .array()
           .of(
             yup.object({
-              day: yup.string().required('La journée est obligatoire'),
-              startTime: yup.string().required('L`heure de début est requise'),
-              endTime: yup.string().required('L`heure de fin est requise'),
+              day: yup.string().optional(),
+              startTime: yup.string().optional(),
+              endTime: yup.string().optional(),
             }),
           )
-          .min(1, 'Au moins un créneau de disponibilité est requis')
-          .required('La disponibilité est requise'),
+          .optional(),
       }),
     )
-    .min(1, 'Au moins une branche est requise')
-    .required('Des succursales sont nécessaires')
+    .optional()
     .defined(),
-  languages: yup.array().of(yup.number().required()).min(1, 'Au moins une langue est requise'),
+  languages: yup.array().of(yup.number().optional()),
   faq: yup.string().nullable(),
-  paymentMethods: yup
-    .array()
-    .of(yup.string().required())
-    .min(1, 'Au moins un mode de paiement est requis'),
+  paymentMethods: yup.array().of(yup.string().optional()),
 });
 
 const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
@@ -396,7 +388,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     specializations: data.specializationIds?.map((id) => id),
     branches: data.branches?.map((b) => b.branch_id),
     availability: data.branches?.flatMap((b) =>
-      b.availability.map((av) => ({ ...av, branchId: b.branch_id })),
+      b?.availability?.map((av: any) => ({ ...av, branchId: b.branch_id })),
     ),
     languages: data.languages
       ?.map((id) => {
@@ -526,10 +518,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           <h5 className="mb-4">
             {therapistId ? 'Modifier le thérapeute' : 'Ajouter un thérapeute'}
           </h5>
-          {/* <Form
-          onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))} */}
-          {/* > */}
-          {/* First name / Last name */}
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
@@ -633,9 +621,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                   placeholder="Enter Numéro INAMI"
                   isInvalid={!!errors.inamiNumber}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.inamiNumber?.message}
-                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
