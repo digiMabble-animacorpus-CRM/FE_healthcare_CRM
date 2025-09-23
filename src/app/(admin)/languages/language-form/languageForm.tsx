@@ -3,29 +3,44 @@
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
+import {
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+  Form,
+} from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
+import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
 
-// 📝 Form values type
-interface LanguageFormValues {
+export interface LanguageFormValues {
   key: string;
   label: string;
+  is_active: boolean;
 }
 
-// ✅ Validation Schema
 const schema = yup.object({
   key: yup.string().required('Key is required'),
   label: yup.string().required('Language is required'),
+  is_active: yup.boolean().default(true),
 });
 
 interface Props {
-  defaultValues?: Partial<LanguageFormValues>;
+  defaultValues?: Partial<LanguageFormValues & { _id?: string }>;
   isEditMode?: boolean;
-  onSubmitHandler: (data: LanguageFormValues & { _id?: string }) => Promise<void>;
+  onSubmitHandler?: (data: LanguageFormValues) => void;
 }
 
-const LanguageForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
+const LanguageForm = ({
+  defaultValues,
+  isEditMode = false,
+  onSubmitHandler,
+}: Props) => {
   const router = useRouter();
 
   const methods = useForm<LanguageFormValues>({
@@ -33,24 +48,51 @@ const LanguageForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Pr
     defaultValues: {
       key: defaultValues?.key || '',
       label: defaultValues?.label || '',
+      is_active: defaultValues?.is_active ?? true, // default true
     },
   });
 
-  const {
-    handleSubmit,
-    control,
-    formState: { errors },
-  } = methods;
+  const { handleSubmit, control, register } = methods;
 
-  // ✅ Merge _id only in edit mode
-  const handleFormSubmit = async (data: LanguageFormValues) => {
-    const payload =
-      isEditMode && (defaultValues as any)?._id
-        ? { ...data, _id: (defaultValues as any)._id }
-        : data;
+  // Use passed onSubmitHandler if provided, otherwise internal axios logic
+  const handleFormSubmit = onSubmitHandler
+    ? onSubmitHandler
+    : async (data: LanguageFormValues) => {
+        try {
+          const token = localStorage.getItem('access_token');
+          if (!token) {
+            console.warn('No access token found');
+            return;
+          }
 
-    await onSubmitHandler(payload);
-  };
+          if (isEditMode && (defaultValues as any)?._id) {
+            // PUT request for update
+            await axios.patch(
+              `${API_BASE_PATH}/languages/${(defaultValues as any)._id}`,
+              data,
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+              },
+            );
+          } else {
+            // POST request for create
+            await axios.post(`${API_BASE_PATH}/languages`, data, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            });
+          }
+
+          router.push('/languages'); // redirect after success
+        } catch (err) {
+          console.error('Error saving language:', err);
+        }
+      };
+
 
   return (
     <FormProvider {...methods}>
