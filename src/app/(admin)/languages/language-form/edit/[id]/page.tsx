@@ -5,8 +5,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
-import LanguageForm from '../../languageForm';
-import type { LanguageType } from '@/types/data';
+import LanguageForm, { LanguageFormValues } from '../../languageForm';
 
 interface Props {
   params: { id?: string };
@@ -18,7 +17,7 @@ const EditLanguagePage = ({ params }: Props) => {
 
   // Default values to prefill the form
   const [defaultValues, setDefaultValues] = useState<
-    Partial<LanguageType & { language_id?: string | number }>
+    Partial<LanguageFormValues & { _id?: string }>
   >({});
 
   useEffect(() => {
@@ -38,18 +37,23 @@ const EditLanguagePage = ({ params }: Props) => {
           },
         });
 
-        const language = res.data;
+        console.log('API Response:', res.data);
+
+        // Adjust this if your API wraps data
+        const language = res.data.data || res.data;
 
         if (language?.id || language?._id) {
           setDefaultValues({
-            language_name: language.language_name || '',
-            language_description: language.language_description || '',
+            key: language.language_name || '',
+            label: language.language_description || '',
             is_active: language.is_active ?? true,
-            language_id: language.id || language._id, // Use consistent key for backend
+            _id: language.id || language._id, // consistent ID key
           });
+        } else {
+          toast.error('Invalid language data received');
         }
       } catch (err) {
-        console.error(err);
+        console.error('Error fetching language details:', err);
         toast.error('Failed to load language details');
       } finally {
         setLoading(false);
@@ -60,11 +64,7 @@ const EditLanguagePage = ({ params }: Props) => {
   }, [params.id]);
 
   // Submit handler for updating the language
-  const onSubmitHandler = async (
-    data: Omit<LanguageType, 'id' | 'created_at' | 'updated_at'> & {
-      language_id?: string | number;
-    },
-  ) => {
+  const onSubmitHandler = async (data: LanguageFormValues) => {
     if (!params.id) return;
 
     try {
@@ -74,8 +74,8 @@ const EditLanguagePage = ({ params }: Props) => {
       await axios.patch(
         `${API_BASE_PATH}/languages/${params.id}`,
         {
-          language_name: data.language_name,
-          language_description: data.language_description,
+          language_name: data.key,
+          language_description: data.label,
           is_active: data.is_active,
         },
         {
@@ -88,7 +88,7 @@ const EditLanguagePage = ({ params }: Props) => {
       toast.success('Language updated successfully!');
       router.push('/languages');
     } catch (error) {
-      console.error(error);
+      console.error('Update error:', error);
       toast.error('Error updating language');
     }
   };

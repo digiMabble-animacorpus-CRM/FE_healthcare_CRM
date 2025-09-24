@@ -759,6 +759,8 @@ export type TherapistShortType = {
 
 
 export interface LanguageType {
+  key: Key | null | undefined;
+  label: ReactNode;
   id: number;
   language_name: string;
   language_description: string;

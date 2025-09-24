@@ -32,7 +32,7 @@ const CreateLanguagePage = () => {
 
       if (!res.ok) throw new Error('Failed to create language');
 
-      toast.success('Language created successfully!');
+      // toast.success('Language created successfully!');
       router.push('/languages');
     } catch (error) {
       console.error(error);

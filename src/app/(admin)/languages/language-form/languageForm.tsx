@@ -14,6 +14,7 @@ import {
   Form,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import TextFormInput from '@/components/from/TextFormInput';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
@@ -48,13 +49,30 @@ const LanguageForm = ({
     defaultValues: {
       key: defaultValues?.key || '',
       label: defaultValues?.label || '',
-      is_active: defaultValues?.is_active ?? true, // default true
+      is_active: defaultValues?.is_active ?? true,
     },
   });
 
-  const { handleSubmit, control, register } = methods;
+  const { handleSubmit, control, reset } = methods;
 
-  // Use passed onSubmitHandler if provided, otherwise internal axios logic
+  /**
+   * Reset form whenever defaultValues change
+   */
+  useEffect(() => {
+    if (defaultValues) {
+      reset({
+        key: defaultValues.key || '',
+        label: defaultValues.label || '',
+        is_active: defaultValues.is_active ?? true,
+      });
+    }
+  }, [defaultValues, reset]);
+
+  /**
+   * Handle form submit
+   * - Uses onSubmitHandler if provided by parent
+   * - Otherwise performs API call internally
+   */
   const handleFormSubmit = onSubmitHandler
     ? onSubmitHandler
     : async (data: LanguageFormValues) => {
@@ -65,11 +83,15 @@ const LanguageForm = ({
             return;
           }
 
-          if (isEditMode && (defaultValues as any)?._id) {
-            // PUT request for update
+          if (isEditMode && defaultValues?._id) {
+            // Update existing language
             await axios.patch(
-              `${API_BASE_PATH}/languages/${(defaultValues as any)._id}`,
-              data,
+              `${API_BASE_PATH}/languages/${defaultValues._id}`,
+              {
+                language_name: data.key,
+                language_description: data.label,
+                is_active: data.is_active,
+              },
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -78,13 +100,21 @@ const LanguageForm = ({
               },
             );
           } else {
-            // POST request for create
-            await axios.post(`${API_BASE_PATH}/languages`, data, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
+            // Create new language
+            await axios.post(
+              `${API_BASE_PATH}/languages`,
+              {
+                language_name: data.key,
+                language_description: data.label,
+                is_active: data.is_active,
               },
-            });
+              {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                  'Content-Type': 'application/json',
+                },
+              },
+            );
           }
 
           router.push('/languages'); // redirect after success
@@ -92,7 +122,6 @@ const LanguageForm = ({
           console.error('Error saving language:', err);
         }
       };
-
 
   return (
     <FormProvider {...methods}>
