@@ -85,7 +85,7 @@ const EditLanguagePage = ({ params }: Props) => {
         },
       );
 
-      toast.success('Language updated successfully!');
+      // toast.success('Language updated successfully!');
       router.push('/languages');
     } catch (error) {
       console.error('Update error:', error);
