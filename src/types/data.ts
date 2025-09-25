@@ -234,11 +234,11 @@ export type AvailabilitySlot = {
   to: string; // "14:00"
 };
 
-export type LanguageType = {
-  _id: string;
-  key: string;
-  label: string;
-};
+// export type LanguageType = {
+//   _id: string;
+//   key: string;
+//   label: string;
+// };
 
 export type Language = 'french' | 'dutch' | 'english';
 
@@ -758,3 +758,13 @@ export type TherapistShortType = {
 };
 
 
+export interface LanguageType {
+  key: Key | null | undefined;
+  label: ReactNode;
+  id: number;
+  language_name: string;
+  language_description: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};

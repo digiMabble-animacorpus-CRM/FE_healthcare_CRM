@@ -99,7 +99,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     zipcode: '',
   });
 
-  const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
+  const [allLanguages, setAllLanguages] = useState<LanguageType[]>([]);
   const allBranches = useMemo<BranchType[]>(() => getAllBranch(), []);
   const allTags = useMemo<string[]>(() => ['VIP', 'Regular', 'New', 'Follow-up'], []);
 
@@ -112,12 +112,23 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     resolver: yupResolver(schema),
     defaultValues,
   });
-
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      try {
+        const response = await getAllLanguages(); // API call
+        setAllLanguages(response || []);
+      } catch (error) {
+        console.error('Error fetching languages:', error);
+      }
+    };
+    fetchLanguages();
+  }, []);
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
       getPatientById(params.id)
         .then((response) => {
+          console.log('Fetched patient data:', response);
           const patient: PatientType = response;
           if (patient) {
             const mappedPatient: Partial<PatientType> = {
@@ -272,8 +283,8 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
                       Sélectionnez la langue
                     </option>
                     {allLanguages.map((lang) => (
-                      <option key={lang.key} value={lang.key}>
-                        {lang.label}
+                      <option key={lang.id} value={lang.id}>
+                        {lang.language_name}
                       </option>
                     ))}
                   </ChoicesFormInput>
