@@ -65,6 +65,25 @@ export const MENU_ITEMS: MenuItemType[] = [
     ],
   },
   {
+    key: 'therapistsTeam',
+    label: 'Thérapeute Équipes',
+    icon: 'ri-stethoscope-line',
+    children: [
+      {
+        key: 'therapists-list',
+        label: 'Liste des thérapeutes équipes',
+        url: '/therapist-team/TherapistTeam-list',
+        parentKey: 'therapistsTeam',
+      },
+      {
+        key: 'add-therapist',
+        label: 'Ajouter un thérapeute équipes',
+        url: '/therapist-team/add-TherapistTeam',
+        parentKey: 'therapistsTeam',
+      },
+    ],
+  },
+  {
     key: 'patients',
     label: 'Patient',
     icon: 'ri-hospital-line',
