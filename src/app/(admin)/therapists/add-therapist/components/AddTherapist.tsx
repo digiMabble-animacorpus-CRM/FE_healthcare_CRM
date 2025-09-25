@@ -820,20 +820,24 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             <Form.Control.Feedback type="invalid">{errors.faq?.message}</Form.Control.Feedback>
           </Form.Group>
 
-          {/* Submit button */}
-          <Row>
-            <div className="d-flex gap-3 mt-3">
-              <Button variant="primary" type="submit" className="px-4 py-2">
-                {therapistId ? 'Mettre à jour le thérapeute' : 'Enregistrer le thérapeute'}
-              </Button>
-              <Button type="button" variant="danger" onClick={() => router.push('/therapists/therapists-list')}>
-                Annuler
-              </Button>
-            </div>
-          </Row>
+          <div className="mb-3 rounded">
+            <Row className="justify-content-end g-2 mt-2">
+              <Col lg={2}>
+                <Button variant="primary" type="submit" className="w-100">
+                  {therapistId ? 'Mise à jour' : 'Créer'} Therapist
+                </Button>
+              </Col>
+              <Col lg={2}>
+                <Button variant="danger" className="w-100" onClick={() => router.back()}>
+                  Annuler
+                </Button>
+              </Col>
+            </Row>
+          </div>
         </CardBody>
       </Card>
     </Form>
+    
   );
 };
 
