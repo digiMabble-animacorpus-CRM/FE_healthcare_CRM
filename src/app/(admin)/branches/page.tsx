@@ -2,8 +2,11 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState } from 'react';
+import { API_BASE_PATH } from '@/context/constants';
 import type { BranchType } from '@/types/data';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import {
   Button,
   Card,
@@ -16,8 +19,6 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import { getBranches } from '@/helpers/branch';
 
 const PAGE_LIMIT = 10;
 
@@ -34,11 +35,42 @@ const BranchListPage = () => {
   const fetchBranches = async (page: number) => {
     setLoading(true);
     try {
-      const response = await getBranches(page, PAGE_LIMIT, searchTerm);
-      setBranches(response.data);
-      setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
+      const token = localStorage.getItem('access_token');
+      const response = await axios.get(`${API_BASE_PATH}/branches`, {
+        params: {
+          page,
+          limit: PAGE_LIMIT,
+          search: searchTerm,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = response.data?.data || response.data || [];
+      const totalCount = response.data?.totalCount || data.length || 0;
+
+      // ✅ Normalize branch data → always keep an `id`
+      setBranches(
+        data.map((branch: any) => ({
+          id:
+            branch.branch_id?.toString() ??
+            branch._id ??
+            branch.id ??
+            '', // branch_id is the correct field from backend
+          name: branch.name ?? '-',
+          code: branch.code ?? '-',
+          phone: branch.phone ?? '-',
+        })),
+      );
+
+      console.log('Fetched branches:', data);
+      setTotalPages(Math.ceil(totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error('Failed to fetch branches data:', error);
+      console.error('Failed to fetch branches:', error);
+      setBranches([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -55,10 +87,14 @@ const BranchListPage = () => {
   };
 
   const handleEditClick = (id: string) => {
-    router.push(`branches/branch-form/${id}/edit`);
+    if (!id) return;
+    console.log('Edit branch with ID:', id);
+    router.push(`/branches/branch-form/${id}/edit`);
   };
 
   const handleDeleteClick = (id: string) => {
+    if (!id) return;
+    console.log('Delete branch with ID:', id);
     setSelectedBranchId(id);
     setShowDeleteModal(true);
   };
@@ -66,8 +102,12 @@ const BranchListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedBranchId) return;
     try {
-      await fetch(`/api/branches/${selectedBranchId}`, {
-        method: 'DELETE',
+      const token = localStorage.getItem('access_token');
+      await axios.delete(`${API_BASE_PATH}/branches/${selectedBranchId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
       });
       fetchBranches(currentPage);
     } catch (error) {
@@ -86,7 +126,7 @@ const BranchListPage = () => {
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                Liste de toutes les succursales
+                Liste de toutes les succursales ({branches.length} Total)
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -121,24 +161,25 @@ const BranchListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>Non</th>
+                        <th>No</th>
                         <th>Nom de la succursale</th>
-                        <th>Code de succursale</th>
+                        <th>Téléphone</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {branches.map((branch: BranchType, idx: number) => (
-                        <tr key={idx}>
+                      {branches.map((branch: any, idx: number) => (
+                        <tr key={branch.id || idx}>
                           <td>{idx + 1}</td>
                           <td>{branch.name}</td>
-                          <td>{branch.code}</td>
+                          <td>{branch.phone}</td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
                                 variant="soft-primary"
                                 size="sm"
-                                onClick={() => handleEditClick(branch._id)}
+                                onClick={() => handleEditClick(branch.id)}
+                                disabled={!branch.id}
                               >
                                 <IconifyIcon
                                   icon="solar:pen-2-broken"
@@ -148,7 +189,8 @@ const BranchListPage = () => {
                               <Button
                                 variant="soft-danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(branch._id)}
+                                onClick={() => handleDeleteClick(branch.id)}
+                                disabled={!branch.id}
                               >
                                 <IconifyIcon
                                   icon="solar:trash-bin-minimalistic-2-broken"
@@ -212,7 +254,7 @@ const BranchListPage = () => {
           <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Êtes-vous sûr de vouloir supprimer cette branche ? Cette action est irréversible.
+          Êtes-vous sûr de vouloir supprimer cette succursale ? Cette action est irréversible.
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
