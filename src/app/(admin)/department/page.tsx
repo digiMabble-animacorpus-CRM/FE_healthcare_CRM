@@ -30,6 +30,8 @@ const DepartmentListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
   const router = useRouter();
 
   const fetchDepartments = async (page: number) => {
@@ -40,7 +42,7 @@ const DepartmentListPage = () => {
         params: {
           page,
           limit: PAGE_LIMIT,
-          search: searchTerm, // Pass search term to API
+          search: searchTerm,
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,7 +58,6 @@ const DepartmentListPage = () => {
       );
       setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
-      // fallback mock data
       setDepartments([
         {
           _id: '1',
@@ -100,12 +101,17 @@ const DepartmentListPage = () => {
           'Content-Type': 'application/json',
         },
       });
+      setMessage({ type: 'success', text: 'Département supprimé avec succès !' });
       fetchDepartments(currentPage);
     } catch (error) {
       console.error('Failed to delete department:', error);
+      setMessage({ type: 'error', text: 'Échec de la suppression du département.' });
     } finally {
       setShowDeleteModal(false);
       setSelectedDepartmentId(null);
+
+      // auto-clear message after 3s
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -123,13 +129,11 @@ const DepartmentListPage = () => {
         },
       );
 
-      // update UI immediately
       setDepartments((prev) =>
         prev.map((dept) => (dept._id === id ? { ...dept, is_active: newStatus } : dept)),
       );
     } catch (error) {
       console.error('Failed to update status:', error);
-      // rollback UI if API fails
       setDepartments((prev) =>
         prev.map((dept) => (dept._id === id ? { ...dept, is_active: !newStatus } : dept)),
       );
@@ -138,7 +142,21 @@ const DepartmentListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Départements" title="Liste des départements" />
+      <PageTitle subName="Départements" title="Liste des départements" />{' '}
+      {message && (
+        <div
+          style={{
+            margin: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '6px',
+            color: message.type === 'success' ? '#0f5132' : '#842029',
+            backgroundColor: message.type === 'success' ? '#d1e7dd' : '#f8d7da',
+            border: `1px solid ${message.type === 'success' ? '#badbcc' : '#f5c2c7'}`,
+          }}
+        >
+          {message.text}
+        </div>
+      )}
       <Row>
         <Col xl={12}>
           <Card>
@@ -280,7 +298,6 @@ const DepartmentListPage = () => {
           </Card>
         </Col>
       </Row>
-
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>

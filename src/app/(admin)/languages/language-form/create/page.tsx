@@ -1,21 +1,42 @@
 'use client';
 
-import { toast } from 'react-toastify';
+import { API_BASE_PATH } from '@/context/constants';
 import { useRouter } from 'next/navigation';
-import type { LanguageType } from '@/types/data';
-import LanguageForm from '../languageForm';
+import { toast } from 'react-toastify';
+import LanguageForm, { LanguageFormValues } from '../languageForm';
 
 const CreateLanguagePage = () => {
   const router = useRouter();
 
-  const handleCreate = async (data: Omit<LanguageType, '_id'>) => {
+  const handleCreate = async (data: LanguageFormValues) => {
     try {
-      // await createLanguageAPI(data);
+      const token = localStorage.getItem('access_token');
+      if (!token) {
+        toast.error('No access token found!');
+        return;
+      }
 
-      toast.success('Language created successfully!');
+      const payload = {
+        language_name: data.label,
+        language_description: data.key || '',
+      };
+
+      const res = await fetch(`${API_BASE_PATH}/languages`, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) throw new Error('Failed to create language');
+
+      // toast.success('Language created successfully!');
       router.push('/languages');
     } catch (error) {
-      toast.error('Failed to create Language.');
+      console.error(error);
+      // toast.error('Failed to create Language.');
     }
   };
 
