@@ -36,21 +36,11 @@ type ProfileDetailsProps = {
   photo?: string;
 };
 
-const daysOfWeek = [
-  'lundi',
-  'mardi',
-  'mercredi',
-  'jeudi',
-  'vendredi',
-  'samedi',
-  'dimanche',
-];
+const daysOfWeek = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 
 const ProfileDetails = () => {
   const router = useRouter();
-  const [profileData, setProfileData] = useState<ProfileDetailsProps | null>(
-    null
-  );
+  const [profileData, setProfileData] = useState<ProfileDetailsProps | null>(null);
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -67,7 +57,7 @@ const ProfileDetails = () => {
             'Content-Type': 'application/json',
           },
         });
-
+        console.log('Profile API Response:', res.data);
         const apiProfile = res.data?.user?.team;
         if (!apiProfile) {
           console.error('No team object in API response');
@@ -133,36 +123,27 @@ const ProfileDetails = () => {
     photo,
   } = profileData;
 
- 
   const renderSchedule = (text: string) => {
     const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
 
     const phoneMatch = text.match(/(\d{3,4}\/\d{2}\.\d{2}\.\d{2})/);
     const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
 
-
     const branchPairs: { branch: string; address: string }[] = [];
     for (let i = 0; i < lines.length - 1; i++) {
       let current = lines[i];
       const next = lines[i + 1];
 
-      if (
-        /Gembloux|Namur|Anima Corpus|Soul Body/i.test(current) &&
-        /\d{4}/.test(next) 
-      ) {
-  
-        current = current
-          .replace(/^.*?(Anima Corpus.*|Soul Body.*|Gembloux.*)$/i, '$1')
-          .trim();
+      if (/Gembloux|Namur|Anima Corpus|Soul Body/i.test(current) && /\d{4}/.test(next)) {
+        current = current.replace(/^.*?(Anima Corpus.*|Soul Body.*|Gembloux.*)$/i, '$1').trim();
 
         branchPairs.push({ branch: current, address: next });
-        i++; 
+        i++;
       }
     }
 
     return (
       <div>
-        
         <div className="mb-3">
           {daysOfWeek.map((day) => {
             const regex = new RegExp(day, 'i');
@@ -181,7 +162,6 @@ const ProfileDetails = () => {
           })}
         </div>
 
-        
         <div className="mb-3">
           {phoneMatch && (
             <p>
@@ -195,7 +175,6 @@ const ProfileDetails = () => {
           )}
         </div>
 
-       
         {branchPairs.length > 0 && (
           <div>
             <h6 className="fw-semibold">Nos Cabinets :</h6>
