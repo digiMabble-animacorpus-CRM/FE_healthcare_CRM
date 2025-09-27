@@ -1,10 +1,10 @@
+
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { toast } from 'react-toastify';
 import DepartmentForm, { DepartmentFormValues } from '../../departmentForm';
 
 export interface Props {
@@ -19,6 +19,7 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
   const [defaultValues, setDefaultValues] = useState<
     Partial<DepartmentFormValues & { department_id?: string }>
   >({});
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
     if (!params.id) {
@@ -44,12 +45,12 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
             name: department.name || '',
             description: department.description || '',
             is_active: department.is_active ?? true,
-            department_id: department.id, // Use department_id as expected by the type
+            department_id: department.id,
           });
         }
       } catch (err) {
         console.error(err);
-        toast.error('Failed to load department details');
+        setMessage({ type: 'error', text: 'Failed to load department details' });
       } finally {
         setLoading(false);
       }
@@ -79,19 +80,40 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
         },
       );
 
-      toast.success('Department updated successfully!');
-      router.push('/department');
+      setMessage({ type: 'success', text: 'Department updated successfully!' });
+
+      // Optional: Redirect after a short delay
+      setTimeout(() => {
+        router.push('/department');
+      }, 1500);
     } catch (error) {
       console.error(error);
-      toast.error('Error updating department');
+      setMessage({ type: 'error', text: 'Error updating department' });
     }
   };
 
   if (loading) return <div>Loading department details...</div>;
 
   return (
-    <DepartmentForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
+    <div>
+      {message && (
+        <div
+          style={{
+            marginBottom: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '6px',
+            color: message.type === 'success' ? '#0f5132' : '#842029',
+            backgroundColor: message.type === 'success' ? '#d1e7dd' : '#f8d7da',
+            border: `1px solid ${message.type === 'success' ? '#badbcc' : '#f5c2c7'}`,
+          }}
+        >
+          {message.text}
+        </div>
+      )}
+      <DepartmentForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
+    </div>
   );
 };
 
 export default EditDepartmentPage;
+

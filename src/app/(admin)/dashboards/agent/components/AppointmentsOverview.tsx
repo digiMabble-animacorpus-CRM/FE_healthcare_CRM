@@ -2,8 +2,21 @@
 
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from 'react';
-import { Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import {
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Row,
+  Spinner,
+  Dropdown,
+  DropdownToggle,
+  DropdownMenu,
+  DropdownItem,
+} from 'react-bootstrap';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 import avatar1 from '@/assets/images/users/avatar-1.jpg';
 import avatar2 from '@/assets/images/users/avatar-2.jpg';
@@ -39,15 +52,10 @@ export type AppointmentsOverviewProps = {
 
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
-
 const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
   const [selectedDoctor, setSelectedDoctor] = useState<string>('All Doctors');
   const [selectedBranch, setSelectedBranch] = useState<string>('All Branches');
   const [chartMode, setChartMode] = useState<'doctor' | 'branch'>('doctor');
-  // const [view, setView] = useState<'month' | 'week' | 'day'>('month');
-  // const [calendarViewMode, setCalendarViewMode] = useState<'calendar' | 'list'>('calendar');
-  // const [calendarHeight] = useState('750px');
   const [loading] = useState(false);
   const [appointmentStats, setAppointmentStats] = useState<AppointmentStats | null>(null);
   const [statsLoading, setStatsLoading] = useState<boolean>(false);
@@ -55,17 +63,34 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
   const [distributionData, setDistributionData] = useState<AppointmentDistributionItem[]>([]);
   const [distributionTotal, setDistributionTotal] = useState<number>(0);
 
+  const [dateFilter, setDateFilter] = useState<'all' | string>('all');
+
   const calendarRef = useRef<any>(null);
 
-  // Date range for API calls
-  const startDate = dayjs().startOf('week').format('YYYY-MM-DD');
-  const endDate = dayjs().endOf('week').format('YYYY-MM-DD');
+  // ✅ Compute start and end date based on dateFilter
+  const { startDate, endDate } = useMemo(() => {
+    const now = dayjs();
+    switch (dateFilter) {
+      case 'today':
+        return { startDate: now.startOf('day').format('YYYY-MM-DD'), endDate: now.endOf('day').format('YYYY-MM-DD') };
+      case 'this_week':
+        return { startDate: now.startOf('week').format('YYYY-MM-DD'), endDate: now.endOf('week').format('YYYY-MM-DD') };
+      case '15_days':
+        return { startDate: now.subtract(15, 'day').format('YYYY-MM-DD'), endDate: now.format('YYYY-MM-DD') };
+      case 'this_month':
+        return { startDate: now.startOf('month').format('YYYY-MM-DD'), endDate: now.endOf('month').format('YYYY-MM-DD') };
+      case 'this_year':
+        return { startDate: now.startOf('year').format('YYYY-MM-DD'), endDate: now.endOf('year').format('YYYY-MM-DD') };
+      default:
+        return { startDate: now.startOf('year').format('YYYY-MM-DD'), endDate: now.endOf('year').format('YYYY-MM-DD') }; // fallback
+    }
+  }, [dateFilter]);
 
-  // TODO: Map selectedDoctor/selectedBranch to IDs if you have
+  // TODO: Map selectedDoctor/selectedBranch to IDs if needed
   const doctorId = selectedDoctor !== 'All Doctors' ? undefined : undefined;
   const branchId = selectedBranch !== 'All Branches' ? undefined : undefined;
 
-  // Fetch appointment stats
+  // ✅ Fetch appointment stats
   useEffect(() => {
     const fetchStats = async () => {
       setStatsLoading(true);
@@ -75,7 +100,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           endDate,
           doctorId,
           branchId,
-          timeFilter: 'thisWeek',
+          timeFilter: dateFilter,
         });
         if (response?.stats) setAppointmentStats(response.stats);
         else setAppointmentStats(null);
@@ -86,9 +111,9 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
       }
     };
     fetchStats();
-  }, [selectedDoctor, selectedBranch, startDate, endDate]);
+  }, [selectedDoctor, selectedBranch, startDate, endDate, dateFilter]);
 
-  // Fetch appointment distribution
+  // ✅ Fetch appointment distribution
   useEffect(() => {
     const fetchDistribution = async () => {
       try {
@@ -97,7 +122,7 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
           endDate,
           doctorId,
           branchId,
-          timeFilter: 'thisWeek',
+          timeFilter: dateFilter,
           groupBy: chartMode,
         });
         if (response) {
@@ -113,39 +138,12 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
       }
     };
     fetchDistribution();
-  }, [selectedDoctor, selectedBranch, startDate, endDate, chartMode]);
+  }, [selectedDoctor, selectedBranch, startDate, endDate, chartMode, dateFilter]);
 
-  // Compute total count for percentage calculations
+  // ✅ Compute total count for percentage calculations
   const totalAppointments = Array.isArray(distributionData)
     ? distributionData.reduce((sum, item) => sum + item.count, 0) || 1
     : 1;
-
-  // Dropdown source lists from upcoming appointments
-  const allDoctors = Array.from(new Set(upcoming.map((a) => a.doctor)));
-  const allBranches = Array.from(new Set(upcoming.map((a) => a.branch)));
-
-  // Prepare chart data from distributionData
-  const chartCategories = distributionData.map((item) => item.name);
-  const chartData = distributionData.map((item) => item.count);
-
-  /*
-  // Chart options and series for ApexCharts
-  const chartOptions: ApexOptions = {
-    chart: { id: 'appointments-chart', toolbar: { show: false } },
-    xaxis: {
-      categories: chartCategories,
-      labels: { rotate: -45 },
-      title: { text: chartMode === 'doctor' ? 'Doctor' : 'Branch' },
-    },
-    stroke: { curve: 'smooth' },
-    dataLabels: { enabled: false },
-    colors: ['#0d6efd'],
-    tooltip: { shared: true, intersect: false },
-    markers: { size: 4 },
-    yaxis: { title: { text: 'Appointments' } },
-  };
-  const chartSeries = [{ name: 'Appointments', data: chartData }];
-  */
 
   return (
     <Col lg={12}>
@@ -153,53 +151,46 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
         <CardHeader className="d-flex justify-content-between align-items-center border-0">
           <div>
             <CardTitle as="h4">Aperçu des rendez-vous</CardTitle>
-            <p className="text-muted mb-0">Résumé hebdomadaire</p>
+            <p className="text-muted mb-0">Résumé basé sur le filtre</p>
           </div>
 
-          {/*
-          <div className="d-flex gap-2">
-            {/* Doctor Dropdown */}
-          {/* <Dropdown>
-              <DropdownToggle
-                as="a"
-                className="btn btn-sm btn-outline-light rounded content-none icons-center"
-              >
-                {selectedDoctor} <IconifyIcon icon="ri:arrow-down-s-line" className="ms-1" />
-              </DropdownToggle>
-              <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem onClick={() => setSelectedDoctor('All Doctors')}>
-                  Tous les thérapeutes
+          {/* ✅ Date Filter Dropdown */}
+          <Dropdown>
+            <DropdownToggle
+              className="btn btn-sm btn-outline-white d-flex align-items-center"
+              id="dateFilter"
+            >
+              <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
+              {dateFilter === 'all'
+                ? 'Filter by Date'
+                : dateFilter.replace('_', ' ').toUpperCase()}
+            </DropdownToggle>
+            <DropdownMenu>
+              {[
+                { label: 'Today', value: 'today' },
+                { label: 'This Week', value: 'this_week' },
+                { label: 'Last 15 Days', value: '15_days' },
+                { label: 'This Month', value: 'this_month' },
+                { label: 'This Year', value: 'this_year' },
+              ].map((f) => (
+                <DropdownItem
+                  key={f.value}
+                  onClick={() => setDateFilter(f.value)}
+                  active={dateFilter === f.value}
+                >
+                  {f.label}
                 </DropdownItem>
-                {allDoctors.map((doc) => (
-                  <DropdownItem key={doc} onClick={() => setSelectedDoctor(doc)}>
-                    {doc}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown> */}
-
-          {/* Branch Dropdown */}
-          {/* <Dropdown>
-              <DropdownToggle
-                as="a"
-                className="btn btn-sm btn-outline-light rounded content-none icons-center"
-              >
-                {selectedBranch} <IconifyIcon icon="ri:arrow-down-s-line" className="ms-1" />
-              </DropdownToggle>
-              <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem onClick={() => setSelectedBranch('All Branches')}>
-                  Toutes les succursales
+              ))}
+              {dateFilter !== 'all' && (
+                <DropdownItem
+                  className="text-danger"
+                  onClick={() => setDateFilter('all')}
+                >
+                  Clear Date Filter
                 </DropdownItem>
-                {allBranches.map((b) => (
-                  <DropdownItem key={b} onClick={() => setSelectedBranch(b)}>
-                    {b}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown> */}
-          {/*
-          </div>
-          */}
+              )}
+            </DropdownMenu>
+          </Dropdown>
         </CardHeader>
 
         <CardBody>
@@ -242,85 +233,6 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
               </div>
             </Col>
           </Row>
-
-          {/*
-          // Chart + Calendar
-          <Row className="g-3">
-            <Col lg={6}>
-              <ReactApexChart options={chartOptions} series={chartSeries} type="area" height={250} />
-            </Col>
-
-            <Col lg={6} style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <div style={{ flex: 1, minHeight: 0 }}>
-                {loading ? (
-                  <div className="text-center py-5">
-                    <Spinner animation="border" />
-                  </div>
-                ) : calendarViewMode === 'calendar' ? (
-                  <Calendar />
-                ) : (
-                  <div className="p-3 border rounded bg-white" style={{ height: calendarHeight, overflowY: 'auto' }}>
-                    {upcoming.length === 0 ? (
-                      <p className="text-muted">Aucun rendez-vous trouvé.</p>
-                    ) : (
-                      upcoming.map((appt) => (
-                        <div key={appt.id} className="border-bottom py-2">
-                          <strong>{appt.patient}</strong>
-                          <div>{dayjs(`${appt.date}T${appt.time}`).format('MMM D, YYYY h:mm A')}</div>
-                          <small className="text-muted">
-                            {appt.doctor} - {appt.branch}
-                          </small>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
-              </div>
-            </Col>
-          </Row>
-
-
-          // Appointments Breakdown
-          <h5 className="mt-4 mb-2 text-primary fw-bold">Répartition des rendez-vous</h5>
-          <p className="text-muted mb-3">
-            Affichage des rendez-vous pour{' '}
-            <strong>{chartMode === 'doctor' ? selectedDoctor : selectedBranch}</strong>.
-          </p>
-
-          {distributionLoading ? (
-            <Spinner animation="border" />
-          ) : (
-            <Row className="g-3 mb-3">
-              {distributionData.map((item, idx) => {
-                const percent = Math.round((item.count / totalAppointments) * 100);
-                const avatar = AVATARS[idx % AVATARS.length];
-                return (
-                  <Col lg={3} key={item.id}>
-                    <div className="border rounded p-2 d-flex align-items-center gap-3">
-                      <div className="avatar-md flex-centered bg-light rounded-circle">
-                        <Image src={avatar} alt={item.name} width={40} height={40} className="rounded-circle" />
-                      </div>
-                      <div className="flex-grow-1">
-                        <p className="mb-1 text-muted">{item.name}</p>
-                        <p className="fs-18 text-dark fw-medium">
-                          {item.count} <span className="text-muted fs-14">({percent}%)</span>
-                        </p>
-                        <div className="progress" style={{ height: 10 }}>
-                          <div
-                            className={`progress-bar ${
-                              chartMode === 'doctor' ? 'bg-primary' : 'bg-warning'
-                            }`}
-                            style={{ width: `${percent}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </Col>
-                );
-              })}
-            </Row>
-          )}
-          */}
         </CardBody>
       </Card>
     </Col>

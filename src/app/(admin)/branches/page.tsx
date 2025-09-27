@@ -51,7 +51,7 @@ const BranchListPage = () => {
       const data = response.data?.data || response.data || [];
       const totalCount = response.data?.totalCount || data.length || 0;
 
-      // ✅ Normalize branch data → always keep an `id`
+      // ✅ Normalize branch data
       setBranches(
         data.map((branch: any) => ({
           id:
@@ -62,6 +62,7 @@ const BranchListPage = () => {
           name: branch.name ?? '-',
           code: branch.code ?? '-',
           phone: branch.phone ?? '-',
+          email: branch.email ?? '-', // added email field
         })),
       );
 
@@ -164,6 +165,7 @@ const BranchListPage = () => {
                         <th>No</th>
                         <th>Nom de la succursale</th>
                         <th>Téléphone</th>
+                        <th>Email</th> {/* ✅ Added Email column */}
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -173,6 +175,7 @@ const BranchListPage = () => {
                           <td>{idx + 1}</td>
                           <td>{branch.name}</td>
                           <td>{branch.phone}</td>
+                          <td>{branch.email}</td> {/* ✅ Show email */}
                           <td>
                             <div className="d-flex gap-2">
                               <Button

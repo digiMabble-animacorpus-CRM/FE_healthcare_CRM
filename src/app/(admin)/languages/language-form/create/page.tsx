@@ -36,7 +36,7 @@ const CreateLanguagePage = () => {
       router.push('/languages');
     } catch (error) {
       console.error(error);
-      toast.error('Failed to create Language.');
+      // toast.error('Failed to create Language.');
     }
   };
 
