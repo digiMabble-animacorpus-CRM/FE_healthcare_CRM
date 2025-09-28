@@ -1,6 +1,7 @@
 import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
 import { StaticImageData } from 'next/image';
 import { BootstrapVariantType } from './component-props';
+import { Key, ReactNode } from 'react';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -652,40 +653,30 @@ export type ProfileCreatePayload = {
 
 export type TeamMemberType = {
   team_id: string;
-  last_name: string;
-  first_name: string;
+  firstName: string;
+  lastName: string;
   full_name: string;
-  job_1?: string | null;
-  specific_audience?: string | null;
-  specialization_1?: string | null;
-  job_2?: string | null;
-  job_3?: string | null;
-  job_4?: string | null;
-  who_am_i: string;
-  consultations: string;
-  office_address: string;
-  contact_email: string;
-  contact_phone: string;
-  schedule: {
-    text: string | null;
-  };
-  about: string;
-  languages_spoken: string[]; // always an array
-  payment_methods: string[]; // always an array
-  diplomas_and_training: string[]; // always an array
-  specializations: string[]; // always an array
+  imageUrl: string;
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe: string;
+  degreesTraining: string;
+  inamiNumber: number;
+  payment_methods: string[];
+  faq: { question: string; answer: string }[];
   website: string;
-  frequently_asked_questions: any; // JSON string or object
-  calendar_links: string[]; // always an array
-  photo: string;
-  branch_ids?: (string | number)[]; // array of strings or numbers
-  primary_branch_id: number;
-  permissions: Record<string, any>; // object for permissions
+  consultations: string;
+  permissions: { admin: boolean };
   role: string;
-  status: 'active' | 'inactive' | string;
-  created_by_role?: string;
-  branches: any;
+  status: "active" | "inactive";
+  availability: { day: string; startTime: string; endTime: string }[];
+  languagesSpoken: string[];
+  isDelete: boolean;
+  departmentId: number;
+  specializationIds: number[];
+  branchIds: number[];
 };
+
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency

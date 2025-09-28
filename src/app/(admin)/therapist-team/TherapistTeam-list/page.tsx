@@ -2,13 +2,14 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { getAllTeamMembers } from '@/helpers/team-members';
+import { getAllTherapistTeamMembers } from '@/helpers/therapistTeam';
 import type { TeamMemberType } from '@/types/data';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Badge, Button,
+  Badge,
+  Button,
   Card,
   CardBody,
   CardFooter,
@@ -21,13 +22,13 @@ import {
   DropdownToggle,
   Modal,
   Row,
-  Spinner
+  Spinner,
 } from 'react-bootstrap';
 
 const PAGE_SIZE = 500;
 const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
-const TeamsListPage = () => {
+const TherapistTeamsListPage = () => {
   const [allTeamMembers, setAllTeamMembers] = useState<TeamMemberType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
@@ -35,32 +36,12 @@ const TeamsListPage = () => {
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
+  const [selectedTherapistTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [selectedTherapistId, setSelectedTeamMemberId] = useState<string | null>(null);
+  const [totalCount, setTotalCount] = useState(0);
 
   const router = useRouter();
-
-  const fetchTeamMembers = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await getAllTeamMembers(1, 10000); // fetch all
-      if (!response.data || response.data.length === 0) {
-        throw new Error('No data');
-      }
-      setAllTeamMembers(response.data || []);
-    } catch (err) {
-      setError('Failed to fetch data');
-      setAllTeamMembers([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchTeamMembers();
-  }, []);
 
   const getDateRange = () => {
     const now = dayjs();
@@ -79,38 +60,61 @@ const TeamsListPage = () => {
         return null;
     }
   };
+  const fetchTeamMembers = async (page = 1) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const dateRange = getDateRange();
+      const from = dateRange?.from.format('YYYY-MM-DD') || undefined;
+      const to = dateRange?.to.format('YYYY-MM-DD') || undefined;
 
-  const filteredTeamMembers = useMemo(() => {
-    let data = [...allTeamMembers];
-    if (selectedBranch) {
-      data = data.filter((t) => t.office_address?.includes(selectedBranch));
-    }
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      data = data.filter(
-        (t) =>
-          (t.first_name?.toLowerCase().includes(term) ?? false) ||
-          (t.last_name?.toLowerCase().includes(term) ?? false) ||
-          (t.full_name?.toLowerCase().includes(term) ?? false) ||
-          (t.contact_email?.toLowerCase().includes(term) ?? false) ||
-          (t.contact_phone?.toLowerCase().includes(term) ?? false),
+      const response = await getAllTherapistTeamMembers(
+        page,
+        PAGE_SIZE,
+        selectedBranch || undefined,
+        from,
+        to,
+        searchTerm || undefined
       );
+
+      console.log('API Data:', response.data);
+      console.log('Total Count:', response.totalCount);
+
+      if (!response.data || response.data.length === 0) {
+        setAllTeamMembers([]);
+        setTotalCount(0);
+      } else {
+        setAllTeamMembers(
+          response.data.map((item: any) => ({
+            ...item,
+            team_id: item.therapistId ?? item.team_id ?? item.id ?? '',
+          }))
+        );
+        setTotalCount(response.totalCount);
+      }
+    } catch (err) {
+      setError('Failed to fetch data');
+      
+      ([]);
+      setTotalCount(0);
+    } finally {
+      setLoading(false);
     }
-    return data;
-  }, [allTeamMembers, selectedBranch, searchTerm, dateFilter]);
-
-  const totalPages = Math.ceil(filteredTeamMembers.length / PAGE_SIZE);
-
-  const currentData = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredTeamMembers.slice(start, start + PAGE_SIZE);
-  }, [filteredTeamMembers, currentPage]);
-
-  const handleView = (id: string) => {
-    router.push(`/teams/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => router.push(`/teams/edit-team/${id}`);
+  useEffect(() => {
+    fetchTeamMembers(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPage, selectedBranch, searchTerm, dateFilter]);
+
+  const totalPages = Math.ceil(totalCount / PAGE_SIZE);
+  const currentData = allTeamMembers;
+
+  const handleView = (id: string) => {
+    router.push(`/therapist-teams/details/${id}`);
+  };
+
+  const handleEditClick = (id: string) => router.push(`/teams/edit-TherapistTeam/${id}`);
 
   const handleDeleteClick = (id: string) => {
     setSelectedTeamId(id);
@@ -119,14 +123,15 @@ const TeamsListPage = () => {
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedTeamId) return;
+    if (!selectedTherapistTeamId) return;
     try {
-      await fetch(`http://164.92.220.65/api/v1/team-members/${selectedTeamId}`, {
+      await fetch(`http://164.92.220.65/api/v1/therapist-team/${selectedTherapistTeamId}`, {
         method: 'DELETE',
       });
-      setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTeamId));
+      setAllTeamMembers(allTeamMembers.filter((t) => t.team_id !== selectedTherapistTeamId));
+      setTotalCount((count) => count - 1);
     } catch (err) {
-      // error handling
+      // Optionally set error message here for delete failure
     } finally {
       setShowDeleteModal(false);
       setSelectedTeamId(null);
@@ -141,7 +146,7 @@ const TeamsListPage = () => {
 
   // Helper for showing avatar fallback
   const getProfileDisplay = (member: TeamMemberType) => {
-    const photoUrl = member.photo && member.photo.startsWith('http') ? member.photo : '';
+    const photoUrl = member.imageUrl && member.imageUrl.startsWith('http') ? member.imageUrl : '';
     if (photoUrl)
       return (
         <img
@@ -157,7 +162,7 @@ const TeamsListPage = () => {
         />
       );
     // Fallback: first letter in a colored circle
-    const initial = member.first_name ? member.first_name.trim().charAt(0).toUpperCase() : 'U';
+    const initial = member.firstName ? member.firstName.trim().charAt(0).toUpperCase() : 'U';
     return (
       <div
         style={{
@@ -181,13 +186,13 @@ const TeamsListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Teams" title="Liste des équipes" />
+      <PageTitle subName="Teams" title="Liste de toutes les équipes" />
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                Liste de toutes les équipes <small>({filteredTeamMembers.length} Total)</small>
+                Liste de toutes les équipes({totalCount} Total)
               </CardTitle>
               {error && <div className="alert alert-danger text-center">{error}</div>}
               <div className="d-flex gap-2 align-items-center">
@@ -243,10 +248,7 @@ const TeamsListPage = () => {
                 </div>
               ) : (
                 <div className="table-responsive">
-                  <table
-                    className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 1100 }}
-                  >
+                  <table className="table table-hover table-sm table-centered mb-0" style={{ minWidth: 1100 }}>
                     <thead className="bg-light-subtle">
                       <tr>
                         <th style={{ width: 30 }}>Non</th>
@@ -270,26 +272,33 @@ const TeamsListPage = () => {
                         </tr>
                       ) : (
                         currentData.map((item, idx) => (
-                          <tr key={item.team_id}>
+                          <tr key={item.team_id ?? `team-member-${idx}`}>
                             <td>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
                             <td>{getProfileDisplay(item)}</td>
-                            <td>{item.full_name}</td>
-                            <td>{item.contact_email}</td>
-                            <td>{item.contact_phone}</td>
+                            <td>{item.firstName}</td>
+                            <td>{item.contactEmail}</td>
+                            <td>{item.contactPhone}</td>
                             <td>
-                              {Array.isArray(item.branches)
-                                ? item.branches.map((b) => b.name).join(', ')
+                              {Array.isArray(item.branchIds)
+                                ? item.branchIds
+                                    .map((b) =>
+                                      typeof b === 'object' && b !== null && 'name' in b
+                                        ? (b as { name: string }).name
+                                        : typeof b === 'number'
+                                        ? b.toString()
+                                        : ''
+                                    )
+                                    .join(', ')
                                 : ''}
                             </td>
-                            <td>{item.job_1}</td>
                             <td>
                               {item.role === 'super_admin'
                                 ? 'Super Admin'
                                 : item.role === 'staff'
-                                  ? 'Staff'
-                                  : item.role === 'admin'
-                                    ? 'Admin'
-                                    : item.role}
+                                ? 'Staff'
+                                : item.role === 'admin'
+                                ? 'Admin'
+                                : item.role}
                             </td>
                             <td>
                               <Badge
@@ -305,21 +314,24 @@ const TeamsListPage = () => {
                                 <Button
                                   variant="light"
                                   size="sm"
-                                  onClick={() => handleView(item.team_id)}
+                                  onClick={() => item.team_id && handleView(item.team_id)}
+                                  disabled={!item.team_id}
                                 >
                                   <IconifyIcon icon="solar:eye-broken" />
                                 </Button>
                                 <Button
                                   variant="soft-primary"
                                   size="sm"
-                                  onClick={() => handleEditClick(item.team_id.toString())}
+                                  onClick={() => item.team_id && handleEditClick(item.team_id.toString())}
+                                  disabled={!item.team_id}
                                 >
                                   <IconifyIcon icon="solar:pen-2-broken" />
                                 </Button>
                                 <Button
                                   variant="soft-danger"
                                   size="sm"
-                                  onClick={() => handleDeleteClick(item.team_id.toString())}
+                                  onClick={() => item.team_id && handleDeleteClick(item.team_id.toString())}
+                                  disabled={!item.team_id}
                                 >
                                   <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                                 </Button>
@@ -337,31 +349,19 @@ const TeamsListPage = () => {
             <CardFooter>
               <ul className="pagination justify-content-end mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <Button
-                    variant="link"
-                    className="page-link"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                  >
+                  <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
                     Précédent
                   </Button>
                 </li>
-                {Array.from({ length: totalPages }).map((_, idx) => (
+                {Array.from({ length: totalPages }, (_, idx) => (
                   <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
-                    <Button
-                      variant="link"
-                      className="page-link"
-                      onClick={() => handlePageChange(idx + 1)}
-                    >
+                    <Button variant="link" className="page-link" onClick={() => handlePageChange(idx + 1)}>
                       {idx + 1}
                     </Button>
                   </li>
                 ))}
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                  <Button
-                    variant="link"
-                    className="page-link"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  >
+                  <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
                     Suivant
                   </Button>
                 </li>
@@ -389,4 +389,4 @@ const TeamsListPage = () => {
   );
 };
 
-export default TeamsListPage;
+export default TherapistTeamsListPage;

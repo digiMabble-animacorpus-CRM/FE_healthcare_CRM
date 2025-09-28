@@ -16,7 +16,8 @@ export const getAllLanguages = async (): Promise<LanguageType[]> => {
     if (!res.ok) throw new Error('Failed to fetch all languages');
 
     const response = await res.json();
-    return response?.data || [];
+    console.log('API response in helper:', response);
+    return response || [];
   } catch (error) {
     console.error('Error fetching all languages:', error);
     return [];

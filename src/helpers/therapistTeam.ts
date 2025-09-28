@@ -5,7 +5,8 @@ import { API_BASE_PATH } from '@/context/constants';
 import { decryptAES } from '@/utils/encryption';
 
 // Fetch all therapist team members with revised query mapping
-export const getAllTherapistTeamMembers = async (
+export const 
+getAllTherapistTeamMembers = async (
   page: number = 1,
   limit: number = 10,
   branch?: string,
@@ -85,8 +86,12 @@ export const getTherapistTeamMemberById = async (teamMemberId: string | number):
 export const createTherapistTeamMember = async (payload: TherapistTeamMember): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
-    if (!token) return false;
-    // Force parse arrays to number for branchIds/specializationIds
+    console.log('createTherapistTeamMember called, token exists:', !!token);
+    if (!token) {
+      console.error('No access token found');
+      return false;
+    }
+
     const safePayload: TherapistTeamMember = {
       ...payload,
       branchIds: payload.branchIds?.map(Number) ?? [],
@@ -97,6 +102,9 @@ export const createTherapistTeamMember = async (payload: TherapistTeamMember): P
       languagesSpoken: payload.languagesSpoken ?? [],
       permissions: payload.permissions || { admin: false },
     };
+
+    console.log('Sending payload to API:', safePayload);
+
     const response = await fetch(`${API_BASE_PATH}/therapist-team`, {
       method: 'POST',
       headers: {
@@ -105,7 +113,10 @@ export const createTherapistTeamMember = async (payload: TherapistTeamMember): P
       },
       body: JSON.stringify(safePayload),
     });
+
     const result = await response.json();
+    console.log('API response status:', response.status, 'body:', result);
+
     if (!response.ok || result.status === false) {
       console.error('Create failed:', result.message || 'Unknown error');
       return false;
@@ -116,6 +127,7 @@ export const createTherapistTeamMember = async (payload: TherapistTeamMember): P
     return false;
   }
 };
+
 
 // Update a therapist team member
 export const updateTherapistTeamMember = async (

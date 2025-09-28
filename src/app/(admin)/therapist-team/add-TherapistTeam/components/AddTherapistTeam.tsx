@@ -14,7 +14,7 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { Controller, useForm } from 'react-hook-form';
+import { Controller, useForm, useWatch } from 'react-hook-form';
 import * as yup from 'yup';
 
 import { useNotificationContext } from '@/context/useNotificationContext';
@@ -45,6 +45,7 @@ export interface TherapistTeamMember {
   departmentId: number;
   specializationIds: number[];
   branchIds: number[];
+  
 }
 
 const PAYMENT_METHODS = ['Cash', 'Card', 'Insurance'];
@@ -95,7 +96,6 @@ const schema = yup.object().shape({
   branchIds: yup.array().of(yup.number().required()).min(1, 'Select at least one branch').required(),
 });
 
-
 const defaultAvailability = [{ day: 'Monday', startTime: '09:00', endTime: '17:00' }];
 
 const defaultValues: TherapistTeamMember = {
@@ -109,7 +109,7 @@ const defaultValues: TherapistTeamMember = {
   degreesTraining: '',
   inamiNumber: 0,
   payment_methods: [],
-  faq: [],
+  faq: [{ question: '', answer: '' }],
   website: '',
   consultations: '',
   permissions: { admin: false },
@@ -128,18 +128,12 @@ interface AddTherapistProps {
 }
 
 const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
-  const [languages, setLanguages] = useState<LanguageType[]>([]);
-
-  useEffect(() => {
-    async function fetchLanguages() {
-      const data = await getAllLanguages();
-      setLanguages(data);
-    }
-    fetchLanguages();
-  }, []);
-
   const router = useRouter();
   const { showNotification } = useNotificationContext();
+
+  const [languages, setLanguages] = useState<LanguageType[]>([]);
+  const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([{ question: '', answer: '' }]);
+
   const {
     control,
     register,
@@ -150,31 +144,33 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     formState: { errors, isSubmitting },
   } = useForm<TherapistTeamMember>({ resolver: yupResolver(schema), defaultValues });
 
-  const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([
-      { question: '', answer: '' },
-    ]);
-
-
-  useEffect(() => {
-      if (editId) {
-        getTherapistTeamMemberById(editId).then((data) => {
-          if (data) {
-            reset(data);
-            setFaqs(
-              data.faq?.length
-                ? data.faq
-                : [{ question: '', answer: '' }]
-            );
-          }
-        });
-      }
-    }, [editId, reset]);
-
+  const selectedLanguages = useWatch({
+    control,
+    name: 'languagesSpoken',
+    defaultValue: [], // default if no value yet
+  });
 
   useEffect(() => {
-      setValue('faq', faqs);
-    }, [faqs, setValue]);
+    async function fetchLanguages() {
+      const langs = await getAllLanguages();
+      console.log('Fetched languages:', langs);
+      setLanguages(langs);
+    }
+    fetchLanguages();
+  }, []);
 
+  useEffect(() => {
+    if (editId) {
+      getTherapistTeamMemberById(editId).then((data) => {
+        if (data) {
+          reset(data);
+          setFaqs(data.faq?.length ? data.faq : [{ question: '', answer: '' }]);
+        }
+      });
+    }
+  }, [editId, reset]);
+
+  useEffect(() => setValue('faq', faqs), [faqs, setValue]);
 
   useEffect(() => {
     const first = watch('firstName')?.trim() ?? '';
@@ -183,26 +179,42 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
   }, [watch('firstName'), watch('lastName'), setValue]);
 
   const onSubmit = async (data: TherapistTeamMember) => {
-      const sanitizedData = {
+    console.log('Submit clicked, data:', data);
+    const sanitizedData: TherapistTeamMember = {
       ...data,
       payment_methods: data.payment_methods.filter(Boolean),
-      faq: data.faq.filter(Boolean),
+      faq: faqs,
       availability: data.availability.filter(slot => slot.day && slot.startTime && slot.endTime),
       languagesSpoken: data.languagesSpoken.filter(Boolean),
     };
-    let success = false;
-    if (editId) {
-      success = await updateTherapistTeamMember(editId, { ...data, faq: faqs });
-    } else {
-      success = await createTherapistTeamMember({ ...data, faq: faqs });
-    }
-    if (success) {
-      showNotification({ message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`, variant: 'success' });
-      router.push('/teams/teams-list');
-    } else {
-      showNotification({ message: 'Something Went Wrong', variant: 'danger' });
+
+    const apiPayload = {
+      ...sanitizedData,
+      faq: sanitizedData.faq, // keep as array of objects
+    };
+
+    try {
+      console.log('Calling API...');
+      const success = editId
+        ? await updateTherapistTeamMember(editId, apiPayload)
+        : await createTherapistTeamMember(apiPayload);
+      console.log('API call returned:', success);
+
+      if (success) {
+        console.log('Show success notification');
+        showNotification({ message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`, variant: 'success' });
+        router.push('/teams/teams-list');
+      } else {
+        console.log('Show failure notification');
+        showNotification({ message: 'Something Went Wrong', variant: 'danger' });
+      }
+    } catch (error) {
+      console.error('Error in onSubmit:', error);
+      showNotification({ message: 'Submission failed due to error', variant: 'danger' });
     }
   };
+
+
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -346,23 +358,22 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Languages Spoken</Form.Label>
-                {languages.map(({ _id, label }) => (
+                {languages.map(({ id, language_name }) => (
                   <Form.Check
-                    key={_id}
+                    key={id}
                     type="checkbox"
-                    label={label}
-                    checked={watch('languagesSpoken').includes(_id)}
+                    label={language_name}
+                    checked={selectedLanguages.includes(id.toString())}
                     onChange={(e) => {
-                      const current = watch('languagesSpoken');
+                      const current = selectedLanguages || [];
                       if (e.target.checked) {
-                        setValue('languagesSpoken', [...current, _id]);
+                        setValue('languagesSpoken', [...current, id.toString()]);
                       } else {
-                        setValue('languagesSpoken', current.filter((l) => l !== _id));
+                        setValue('languagesSpoken', current.filter(langId => langId !== id.toString()));
                       }
                     }}
                   />
                 ))}
-                {errors.languagesSpoken && <div className="text-danger">{errors.languagesSpoken.message}</div>}
               </Form.Group>
             </Col>
 
@@ -429,9 +440,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                       </Button>
                     </Col>
                   </Row>
-                  ))}
+                ))}
                 <Button variant="outline-primary" onClick={() => setFaqs([...faqs, { question: '', answer: '' }])}>
-                    Add FAQ
+                  Add FAQ
                 </Button>
               </Form.Group>
             </Col>
@@ -507,17 +518,27 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Specializations (comma-separated IDs)</Form.Label>
-                <Form.Control
-                  type="text"
-                  placeholder="Ex: 1,2,3"
-                  {...register('specializationIds')}
-                  onChange={(e) => {
-                    setValue(
-                      'specializationIds',
-                      e.target.value
-                        .split(',')
-                        .map((id) => Number(id.trim()))
-                        .filter((id) => !isNaN(id))
+                <Controller
+                  control={control}
+                  name="specializationIds"
+                  render={({ field: { value, onChange } }) => {
+                    const stringValue = Array.isArray(value) ? value.join(',') : '';
+                    return (
+                      <Form.Control
+                        type="text"
+                        placeholder="Ex: 1,2,3"
+                        value={stringValue}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          onChange(
+                            val
+                              .split(',')
+                              .map((id) => Number(id.trim()))
+                              .filter((id) => !isNaN(id))
+                          );
+                        }}
+                        isInvalid={!!errors.specializationIds}
+                      />
                     );
                   }}
                 />
@@ -550,19 +571,19 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           </Row>
 
           <div className="mb-3 rounded">
-              <Row className="justify-content-end g-2 mt-2">
-                  <Col lg={2}>
-                    <Button variant="primary" type="submit" className="w-100">
-                      {editId ? 'Mise à jour' : 'Créer'} Therapist Team
-                    </Button>
-                  </Col>
-                  <Col lg={2}>
-                    <Button variant="danger" className="w-100" onClick={() => router.back()}>
-                      Annuler
-                    </Button>
-                  </Col>
-              </Row>
-            </div>
+            <Row className="justify-content-end g-2 mt-2">
+              <Col lg={2}>
+                <Button variant="primary" type="submit" className="w-100">
+                  {editId ? 'Mise à jour' : 'Créer'} Therapist Team
+                </Button>
+              </Col>
+              <Col lg={2}>
+                <Button variant="danger" className="w-100" onClick={() => router.back()}>
+                  Annuler
+                </Button>
+              </Col>
+            </Row>
+          </div>
         </CardBody>
       </Card>
     </form>
