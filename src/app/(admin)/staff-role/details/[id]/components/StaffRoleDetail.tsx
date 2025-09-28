@@ -28,7 +28,7 @@ const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
             </div>
           </div>
           <div className="d-flex gap-1">
-            <Button
+            {/* <Button
               variant="dark"
               className="avatar-sm d-flex align-items-center justify-content-center fs-20"
               onClick={() => handleEditClick(data._id)}
@@ -36,7 +36,7 @@ const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
               <span>
                 <IconifyIcon icon="ri:edit-fill" />
               </span>
-            </Button>
+            </Button> */}
           </div>
         </div>
 

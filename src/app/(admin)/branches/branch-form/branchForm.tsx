@@ -173,7 +173,7 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
                   'Créer Succursale'
                 )}
               </Button>
-              <Button variant="secondary" onClick={() => router.back()}>
+              <Button variant="danger" onClick={() => router.back()}>
                 Annuler
               </Button>
             </div>

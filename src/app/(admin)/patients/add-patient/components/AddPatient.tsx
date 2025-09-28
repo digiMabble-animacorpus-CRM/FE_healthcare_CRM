@@ -132,7 +132,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
             ...patient,
             phones: patient.phones?.length ? patient.phones : [''],
 
-            
             language: patient.language ? String(patient.language) : '',
           };
 
@@ -382,23 +381,22 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               />
             </Col>
           </Row>
+          <div className="mb-3 rounded">
+            <Row className="justify-content-end g-2 mt-2">
+              <Col lg={2}>
+                <Button variant="primary" type="submit" className="w-100">
+                  {isEditMode ? 'Mise à jour' : 'Créer'} Patient
+                </Button>
+              </Col>
+              <Col lg={2}>
+                <Button variant="danger" className="w-100" onClick={() => router.back()}>
+                  Annuler
+                </Button>
+              </Col>
+            </Row>
+          </div>
         </CardBody>
       </Card>
-
-      <div className="mb-3 rounded">
-        <Row className="justify-content-end g-2 mt-2">
-          <Col lg={2}>
-            <Button variant="primary" type="submit" className="w-100">
-              {isEditMode ? 'Mise à jour' : 'Créer'} Patient
-            </Button>
-          </Col>
-          <Col lg={2}>
-            <Button variant="danger" className="w-100" onClick={() => router.back()}>
-              Annuler
-            </Button>
-          </Col>
-        </Row>
-      </div>
     </Form>
   );
 };
