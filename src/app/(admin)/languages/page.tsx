@@ -1,44 +1,78 @@
 'use client';
 
-import PageTitle from '@/components/PageTitle';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { getLanguages } from '@/helpers/languages';
-import type { LanguageType } from '@/types/data';
-import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import {
-  Button,
+  Row,
+  Col,
   Card,
+  CardHeader,
   CardBody,
   CardFooter,
-  CardHeader,
   CardTitle,
-  Col,
-  Modal,
-  Row,
+  Button,
   Spinner,
+  Modal,
 } from 'react-bootstrap';
+import { useRouter } from 'next/navigation';
+import PageTitle from '@/components/PageTitle';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { API_BASE_PATH } from '@/context/constants';
+import axios from 'axios';
+
+export interface LanguageType {
+  id: number;
+  language_name: string;
+  language_description: string;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 const PAGE_LIMIT = 10;
 
 const LanguageListPage = () => {
-  const [languages, setLanguages] = useState<LanguageType[]>([]);
-  const [totalPages, setTotalPages] = useState(1);
-  const [currentPage, setCurrentPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const router = useRouter();
+  const [languages, setLanguages] = useState<LanguageType[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedLanguageId, setSelectedLanguageId] = useState<number | null>(null);
+
+  const token = localStorage.getItem('access_token');
 
   const fetchLanguages = async (page: number) => {
     setLoading(true);
     try {
-      const response = await getLanguages(page, PAGE_LIMIT, searchTerm);
-      setLanguages(response.data);
-      setTotalPages(Math.ceil(response.totalCount / PAGE_LIMIT));
+      const res = await axios.get(`${API_BASE_PATH}/languages`, {
+        params: {
+          page,
+          limit: PAGE_LIMIT,
+          search: searchTerm,
+        },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      // check backend structure
+      const data = res.data;
+
+      // if backend sends array directly
+      if (Array.isArray(data)) {
+        setLanguages(data);
+        setTotalPages(1);
+      }
+      // if backend sends { data: [...], totalCount: n }
+      else {
+        setLanguages(data.data || []);
+        setTotalPages(Math.ceil((data.totalCount || 0) / PAGE_LIMIT));
+      }
     } catch (error) {
-      console.error('Failed to fetch enquiries data:', error);
+      console.error('Failed to fetch languages:', error);
+      setLanguages([]);
+      setTotalPages(1);
     } finally {
       setLoading(false);
     }
@@ -49,40 +83,60 @@ const LanguageListPage = () => {
   }, [currentPage, searchTerm]);
 
   const handlePageChange = (page: number) => {
-    if (page !== currentPage) {
-      setCurrentPage(page);
-    }
+    if (page < 1 || page > totalPages) return;
+    setCurrentPage(page);
   };
 
-  const handleEditClick = (id: string) => {
-    router.push(`languages/language-form/${id}/edit`);
+  const handleEditClick = (id: number) => {
+    router.push(`/languages/language-form/edit/${id}`);
   };
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedPatientId(id);
+  const handleDeleteClick = (id: number) => {
+    setSelectedLanguageId(id);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedPatientId) return;
-
+    if (!selectedLanguageId) return;
     try {
-      await fetch(`/api/languages/${selectedPatientId}`, {
-        method: 'DELETE',
+      await axios.delete(`${API_BASE_PATH}/languages/${selectedLanguageId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
-
-      fetchLanguages(currentPage); // refresh list
+      fetchLanguages(currentPage);
     } catch (error) {
-      console.error('Failed to delete enquiries:', error);
+      console.error('Failed to delete language:', error);
     } finally {
       setShowDeleteModal(false);
-      setSelectedPatientId(null);
+      setSelectedLanguageId(null);
+    }
+  };
+
+  const handleToggleStatus = async (id: number, newStatus: boolean) => {
+    try {
+      await axios.patch(
+        `${API_BASE_PATH}/languages/${id}`,
+        { is_active: newStatus },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      setLanguages((prev) =>
+        prev.map((lang) => (lang.id === id ? { ...lang, is_active: newStatus } : lang)),
+      );
+    } catch (error) {
+      console.error('Failed to update status:', error);
     }
   };
 
   return (
     <>
       <PageTitle subName="Langues" title="Liste des langues" />
+
       <Row>
         <Col xl={12}>
           <Card>
@@ -96,7 +150,7 @@ const LanguageListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Rechercher par nom, email, numéro..."
+                    placeholder="Rechercher par nom..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -104,6 +158,7 @@ const LanguageListPage = () => {
                     }}
                   />
                 </div>
+
                 <Button
                   variant="primary"
                   onClick={() => router.push('/languages/language-form/create')}
@@ -124,33 +179,34 @@ const LanguageListPage = () => {
                     <thead className="bg-light-subtle">
                       <tr>
                         <th>Non</th>
-                        <th>Clé</th>
-                        <th>Étiquette</th>
-                        <th>Action</th>
+                        <th>Nom</th>
+                        <th>Description</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {languages.map((item: LanguageType, idx: number) => (
-                        <tr key={idx}>
+                      {languages.map((item, idx) => (
+                        <tr key={item.id}>
                           <td>{idx + 1}</td>
-                          <td>{item.key}</td>
-                          <td>{item.label}</td>
+                          <td>{item.language_name}</td>
+                          <td>{item.language_description}</td>
                           <td>
-                            <div className="d-flex gap-2">
+                            <div className="d-flex gap-2 align-items-center">
                               <Button
                                 variant="soft-primary"
                                 size="sm"
-                                onClick={() => handleEditClick(item._id)}
+                                onClick={() => handleEditClick(item.id)}
                               >
                                 <IconifyIcon
                                   icon="solar:pen-2-broken"
                                   className="align-middle fs-18"
                                 />
                               </Button>
+
                               <Button
                                 variant="soft-danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(item._id)}
+                                onClick={() => handleDeleteClick(item.id)}
                               >
                                 <IconifyIcon
                                   icon="solar:trash-bin-minimalistic-2-broken"
@@ -209,12 +265,12 @@ const LanguageListPage = () => {
         </Col>
       </Row>
 
-      {/* Delete Confirmation Modal */}
+      {/* Delete Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce client ?</Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer cette langue ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Annuler

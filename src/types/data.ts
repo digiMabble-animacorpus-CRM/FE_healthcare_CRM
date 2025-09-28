@@ -236,11 +236,11 @@ export type AvailabilitySlot = {
   to: string; // "14:00"
 };
 
-export type LanguageType = {
-  _id: string;
-  key: string;
-  label: string;
-};
+// export type LanguageType = {
+//   _id: string;
+//   key: string;
+//   label: string;
+// };
 
 export type Language = 'french' | 'dutch' | 'english';
 
@@ -760,3 +760,10 @@ export type TherapistShortType = {
 };
 
 
+export interface LanguageType {
+  id: number;
+  language_name: string;
+  language_description: string;
+  created_at: string;
+  updated_at: string;
+}

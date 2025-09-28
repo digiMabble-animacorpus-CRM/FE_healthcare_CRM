@@ -22,7 +22,7 @@ import {
   Spinner,
 } from 'react-bootstrap';
 
-const PAGE_SIZE = 500;
+const PAGE_SIZE = 100;
 
 const PatientsListPage = () => {
   const [allPatients, setAllPatients] = useState<PatientType[]>([]);
@@ -298,6 +298,7 @@ const PatientsListPage = () => {
 
             <CardFooter>
               <ul className="pagination justify-content-end mb-0">
+                {/* Previous Button */}
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
                   <Button
                     variant="link"
@@ -307,17 +308,51 @@ const PatientsListPage = () => {
                     Précédent
                   </Button>
                 </li>
-                {Array.from({ length: totalPages }).map((_, idx) => (
-                  <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
+
+                {/* Always show first page */}
+                <li className={`page-item ${currentPage === 1 ? 'active' : ''}`}>
+                  <Button variant="link" className="page-link" onClick={() => handlePageChange(1)}>
+                    1
+                  </Button>
+                </li>
+
+                {/* Left dots */}
+                {currentPage > 3 && (
+                  <li className="page-item disabled">
+                    <span className="page-link">...</span>
+                  </li>
+                )}
+
+                {/* Current Page (if not first/last) */}
+                {currentPage !== 1 && currentPage !== totalPages && (
+                  <li className="page-item active">
+                    <Button variant="link" className="page-link">
+                      {currentPage}
+                    </Button>
+                  </li>
+                )}
+
+                {/* Right dots */}
+                {currentPage < totalPages - 2 && (
+                  <li className="page-item disabled">
+                    <span className="page-link">...</span>
+                  </li>
+                )}
+
+                {/* Always show last page */}
+                {totalPages > 1 && (
+                  <li className={`page-item ${currentPage === totalPages ? 'active' : ''}`}>
                     <Button
                       variant="link"
                       className="page-link"
-                      onClick={() => handlePageChange(idx + 1)}
+                      onClick={() => handlePageChange(totalPages)}
                     >
-                      {idx + 1}
+                      {totalPages}
                     </Button>
                   </li>
-                ))}
+                )}
+
+                {/* Next Button */}
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
                   <Button
                     variant="link"

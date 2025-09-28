@@ -172,7 +172,7 @@ const PatientDetailsPage = () => {
 
   return (
     <>
-      <PageTitle subName="Healthcare" title="Aperçu des patients" />
+      <PageTitle subName="Patient" title="Aperçu des patients" />
       <PatientDetails
         id={data.id}
         name={`${data.firstname} ${data.lastname}`}
