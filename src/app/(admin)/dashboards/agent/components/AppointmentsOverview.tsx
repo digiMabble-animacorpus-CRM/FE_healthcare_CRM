@@ -1,5 +1,5 @@
-
 'use client';
+import { useRouter } from 'next/navigation'; // ✅ import router
 
 import dayjs from 'dayjs';
 import dynamic from 'next/dynamic';
@@ -52,6 +52,8 @@ export type AppointmentDistributionItem = {
 const AVATARS = [avatar1, avatar2, avatar3, avatar4];
 
 const AppointmentsOverview = () => {
+  const router = useRouter(); // ✅ instantiate router
+
   const [selectedDoctor, setSelectedDoctor] = useState<string>('All Doctors');
   const [selectedBranch, setSelectedBranch] = useState<string>('All Branches');
   const [chartMode, setChartMode] = useState<'doctor' | 'branch'>('doctor');
@@ -109,7 +111,6 @@ const AppointmentsOverview = () => {
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
       setDoctors(data?.data || []);
-      console.log('Fetched doctors:', data?.data || []);
     } catch (err) {
       console.error('Error fetching therapists', err);
     }
@@ -200,32 +201,42 @@ const AppointmentsOverview = () => {
             <p className="text-muted mb-0">Résumé basé sur le filtre</p>
           </div>
 
-          {/* ✅ Date Filter Dropdown */}
-          <Dropdown>
-            <DropdownToggle
-              className="btn btn-sm btn-outline-white d-flex align-items-center"
-              id="dateFilter"
+          <div className="d-flex align-items-center gap-2">
+            {/* ✅ Calendar redirect icon */}
+            <button
+              className="btn btn-sm btn-outline-secondary d-flex align-items-center"
+              onClick={() => router.push('/appointments/appointment-list')}
             >
-              <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
-              {dateFilter.replace('_', ' ').toUpperCase()}
-            </DropdownToggle>
-            <DropdownMenu>
-              {[
-                { label: 'This Week', value: 'this_week' },
-                { label: 'Last Week', value: 'last_week' },
-                { label: 'This Month', value: 'this_month' },
-                { label: 'Last Month', value: 'last_month' },
-              ].map((f) => (
-                <DropdownItem
-                  key={f.value}
-                  onClick={() => setDateFilter(f.value as any)}
-                  active={dateFilter === f.value}
-                >
-                  {f.label}
-                </DropdownItem>
-              ))}
-            </DropdownMenu>
-          </Dropdown>
+              <IconifyIcon icon="ri:calendar-line" width={18} />
+            </button>
+
+            {/* ✅ Date Filter Dropdown */}
+            <Dropdown>
+              <DropdownToggle
+                className="btn btn-sm btn-outline-white d-flex align-items-center"
+                id="dateFilter"
+              >
+                <IconifyIcon icon="mdi:calendar-clock" width={18} className="me-1" />
+                {dateFilter.replace('_', ' ').toUpperCase()}
+              </DropdownToggle>
+              <DropdownMenu>
+                {[
+                  { label: 'This Week', value: 'this_week' },
+                  { label: 'Last Week', value: 'last_week' },
+                  { label: 'This Month', value: 'this_month' },
+                  { label: 'Last Month', value: 'last_month' },
+                ].map((f) => (
+                  <DropdownItem
+                    key={f.value}
+                    onClick={() => setDateFilter(f.value as any)}
+                    active={dateFilter === f.value}
+                  >
+                    {f.label}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+          </div>
         </CardHeader>
 
         <CardBody>
@@ -241,10 +252,7 @@ const AppointmentsOverview = () => {
                     All Doctors
                   </DropdownItem>
                   {doctors.map((doc) => (
-                    <DropdownItem
-                      key={doc.id}
-                      onClick={() => setSelectedDoctor(doc.id)}
-                    >
+                    <DropdownItem key={doc.id} onClick={() => setSelectedDoctor(doc.id)}>
                       {doc.name}
                     </DropdownItem>
                   ))}
@@ -261,10 +269,7 @@ const AppointmentsOverview = () => {
                     All Branches
                   </DropdownItem>
                   {branches.map((br) => (
-                    <DropdownItem
-                      key={br.id}
-                      onClick={() => setSelectedBranch(br.id)}
-                    >
+                    <DropdownItem key={br.id} onClick={() => setSelectedBranch(br.id)}>
                       {br.name}
                     </DropdownItem>
                   ))}
