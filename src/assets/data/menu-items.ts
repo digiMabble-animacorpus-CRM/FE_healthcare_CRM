@@ -128,7 +128,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
   {
     key: 'branchs',
-    label: 'succursales',
+    label: 'Succursales',
     icon: 'ri-building-2-line',
     url: '/branches',
   },
