@@ -236,7 +236,7 @@ const PatientInfoCard = ({
 
         {mode === 'search' && (
           <div className="mb-4">
-            <div className="d-flex mb-3 gap-2">
+            <div className="d-flex flex-column flex-md-row mb-3 gap-2">
               <input
                 type="text"
                 className="form-control"

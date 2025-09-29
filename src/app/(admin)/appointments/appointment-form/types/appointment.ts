@@ -54,6 +54,8 @@ export interface PatientType {
   }
   
   export interface TherapistType {
+    department: any;
+    branches: any;
     therapistId: number;
     firstName: string;
     lastName: string;
