@@ -6,7 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Card, CardBody, Col, Row, Table } from 'react-bootstrap';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
 type ProfileDetailsProps = {
   team_id: string;
@@ -14,29 +14,20 @@ type ProfileDetailsProps = {
   first_name: string;
   full_name: string;
   job_1: string;
-  job_2?: string;
-  job_3?: string;
-  job_4?: string;
-  specific_audience?: string;
-  specialization_1?: string;
-  who_am_i?: string;
-  consultations?: string;
-  office_address?: string;
   contact_email?: string;
   contact_phone?: string;
-  schedule?: { text: string };
-  about?: string;
+  schedule?: { array: { day: string; startTime: string; endTime: string }[]; text: string };
   languages_spoken?: string[];
   payment_methods?: string[];
   diplomas_and_training?: string[];
   specializations?: string[];
+  who_am_i?: string;
   website?: string;
+  about?: string;
+  consultations?: string;
   frequently_asked_questions?: string;
-  calendar_links?: string[];
   photo?: string;
 };
-
-const daysOfWeek = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
 
 const ProfileDetails = () => {
   const router = useRouter();
@@ -46,51 +37,59 @@ const ProfileDetails = () => {
     const fetchProfile = async () => {
       try {
         const token = localStorage.getItem('access_token');
-        if (!token) {
-          console.warn('No access token found');
-          return;
-        }
+        if (!token) return;
 
         const res = await axios.get(`${API_BASE_PATH}/profile`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         });
-        console.log('Profile API Response:', res.data);
-        const apiProfile = res.data?.user?.team;
-        if (!apiProfile) {
-          console.error('No team object in API response');
-          return;
+
+        const apiProfile = res.data?.therapistTeamMembers;
+        if (!apiProfile) return;
+
+        // Normalize FAQ
+        let faqString = '';
+        try {
+          if (typeof apiProfile.faq === 'string') {
+            // Try parsing JSON string
+            const parsed = JSON.parse(apiProfile.faq);
+            if (Array.isArray(parsed)) {
+              faqString = parsed.join('\r\n');
+            } else {
+              faqString = apiProfile.faq;
+            }
+          }
+        } catch {
+          faqString = String(apiProfile.faq || '');
         }
 
         const normalized: ProfileDetailsProps = {
-          team_id: apiProfile.team_id,
-          last_name: apiProfile.last_name,
-          first_name: apiProfile.first_name,
-          full_name: apiProfile.full_name,
-          job_1: apiProfile.job_1,
-          job_2: apiProfile.job_2,
-          job_3: apiProfile.job_3,
-          job_4: apiProfile.job_4,
-          specific_audience: apiProfile.specific_audience,
-          specialization_1: apiProfile.specialization_1,
-          who_am_i: apiProfile.who_am_i,
-          consultations: apiProfile.consultations,
-          office_address: apiProfile.office_address,
-          contact_email: apiProfile.contact_email,
-          contact_phone: apiProfile.contact_phone,
-          schedule: apiProfile.schedule,
-          about: apiProfile.about,
-          languages_spoken: apiProfile.languages_spoken || [],
+          team_id: apiProfile.therapistId?.toString() || '',
+          last_name: apiProfile.lastName || '',
+          first_name: apiProfile.firstName || '',
+          full_name: apiProfile.fullName || '',
+          job_1: '',
+          contact_email: apiProfile.contactEmail || '',
+          contact_phone: apiProfile.contactPhone || '',
+          schedule: {
+            array: apiProfile.availability || [],
+            text: apiProfile.availability
+              ? apiProfile.availability.map((a: any) => `${a.day} ${a.startTime}-${a.endTime}`).join('\n')
+              : '',
+          },
+          languages_spoken: apiProfile.languagesSpoken || [],
           payment_methods: apiProfile.payment_methods || [],
-          diplomas_and_training: apiProfile.diplomas_and_training || [],
+          diplomas_and_training: apiProfile.degreesTraining
+            ? apiProfile.degreesTraining.split('\r\n').filter((d: string) => d.trim() !== '')
+            : [],
           specializations: apiProfile.specializations || [],
-          website: apiProfile.website,
-          frequently_asked_questions: apiProfile.frequently_asked_questions,
-          calendar_links: apiProfile.calendar_links || [],
-          photo: apiProfile.photo || '',
+          who_am_i: apiProfile.aboutMe || '',
+          website: apiProfile.website || '',
+          about: apiProfile.aboutMe || '',
+          consultations: apiProfile.consultations || '',
+          frequently_asked_questions: faqString,
+          photo: apiProfile.imageUrl || '',
         };
+
         setProfileData(normalized);
       } catch (err) {
         console.error('Error fetching profile:', err);
@@ -100,17 +99,13 @@ const ProfileDetails = () => {
     fetchProfile();
   }, []);
 
-  if (!profileData) {
-    return <p>Check the User profile...</p>;
-  }
+  if (!profileData) return <p>Check the User profile...</p>;
 
   const {
     full_name,
     job_1,
     contact_email,
     contact_phone,
-    office_address,
-    consultations,
     about,
     languages_spoken = [],
     payment_methods = [],
@@ -118,91 +113,39 @@ const ProfileDetails = () => {
     specializations = [],
     who_am_i,
     website,
-    frequently_asked_questions,
+    consultations,
     schedule,
     photo,
+    frequently_asked_questions,
   } = profileData;
 
-  const renderSchedule = (text: string) => {
-    const lines = text.split(/\r?\n/).filter((l) => l.trim() !== '');
+  const formatTime = (time: string, type: 'am' | 'pm') => {
+    const [h, m] = time.split(':').map(Number);
+    let hour = h;
+    if (hour > 12) hour -= 12;
+    if (hour === 0) hour = 12;
+    return `${hour.toString().padStart(2, '0')}:${m.toString().padStart(2, '0')} ${type.toUpperCase()}`;
+  };
 
-    const phoneMatch = text.match(/(\d{3,4}\/\d{2}\.\d{2}\.\d{2})/);
-    const emailMatch = text.match(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-z]{2,}/);
-
-    const branchPairs: { branch: string; address: string }[] = [];
-    for (let i = 0; i < lines.length - 1; i++) {
-      let current = lines[i];
-      const next = lines[i + 1];
-
-      if (/Gembloux|Namur|Anima Corpus|Soul Body/i.test(current) && /\d{4}/.test(next)) {
-        current = current.replace(/^.*?(Anima Corpus.*|Soul Body.*|Gembloux.*)$/i, '$1').trim();
-
-        branchPairs.push({ branch: current, address: next });
-        i++;
-      }
-    }
-
+  const renderSchedule = (schedule: ProfileDetailsProps['schedule']) => {
     return (
-      <div>
-        <div className="mb-3">
-          {daysOfWeek.map((day) => {
-            const regex = new RegExp(day, 'i');
-            if (regex.test(text)) {
-              return (
-                <span
-                  key={day}
-                  className="badge bg-primary me-2 mb-2"
-                  style={{ fontSize: '0.85rem' }}
-                >
-                  {day.charAt(0).toUpperCase() + day.slice(1)}
-                </span>
-              );
-            }
-            return null;
-          })}
-        </div>
-
-        <div className="mb-3">
-          {phoneMatch && (
-            <p>
-              <strong>Téléphone:</strong> {phoneMatch[0]}
-            </p>
-          )}
-          {emailMatch && (
-            <p>
-              <strong>Email:</strong> {emailMatch[0]}
-            </p>
-          )}
-        </div>
-
-        {branchPairs.length > 0 && (
-          <div>
-            <h6 className="fw-semibold">Nos Cabinets :</h6>
-            <Table striped bordered hover responsive>
-              <thead>
-                <tr>
-                  <th>Branch</th>
-                  <th>Adresse</th>
-                </tr>
-              </thead>
-              <tbody>
-                {branchPairs.map((b, idx) => (
-                  <tr key={idx}>
-                    <td>{b.branch}</td>
-                    <td>{b.address}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
+      <div className="mb-3 d-flex flex-wrap gap-2">
+        {schedule?.array?.map((a, idx) => (
+          <div key={idx} className="d-flex align-items-center gap-2">
+            <span className="badge bg-primary" style={{ fontSize: '0.85rem' }}>
+              {a.day}
+            </span>
+            <span style={{ fontSize: '0.85rem' }}>
+              {formatTime(a.startTime, 'am')} - {formatTime(a.endTime, 'pm')}
+            </span>
           </div>
-        )}
+        ))}
       </div>
     );
   };
 
   return (
     <div>
-      {/* Profile Header */}
       <Card className="mb-4">
         <CardBody>
           <div className="d-flex align-items-center gap-3">
@@ -248,17 +191,10 @@ const ProfileDetails = () => {
 
           <Row className="my-4">
             <Col lg={6}>
-              <p className="fw-semibold mb-1">Adresse du bureau:</p>
-              <p>{office_address || '-'}</p>
-            </Col>
-            <Col lg={6}>
               <p className="fw-semibold mb-1">Consultations:</p>
               <p>{consultations || '-'}</p>
             </Col>
-          </Row>
-
-          <Row className="my-4">
-            <Col lg={12}>
+            <Col lg={6}>
               <p className="fw-semibold mb-1">À propos:</p>
               <p>{about || '-'}</p>
             </Col>
@@ -275,7 +211,7 @@ const ProfileDetails = () => {
             </Col>
             <Col lg={6}>
               <p className="fw-semibold mb-1">Calendrier:</p>
-              {schedule?.text ? renderSchedule(schedule.text) : <span>-</span>}
+              {schedule?.array?.length ? renderSchedule(schedule) : <span>-</span>}
             </Col>
           </Row>
 
@@ -328,13 +264,15 @@ const ProfileDetails = () => {
               )}
             </Col>
           </Row>
+
+          {/* FAQ Section with Question/Answer pairing */}
           <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Questions fréquemment posées:</p>
               {frequently_asked_questions ? (
                 <ol style={{ paddingLeft: '1.2rem' }}>
                   {(() => {
-                    const lines = frequently_asked_questions
+                    const lines = (frequently_asked_questions || '')
                       .split('\r\n')
                       .filter((line) => line.trim() !== '');
                     const items: { question: string; answer: string }[] = [];
@@ -365,3 +303,4 @@ const ProfileDetails = () => {
 };
 
 export default ProfileDetails;
+
