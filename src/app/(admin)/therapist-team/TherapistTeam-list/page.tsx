@@ -119,10 +119,10 @@ const TherapistTeamsListPage = () => {
   const currentData = allTeamMembers;
 
   const handleView = (id: string) => {
-    router.push(`/therapist-teams/details/${id}`);
+    router.push(`/therapist-team/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => router.push(`/teams/edit-TherapistTeam/${id}`);
+  const handleEditClick = (id: string) => router.push(`/therapist-team/edit-TherapistTeam/${id}`);
 
   const handleDeleteClick = (id: string) => {
     setSelectedTeamId(id);

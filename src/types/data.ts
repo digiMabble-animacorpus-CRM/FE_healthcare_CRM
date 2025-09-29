@@ -652,6 +652,27 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
+  first_name: string;
+  last_name: string;
+  job_1: string | null | undefined;
+  job_2: string | null | undefined;
+  job_3: string | null | undefined;
+  job_4: string | null | undefined;
+  specific_audience: string | null | undefined;
+  specializations: string[];
+  who_am_i: string;
+  office_address: string;
+  contact_email: string;
+  contact_phone: string;
+  schedule: Record<string, string> | { text?: string | null | undefined; };
+  about: string;
+  languages_spoken: string[];
+  diplomas_and_training: string[];
+  frequently_asked_questions: string | Record<string, string> | FAQItem[];
+  calendar_links: string[];
+  photo: string;
+  branches: never[];
+  primary_branch_id: number;
   team_id: string;
   firstName: string;
   lastName: string;

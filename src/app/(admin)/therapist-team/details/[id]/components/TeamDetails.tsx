@@ -279,7 +279,8 @@ const TeamDetails = ({
       )}
 
       {/* Languages Spoken */}
-      {languages_spoken.length > 0 && (
+      {/* Languages Spoken */}
+      {languages_spoken?.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Langues parlées</h4>
@@ -295,7 +296,7 @@ const TeamDetails = ({
       )}
 
       {/* Payment Methods */}
-      {payment_methods.length > 0 && (
+      {payment_methods?.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Méthodes de paiement</h4>
@@ -311,7 +312,7 @@ const TeamDetails = ({
       )}
 
       {/* Diplomas & Training */}
-      {diplomas_and_training.length > 0 && (
+      {diplomas_and_training?.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Éducation et formation</h4>
@@ -327,7 +328,7 @@ const TeamDetails = ({
       )}
 
       {/* Specializations */}
-      {specializations.length > 0 && (
+      {specializations?.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Spécialisations</h4>
@@ -391,8 +392,7 @@ const TeamDetails = ({
       {/* Calendar Links */}
       <Card className="mb-4">
         <CardBody>
-          <h4>Liens du calendrier</h4>
-          {calendar_links.length > 0 ? (
+          {calendar_links?.length > 0 ? (
             <ul>
               {calendar_links.map((link, idx) => (
                 <li key={idx}>
