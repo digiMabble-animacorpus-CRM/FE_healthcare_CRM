@@ -70,7 +70,8 @@ export type PatientType = {
   emails: string;
   number: string;
   legalgender: string;
-  language: string;
+
+  languageId: number | string
   city: string;
   country: string;
   street: string;
