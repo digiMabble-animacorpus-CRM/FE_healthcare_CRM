@@ -54,7 +54,8 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     note: yup.string().optional(),
     zipcode: yup.string().optional(),
     legalgender: yup.string().optional(),
-    language: yup.string().optional(),
+    languageId: yup.string().optional(),
+
     city: yup.string().optional(),
     country: yup.string().optional(),
     ssin: yup.string(),
@@ -85,7 +86,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     emails: '',
     firstname: '',
     id: '',
-    language: '',
+    languageId: '',
     lastname: '',
     legalgender: '',
     middlename: '',
@@ -132,8 +133,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
             ...patient,
             phones: patient.phones?.length ? patient.phones : [''],
 
-            
-            language: patient.language ? String(patient.language) : '',
+            languageId: patient.languageId ? String(patient.languageId) : '',
           };
 
           setDefaultValues(mappedPatient);
@@ -150,6 +150,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     const payload = {
       ...data,
       phones: data.phones?.filter((p) => p.trim() !== '') ?? [],
+      languageId: data.languageId ? Number(data.languageId) : undefined,
     };
 
     try {
@@ -276,7 +277,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               <label className="form-label">{renderLabel('Langue')}</label>
               <Controller
                 control={control}
-                name="language"
+                name="languageId"
                 render={({ field }) => (
                   <select {...field} className="form-control">
                     <option value="" disabled hidden>
@@ -382,23 +383,22 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               />
             </Col>
           </Row>
+          <div className="mb-3 rounded">
+            <Row className="justify-content-end g-2 mt-2">
+              <Col lg={2}>
+                <Button variant="primary" type="submit" className="w-100">
+                  {isEditMode ? 'Mise à jour' : 'Créer'} Patient
+                </Button>
+              </Col>
+              <Col lg={2}>
+                <Button variant="danger" className="w-100" onClick={() => router.back()}>
+                  Annuler
+                </Button>
+              </Col>
+            </Row>
+          </div>
         </CardBody>
       </Card>
-
-      <div className="mb-3 rounded">
-        <Row className="justify-content-end g-2 mt-2">
-          <Col lg={2}>
-            <Button variant="primary" type="submit" className="w-100">
-              {isEditMode ? 'Mise à jour' : 'Créer'} Patient
-            </Button>
-          </Col>
-          <Col lg={2}>
-            <Button variant="danger" className="w-100" onClick={() => router.back()}>
-              Annuler
-            </Button>
-          </Col>
-        </Row>
-      </div>
     </Form>
   );
 };

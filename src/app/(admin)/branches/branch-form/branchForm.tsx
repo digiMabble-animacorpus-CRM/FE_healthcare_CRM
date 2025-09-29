@@ -13,13 +13,13 @@ import {
   Row,
   Form,
   Spinner,
+  Alert,
 } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
 import { API_BASE_PATH } from '@/context/constants';
 import axios from 'axios';
 import { useState } from 'react';
-import { toast } from 'react-toastify';
 
 export interface BranchFormValues {
   name: string;
@@ -45,6 +45,7 @@ interface Props {
 const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const methods = useForm<BranchFormValues>({
     resolver: yupResolver(schema),
@@ -62,22 +63,19 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
   const handleFormSubmit = async (data: BranchFormValues) => {
     try {
       setSubmitting(true);
+      setMessage(null);
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No access token found');
 
       if (isEditMode && defaultValues?.branch_id) {
-        // UPDATE branch
-        await axios.patch(
-          `${API_BASE_PATH}/branches/${defaultValues.branch_id}`,
-          data,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-        toast.success('Succursale mise à jour avec succès');
+        // UPDATE branch (no branch_id in body, only in URL)
+        await axios.patch(`${API_BASE_PATH}/branches/${defaultValues.branch_id}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        setMessage({ type: 'success', text: 'Succursale mise à jour avec succès.' });
       } else {
         // CREATE branch
         await axios.post(`${API_BASE_PATH}/branches`, data, {
@@ -86,13 +84,13 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
             'Content-Type': 'application/json',
           },
         });
-        toast.success('Succursale créée avec succès');
+        setMessage({ type: 'success', text: 'Succursale créée avec succès.' });
       }
 
-      router.push('/branches');
+      setTimeout(() => router.push('/branches'), 1500);
     } catch (error) {
       console.error(error);
-      toast.error(' Une erreur est survenue');
+      setMessage({ type: 'error', text: 'Une erreur est survenue. Veuillez réessayer.' });
     } finally {
       setSubmitting(false);
     }
@@ -107,8 +105,13 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
               {isEditMode ? 'Modifier les détails de la succursale' : 'Créer une nouvelle branche'}
             </CardTitle>
           </CardHeader>
-
           <CardBody>
+            {message && (
+              <Alert variant={message.type === 'success' ? 'success' : 'danger'}>
+                {message.text}
+              </Alert>
+            )}
+
             <Row className="mb-4">
               <Col lg={6} className="mb-3">
                 <TextFormInput
@@ -173,7 +176,7 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
                   'Créer Succursale'
                 )}
               </Button>
-              <Button variant="secondary" onClick={() => router.back()}>
+              <Button variant="danger" onClick={() => router.back()}>
                 Annuler
               </Button>
             </div>

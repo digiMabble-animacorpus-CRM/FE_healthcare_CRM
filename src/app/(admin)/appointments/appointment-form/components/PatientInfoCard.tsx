@@ -210,7 +210,7 @@ const PatientInfoCard = ({
 
   return (
     <Card className="shadow-sm">
-      <CardHeader className="bg-light">
+      <CardHeader className="h4">
         <CardTitle as="h4" className="mb-0">
           Patient Details
         </CardTitle>
@@ -570,12 +570,6 @@ const PatientInfoCard = ({
             </Form.Group>
 
             <div className="d-flex justify-content-end gap-2">
-              <Button
-                variant="outline-secondary"
-                onClick={() => (mode === 'edit' ? setMode('view') : handleReset())}
-              >
-                Annuler
-              </Button>
               <Button variant="primary" onClick={handleSave} disabled={loading}>
                 {loading ? (
                   <Spinner size="sm" animation="border" />
@@ -584,6 +578,12 @@ const PatientInfoCard = ({
                 ) : (
                   'Ajouter un patient'
                 )}
+              </Button>
+              <Button
+                variant="danger"
+                onClick={() => (mode === 'edit' ? setMode('view') : handleReset())}
+              >
+                Annuler
               </Button>
             </div>
           </Form>
