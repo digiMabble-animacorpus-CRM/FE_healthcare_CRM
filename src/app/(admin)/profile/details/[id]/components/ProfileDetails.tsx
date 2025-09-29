@@ -201,22 +201,23 @@ const ProfileDetails = () => {
           </Row>
 
           <Row className="my-4">
-            <Col lg={3}>
+            <Col lg={6}>
               <p className="fw-semibold mb-1">Langues parlées:</p>
               <p>{languages_spoken.join(', ') || '-'}</p>
             </Col>
-            <Col lg={3}>
+            <Col lg={6}>
               <p className="fw-semibold mb-1">Méthodes de paiement:</p>
               <p>{payment_methods.join(', ') || '-'}</p>
             </Col>
+            
+          </Row>
+
+          <Row className="my-4">
             <Col lg={6}>
               <p className="fw-semibold mb-1">Calendrier:</p>
               {schedule?.array?.length ? renderSchedule(schedule) : <span>-</span>}
             </Col>
-          </Row>
-
-          <Row className="my-4">
-            <Col lg={12}>
+            <Col lg={6}>
               <p className="fw-semibold mb-1">Diplômes / Formation:</p>
               {diplomas_and_training.length > 0 ? (
                 <ul>
@@ -230,7 +231,7 @@ const ProfileDetails = () => {
             </Col>
           </Row>
 
-          <Row className="my-4">
+          {/* <Row className="my-4">
             <Col lg={12}>
               <p className="fw-semibold mb-1">Spécialisations:</p>
               {specializations.length > 0 ? (
@@ -243,7 +244,7 @@ const ProfileDetails = () => {
                 <span>-</span>
               )}
             </Col>
-          </Row>
+          </Row> */}
 
           <Row className="my-4">
             <Col lg={12}>
