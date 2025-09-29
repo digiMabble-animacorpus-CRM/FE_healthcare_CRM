@@ -5,8 +5,7 @@ import { API_BASE_PATH } from '@/context/constants';
 import { decryptAES } from '@/utils/encryption';
 
 // Fetch all therapist team members with revised query mapping
-export const 
-getAllTherapistTeamMembers = async (
+export const getAllTherapistTeamMembers = async (
   page: number = 1,
   limit: number = 10,
   branch?: string,
@@ -29,6 +28,7 @@ getAllTherapistTeamMembers = async (
       ...(search ? { searchText: search } : {}),
     };
     const queryParams = new URLSearchParams(filters).toString();
+
     const response = await fetch(`${API_BASE_PATH}/therapist-team?${queryParams}`, {
       method: 'GET',
       headers: {
@@ -36,16 +36,25 @@ getAllTherapistTeamMembers = async (
         'Content-Type': 'application/json',
       },
     });
+
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Backend error:', response.status, errorText);
       return { data: [], totalCount: 0 };
     }
+
     const jsonData = await response.json();
-    const teamData: TherapistTeamMember[] = Array.isArray(jsonData?.data) ? jsonData.data : [];
+
+    // ✅ Fix here
+    const teamData: TherapistTeamMember[] = Array.isArray(jsonData)
+      ? jsonData
+      : Array.isArray(jsonData?.data)
+        ? jsonData.data
+        : [];
+
     return {
       data: teamData,
-      totalCount: jsonData?.totalCount || 0,
+      totalCount: jsonData?.totalCount ?? teamData.length,
     };
   } catch (error) {
     console.error('Error fetching team members:', error);

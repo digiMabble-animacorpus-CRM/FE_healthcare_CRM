@@ -60,6 +60,7 @@ const TherapistTeamsListPage = () => {
         return null;
     }
   };
+
   const fetchTeamMembers = async (page = 1) => {
     setLoading(true);
     setError(null);
@@ -74,28 +75,35 @@ const TherapistTeamsListPage = () => {
         selectedBranch || undefined,
         from,
         to,
-        searchTerm || undefined
+        searchTerm || undefined,
       );
 
-      console.log('API Data:', response.data);
-      console.log('Total Count:', response.totalCount);
+      console.log('API RAW Response:', response);
 
-      if (!response.data || response.data.length === 0) {
+      const members = response?.data || [];
+      if (!members || members.length === 0) {
         setAllTeamMembers([]);
         setTotalCount(0);
       } else {
         setAllTeamMembers(
-          response.data.map((item: any) => ({
+          members.map((item: any) => ({
             ...item,
-            team_id: item.therapistId ?? item.team_id ?? item.id ?? '',
-          }))
+            team_id: item.therapistId ?? item.id ?? '',
+            firstName: item.firstName,
+            lastName: item.lastName,
+            contactEmail: item.contactEmail,
+            contactPhone: item.contactPhone,
+            branches: item.branches ?? [], // ✅ correct field
+            role: item.role,
+            status: item.status,
+            imageUrl: item.imageUrl,
+          })),
         );
-        setTotalCount(response.totalCount);
+        setTotalCount(response.totalCount ?? members.length);
       }
     } catch (err) {
       setError('Failed to fetch data');
-      
-      ([]);
+      setAllTeamMembers([]);
       setTotalCount(0);
     } finally {
       setLoading(false);
@@ -161,7 +169,6 @@ const TherapistTeamsListPage = () => {
           }}
         />
       );
-    // Fallback: first letter in a colored circle
     const initial = member.firstName ? member.firstName.trim().charAt(0).toUpperCase() : 'U';
     return (
       <div
@@ -248,7 +255,10 @@ const TherapistTeamsListPage = () => {
                 </div>
               ) : (
                 <div className="table-responsive">
-                  <table className="table table-hover table-sm table-centered mb-0" style={{ minWidth: 1100 }}>
+                  <table
+                    className="table table-hover table-sm table-centered mb-0"
+                    style={{ minWidth: 1100 }}
+                  >
                     <thead className="bg-light-subtle">
                       <tr>
                         <th style={{ width: 30 }}>Non</th>
@@ -275,30 +285,22 @@ const TherapistTeamsListPage = () => {
                           <tr key={item.team_id ?? `team-member-${idx}`}>
                             <td>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
                             <td>{getProfileDisplay(item)}</td>
-                            <td>{item.firstName}</td>
+                            <td>{item.firstName} {item.lastName}</td>
                             <td>{item.contactEmail}</td>
                             <td>{item.contactPhone}</td>
                             <td>
-                              {Array.isArray(item.branchIds)
-                                ? item.branchIds
-                                    .map((b) =>
-                                      typeof b === 'object' && b !== null && 'name' in b
-                                        ? (b as { name: string }).name
-                                        : typeof b === 'number'
-                                        ? b.toString()
-                                        : ''
-                                    )
-                                    .join(', ')
+                              {Array.isArray(item.branches)
+                                ? item.branches.map((b: any) => b.name).join(', ')
                                 : ''}
                             </td>
                             <td>
                               {item.role === 'super_admin'
                                 ? 'Super Admin'
                                 : item.role === 'staff'
-                                ? 'Staff'
-                                : item.role === 'admin'
-                                ? 'Admin'
-                                : item.role}
+                                  ? 'Staff'
+                                  : item.role === 'admin'
+                                    ? 'Admin'
+                                    : item.role}
                             </td>
                             <td>
                               <Badge
@@ -322,7 +324,9 @@ const TherapistTeamsListPage = () => {
                                 <Button
                                   variant="soft-primary"
                                   size="sm"
-                                  onClick={() => item.team_id && handleEditClick(item.team_id.toString())}
+                                  onClick={() =>
+                                    item.team_id && handleEditClick(item.team_id.toString())
+                                  }
                                   disabled={!item.team_id}
                                 >
                                   <IconifyIcon icon="solar:pen-2-broken" />
@@ -330,7 +334,9 @@ const TherapistTeamsListPage = () => {
                                 <Button
                                   variant="soft-danger"
                                   size="sm"
-                                  onClick={() => item.team_id && handleDeleteClick(item.team_id.toString())}
+                                  onClick={() =>
+                                    item.team_id && handleDeleteClick(item.team_id.toString())
+                                  }
                                   disabled={!item.team_id}
                                 >
                                   <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
@@ -349,19 +355,31 @@ const TherapistTeamsListPage = () => {
             <CardFooter>
               <ul className="pagination justify-content-end mb-0">
                 <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+                  <Button
+                    variant="link"
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage - 1)}
+                  >
                     Précédent
                   </Button>
                 </li>
                 {Array.from({ length: totalPages }, (_, idx) => (
                   <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
-                    <Button variant="link" className="page-link" onClick={() => handlePageChange(idx + 1)}>
+                    <Button
+                      variant="link"
+                      className="page-link"
+                      onClick={() => handlePageChange(idx + 1)}
+                    >
                       {idx + 1}
                     </Button>
                   </li>
                 ))}
                 <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                  <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+                  <Button
+                    variant="link"
+                    className="page-link"
+                    onClick={() => handlePageChange(currentPage + 1)}
+                  >
                     Suivant
                   </Button>
                 </li>
