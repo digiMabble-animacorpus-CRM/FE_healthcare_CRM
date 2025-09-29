@@ -80,12 +80,8 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
         },
       );
 
-      setMessage({ type: 'success', text: 'Department updated successfully!' });
-
-      // Optional: Redirect after a short delay
-      setTimeout(() => {
-        router.push('/department');
-      }, 1500);
+      // toast.success('Department updated successfully!');
+      router.push('/department');
     } catch (error) {
       console.error(error);
       setMessage({ type: 'error', text: 'Error updating department' });

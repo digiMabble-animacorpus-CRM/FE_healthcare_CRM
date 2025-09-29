@@ -98,7 +98,7 @@ const StaffRoleForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: P
               <Button type="submit" variant="primary">
                 {isEditMode ? 'Mise à jour' : 'Créer'} Rôle du personnel
               </Button>
-              <Button variant="secondary" onClick={() => router.back()}>
+              <Button variant="danger" onClick={() => router.back()}>
                 Annuler
               </Button>
             </div>
