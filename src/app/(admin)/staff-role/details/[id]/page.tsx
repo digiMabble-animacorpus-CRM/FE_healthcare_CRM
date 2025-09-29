@@ -2,7 +2,6 @@ import PageTitle from '@/components/PageTitle';
 import type { StaffRoleType } from '@/types/data';
 import { Col, Row } from 'react-bootstrap';
 import { Metadata } from 'next';
-import { getStaffRoleById } from '@/helpers/staff';
 import StaffRoleDetail from './components/StaffRoleDetail';
 
 export const metadata: Metadata = { title: 'Staff Role Overview' };
@@ -13,8 +12,18 @@ interface Props {
 
 const StaffRoleDetailsPage = async ({ params }: Props) => {
   const staffRoleId = params.id;
-  const response = await getStaffRoleById(staffRoleId);
-  const staffRoles: StaffRoleType[] = response.data;
+
+  // 👉 Dummy data instead of API
+  const staffRoles: StaffRoleType[] = [
+    {
+      id: staffRoleId,
+      role_name: 'Admin',
+      role_description: 'Has full access to all modules.',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+      // extra fields if StaffRoleType has more, add here with mock values
+    },
+  ];
 
   return (
     <>

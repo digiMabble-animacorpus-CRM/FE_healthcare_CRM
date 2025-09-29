@@ -1,42 +1,105 @@
-import { languageData } from '@/assets/data/languageData';
+import { API_BASE_PATH } from '@/context/constants';
 import { LanguageType } from '@/types/data';
 
-const sleep = (ms = 500) => new Promise((res) => setTimeout(res, ms));
 
-export const getAllLanguages = (): LanguageType[] => {
-  return languageData;
+export const getAllLanguages = async (): Promise<LanguageType[]> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) throw new Error('No access token found');
+
+    const res = await fetch(`${API_BASE_PATH}/languages`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch all languages. Status: ${res.status}`);
+    }
+
+    const response = await res.json();
+    console.log(" getAllLanguages raw API response:", response);
+
+    
+    return Array.isArray(response) ? response : response?.data || [];
+  } catch (error) {
+    console.error(' Error fetching all languages:', error);
+    return [];
+  }
 };
+
 
 export const getLanguages = async (
   page: number = 1,
   limit: number = 10,
-  search?: string,
+  search: string = ''
 ): Promise<{
   data: LanguageType[];
   totalCount: number;
 }> => {
-  await sleep(); // simulate delay
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) throw new Error('No access token found');
 
-  let filteredData = languageData;
+    const query = new URLSearchParams({
+      page: page.toString(),
+      limit: limit.toString(),
+      search: search,
+    });
 
-  if (search) {
-    const lowerSearch = search.toLowerCase();
-    filteredData = filteredData.filter((item) => item.label.toLowerCase().includes(lowerSearch));
+    const res = await fetch(`${API_BASE_PATH}/languages?${query.toString()}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch paginated languages. Status: ${res.status}`);
+    }
+
+    const response = await res.json();
+    console.log(" getLanguages paginated response:", response);
+
+    return {
+      data: response?.data || [],
+      totalCount: response?.totalCount || 0,
+    };
+  } catch (error) {
+    console.error(' Error fetching paginated languages:', error);
+    return { data: [], totalCount: 0 };
   }
-
-  const start = (page - 1) * limit;
-  const end = start + limit;
-  const paginatedData = filteredData.slice(start, end);
-
-  return {
-    data: paginatedData,
-    totalCount: filteredData.length,
-  };
 };
 
-export const getLanguageById = async (id?: string): Promise<{ data: LanguageType[] }> => {
-  await sleep();
-  if (!id) return { data: [] };
-  const result = languageData.filter((p) => p._id === id);
-  return { data: result };
+
+export const getLanguageById = async (
+  id?: string
+): Promise<{ data: LanguageType[] }> => {
+  try {
+    if (!id) return { data: [] };
+
+    const token = localStorage.getItem('access_token');
+    if (!token) throw new Error('No access token found');
+
+    const res = await fetch(`${API_BASE_PATH}/languages/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      throw new Error(`Failed to fetch language by ID. Status: ${res.status}`);
+    }
+
+    const response = await res.json();
+    console.log(" getLanguageById response:", response);
+
+    
+    return { data: response?.data ? [response.data] : [] };
+  } catch (error) {
+    console.error(' Error fetching language by ID:', error);
+    return { data: [] };
+  }
 };

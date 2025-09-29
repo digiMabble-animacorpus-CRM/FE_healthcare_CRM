@@ -1,5 +1,6 @@
 'use client';
 import { API_BASE_PATH } from '@/context/constants';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import { yupResolver } from '@hookform/resolvers/yup';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -55,7 +56,7 @@ interface TherapistFormInputs {
   departmentId?: number | null;
   specializationIds?: number[];
   branches?: BranchWithAvailability[];
-  languages?: any[]; // selected language IDs
+  languages?: any[];
   faq?: string | null;
   paymentMethods?: any[];
 }
@@ -63,28 +64,30 @@ interface TherapistFormInputs {
 const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
   firstName: yup.string().required('Le prénom est obligatoire'),
   lastName: yup.string().required('Le nom de famille est obligatoire'),
-  fullName: yup.string().optional(),
-  photo: yup.string().optional(),
-  contactEmail: yup.string().email('E-mail invalide').required('L e-mail est requis'),
-  contactPhone: yup.string().required('Le numéro de téléphone est requis'),
-  inamiNumber: yup.string().optional(),
-  aboutMe: yup.string().nullable(),
-  degreesTraining: yup.string().nullable(),
+  contactEmail: yup.string()
+    .matches(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/, 'E-mail invalide')
+    .required('L e-mail est requis'),
+  contactPhone: yup.string()
+    .required('Le numéro de téléphone est requis'),
   departmentId: yup
     .number()
-    .nullable()
     .typeError('Le département est requis')
     .required('Le département est requis'),
   specializationIds: yup
     .array()
     .of(yup.number().required())
     .min(1, 'Au moins une spécialisation est requise'),
+  fullName: yup.string().optional(),
+  photo: yup.string().optional(),
+  inamiNumber: yup.string().optional().nullable(),
+  aboutMe: yup.string().optional().nullable(),
+  degreesTraining: yup.string().optional().nullable(),
   branches: yup
     .array()
     .of(
       yup.object({
         branch_id: yup.number().optional(),
-        branch_name: yup.string().nullable().defined(),
+        branch_name: yup.string().optional().nullable(),
         availability: yup
           .array()
           .of(
@@ -99,9 +102,9 @@ const schema: yup.ObjectSchema<TherapistFormInputs> = yup.object({
     )
     .optional()
     .defined(),
-  languages: yup.array().of(yup.number().optional()),
-  faq: yup.string().nullable(),
-  paymentMethods: yup.array().of(yup.string().optional()),
+  languages: yup.array().of(yup.number().optional()).optional(),
+  faq: yup.string().optional().nullable(),
+  paymentMethods: yup.array().of(yup.string().optional()).optional(),
 });
 
 const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
@@ -148,6 +151,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
   const [specializations, setSpecializations] = useState<Specialization[]>([]);
   const [languages, setLanguages] = useState<Language[]>([]);
   const [dropdownsLoaded, setDropdownsLoaded] = useState(false);
+  const { showNotification } = useNotificationContext();
 
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
   const router = useRouter();
@@ -167,7 +171,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     return [];
   };
 
-  // --- Loader functions (they return the loaded array)
+  // Loader functions
   const loadBranches = async (): Promise<Branch[]> => {
     if (!token) return [];
     try {
@@ -178,8 +182,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       const arr = safeArray(json);
       setBranches(arr);
       return arr;
-    } catch (err) {
-      console.error('Error loading branches:', err);
+    } catch {
       setBranches([]);
       return [];
     }
@@ -195,8 +198,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       const arr = safeArray(json);
       setDepartments(arr);
       return arr;
-    } catch (err) {
-      console.error('Error loading departments:', err);
+    } catch {
       setDepartments([]);
       return [];
     }
@@ -212,20 +214,19 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
       const arr = safeArray(json);
       setLanguages(arr);
       return arr;
-    } catch (err) {
-      console.error('Error loading languages:', err);
+    } catch {
       setLanguages([]);
       return [];
     }
   };
 
-  // Specializations loader based on department
-  // Specializations loader based on department
+  // Specializations loader
   useEffect(() => {
     if (!token) {
       setSpecializations([]);
       return;
     }
+
     const loadSpecializations = async () => {
       try {
         const res = await fetch(`${API_BASE_PATH}/specializations`, {
@@ -234,22 +235,21 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         const json = await res.json();
         const arr = safeArray(json);
 
-        // ✅ Deduplicate by specialization_type
+        // Deduplicate by specialization_type
         const uniqueArr = arr.filter(
           (s: Specialization, index: number, self: Specialization[]) =>
             index === self.findIndex((sp) => sp.specialization_type === s.specialization_type),
         );
 
         setSpecializations(uniqueArr);
-      } catch (err) {
-        console.error('Error loading specializations:', err);
+      } catch {
         setSpecializations([]);
       }
     };
     loadSpecializations();
   }, [token]);
 
-  // --- Mapping API therapist -> form
+  // Map API therapist -> form values
   const mapTherapistToFormValues = (
     data: any,
     branchesList: Branch[],
@@ -320,7 +320,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
               if (langName === 'french') return 2;
               if (langName === 'german') return 3;
             }
-
             return undefined;
           })
           .filter((id: any) => typeof id === 'number')
@@ -345,7 +344,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     };
   };
 
-  // --- Init load
+  // Init load
   useEffect(() => {
     const init = async () => {
       if (!token) return;
@@ -364,13 +363,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             });
             const mapped = mapTherapistToFormValues(resp.data, branchesRes, languagesRes);
             reset(mapped);
-          } catch (err) {
-            console.error('Failed to fetch therapist for edit:', err);
-          }
+          } catch {}
         }
-      } catch (err) {
-        console.error('Init error loading dropdowns:', err);
-      }
+      } catch {}
     };
     init();
   }, [token, therapistId, reset]);
@@ -398,7 +393,6 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         return null;
       })
       .filter((n) => n),
-
     faq: data.faq,
     paymentMethods: data.paymentMethods,
   });
@@ -419,7 +413,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
         body: JSON.stringify(payload),
       });
       if (res.ok) {
-        alert(`Therapist ${therapistId ? 'updated' : 'saved'} successfully`);
+        showNotification({ message: 'Therapist Added successfully', variant: 'success' });
         router.push('/therapists/therapists-list');
       } else {
         const errText = await res.text();
@@ -428,6 +422,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     } catch (err: any) {
       console.error('Submit error:', err);
       alert(err.message || 'Error saving therapist');
+      showNotification({ message: 'Therapist Could not be added', variant: 'danger' });
     }
   };
 
@@ -490,8 +485,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             <Col md={2}>
               <Button
                 type="button"
-                variant="danger"
-                style={{ marginTop: '1.7rem' }}
+                variant="danger"                
                 onClick={() => remove(k)}
               >
                 Remove
@@ -499,14 +493,16 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             </Col>
           </Row>
         ))}
+        <Col md={2}>
         <Button
           type="button"
-          variant="secondary"
-          size="sm"
+          variant="primary"
+          style={{ padding: '0.25rem 0.5rem', fontSize: '0.75rem' }}
           onClick={() => append({ day: '', startTime: '', endTime: '' })}
         >
           Add Slot
         </Button>
+        </Col>
       </>
     );
   };
@@ -515,53 +511,46 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
     <Form onSubmit={handleSubmit(onSubmit, (errors) => console.log('Validation errors:', errors))}>
       <Card className="p-3 shadow-sm rounded">
         <CardBody>
-          <h5 className="mb-4">
-            {therapistId ? 'Modifier le thérapeute' : 'Ajouter un thérapeute'}
-          </h5>
+          <h5 className="mb-4">{therapistId ? 'Modifier le thérapeute' : 'Ajouter un thérapeute'}</h5>
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Prénom</Form.Label>
+                <Form.Label>
+                  Prénom <span style={{ color: 'red' }}>*</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   {...register('firstName')}
                   placeholder="Entre Prénom"
                   isInvalid={!!errors.firstName}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.firstName?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.firstName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Nom de famille</Form.Label>
+                <Form.Label>
+                  Nom de famille <span style={{ color: 'red' }}>*</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   {...register('lastName')}
                   placeholder="Entrez Nom de famille"
                   isInvalid={!!errors.lastName}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.lastName?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.lastName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
 
           {/* Full name, Photo */}
           <Row>
-            <Col md={6}>
+            {/* <Col md={6}>
               <Form.Group className="mb-3">
                 <Form.Label>Nom et prénom</Form.Label>
-                <Form.Control
-                  type="text"
-                  {...register('fullName')}
-                  placeholder="Nom et prénom"
-                  readOnly
-                />
+                <Form.Control type="text" {...register('fullName')} placeholder="Nom et prénom" readOnly />
               </Form.Group>
-            </Col>
+            </Col> */}
             <Col md={6}>
               <Form.Group className="mb-3">
                 <Form.Label>Photo (URL)</Form.Label>
@@ -571,9 +560,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                   {...register('photo')}
                   isInvalid={!!errors.photo}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.photo?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.photo?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -582,30 +569,30 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>E-mail</Form.Label>
+                <Form.Label>
+                  E-mail <span style={{ color: 'red' }}>*</span>
+                </Form.Label>
                 <Form.Control
                   type="email"
                   {...register('contactEmail')}
                   placeholder="Entrez votre adresse e-mail"
                   isInvalid={!!errors.contactEmail}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.contactEmail?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.contactEmail?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Numéro de téléphone</Form.Label>
+                <Form.Label>
+                  Numéro de téléphone <span style={{ color: 'red' }}>*</span>
+                </Form.Label>
                 <Form.Control
                   type="text"
                   {...register('contactPhone')}
                   placeholder="Entrez le numéro de téléphone"
                   isInvalid={!!errors.contactPhone}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.contactPhone?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.contactPhone?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -633,9 +620,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                   placeholder="Entrez Diplômes et formations"
                   isInvalid={!!errors.degreesTraining}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.degreesTraining?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.degreesTraining?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -657,7 +642,9 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
           <Row>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Département</Form.Label>
+                <Form.Label>
+                  Département <span style={{ color: 'red' }}>*</span>
+                </Form.Label>
                 <Form.Select {...register('departmentId')} isInvalid={!!errors.departmentId}>
                   <option value="">Sélectionnez un département</option>
                   {departments.map((d) => (
@@ -666,14 +653,14 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                     </option>
                   ))}
                 </Form.Select>
-                <Form.Control.Feedback type="invalid">
-                  {errors.departmentId?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{errors.departmentId?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Spécialisation</Form.Label>
+                <Form.Label>
+                  Spécialisation <span style={{ color: 'red' }}>*</span>
+                </Form.Label>
                 <div>
                   {specializations.length ? (
                     specializations.map((s) => (
@@ -685,8 +672,7 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                         checked={watch('specializationIds')?.includes(s.specialization_id)}
                         onChange={(e) => {
                           const current = watch('specializationIds') || [];
-                          if (e.target.checked)
-                            setValue('specializationIds', [...current, s.specialization_id]);
+                          if (e.target.checked) setValue('specializationIds', [...current, s.specialization_id]);
                           else
                             setValue(
                               'specializationIds',
@@ -700,66 +686,69 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                   )}
                 </div>
                 {errors.specializationIds && (
-                  <Form.Text className="text-danger">
-                    {errors.specializationIds.message as string}
-                  </Form.Text>
+                  <Form.Text className="text-danger">{errors.specializationIds.message as string}</Form.Text>
                 )}
               </Form.Group>
             </Col>
           </Row>
 
           {/* Branch & Availability */}
-          <h6>Succursale et disponibilité</h6>
-          {branchFields.map((branch, index) => (
-            <Card key={branch.id} className="mb-3 p-3">
-              <Row className="align-items-center">
-                <Col md={8}>
-                  <Form.Group className="mb-3">
-                    <Form.Label>Branch</Form.Label>
-                    <Form.Select
-                      {...register(`branches.${index}.branch_id` as const)}
-                      isInvalid={!!errors.branches?.[index]?.branch_id}
-                    >
-                      <option value="">Sélectionnez une succursale</option>
-                      {branches.map((b) => (
-                        <option key={b.branch_id} value={b.branch_id}>
-                          {b.name}
-                        </option>
-                      ))}
-                    </Form.Select>
-                    <Form.Control.Feedback type="invalid">
-                      {errors.branches?.[index]?.branch_id?.message}
-                    </Form.Control.Feedback>
-                  </Form.Group>
-                </Col>
-                <Col md={4}>
-                  <Button
-                    type="button"
-                    variant="danger"
-                    className="mt-4"
-                    onClick={() => removeBranch(index)}
+         <h6>Succursale et disponibilité</h6>
+            {branchFields.map((branch, index) => (
+              <Card key={branch.id} className="mb-3 p-3">
+                <Row className="align-items-center">
+                  <Col md={8}>
+                    <Form.Group className="mb-3">
+                      <Form.Label>Branch</Form.Label>
+                      <Form.Select
+                        {...register(`branches.${index}.branch_id` as const)}
+                        isInvalid={!!errors.branches?.[index]?.branch_id}
+                      >
+                        <option value="">Sélectionnez une succursale</option>
+                        {branches.map((b) => (
+                          <option key={b.branch_id} value={b.branch_id}>
+                            {b.name}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.branches?.[index]?.branch_id?.message}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                  <Col
+                    md={4}
+                    className="d-flex align-items-center justify-content-start"
                   >
-                    Supprimer la branche
-                  </Button>
-                </Col>
-              </Row>
-              <AvailabilitySlots nestIndex={index} />
-            </Card>
-          ))}
-          <Button
-            type="button"
-            variant="secondary"
-            className="mb-3"
-            onClick={() =>
-              appendBranch({
-                branch_id: 0,
-                branch_name: '',
-                availability: [{ day: '', startTime: '', endTime: '' }],
-              })
-            }
-          >
-            Ajouter une succursale
-          </Button>
+                    <Button
+                      type="button"
+                      variant="danger"
+                      // remove mt-4 and rely on flex alignment
+                      onClick={() => removeBranch(index)}
+                    >
+                      Supprimer la branche
+                    </Button>
+                  </Col>
+                </Row>
+                <AvailabilitySlots nestIndex={index} />
+              </Card>
+            ))}
+            <Button
+              type="button"
+              variant="primary"
+              size="sm" // small button
+              className="mb-3"
+              onClick={() =>
+                appendBranch({
+                  branch_id: 0,
+                  branch_name: '',
+                  availability: [{ day: '', startTime: '', endTime: '' }],
+                })
+              }
+            >
+              Ajouter une succursale
+            </Button>
+
 
           {/* Languages + Payment Methods */}
           <Row>
@@ -780,19 +769,13 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                       onChange={(e) => {
                         const current = watch('languages') || [];
                         if (e.target.checked) setValue('languages', [...current, lang.id]);
-                        else
-                          setValue(
-                            'languages',
-                            current.filter((l) => l !== lang.id),
-                          );
+                        else setValue('languages', current.filter((l) => l !== lang.id));
                       }}
                     />
                   ))}
                 </div>
                 {errors.languages && (
-                  <Form.Text className="text-danger">
-                    {errors.languages.message as string}
-                  </Form.Text>
+                  <Form.Text className="text-danger">{errors.languages.message as string}</Form.Text>
                 )}
               </Form.Group>
             </Col>
@@ -814,18 +797,12 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
                       checked={current.includes(pm.id)}
                       onChange={(e) => {
                         if (e.target.checked) setValue('paymentMethods', [...current, pm.id]);
-                        else
-                          setValue(
-                            'paymentMethods',
-                            current.filter((p) => p !== pm.id),
-                          );
+                        else setValue('paymentMethods', current.filter((p) => p !== pm.id));
                       }}
                     />
                   );
                 })}
-                {errors.paymentMethods && (
-                  <div className="text-danger">{errors.paymentMethods.message}</div>
-                )}
+                {errors.paymentMethods && <div className="text-danger">{errors.paymentMethods.message}</div>}
               </Form.Group>
             </Col>
           </Row>
@@ -843,27 +820,24 @@ const AddTherapist: React.FC<AddTherapistProps> = ({ therapistId }) => {
             <Form.Control.Feedback type="invalid">{errors.faq?.message}</Form.Control.Feedback>
           </Form.Group>
 
-          {/* Submit button fixed bottom */}
-          {/* <div
-            className="d-flex justify-content-end p-3 bg-white shadow"
-            style={{ position: 'sticky', bottom: 0, zIndex: 1000 }}
-          >
-            <Button variant="primary" type="submit" className="px-4 py-2 rounded-2">
-              {therapistId ? 'Mettre à jour le thérapeute' : 'Enregistrer le thérapeute'}
-            </Button>
+          <div className="mb-3 rounded">
+            <Row className="justify-content-end g-2 mt-2">
+              <Col lg={2}>
+                <Button variant="primary" type="submit" className="w-100">
+                  {therapistId ? 'Mise à jour' : 'Créer'} Therapist
+                </Button>
+              </Col>
+              <Col lg={2}>
+                <Button variant="danger" className="w-100" onClick={() => router.back()}>
+                  Annuler
+                </Button>
+              </Col>
+            </Row>
           </div>
-        </Form> */}
         </CardBody>
       </Card>
-
-      <Row>
-        <Col className="d-flex justify-content-end">
-          <Button variant="primary" type="submit" className="px-4 py-2">
-            {therapistId ? 'Mettre à jour le thérapeute' : 'Enregistrer le thérapeute'}
-          </Button>
-        </Col>
-      </Row>
     </Form>
+    
   );
 };
 

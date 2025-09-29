@@ -54,7 +54,8 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     note: yup.string().optional(),
     zipcode: yup.string().optional(),
     legalgender: yup.string().optional(),
-    language: yup.string().optional(),
+    languageId: yup.string().optional(),
+
     city: yup.string().optional(),
     country: yup.string().optional(),
     ssin: yup.string(),
@@ -74,6 +75,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   const [loading, setLoading] = useState<boolean>(isEditMode);
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
+  const [allLanguages, setAllLanguages] = useState<LanguageType[]>([]);
 
   const [defaultValues, setDefaultValues] = useState<Partial<PatientType>>({
     createdAt: '',
@@ -84,7 +86,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     emails: '',
     firstname: '',
     id: '',
-    language: '',
+    languageId: '',
     lastname: '',
     legalgender: '',
     middlename: '',
@@ -99,7 +101,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     zipcode: '',
   });
 
-  const allLanguages = useMemo<LanguageType[]>(() => getAllLanguages(), []);
   const allBranches = useMemo<BranchType[]>(() => getAllBranch(), []);
   const allTags = useMemo<string[]>(() => ['VIP', 'Regular', 'New', 'Follow-up'], []);
 
@@ -112,23 +113,33 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     resolver: yupResolver(schema),
     defaultValues,
   });
+  useEffect(() => {
+    const fetchLanguages = async () => {
+      const response = await getAllLanguages();
+      console.log('📌 Languages for dropdown:', response);
+      setAllLanguages(response || []);
+    };
+    fetchLanguages();
+  }, []);
 
   useEffect(() => {
     if (isEditMode && params?.id) {
       setLoading(true);
       getPatientById(params.id)
-        .then((response) => {
-          const patient: PatientType = response;
-          if (patient) {
-            const mappedPatient: Partial<PatientType> = {
-              ...patient,
-              phones: patient.phones?.length ? patient.phones : [''],
-            };
-            setDefaultValues(mappedPatient);
-            reset(mappedPatient);
-          }
+        .then((patient) => {
+          console.log('🧾 Fetched patient data:', patient);
+
+          const mappedPatient: Partial<PatientType> = {
+            ...patient,
+            phones: patient.phones?.length ? patient.phones : [''],
+
+            languageId: patient.languageId ? String(patient.languageId) : '',
+          };
+
+          setDefaultValues(mappedPatient);
+          reset(mappedPatient);
         })
-        .catch((error) => console.error('Failed to fetch patient:', error))
+        .catch((error) => console.error(' Failed to fetch patient:', error))
         .finally(() => setLoading(false));
     }
   }, [isEditMode, params?.id, reset]);
@@ -139,6 +150,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     const payload = {
       ...data,
       phones: data.phones?.filter((p) => p.trim() !== '') ?? [],
+      languageId: data.languageId ? Number(data.languageId) : undefined,
     };
 
     try {
@@ -262,21 +274,21 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               />
             </Col>
             <Col lg={6} className="mb-3">
-              <label className="form-label">{renderLabel('Language')}</label>
+              <label className="form-label">{renderLabel('Langue')}</label>
               <Controller
                 control={control}
-                name="language"
+                name="languageId"
                 render={({ field }) => (
-                  <ChoicesFormInput className="form-control" {...field}>
+                  <select {...field} className="form-control">
                     <option value="" disabled hidden>
                       Sélectionnez la langue
                     </option>
                     {allLanguages.map((lang) => (
-                      <option key={lang.key} value={lang.key}>
-                        {lang.label}
+                      <option key={lang.id} value={String(lang.id)}>
+                        {lang.language_name}
                       </option>
                     ))}
-                  </ChoicesFormInput>
+                  </select>
                 )}
               />
             </Col>
@@ -371,23 +383,22 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
               />
             </Col>
           </Row>
+          <div className="mb-3 rounded">
+            <Row className="justify-content-end g-2 mt-2">
+              <Col lg={2}>
+                <Button variant="primary" type="submit" className="w-100">
+                  {isEditMode ? 'Mise à jour' : 'Créer'} Patient
+                </Button>
+              </Col>
+              <Col lg={2}>
+                <Button variant="danger" className="w-100" onClick={() => router.back()}>
+                  Annuler
+                </Button>
+              </Col>
+            </Row>
+          </div>
         </CardBody>
       </Card>
-
-      <div className="mb-3 rounded">
-        <Row className="justify-content-end g-2 mt-2">
-          <Col lg={2}>
-            <Button variant="primary" type="submit" className="w-100">
-              {isEditMode ? 'Mise à jour' : 'Créer'} Patient
-            </Button>
-          </Col>
-          <Col lg={2}>
-            <Button variant="danger" className="w-100" onClick={() => router.back()}>
-              Annuler
-            </Button>
-          </Col>
-        </Row>
-      </div>
     </Form>
   );
 };
