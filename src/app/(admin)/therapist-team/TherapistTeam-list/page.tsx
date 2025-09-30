@@ -2,7 +2,7 @@
 
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { getAllTherapistTeamMembers } from '@/helpers/therapistTeam';
+import { deleteTherapistTeamMember, getAllTherapistTeamMembers } from '@/helpers/therapistTeam';
 import type { TeamMemberType } from '@/types/data';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
@@ -103,8 +103,8 @@ const TherapistTeamsListPage = () => {
       }
     } catch (err) {
       setError('Failed to fetch data');
-      setAllTeamMembers([]);
-      setTotalCount(0);
+      setAllTeamMembers(allTeamMembers.filter((t) => t.team_id !== selectedTherapistTeamId));
+      setTotalCount((count) => count - 1);
     } finally {
       setLoading(false);
     }
@@ -130,22 +130,32 @@ const TherapistTeamsListPage = () => {
     setShowDeleteModal(true);
   };
 
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
   const handleConfirmDelete = async () => {
-    if (!selectedTherapistTeamId) return;
-    try {
-      await fetch(`http://164.92.220.65/api/v1/therapist-team/${selectedTherapistTeamId}`, {
-        method: 'DELETE',
-      });
-      setAllTeamMembers(allTeamMembers.filter((t) => t.team_id !== selectedTherapistTeamId));
-      setTotalCount((count) => count - 1);
-    } catch (err) {
-      // Optionally set error message here for delete failure
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedTeamId(null);
-      setSelectedTeamMemberId(null);
+  if (!selectedTherapistTeamId) return;
+
+  setShowDeleteModal(false); // close modal immediately
+
+  try {
+    const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
+    if (success) {
+      // Update state using functional update
+      setAllTeamMembers((prev) =>
+        prev.filter((t) => String(t.team_id) !== String(selectedTherapistTeamId))
+      );
+      setTotalCount((prev) => prev - 1);
+    } else {
+      setError('Failed to delete therapist team member.');
     }
-  };
+  } catch (err) {
+    setError('An error occurred while deleting the member.');
+  } finally {
+    setSelectedTeamId(null);
+    setSelectedTeamMemberId(null);
+  }
+};
+
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -398,8 +408,8 @@ const TherapistTeamsListPage = () => {
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Annuler
           </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
-            Supprimer
+          <Button variant="danger" onClick={handleConfirmDelete} disabled={deletingId !== null}>
+            {deletingId ? <Spinner size="sm" animation="border" /> : 'Supprimer'}
           </Button>
         </Modal.Footer>
       </Modal>

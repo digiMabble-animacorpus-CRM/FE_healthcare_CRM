@@ -246,3 +246,36 @@ export const getAllAccessLevels = async (): Promise<any[]> => {
     return [];
   }
 };
+
+export const deleteTherapistTeamMember = async (
+  id: string | number
+): Promise<boolean> => {
+  try {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      console.error('No access token found');
+      return false;
+    }
+
+    // If your API supports DELETE method
+    const response = await fetch(`${API_BASE_PATH}/therapist-team/${encodeURIComponent(String(id))}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const result = await response.json();
+
+    if (!response.ok || result.status === false) {
+      console.error('Delete failed:', result.message || 'Unknown error');
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error deleting therapist team member:', error);
+    return false;
+  }
+};

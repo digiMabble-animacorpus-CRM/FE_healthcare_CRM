@@ -780,3 +780,14 @@ export interface LanguageType {
   created_at: string;
   updated_at: string;
 };
+
+export interface SpecializationType {
+  id: number;       // normalized from specialization_id
+  name: string;     // normalized from specialization_type
+  description?: string;
+  is_active?: boolean;
+  department?: {
+    id: number;
+    name: string;
+  };
+}

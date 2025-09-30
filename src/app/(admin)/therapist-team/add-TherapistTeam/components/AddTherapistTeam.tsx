@@ -1,102 +1,74 @@
 'use client';
 
-import { yupResolver } from '@hookform/resolvers/yup';
-import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Form,
-  Row,
-  Spinner,
+  Button, Card, CardBody, CardHeader, CardTitle,
+  Col, Form, Row, Spinner
 } from 'react-bootstrap';
-import { Controller, useForm, useWatch } from 'react-hook-form';
+import {
+  useForm, Controller, useFieldArray,
+  Control, UseFormRegister
+} from 'react-hook-form';
 import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
 
-import { useNotificationContext } from '@/context/useNotificationContext';
-import { getTherapistTeamMemberById, updateTherapistTeamMember, createTherapistTeamMember } from '@/helpers/therapistTeam';
+import {
+  getTherapistTeamMemberById,
+  updateTherapistTeamMember,
+  createTherapistTeamMember,
+} from '@/helpers/therapistTeam';
 import { getAllLanguages } from '@/helpers/languages';
-import { LanguageType } from '@/types/data';
-
-export interface TherapistTeamMember {
-  firstName: string;
-  lastName: string;
-  full_name: string;
-  imageUrl: string;
-  contactEmail: string;
-  contactPhone: string;
-  aboutMe: string;
-  degreesTraining: string;
-  inamiNumber: number;
-  payment_methods: string[];
-  faq: { question: string; answer: string }[];
-  website: string;
-  consultations: string;
-  permissions: { admin: boolean };
-  role: string;
-  status: "active" | "inactive";
-  availability: { day: string; startTime: string; endTime: string }[];
-  languagesSpoken: string[];
-  isDelete: boolean;
-  departmentId: number;
-  specializationIds: number[];
-  branchIds: number[];
-  
-}
+import { getBranches } from '@/helpers/branch';
+import { getDepartments } from '@/helpers/department';
+import { getSpecializations } from '@/helpers/specialization';
+import { useNotificationContext } from '@/context/useNotificationContext';
+import { DepartmentType, LanguageType, SpecializationType } from '@/types/data';
 
 const PAYMENT_METHODS = ['Cash', 'Card', 'Insurance'];
-const BRANCHES = [
-  { id: 1, name: 'Branch 1' },
-  { id: 2, name: 'Branch 2' },
-];
 
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
   lastName: yup.string().required('Last name is required'),
-  full_name: yup.string().required(),
-  imageUrl: yup.string().url('Must be a valid URL').required('Profile image is required'),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
   contactPhone: yup.string().required('Contact number is required'),
-  aboutMe: yup.string().required('About Me is required'),
-  degreesTraining: yup.string().required('Degrees & Training required'),
-  inamiNumber: yup.number().typeError('Must be a number').required('Inami number is required'),
-
-  payment_methods: yup.array().of(yup.string().required()).min(1, 'Select at least one payment method').required(),
+  languagesSpoken: yup.array().of(yup.string().required()).min(1, 'Select at least one language').required(),
+  full_name: yup.string(),
+  imageUrl: yup.string().url('Must be a valid URL'),
+  aboutMe: yup.string(),
+  degreesTraining: yup.string(),
+  inamiNumber: yup.number().typeError('Must be a number'),
+  payment_methods: yup.array().of(yup.string()),
   faq: yup.array().of(
     yup.object().shape({
-      question: yup.string().required(),
-      answer: yup.string().required(),
+      question: yup.string(),
+      answer: yup.string(),
     })
-  ).required('FAQ is required'),
-
-  website: yup.string().url('Must be a valid URL').required('Website is required'),
-  consultations: yup.string().required('Consultation info required'),
-  permissions: yup.object().shape({ admin: yup.boolean().required() }),
-  role: yup.string().required(),
-  status: yup.string().oneOf(['active', 'inactive']).required(),
-  availability: yup
-    .array()
-    .of(
-      yup.object().shape({
-        day: yup.string().required('Day required'),
-        startTime: yup.string().required('Start time required'),
-        endTime: yup.string().required('End time required'),
-      })
-    )
-    .min(1, 'Add at least one availability slot')
-    .required(),
-  languagesSpoken: yup.array().of(yup.string().required()).min(1, 'Select at least one language').required(),
-  isDelete: yup.boolean().required(),
-  departmentId: yup.number().typeError('Department ID required').required(),
-  specializationIds: yup.array().of(yup.number().required()).min(1, 'Add at least one specialization').required(),
-  branchIds: yup.array().of(yup.number().required()).min(1, 'Select at least one branch').required(),
+  ),
+  website: yup.string().url('Must be a valid URL'),
+  consultations: yup.string(),
+  permissions: yup.object().shape({ admin: yup.boolean() }).required(),
+  role: yup.string(),
+  status: yup.string().oneOf(['active', 'inactive']).required('Status is required'),
+  isDelete: yup.boolean(),
+  departmentId: yup.number().required('Department is required'),
+  specializationIds: yup.array().of(yup.number()),
+  branches: yup.array().of(
+    yup.object().shape({
+      branch_id: yup.number().required('Branch is required'),
+      branch_name: yup.string(),
+      availability: yup.array().of(
+        yup.object().shape({
+          day: yup.string(),
+          startTime: yup.string(),
+          endTime: yup.string(),
+        })
+      ),
+    })
+  ),
 });
 
-const defaultAvailability = [{ day: 'Monday', startTime: '09:00', endTime: '17:00' }];
+const defaultAvailability = [{ day: '', startTime: '', endTime: '' }];
 
 const defaultValues: TherapistTeamMember = {
   firstName: '',
@@ -115,106 +87,198 @@ const defaultValues: TherapistTeamMember = {
   permissions: { admin: false },
   role: 'staff',
   status: 'active',
-  availability: defaultAvailability,
   languagesSpoken: [],
   isDelete: false,
   departmentId: 0,
   specializationIds: [],
-  branchIds: [],
+  branches: [
+    {
+      branch_id: 0,
+      branch_name: '',
+      availability: [...defaultAvailability],
+    },
+  ],
 };
 
 interface AddTherapistProps {
   editId?: string;
 }
 
+interface BranchType {
+  branch_id: number;
+  branch_name: string;
+  availability: { day: string; startTime: string; endTime: string }[];
+}
+
+interface AvailabilitySlotsProps {
+  nestIndex: number;
+  control: Control<any>;
+  register: UseFormRegister<any>;
+}
+
+type TherapistTeamMember = {
+  firstName: string;
+  lastName: string;
+  full_name?: string;
+  imageUrl?: string;
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe?: string;
+  degreesTraining?: string;
+  inamiNumber?: number;
+  payment_methods?: string[];
+  faq?: { question: string; answer: string }[];
+  website?: string;
+  consultations?: string;
+  permissions: { admin?: boolean };
+  role?: string;
+  status: 'active' | 'inactive';
+  languagesSpoken: string[];
+  isDelete?: boolean;
+  departmentId: number;
+  specializationIds?: number[];
+  branches: {
+    branch_id: number;
+    branch_name?: string;
+    availability: { day: string; startTime: string; endTime: string }[];
+  }[];
+};
+
 const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
   const router = useRouter();
   const { showNotification } = useNotificationContext();
 
   const [languages, setLanguages] = useState<LanguageType[]>([]);
-  const [faqs, setFaqs] = useState<{ question: string; answer: string }[]>([{ question: '', answer: '' }]);
+  const [faqs, setFaqs] = useState([{ question: '', answer: '' }]);
+  const [loading, setLoading] = useState(false);
+  const [branchesList, setBranchesList] = useState<{ branch_id: number; name: string }[]>([]);
+  const [departments, setDepartments] = useState<DepartmentType[]>([]);
+  const [specializations, setSpecializations] = useState<SpecializationType[]>([]);
 
   const {
-    control,
-    register,
-    setValue,
-    watch,
-    reset,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TherapistTeamMember>({ resolver: yupResolver(schema), defaultValues });
-
-  const selectedLanguages = useWatch({
-    control,
-    name: 'languagesSpoken',
-    defaultValue: [], // default if no value yet
+    control, register, setValue, watch, reset, handleSubmit, formState: { errors, isSubmitting }
+  } = useForm<TherapistTeamMember>({
+    resolver: yupResolver(schema),
+    defaultValues,
   });
 
-  useEffect(() => {
-    async function fetchLanguages() {
-      const langs = await getAllLanguages();
-      console.log('Fetched languages:', langs);
-      setLanguages(langs);
-    }
-    fetchLanguages();
-  }, []);
+  const selectedLanguages = watch('languagesSpoken') as string[] || [];
+
+  const { fields: branchFields, append: appendBranch, remove: removeBranch } = useFieldArray({
+    control,
+    name: 'branches',
+  });
+
+  useEffect(() => { getAllLanguages().then(setLanguages); }, []);
+  useEffect(() => { getBranches(1, 100).then(({ data }) => setBranchesList(data)); }, []);
+  useEffect(() => { getDepartments(1, 100, '').then(({ data }) => setDepartments(data)); }, []);
+  useEffect(() => { getSpecializations().then(({ data }) => setSpecializations(data)); }, []);
+
+ useEffect(() => {
+  if (editId) {
+    setLoading(true);
+    getTherapistTeamMemberById(editId).then(rawData => {
+      if (rawData) {
+        const adaptedData = {
+          ...rawData,
+          departmentId: Number(rawData.departmentId),
+          specializationIds: (rawData.specializationIds || []).map(Number),
+          languagesSpoken: (rawData.languagesSpoken || []).map(String),
+          branches: Array.isArray(rawData.branches) && rawData.branches.length
+            ? rawData.branches.map((branch: { branch_id: any; availability: string | any[]; }) => ({
+                ...branch,
+                branch_id: Number(branch.branch_id),
+                availability: Array.isArray(branch.availability) && branch.availability.length
+                  ? branch.availability
+                  : [{ day: '', startTime: '', endTime: '' }],
+              }))
+            : [{ branch_id: 0, branch_name: '', availability: [{ day: '', startTime: '', endTime: '' }] }],
+          faq: Array.isArray(rawData.faq) && rawData.faq.length
+            ? rawData.faq
+            : [{ question: '', answer: '' }],
+          status: rawData.status === 'inactive' ? 'inactive' : 'active',
+        };
+        reset(adaptedData);  // React Hook Form resets all fields to these values
+        setFaqs(adaptedData.faq);
+      }
+      setLoading(false);
+    });
+  }
+}, [editId, reset]);
+
+
 
   useEffect(() => {
-    if (editId) {
-      getTherapistTeamMemberById(editId).then((data) => {
-        if (data) {
-          reset(data);
-          setFaqs(data.faq?.length ? data.faq : [{ question: '', answer: '' }]);
-        }
-      });
-    }
-  }, [editId, reset]);
+    setValue('full_name', `${watch('firstName')?.trim() ?? ''} ${watch('lastName')?.trim() ?? ''}`.trim());
+  }, [watch('firstName'), watch('lastName'), setValue]);
 
   useEffect(() => setValue('faq', faqs), [faqs, setValue]);
 
-  useEffect(() => {
-    const first = watch('firstName')?.trim() ?? '';
-    const last = watch('lastName')?.trim() ?? '';
-    setValue('full_name', `${first} ${last}`.trim());
-  }, [watch('firstName'), watch('lastName'), setValue]);
-
-  const onSubmit = async (data: TherapistTeamMember) => {
-    console.log('Submit clicked, data:', data);
-    const sanitizedData: TherapistTeamMember = {
+  const onSubmit = async function (data: TherapistTeamMember) {
+    const deptValue = data.departmentId;
+    const departmentIdNum = deptValue && !isNaN(Number(deptValue)) ? Number(deptValue) : 0; // fallback if invalid
+    const sanitizedData = {
       ...data,
-      payment_methods: data.payment_methods.filter(Boolean),
+      departmentId: departmentIdNum, 
+      specializationIds: (data.specializationIds || []).map(Number),
+      payment_methods: (data.payment_methods || []).filter(Boolean),
       faq: faqs,
-      availability: data.availability.filter(slot => slot.day && slot.startTime && slot.endTime),
-      languagesSpoken: data.languagesSpoken.filter(Boolean),
+      branches: (data.branches || []).map(branch => ({
+        ...branch,
+        branch_id: Number(branch.branch_id),
+        availability: branch.availability.filter(slot => slot.day && slot.startTime && slot.endTime),
+      })),
+      languagesSpoken: (data.languagesSpoken || []).filter(Boolean),
     };
-
-    const apiPayload = {
-      ...sanitizedData,
-      faq: sanitizedData.faq, // keep as array of objects
-    };
-
     try {
-      console.log('Calling API...');
       const success = editId
-        ? await updateTherapistTeamMember(editId, apiPayload)
-        : await createTherapistTeamMember(apiPayload);
-      console.log('API call returned:', success);
-
+        ? await updateTherapistTeamMember(editId, sanitizedData)
+        : await createTherapistTeamMember(sanitizedData);
       if (success) {
-        console.log('Show success notification');
         showNotification({ message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`, variant: 'success' });
-        router.push('/teams/teams-list');
+        router.push('/therapist-teams/TherapistTeam-list');
       } else {
-        console.log('Show failure notification');
         showNotification({ message: 'Something Went Wrong', variant: 'danger' });
       }
     } catch (error) {
-      console.error('Error in onSubmit:', error);
       showNotification({ message: 'Submission failed due to error', variant: 'danger' });
     }
   };
 
+  const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({ nestIndex, control, register }) => {
+    const { fields, append, remove } = useFieldArray({
+      control,
+      name: `branches.${nestIndex}.availability`,
+    });
+    return (
+      <div>
+        <label>Availability for Branch</label>
+        {fields.map((field, k) => (
+          <Row key={field.id} className="mb-2 align-items-center">
+            <Col>
+              <Form.Control {...register(`branches.${nestIndex}.availability.${k}.day`)} placeholder="Day" />
+            </Col>
+            <Col>
+              <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.startTime`)} placeholder="Start" />
+            </Col>
+            <Col>
+              <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.endTime`)} placeholder="End" />
+            </Col>
+            <Col xs="auto">
+              <Button type="button" variant="danger" onClick={() => remove(k)} disabled={fields.length === 1}>
+                Remove
+              </Button>
+            </Col>
+          </Row>
+        ))}
+        <Button type="button" variant="outline-primary" onClick={() => append({ day: '', startTime: '', endTime: '' })}>
+          Add Availability
+        </Button>
+      </div>
+    );
+  };
 
+  if (loading) return <Spinner animation="border" />;
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
@@ -227,52 +291,73 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>First Name</Form.Label>
+                <Form.Label>First Name *</Form.Label>
                 <Form.Control {...register('firstName')} isInvalid={!!errors.firstName} />
                 <Form.Control.Feedback type="invalid">{errors.firstName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Last Name</Form.Label>
+                <Form.Label>Last Name *</Form.Label>
                 <Form.Control {...register('lastName')} isInvalid={!!errors.lastName} />
                 <Form.Control.Feedback type="invalid">{errors.lastName?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
 
-          {/* Image & Email */}
+          {/* Image URL & Email */}
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Profile Image URL</Form.Label>
-                <Form.Control {...register('imageUrl')} isInvalid={!!errors.imageUrl} />
-                <Form.Control.Feedback type="invalid">{errors.imageUrl?.message}</Form.Control.Feedback>
+                <Form.Control
+                  {...register('imageUrl')}
+                  isInvalid={!!errors.imageUrl}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.imageUrl?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Email</Form.Label>
-                <Form.Control {...register('contactEmail')} isInvalid={!!errors.contactEmail} />
-                <Form.Control.Feedback type="invalid">{errors.contactEmail?.message}</Form.Control.Feedback>
+                <Form.Label>Email *</Form.Label>
+                <Form.Control
+                  {...register('contactEmail')}
+                  isInvalid={!!errors.contactEmail}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactEmail?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
 
-          {/* Phone & Inami Number */}
+          {/* Contact Phone & Inami Number */}
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Contact Phone</Form.Label>
-                <Form.Control {...register('contactPhone')} isInvalid={!!errors.contactPhone} />
-                <Form.Control.Feedback type="invalid">{errors.contactPhone?.message}</Form.Control.Feedback>
+                <Form.Label>Contact Phone *</Form.Label>
+                <Form.Control
+                  {...register('contactPhone')}
+                  isInvalid={!!errors.contactPhone}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.contactPhone?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Inami Number</Form.Label>
-                <Form.Control type="number" {...register('inamiNumber')} isInvalid={!!errors.inamiNumber} />
-                <Form.Control.Feedback type="invalid">{errors.inamiNumber?.message}</Form.Control.Feedback>
+                <Form.Control
+                  type="number"
+                  {...register('inamiNumber')}
+                  isInvalid={!!errors.inamiNumber}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.inamiNumber?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -282,8 +367,15 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={12} className="mb-3">
               <Form.Group>
                 <Form.Label>About Me</Form.Label>
-                <Form.Control as="textarea" rows={3} {...register('aboutMe')} isInvalid={!!errors.aboutMe} />
-                <Form.Control.Feedback type="invalid">{errors.aboutMe?.message}</Form.Control.Feedback>
+                <Form.Control
+                  as="textarea"
+                  rows={3}
+                  {...register('aboutMe')}
+                  isInvalid={!!errors.aboutMe}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.aboutMe?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -293,8 +385,13 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={12} className="mb-3">
               <Form.Group>
                 <Form.Label>Degrees & Training</Form.Label>
-                <Form.Control {...register('degreesTraining')} isInvalid={!!errors.degreesTraining} />
-                <Form.Control.Feedback type="invalid">{errors.degreesTraining?.message}</Form.Control.Feedback>
+                <Form.Control
+                  {...register('degreesTraining')}
+                  isInvalid={!!errors.degreesTraining}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.degreesTraining?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -304,60 +401,40 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={12} className="mb-3">
               <Form.Group>
                 <Form.Label>Consultations</Form.Label>
-                <Form.Control as="textarea" rows={2} {...register('consultations')} isInvalid={!!errors.consultations} />
-                <Form.Control.Feedback type="invalid">{errors.consultations?.message}</Form.Control.Feedback>
+                <Form.Control
+                  as="textarea"
+                  rows={2}
+                  {...register('consultations')}
+                  isInvalid={!!errors.consultations}
+                />
+                <Form.Control.Feedback type="invalid">
+                  {errors.consultations?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
 
-          {/* Website, Status, Role */}
+          {/* Website */}
           <Row>
-            <Col md={4} className="mb-3">
+            <Col md={12} className="mb-3">
               <Form.Group>
                 <Form.Label>Website</Form.Label>
-                <Form.Control {...register('website')} isInvalid={!!errors.website} />
-                <Form.Control.Feedback type="invalid">{errors.website?.message}</Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Form.Group>
-                <Form.Label>Status</Form.Label>
-                <Controller
-                  control={control}
-                  name="status"
-                  render={({ field }) => (
-                    <Form.Select {...field} isInvalid={!!errors.status}>
-                      <option value="active">Active</option>
-                      <option value="inactive">Inactive</option>
-                    </Form.Select>
-                  )}
+                <Form.Control
+                  {...register('website')}
+                  isInvalid={!!errors.website}
                 />
-                <Form.Control.Feedback type="invalid">{errors.status?.message}</Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-            <Col md={4} className="mb-3">
-              <Form.Group>
-                <Form.Label>Role</Form.Label>
-                <Controller
-                  control={control}
-                  name="role"
-                  render={({ field }) => (
-                    <Form.Select {...field} isInvalid={!!errors.role}>
-                      <option value="staff">Staff</option>
-                      <option value="admin">Admin</option>
-                    </Form.Select>
-                  )}
-                />
-                <Form.Control.Feedback type="invalid">{errors.role?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.website?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
 
-          {/* Languages Spoken & Payment Methods */}
+          {/* Languages Spoken */}
           <Row>
-            <Col md={6} className="mb-3">
+            <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>Languages Spoken</Form.Label>
+                <Form.Label>Languages Spoken *</Form.Label>
                 {languages.map(({ id, language_name }) => (
                   <Form.Check
                     key={id}
@@ -365,7 +442,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                     label={language_name}
                     checked={selectedLanguages.includes(id.toString())}
                     onChange={(e) => {
-                      const current = selectedLanguages || [];
+                      const current = selectedLanguages;
                       if (e.target.checked) {
                         setValue('languagesSpoken', [...current, id.toString()]);
                       } else {
@@ -374,29 +451,32 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                     }}
                   />
                 ))}
+                {errors.languagesSpoken && <div className="text-danger">{errors.languagesSpoken.message}</div>}
               </Form.Group>
             </Col>
+          </Row>
 
-            <Col md={6} className="mb-3">
+          {/* Payment Methods */}
+          <Row>
+            <Col md={12} className="mb-3">
               <Form.Group>
                 <Form.Label>Payment Methods</Form.Label>
-                {PAYMENT_METHODS.map((pm) => (
+                {PAYMENT_METHODS.map(pm => (
                   <Form.Check
                     key={pm}
                     type="checkbox"
                     label={pm}
-                    checked={watch('payment_methods').includes(pm)}
-                    onChange={(e) => {
-                      const current = watch('payment_methods');
+                    checked={(watch('payment_methods') || []).includes(pm)}
+                    onChange={e => {
+                      const current = watch('payment_methods') || [];
                       if (e.target.checked) {
                         setValue('payment_methods', [...current, pm]);
                       } else {
-                        setValue('payment_methods', current.filter((p) => p !== pm));
+                        setValue('payment_methods', current.filter(p => p !== pm));
                       }
                     }}
                   />
                 ))}
-                {errors.payment_methods && <div className="text-danger">{errors.payment_methods.message}</div>}
               </Form.Group>
             </Col>
           </Row>
@@ -431,11 +511,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                       />
                     </Col>
                     <Col xs="auto">
-                      <Button
-                        variant="danger"
-                        onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))}
-                        disabled={faqs.length === 1}
-                      >
+                      <Button variant="danger" onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))} disabled={faqs.length === 1}>
                         Remove
                       </Button>
                     </Col>
@@ -448,146 +524,166 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
           </Row>
 
-          {/* Availability */}
-          <Row>
-            <Col md={12}>
-              <Form.Group>
-                <Form.Label>Availability</Form.Label>
-                {watch('availability').map((slot, idx) => (
-                  <Row key={idx} className="mb-2 align-items-center">
-                    <Col>
-                      <Form.Control
-                        placeholder="Day"
-                        value={slot.day}
-                        onChange={(e) => {
-                          const newAvail = [...watch('availability')];
-                          newAvail[idx].day = e.target.value;
-                          setValue('availability', newAvail);
-                        }}
-                      />
-                    </Col>
-                    <Col>
-                      <Form.Control
-                        type="time"
-                        placeholder="Start Time"
-                        value={slot.startTime}
-                        onChange={(e) => {
-                          const newAvail = [...watch('availability')];
-                          newAvail[idx].startTime = e.target.value;
-                          setValue('availability', newAvail);
-                        }}
-                      />
-                    </Col>
-                    <Col>
-                      <Form.Control
-                        type="time"
-                        placeholder="End Time"
-                        value={slot.endTime}
-                        onChange={(e) => {
-                          const newAvail = [...watch('availability')];
-                          newAvail[idx].endTime = e.target.value;
-                          setValue('availability', newAvail);
-                        }}
-                      />
-                    </Col>
-                    <Col xs="auto">
-                      <Button
-                        variant="danger"
-                        onClick={() => setValue('availability', watch('availability').filter((_, i) => i !== idx))}
-                        disabled={watch('availability').length === 1}
-                      >
-                        Remove
-                      </Button>
-                    </Col>
-                  </Row>
-                ))}
-                <Button
-                  variant="outline-primary"
-                  onClick={() =>
-                    setValue('availability', [...watch('availability'), { day: '', startTime: '', endTime: '' }])
-                  }
-                >
-                  Add Availability
-                </Button>
-              </Form.Group>
-            </Col>
-          </Row>
 
-          {/* Specializations */}
+          {/* Department Select */}
           <Row>
-            <Col md={6} className="mb-3">
+            <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>Specializations (comma-separated IDs)</Form.Label>
+                <Form.Label>Department *</Form.Label>
                 <Controller
                   control={control}
-                  name="specializationIds"
-                  render={({ field: { value, onChange } }) => {
-                    const stringValue = Array.isArray(value) ? value.join(',') : '';
-                    return (
-                      <Form.Control
-                        type="text"
-                        placeholder="Ex: 1,2,3"
-                        value={stringValue}
-                        onChange={(e) => {
-                          const val = e.target.value;
-                          onChange(
-                            val
-                              .split(',')
-                              .map((id) => Number(id.trim()))
-                              .filter((id) => !isNaN(id))
-                          );
-                        }}
-                        isInvalid={!!errors.specializationIds}
-                      />
-                    );
-                  }}
+                  name="departmentId"
+                  render={({ field }) => (
+                    <Form.Select
+                      {...field}
+                      value={field.value === undefined || field.value === null ? '' : String(field.value)}
+                      onChange={e => field.onChange(e.target.value)}
+                      isInvalid={!!errors.departmentId}
+                    >
+                      <option value="">Select Department</option>
+                      {departments.map(dept => (
+                        <option key={dept._id} value={String(dept._id)}>{dept.name}</option>
+                      ))}
+                    </Form.Select>
+                  )}
                 />
-                <Form.Control.Feedback type="invalid">{errors.specializationIds?.message}</Form.Control.Feedback>
-              </Form.Group>
-            </Col>
-
-            <Col md={6} className="mb-3">
-              <Form.Group>
-                <Form.Label>Branches</Form.Label>
-                {BRANCHES.map((branch) => (
-                  <Form.Check
-                    key={branch.id}
-                    type="checkbox"
-                    label={branch.name}
-                    checked={watch('branchIds').includes(branch.id)}
-                    onChange={(e) => {
-                      const current = watch('branchIds');
-                      if (e.target.checked) {
-                        setValue('branchIds', [...current, branch.id]);
-                      } else {
-                        setValue('branchIds', current.filter((id) => id !== branch.id));
-                      }
-                    }}
-                  />
-                ))}
-                {errors.branchIds && <div className="text-danger">{errors.branchIds.message}</div>}
+                <Form.Control.Feedback type="invalid">{errors.departmentId?.message}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
 
-          <div className="mb-3 rounded">
-            <Row className="justify-content-end g-2 mt-2">
-              <Col lg={2}>
-                <Button variant="primary" type="submit" className="w-100">
-                  {editId ? 'Mise à jour' : 'Créer'} Therapist Team
-                </Button>
-              </Col>
-              <Col lg={2}>
-                <Button variant="danger" className="w-100" onClick={() => router.back()}>
-                  Annuler
-                </Button>
-              </Col>
-            </Row>
-          </div>
+          {/* Branch & Availability */}
+          <h6>Branch & Availability</h6>
+          {branchFields.map((branch, index) => (
+            <Card key={branch.id} className="mb-3 p-3">
+              <Row className="align-items-center">
+                <Col md={8}>
+                  <Form.Group className="mb-3">
+                    <Form.Label>Branch</Form.Label>
+                    <Form.Select {...register(`branches.${index}.branch_id`)} isInvalid={!!errors.branches?.[index]?.branch_id}>
+                      <option value="">Select Branch</option>
+                      {branchesList.map(b => (
+                        <option key={b.branch_id} value={b.branch_id}>{b.name}</option>
+                      ))}
+                    </Form.Select>
+                    <Form.Control.Feedback type="invalid">
+                      {errors.branches?.[index]?.branch_id?.message}
+                    </Form.Control.Feedback>
+                  </Form.Group>
+                </Col>
+                <Col md={4} className="d-flex align-items-center justify-content-start">
+                  <Button type="button" variant="danger" onClick={() => removeBranch(index)}>
+                    Remove Branch
+                  </Button>
+                </Col>
+              </Row>
+              <AvailabilitySlots nestIndex={index} control={control} register={register} />
+            </Card>
+          ))}
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            className="mb-3"
+            onClick={() =>
+              appendBranch({
+                branch_id: 0,
+                branch_name: '',
+                availability: [...defaultAvailability],
+              })
+            }
+          >
+            Add Branch
+          </Button>
+
+          {/* Status & Role */}
+          <Row>
+            <Col md={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>Status</Form.Label>
+                <Controller
+                  control={control}
+                  name="status"
+                  render={({ field }) => (
+                    <Form.Select {...field} value={field.value || 'active'} isInvalid={!!errors.status}>
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </Form.Select>
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">{errors.status?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+            <Col md={4} className="mb-3">
+              <Form.Group>
+                <Form.Label>Role</Form.Label>
+                <Controller
+                  control={control}
+                  name="role"
+                  render={({ field }) => (
+                    <Form.Select {...field} isInvalid={!!errors.role}>
+                      <option value="staff">Staff</option>
+                      <option value="admin">Admin</option>
+                    </Form.Select>
+                  )}
+                />
+                <Form.Control.Feedback type="invalid">{errors.role?.message}</Form.Control.Feedback>
+              </Form.Group>
+            </Col>
+          </Row>
+
+          {/* Submit & Cancel */}
+          <Row className="justify-content-end g-2 mt-2">
+            <Col lg={2}>
+              <Button type="submit" variant="primary" className="w-100" disabled={isSubmitting}>
+                {editId ? 'Update' : 'Create'} Therapist Team
+              </Button>
+            </Col>
+            <Col lg={2}>
+              <Button variant="danger" className="w-100" onClick={() => router.back()} disabled={isSubmitting}>
+                Cancel
+              </Button>
+            </Col>
+          </Row>
         </CardBody>
       </Card>
     </form>
   );
 };
+
+
+export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({ nestIndex, control, register }) => {
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: `branches.${nestIndex}.availability`,
+  });
+  return (
+    <div>
+      <label>Availability for Branch</label>
+      {fields.map((field, k) => (
+        <Row key={field.id} className="mb-2 align-items-center">
+          <Col>
+            <Form.Control {...register(`branches.${nestIndex}.availability.${k}.day`)} placeholder="Day" />
+          </Col>
+          <Col>
+            <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.startTime`)} placeholder="Start" />
+          </Col>
+          <Col>
+            <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.endTime`)} placeholder="End" />
+          </Col>
+          <Col xs="auto">
+            <Button type="button" variant="danger" onClick={() => remove(k)} disabled={fields.length === 1}>
+              Remove
+            </Button>
+          </Col>
+        </Row>
+      ))}
+      <Button type="button" variant="outline-primary" onClick={() => append({ day: '', startTime: '', endTime: '' })}>
+        Add Availability
+      </Button>
+    </div>
+  );
+};
+
 
 export default AddTherapistTeamPage;
