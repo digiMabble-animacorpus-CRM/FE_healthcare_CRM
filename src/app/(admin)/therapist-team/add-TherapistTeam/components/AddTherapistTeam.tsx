@@ -185,7 +185,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     defaultValues,
   });
 
-  const selectedLanguages = (watch('languagesSpoken') as string[]) || [];
+  const selectedLanguages = watch('languagesSpoken') || [];
 
   const {
     fields: branchFields,
@@ -210,7 +210,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
   }, []);
 
   useEffect(() => {
-    if (editId) {
+    if (editId && departments.length > 0) {
       setLoading(true);
       getTherapistTeamMemberById(editId).then((rawData) => {
         if (rawData) {
@@ -250,7 +250,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
         setLoading(false);
       });
     }
-  }, [editId, reset]);
+  }, [editId, reset, departments]);
 
   useEffect(() => {
     setValue(
@@ -274,7 +274,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
         ...branch,
         branch_id: Number(branch.branch_id),
         availability: branch.availability.filter(
-          (slot) => slot.day && slot.startTime && slot.endTime,
+          (slot) => slot.day || slot.startTime || slot.endTime,
         ),
       })),
       languagesSpoken: (data.languagesSpoken || []).filter(Boolean),
@@ -297,62 +297,52 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     }
   };
 
-  const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({
-    nestIndex,
+  const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({ nestIndex, control, register }) => {
+  const { fields, append, remove } = useFieldArray({
     control,
-    register,
-  }) => {
-    const { fields, append, remove } = useFieldArray({
-      control,
-      name: `branches.${nestIndex}.availability`,
-    });
-    return (
-      <div>
-        <label>Availability for Branch</label>
-        {fields.map((field, k) => (
-          <Row key={field.id} className="mb-2 align-items-center">
-            <Col>
-              <Form.Control
-                {...register(`branches.${nestIndex}.availability.${k}.day`)}
-                placeholder="Day"
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                type="time"
-                {...register(`branches.${nestIndex}.availability.${k}.startTime`)}
-                placeholder="Start"
-              />
-            </Col>
-            <Col>
-              <Form.Control
-                type="time"
-                {...register(`branches.${nestIndex}.availability.${k}.endTime`)}
-                placeholder="End"
-              />
-            </Col>
-            <Col xs="auto">
-              <Button
-                type="button"
-                variant="danger"
-                onClick={() => remove(k)}
-                disabled={fields.length === 1}
-              >
-                Remove
-              </Button>
-            </Col>
-          </Row>
-        ))}
-        <Button
-          type="button"
-          variant="outline-primary"
-          onClick={() => append({ day: '', startTime: '', endTime: '' })}
-        >
-          Add Availability
-        </Button>
-      </div>
-    );
-  };
+    name: `branches.${nestIndex}.availability`,
+  });
+
+  return (
+    <div className="mb-3">
+      <label>Availability for Branch</label>
+      {fields.map((field, k) => (
+        <Row key={field.id} className="mb-2 align-items-center">
+          <Col>
+            <Form.Select {...register(`branches.${nestIndex}.availability.${k}.day`)}>
+              <option value="">Select Day</option>
+              {DAYS_OF_WEEK.map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
+            </Form.Select>
+          </Col>
+          <Col>
+            <Form.Control
+              type="time"
+              {...register(`branches.${nestIndex}.availability.${k}.startTime`)}
+            />
+          </Col>
+          <Col>
+            <Form.Control
+              type="time"
+              {...register(`branches.${nestIndex}.availability.${k}.endTime`)}
+            />
+          </Col>
+          <Col xs="auto">
+            <Button type="button" variant="danger" onClick={() => remove(k)} disabled={fields.length === 1}>
+              Remove
+            </Button>
+          </Col>
+        </Row>
+      ))}
+      <Button type="button" variant="outline-primary" onClick={() => append({ day: '', startTime: '', endTime: '' })}>
+        Add Availability
+      </Button>
+    </div>
+  );
+};
 
   if (loading) return <Spinner animation="border" />;
 
@@ -500,7 +490,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
 
           {/* Languages Spoken */}
           <Row>
-            <Col md={12} className="mb-3">
+            <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Languages Spoken *</Form.Label>
                 {languages.map(({ id, language_name }) => (
@@ -508,9 +498,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                     key={id}
                     type="checkbox"
                     label={language_name}
-                    checked={selectedLanguages.includes(id.toString())}
+                    checked={(watch('languagesSpoken') || []).includes(id.toString())}
                     onChange={(e) => {
-                      const current = selectedLanguages;
+                      const current = watch('languagesSpoken') || [];
                       if (e.target.checked) {
                         setValue('languagesSpoken', [...current, id.toString()]);
                       } else {
@@ -527,11 +517,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 )}
               </Form.Group>
             </Col>
-          </Row>
-
-          {/* Payment Methods */}
-          <Row>
-            <Col md={12} className="mb-3">
+            <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Payment Methods</Form.Label>
                 {PAYMENT_METHODS.map((pm) => (
@@ -555,7 +541,8 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 ))}
               </Form.Group>
             </Col>
-          </Row>
+        </Row>
+
 
           {/* FAQ */}
           <Row>
@@ -618,41 +605,44 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                   render={({ field }) => (
                     <Form.Select
                       {...field}
-                      value={field.value ? String(field.value) : ''}
+                      value={field.value || 0}  // store as number
                       onChange={(e) => field.onChange(Number(e.target.value))}
-                      isInvalid={!!errors.departmentId}
                     >
-                      <option value="">Select Department</option>
-                      {departments.map((dept) => (
-                        <option key={dept.id} value={String(dept.id)}>
-                          {dept.name}
-                        </option>
-                      ))}
+                      <option value={0}>Select Department</option>
+                      {departments
+                        .filter((dept) => dept.id !== null && dept.id !== undefined)
+                        .map((dept) => (
+                          <option key={dept.id} value={dept.id!.toString()}>
+                            {dept.name}
+                          </option>
+                        ))}
                     </Form.Select>
                   )}
                 />
-
                 <Form.Control.Feedback type="invalid">
                   {errors.departmentId?.message}
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
+
+
             <Col md={12} className="mb-3">
               <Form.Group>
+                <Form.Label>Specialization *</Form.Label>
                 {specializations.map((spec) => (
                   <Form.Check
-                    key={spec.specialization_id}
-                    type="checkbox"
-                    label={spec.specialization_type} // show name instead of id
-                    checked={(watch('specializationIds') || []).includes(spec.specialization_id)}
-                    onChange={(e) => {
+                      key={spec.id}
+                      type="checkbox"
+                      label={spec.name} // show name instead of id
+                      checked={(watch('specializationIds') || []).includes(spec.id)}
+                      onChange={(e) => {
                       const current = watch('specializationIds') || [];
                       if (e.target.checked) {
-                        setValue('specializationIds', [...current, spec.specialization_id]);
+                        setValue('specializationIds', [...current, spec.id]);
                       } else {
                         setValue(
                           'specializationIds',
-                          current.filter((id) => id !== spec.specialization_id),
+                          current.filter((id) => id !== spec.id),
                         );
                       }
                     }}
@@ -743,8 +733,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                   name="role"
                   render={({ field }) => (
                     <Form.Select {...field} isInvalid={!!errors.role}>
-                      <option value="staff">Staff</option>
+                      <option value="super-admin">Super-Admin</option>
                       <option value="admin">Admin</option>
+                      <option value="therapist">Therapist</option>
                     </Form.Select>
                   )}
                 />
@@ -774,65 +765,6 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
         </CardBody>
       </Card>
     </form>
-  );
-};
-export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({
-  nestIndex,
-  control,
-  register,
-}) => {
-  const { fields, append, remove } = useFieldArray({
-    control,
-    name: `branches.${nestIndex}.availability`,
-  });
-
-  return (
-    <div className="mb-3">
-      <label>Availability for Branch</label>
-      {fields.map((field, k) => (
-        <Row key={field.id} className="mb-2 align-items-center">
-          <Col>
-            <Form.Select {...register(`branches.${nestIndex}.availability.${k}.day`)}>
-              <option value="">Select Day</option>
-              {DAYS_OF_WEEK.map((day) => (
-                <option key={day} value={day}>
-                  {day}
-                </option>
-              ))}
-            </Form.Select>
-          </Col>
-          <Col>
-            <Form.Control
-              type="time"
-              {...register(`branches.${nestIndex}.availability.${k}.startTime`)}
-            />
-          </Col>
-          <Col>
-            <Form.Control
-              type="time"
-              {...register(`branches.${nestIndex}.availability.${k}.endTime`)}
-            />
-          </Col>
-          <Col xs="auto">
-            <Button
-              type="button"
-              variant="danger"
-              onClick={() => remove(k)}
-              disabled={fields.length === 1}
-            >
-              Remove
-            </Button>
-          </Col>
-        </Row>
-      ))}
-      <Button
-        type="button"
-        variant="outline-primary"
-        onClick={() => append({ day: '', startTime: '', endTime: '' })}
-      >
-        Add Availability
-      </Button>
-    </div>
   );
 };
 
