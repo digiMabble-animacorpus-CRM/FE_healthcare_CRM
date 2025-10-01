@@ -3,17 +3,22 @@ import { useState } from 'react';
 import { Badge, Button, Card, CardBody, Col, Collapse, Row, Table } from 'react-bootstrap';
 import { FaEnvelope, FaGlobe, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
 
-const BRANCHES = [
-  { id: 1, name: 'Gembloux - Orneau' },
-  { id: 2, name: 'Gembloux - Tout Vent' },
-  { id: 3, name: 'Namur' },
-];
-
 type FAQItem = { question: string; answer: string };
 
+type Branch = {
+  branch_id: number;
+  name: string;
+  address: string;
+  email?: string;
+  phone?: string;
+  location?: string;
+  is_active?: boolean;
+  created_at?: string;
+};
+
 type TeamDetailsCardProps = {
-  last_name: string;
   first_name: string;
+  last_name: string;
   full_name: string;
   job_1?: string | null;
   job_2?: string | null;
@@ -21,36 +26,26 @@ type TeamDetailsCardProps = {
   job_4?: string | null;
   specific_audience?: string | null;
   specialization_1?: string | null;
+  specializations?: string[];
+  department?: string;
   who_am_i: string;
   consultations: string;
   office_address: string;
-  contact_email: string;
-  contact_phone: string;
+  contact_email?: string;
+  contact_phone?: string;
   schedule: Record<string, string> | { text?: string | null };
   about: string;
-  languages_spoken: string[];
-  payment_methods: string[];
-  diplomas_and_training: string[];
-  specializations: string[];
-  website: string;
-  frequently_asked_questions: string | Record<string, string> | FAQItem[];
-  calendar_links: string[];
-  photo: string;
+  languages_spoken?: string[];
+  payment_methods?: string[];
+  diplomas_and_training?: string[];
+  website?: string;
+  frequently_asked_questions?: string | Record<string, string> | FAQItem[];
+  calendar_links?: string[];
+  photo?: string;
   role?: string;
   status?: string;
-  branches: branch[];
-  primary_branch_id: number;
-};
-
-type branch = {
-  branch_id: string;
-  name: string;
-  address: string;
-  email: string;
-  phone: string;
-  location: string;
-  is_active: boolean;
-  created_at: string;
+  branches?: Branch[];
+  primary_branch_id?: number;
 };
 
 const TeamDetails = ({
@@ -61,6 +56,8 @@ const TeamDetails = ({
   job_4,
   specific_audience,
   specialization_1,
+  specializations = [],
+  department = '-',
   who_am_i,
   consultations,
   office_address,
@@ -68,21 +65,19 @@ const TeamDetails = ({
   contact_phone,
   schedule,
   about,
-  languages_spoken,
-  payment_methods,
-  diplomas_and_training,
-  specializations,
+  languages_spoken = [],
+  payment_methods = [],
+  diplomas_and_training = [],
   website,
   frequently_asked_questions,
-  calendar_links,
+  calendar_links = [],
   photo,
   role,
   status,
   branches = [],
-  primary_branch_id,
+  primary_branch_id = 0,
 }: TeamDetailsCardProps) => {
   const [aboutOpen, setAboutOpen] = useState(true);
-  const [whoIAmOpen, setWhoIAmOpen] = useState(true);
   const [consultationOpen, setConsultationOpen] = useState(true);
   const [specificAudienceOpen, setSpecificAudienceOpen] = useState(true);
 
@@ -104,27 +99,20 @@ const TeamDetails = ({
           )
       : (schedule as Record<string, string>) || {};
 
-  // ✅ Normalize FAQ input
+  // Normalize FAQ input
   let faqArray: FAQItem[] = [];
   if (Array.isArray(frequently_asked_questions)) {
     faqArray = frequently_asked_questions;
-  } else if (
-    typeof frequently_asked_questions === 'object' &&
-    frequently_asked_questions !== null
-  ) {
+  } else if (typeof frequently_asked_questions === 'object' && frequently_asked_questions !== null) {
     faqArray = Object.entries(frequently_asked_questions).map(([question, answer]) => ({
       question,
       answer: String(answer),
     }));
   } else if (typeof frequently_asked_questions === 'string') {
-    faqArray = frequently_asked_questions
-      .split(/\n/)
-      .reduce((acc: FAQItem[], line: string, idx: number, arr: string[]) => {
-        if (idx % 2 === 0 && line.trim() !== '') {
-          acc.push({ question: line.trim(), answer: arr[idx + 1]?.trim() || '' });
-        }
-        return acc;
-      }, []);
+    const lines = frequently_asked_questions.split(/\r?\n/).filter(Boolean);
+    for (let i = 0; i < lines.length; i += 2) {
+      faqArray.push({ question: lines[i], answer: lines[i + 1] || '' });
+    }
   }
 
   return (
@@ -173,6 +161,9 @@ const TeamDetails = ({
                     <strong>Spécialisation primaire:</strong> {specialization_1 || '-'}
                   </p>
                   <p className="mb-1">
+                    <strong>Département:</strong> {department}
+                  </p>
+                  <p className="mb-1">
                     <strong>Rôle:</strong> {role || '-'}
                   </p>
                   <p className="mb-1">
@@ -192,12 +183,7 @@ const TeamDetails = ({
                     {website && (
                       <div className="d-flex align-items-center gap-2">
                         <FaGlobe className="text-info" />
-                        <a
-                          href={website}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-decoration-none"
-                        >
+                        <a href={website} target="_blank" rel="noopener noreferrer" className="text-decoration-none">
                           {website}
                         </a>
                       </div>
@@ -226,7 +212,7 @@ const TeamDetails = ({
                   </div>
                 </div>
               )}
-              {branches?.length > 0 && (
+              {branches.length > 0 && (
                 <div>
                   <strong>Succursales disponibles:</strong> {branches.map((b) => b.name).join(', ')}
                 </div>
@@ -279,8 +265,7 @@ const TeamDetails = ({
       )}
 
       {/* Languages Spoken */}
-      {/* Languages Spoken */}
-      {languages_spoken?.length > 0 && (
+      {languages_spoken.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Langues parlées</h4>
@@ -296,7 +281,7 @@ const TeamDetails = ({
       )}
 
       {/* Payment Methods */}
-      {payment_methods?.length > 0 && (
+      {payment_methods.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Méthodes de paiement</h4>
@@ -312,7 +297,7 @@ const TeamDetails = ({
       )}
 
       {/* Diplomas & Training */}
-      {diplomas_and_training?.length > 0 && (
+      {diplomas_and_training.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Éducation et formation</h4>
@@ -328,7 +313,7 @@ const TeamDetails = ({
       )}
 
       {/* Specializations */}
-      {specializations?.length > 0 && (
+      {specializations.length > 0 && (
         <Card className="mb-4">
           <CardBody>
             <h4>Spécialisations</h4>
@@ -361,25 +346,27 @@ const TeamDetails = ({
       </Card>
 
       {/* Specific Audience */}
-      <Card className="mb-4">
-        <CardBody>
-          <div className="d-flex justify-content-between mb-2">
-            <h4>Public spécifique</h4>
-            <Button
-              variant="link"
-              size="sm"
-              onClick={() => setSpecificAudienceOpen(!specificAudienceOpen)}
-            >
-              {specificAudienceOpen ? 'Hide' : 'Show'}
-            </Button>
-          </div>
-          <Collapse in={specificAudienceOpen}>
-            <div>
-              <p>{specific_audience || '-'}</p>
+      {specific_audience && (
+        <Card className="mb-4">
+          <CardBody>
+            <div className="d-flex justify-content-between mb-2">
+              <h4>Public spécifique</h4>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={() => setSpecificAudienceOpen(!specificAudienceOpen)}
+              >
+                {specificAudienceOpen ? 'Hide' : 'Show'}
+              </Button>
             </div>
-          </Collapse>
-        </CardBody>
-      </Card>
+            <Collapse in={specificAudienceOpen}>
+              <div>
+                <p>{specific_audience}</p>
+              </div>
+            </Collapse>
+          </CardBody>
+        </Card>
+      )}
 
       {/* Who I Am */}
       <Card className="mb-4">
@@ -390,9 +377,9 @@ const TeamDetails = ({
       </Card>
 
       {/* Calendar Links */}
-      <Card className="mb-4">
-        <CardBody>
-          {calendar_links?.length > 0 ? (
+      {calendar_links.length > 0 && (
+        <Card className="mb-4">
+          <CardBody>
             <ul>
               {calendar_links.map((link, idx) => (
                 <li key={idx}>
@@ -402,11 +389,9 @@ const TeamDetails = ({
                 </li>
               ))}
             </ul>
-          ) : (
-            <p>-</p>
-          )}
-        </CardBody>
-      </Card>
+          </CardBody>
+        </Card>
+      )}
 
       {/* FAQ */}
       {faqArray.length > 0 && (

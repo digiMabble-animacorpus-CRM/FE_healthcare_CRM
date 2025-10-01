@@ -652,6 +652,8 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
+  [x: string]: any;
+  departmentName: number;
   first_name: string;
   last_name: string;
   job_1: string | null | undefined;
@@ -783,6 +785,8 @@ export interface LanguageType {
 };
 
 export interface SpecializationType {
+  specialization_type: ReactNode;
+  specialization_id: Key | null | undefined;
   id: number;       // normalized from specialization_id
   name: string;     // normalized from specialization_type
   description?: string;
@@ -791,4 +795,36 @@ export interface SpecializationType {
     id: number;
     name: string;
   };
+}
+
+export interface TherapistTeamMember {
+  team_id: string;
+  firstName: string;
+  lastName: string;
+  full_name: string;
+  job_1?: string;
+  job_2?: string;
+  job_3?: string;
+  job_4?: string;
+  specific_audience?: string;
+  specializationIds?: string[];
+  departmentId?: string;   // ✅ ADD THIS
+  departmentName?: string; // optional if API returns department details
+  aboutMe?: string;
+  consultations?: any[];
+  office_address?: string;
+  contactEmail?: string;
+  contactPhone?: string;
+  availability?: any;
+  languagesSpoken?: string[];
+  payment_methods?: string[];
+  degreesTraining?: string;
+  website?: string;
+  faq?: string[];
+  calendar_links?: string[];
+  imageUrl?: string;
+  branches?: any[];
+  primary_branch_id?: number;
+  role?: string;
+  status?: string;
 }

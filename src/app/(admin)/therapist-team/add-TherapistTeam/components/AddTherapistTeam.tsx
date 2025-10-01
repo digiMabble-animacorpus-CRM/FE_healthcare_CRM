@@ -30,6 +30,15 @@ import { useNotificationContext } from '@/context/useNotificationContext';
 import { DepartmentType, LanguageType, SpecializationType } from '@/types/data';
 
 const PAYMENT_METHODS = ['Cash', 'Card', 'Insurance'];
+const DAYS_OF_WEEK = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+];
 
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
@@ -279,7 +288,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`,
           variant: 'success',
         });
-        router.push('/therapist-teams/TherapistTeam-list');
+        router.push('/therapist-team/TherapistTeam-list');
       } else {
         showNotification({ message: 'Something Went Wrong', variant: 'danger' });
       }
@@ -628,6 +637,29 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
+            <Col md={12} className="mb-3">
+              <Form.Group>
+                {specializations.map((spec) => (
+                  <Form.Check
+                    key={spec.specialization_id}
+                    type="checkbox"
+                    label={spec.specialization_type} // show name instead of id
+                    checked={(watch('specializationIds') || []).includes(spec.specialization_id)}
+                    onChange={(e) => {
+                      const current = watch('specializationIds') || [];
+                      if (e.target.checked) {
+                        setValue('specializationIds', [...current, spec.specialization_id]);
+                      } else {
+                        setValue(
+                          'specializationIds',
+                          current.filter((id) => id !== spec.specialization_id),
+                        );
+                      }
+                    }}
+                  />
+                ))}
+              </Form.Group>
+            </Col>
           </Row>
 
           {/* Branch & Availability */}
@@ -744,7 +776,6 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     </form>
   );
 };
-
 export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({
   nestIndex,
   control,
@@ -754,29 +785,32 @@ export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({
     control,
     name: `branches.${nestIndex}.availability`,
   });
+
   return (
-    <div>
+    <div className="mb-3">
       <label>Availability for Branch</label>
       {fields.map((field, k) => (
         <Row key={field.id} className="mb-2 align-items-center">
           <Col>
-            <Form.Control
-              {...register(`branches.${nestIndex}.availability.${k}.day`)}
-              placeholder="Day"
-            />
+            <Form.Select {...register(`branches.${nestIndex}.availability.${k}.day`)}>
+              <option value="">Select Day</option>
+              {DAYS_OF_WEEK.map((day) => (
+                <option key={day} value={day}>
+                  {day}
+                </option>
+              ))}
+            </Form.Select>
           </Col>
           <Col>
             <Form.Control
               type="time"
               {...register(`branches.${nestIndex}.availability.${k}.startTime`)}
-              placeholder="Start"
             />
           </Col>
           <Col>
             <Form.Control
               type="time"
               {...register(`branches.${nestIndex}.availability.${k}.endTime`)}
-              placeholder="End"
             />
           </Col>
           <Col xs="auto">
@@ -801,5 +835,6 @@ export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({
     </div>
   );
 };
+
 
 export default AddTherapistTeamPage;

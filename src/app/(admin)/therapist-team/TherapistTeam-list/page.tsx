@@ -285,7 +285,6 @@ const TherapistTeamsListPage = () => {
                         <th>E-mail</th>
                         <th>Téléphone</th>
                         <th>Succursale</th>
-                        <th>Titre demploi</th>
                         <th>Rôle</th>
                         <th>Statut</th>
                         <th>Action</th>

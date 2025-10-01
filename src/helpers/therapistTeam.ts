@@ -90,6 +90,16 @@ export const getTherapistTeamMemberById = async (teamMemberId: string | number):
     return null;
   }
 };
+// helpers/team-members.ts
+export async function getTeamMemberById(id: number) {
+  // Send the numeric ID as a query param
+  const res = await fetch(`${API_BASE_PATH}/team?id=${id}`);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch team member with id ${id}`);
+  }
+  return res.json();
+}
+
 
 // Create a therapist team member
 export const createTherapistTeamMember = async (payload: TherapistTeamMember): Promise<boolean> => {
