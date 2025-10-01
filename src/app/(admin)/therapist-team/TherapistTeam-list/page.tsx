@@ -131,31 +131,39 @@ const TherapistTeamsListPage = () => {
   };
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
-
   const handleConfirmDelete = async () => {
-  if (!selectedTherapistTeamId) return;
+    if (!selectedTherapistTeamId) return;
 
-  setShowDeleteModal(false); // close modal immediately
+    setDeletingId(selectedTherapistTeamId);
+    setShowDeleteModal(false);
 
-  try {
-    const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
-    if (success) {
-      // Update state using functional update
-      setAllTeamMembers((prev) =>
-        prev.filter((t) => String(t.team_id) !== String(selectedTherapistTeamId))
-      );
-      setTotalCount((prev) => prev - 1);
-    } else {
-      setError('Failed to delete therapist team member.');
+    try {
+      const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
+      if (success) {
+        // <-- THIS IS WHERE YOU PUT THE NEW CODE
+        setAllTeamMembers((prev) => {
+          const updated = prev.filter((t) => String(t.team_id) !== String(selectedTherapistTeamId));
+
+          // Handle last item on page
+          if (updated.length === 0 && currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+          }
+
+          return updated;
+        });
+
+        setTotalCount((prev) => prev - 1);
+      } else {
+        setError('Failed to delete therapist team member.');
+      }
+    } catch (err) {
+      setError('An error occurred while deleting the member.');
+    } finally {
+      setDeletingId(null);
+      setSelectedTeamId(null);
+      setSelectedTeamMemberId(null);
     }
-  } catch (err) {
-    setError('An error occurred while deleting the member.');
-  } finally {
-    setSelectedTeamId(null);
-    setSelectedTeamMemberId(null);
-  }
-};
-
+  };
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -295,7 +303,9 @@ const TherapistTeamsListPage = () => {
                           <tr key={item.team_id ?? `team-member-${idx}`}>
                             <td>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
                             <td>{getProfileDisplay(item)}</td>
-                            <td>{item.firstName} {item.lastName}</td>
+                            <td>
+                              {item.firstName} {item.lastName}
+                            </td>
                             <td>{item.contactEmail}</td>
                             <td>{item.contactPhone}</td>
                             <td>

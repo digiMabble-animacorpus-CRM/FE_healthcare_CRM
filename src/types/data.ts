@@ -737,6 +737,7 @@ export type TeamMemberCreatePayload = {
 };
 
 export interface DepartmentType {
+  id: Key | null | undefined;
   _id: string;
   name: string;
   description?: string;

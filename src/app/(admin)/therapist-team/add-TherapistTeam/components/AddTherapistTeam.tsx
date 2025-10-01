@@ -3,13 +3,17 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import {
-  Button, Card, CardBody, CardHeader, CardTitle,
-  Col, Form, Row, Spinner
+  Button,
+  Card,
+  CardBody,
+  CardHeader,
+  CardTitle,
+  Col,
+  Form,
+  Row,
+  Spinner,
 } from 'react-bootstrap';
-import {
-  useForm, Controller, useFieldArray,
-  Control, UseFormRegister
-} from 'react-hook-form';
+import { useForm, Controller, useFieldArray, Control, UseFormRegister } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -32,7 +36,11 @@ const schema = yup.object().shape({
   lastName: yup.string().required('Last name is required'),
   contactEmail: yup.string().email('Invalid email').required('Email is required'),
   contactPhone: yup.string().required('Contact number is required'),
-  languagesSpoken: yup.array().of(yup.string().required()).min(1, 'Select at least one language').required(),
+  languagesSpoken: yup
+    .array()
+    .of(yup.string().required())
+    .min(1, 'Select at least one language')
+    .required(),
   full_name: yup.string(),
   imageUrl: yup.string().url('Must be a valid URL'),
   aboutMe: yup.string(),
@@ -43,7 +51,7 @@ const schema = yup.object().shape({
     yup.object().shape({
       question: yup.string(),
       answer: yup.string(),
-    })
+    }),
   ),
   website: yup.string().url('Must be a valid URL'),
   consultations: yup.string(),
@@ -62,9 +70,9 @@ const schema = yup.object().shape({
           day: yup.string(),
           startTime: yup.string(),
           endTime: yup.string(),
-        })
+        }),
       ),
-    })
+    }),
   ),
 });
 
@@ -156,60 +164,90 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
   const [specializations, setSpecializations] = useState<SpecializationType[]>([]);
 
   const {
-    control, register, setValue, watch, reset, handleSubmit, formState: { errors, isSubmitting }
+    control,
+    register,
+    setValue,
+    watch,
+    reset,
+    handleSubmit,
+    formState: { errors, isSubmitting },
   } = useForm<TherapistTeamMember>({
     resolver: yupResolver(schema),
     defaultValues,
   });
 
-  const selectedLanguages = watch('languagesSpoken') as string[] || [];
+  const selectedLanguages = (watch('languagesSpoken') as string[]) || [];
 
-  const { fields: branchFields, append: appendBranch, remove: removeBranch } = useFieldArray({
+  const {
+    fields: branchFields,
+    append: appendBranch,
+    remove: removeBranch,
+  } = useFieldArray({
     control,
     name: 'branches',
   });
 
-  useEffect(() => { getAllLanguages().then(setLanguages); }, []);
-  useEffect(() => { getBranches(1, 100).then(({ data }) => setBranchesList(data)); }, []);
-  useEffect(() => { getDepartments(1, 100, '').then(({ data }) => setDepartments(data)); }, []);
-  useEffect(() => { getSpecializations().then(({ data }) => setSpecializations(data)); }, []);
-
- useEffect(() => {
-  if (editId) {
-    setLoading(true);
-    getTherapistTeamMemberById(editId).then(rawData => {
-      if (rawData) {
-        const adaptedData = {
-          ...rawData,
-          departmentId: Number(rawData.departmentId),
-          specializationIds: (rawData.specializationIds || []).map(Number),
-          languagesSpoken: (rawData.languagesSpoken || []).map(String),
-          branches: Array.isArray(rawData.branches) && rawData.branches.length
-            ? rawData.branches.map((branch: { branch_id: any; availability: string | any[]; }) => ({
-                ...branch,
-                branch_id: Number(branch.branch_id),
-                availability: Array.isArray(branch.availability) && branch.availability.length
-                  ? branch.availability
-                  : [{ day: '', startTime: '', endTime: '' }],
-              }))
-            : [{ branch_id: 0, branch_name: '', availability: [{ day: '', startTime: '', endTime: '' }] }],
-          faq: Array.isArray(rawData.faq) && rawData.faq.length
-            ? rawData.faq
-            : [{ question: '', answer: '' }],
-          status: rawData.status === 'inactive' ? 'inactive' : 'active',
-        };
-        reset(adaptedData);  // React Hook Form resets all fields to these values
-        setFaqs(adaptedData.faq);
-      }
-      setLoading(false);
-    });
-  }
-}, [editId, reset]);
-
-
+  useEffect(() => {
+    getAllLanguages().then(setLanguages);
+  }, []);
+  useEffect(() => {
+    getBranches(1, 100).then(({ data }) => setBranchesList(data));
+  }, []);
+  useEffect(() => {
+    getDepartments(1, 100, '').then(({ data }) => setDepartments(data));
+  }, []);
+  useEffect(() => {
+    getSpecializations().then(({ data }) => setSpecializations(data));
+  }, []);
 
   useEffect(() => {
-    setValue('full_name', `${watch('firstName')?.trim() ?? ''} ${watch('lastName')?.trim() ?? ''}`.trim());
+    if (editId) {
+      setLoading(true);
+      getTherapistTeamMemberById(editId).then((rawData) => {
+        if (rawData) {
+          const adaptedData = {
+            ...rawData,
+            departmentId: Number(rawData.departmentId),
+            specializationIds: (rawData.specializationIds || []).map(Number),
+            languagesSpoken: (rawData.languagesSpoken || []).map(String),
+            branches:
+              Array.isArray(rawData.branches) && rawData.branches.length
+                ? rawData.branches.map(
+                    (branch: { branch_id: any; availability: string | any[] }) => ({
+                      ...branch,
+                      branch_id: Number(branch.branch_id),
+                      availability:
+                        Array.isArray(branch.availability) && branch.availability.length
+                          ? branch.availability
+                          : [{ day: '', startTime: '', endTime: '' }],
+                    }),
+                  )
+                : [
+                    {
+                      branch_id: 0,
+                      branch_name: '',
+                      availability: [{ day: '', startTime: '', endTime: '' }],
+                    },
+                  ],
+            faq:
+              Array.isArray(rawData.faq) && rawData.faq.length
+                ? rawData.faq
+                : [{ question: '', answer: '' }],
+            status: rawData.status === 'inactive' ? 'inactive' : 'active',
+          };
+          reset(adaptedData); // React Hook Form resets all fields to these values
+          setFaqs(adaptedData.faq);
+        }
+        setLoading(false);
+      });
+    }
+  }, [editId, reset]);
+
+  useEffect(() => {
+    setValue(
+      'full_name',
+      `${watch('firstName')?.trim() ?? ''} ${watch('lastName')?.trim() ?? ''}`.trim(),
+    );
   }, [watch('firstName'), watch('lastName'), setValue]);
 
   useEffect(() => setValue('faq', faqs), [faqs, setValue]);
@@ -219,14 +257,16 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     const departmentIdNum = deptValue && !isNaN(Number(deptValue)) ? Number(deptValue) : 0; // fallback if invalid
     const sanitizedData = {
       ...data,
-      departmentId: departmentIdNum, 
+      departmentId: departmentIdNum,
       specializationIds: (data.specializationIds || []).map(Number),
       payment_methods: (data.payment_methods || []).filter(Boolean),
       faq: faqs,
-      branches: (data.branches || []).map(branch => ({
+      branches: (data.branches || []).map((branch) => ({
         ...branch,
         branch_id: Number(branch.branch_id),
-        availability: branch.availability.filter(slot => slot.day && slot.startTime && slot.endTime),
+        availability: branch.availability.filter(
+          (slot) => slot.day && slot.startTime && slot.endTime,
+        ),
       })),
       languagesSpoken: (data.languagesSpoken || []).filter(Boolean),
     };
@@ -235,7 +275,10 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
         ? await updateTherapistTeamMember(editId, sanitizedData)
         : await createTherapistTeamMember(sanitizedData);
       if (success) {
-        showNotification({ message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`, variant: 'success' });
+        showNotification({
+          message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`,
+          variant: 'success',
+        });
         router.push('/therapist-teams/TherapistTeam-list');
       } else {
         showNotification({ message: 'Something Went Wrong', variant: 'danger' });
@@ -245,7 +288,11 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     }
   };
 
-  const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({ nestIndex, control, register }) => {
+  const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({
+    nestIndex,
+    control,
+    register,
+  }) => {
     const { fields, append, remove } = useFieldArray({
       control,
       name: `branches.${nestIndex}.availability`,
@@ -256,22 +303,42 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
         {fields.map((field, k) => (
           <Row key={field.id} className="mb-2 align-items-center">
             <Col>
-              <Form.Control {...register(`branches.${nestIndex}.availability.${k}.day`)} placeholder="Day" />
+              <Form.Control
+                {...register(`branches.${nestIndex}.availability.${k}.day`)}
+                placeholder="Day"
+              />
             </Col>
             <Col>
-              <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.startTime`)} placeholder="Start" />
+              <Form.Control
+                type="time"
+                {...register(`branches.${nestIndex}.availability.${k}.startTime`)}
+                placeholder="Start"
+              />
             </Col>
             <Col>
-              <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.endTime`)} placeholder="End" />
+              <Form.Control
+                type="time"
+                {...register(`branches.${nestIndex}.availability.${k}.endTime`)}
+                placeholder="End"
+              />
             </Col>
             <Col xs="auto">
-              <Button type="button" variant="danger" onClick={() => remove(k)} disabled={fields.length === 1}>
+              <Button
+                type="button"
+                variant="danger"
+                onClick={() => remove(k)}
+                disabled={fields.length === 1}
+              >
                 Remove
               </Button>
             </Col>
           </Row>
         ))}
-        <Button type="button" variant="outline-primary" onClick={() => append({ day: '', startTime: '', endTime: '' })}>
+        <Button
+          type="button"
+          variant="outline-primary"
+          onClick={() => append({ day: '', startTime: '', endTime: '' })}
+        >
           Add Availability
         </Button>
       </div>
@@ -293,14 +360,18 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
               <Form.Group>
                 <Form.Label>First Name *</Form.Label>
                 <Form.Control {...register('firstName')} isInvalid={!!errors.firstName} />
-                <Form.Control.Feedback type="invalid">{errors.firstName?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.firstName?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Last Name *</Form.Label>
                 <Form.Control {...register('lastName')} isInvalid={!!errors.lastName} />
-                <Form.Control.Feedback type="invalid">{errors.lastName?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.lastName?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -310,10 +381,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Profile Image URL</Form.Label>
-                <Form.Control
-                  {...register('imageUrl')}
-                  isInvalid={!!errors.imageUrl}
-                />
+                <Form.Control {...register('imageUrl')} isInvalid={!!errors.imageUrl} />
                 <Form.Control.Feedback type="invalid">
                   {errors.imageUrl?.message}
                 </Form.Control.Feedback>
@@ -322,10 +390,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Email *</Form.Label>
-                <Form.Control
-                  {...register('contactEmail')}
-                  isInvalid={!!errors.contactEmail}
-                />
+                <Form.Control {...register('contactEmail')} isInvalid={!!errors.contactEmail} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactEmail?.message}
                 </Form.Control.Feedback>
@@ -338,10 +403,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Contact Phone *</Form.Label>
-                <Form.Control
-                  {...register('contactPhone')}
-                  isInvalid={!!errors.contactPhone}
-                />
+                <Form.Control {...register('contactPhone')} isInvalid={!!errors.contactPhone} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactPhone?.message}
                 </Form.Control.Feedback>
@@ -419,10 +481,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={12} className="mb-3">
               <Form.Group>
                 <Form.Label>Website</Form.Label>
-                <Form.Control
-                  {...register('website')}
-                  isInvalid={!!errors.website}
-                />
+                <Form.Control {...register('website')} isInvalid={!!errors.website} />
                 <Form.Control.Feedback type="invalid">
                   {errors.website?.message}
                 </Form.Control.Feedback>
@@ -446,12 +505,17 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                       if (e.target.checked) {
                         setValue('languagesSpoken', [...current, id.toString()]);
                       } else {
-                        setValue('languagesSpoken', current.filter(langId => langId !== id.toString()));
+                        setValue(
+                          'languagesSpoken',
+                          current.filter((langId) => langId !== id.toString()),
+                        );
                       }
                     }}
                   />
                 ))}
-                {errors.languagesSpoken && <div className="text-danger">{errors.languagesSpoken.message}</div>}
+                {errors.languagesSpoken && (
+                  <div className="text-danger">{errors.languagesSpoken.message}</div>
+                )}
               </Form.Group>
             </Col>
           </Row>
@@ -461,18 +525,21 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             <Col md={12} className="mb-3">
               <Form.Group>
                 <Form.Label>Payment Methods</Form.Label>
-                {PAYMENT_METHODS.map(pm => (
+                {PAYMENT_METHODS.map((pm) => (
                   <Form.Check
                     key={pm}
                     type="checkbox"
                     label={pm}
                     checked={(watch('payment_methods') || []).includes(pm)}
-                    onChange={e => {
+                    onChange={(e) => {
                       const current = watch('payment_methods') || [];
                       if (e.target.checked) {
                         setValue('payment_methods', [...current, pm]);
                       } else {
-                        setValue('payment_methods', current.filter(p => p !== pm));
+                        setValue(
+                          'payment_methods',
+                          current.filter((p) => p !== pm),
+                        );
                       }
                     }}
                   />
@@ -511,19 +578,25 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                       />
                     </Col>
                     <Col xs="auto">
-                      <Button variant="danger" onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))} disabled={faqs.length === 1}>
+                      <Button
+                        variant="danger"
+                        onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))}
+                        disabled={faqs.length === 1}
+                      >
                         Remove
                       </Button>
                     </Col>
                   </Row>
                 ))}
-                <Button variant="outline-primary" onClick={() => setFaqs([...faqs, { question: '', answer: '' }])}>
+                <Button
+                  variant="outline-primary"
+                  onClick={() => setFaqs([...faqs, { question: '', answer: '' }])}
+                >
                   Add FAQ
                 </Button>
               </Form.Group>
             </Col>
           </Row>
-
 
           {/* Department Select */}
           <Row>
@@ -536,18 +609,23 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                   render={({ field }) => (
                     <Form.Select
                       {...field}
-                      value={field.value === undefined || field.value === null ? '' : String(field.value)}
-                      onChange={e => field.onChange(e.target.value)}
+                      value={field.value ? String(field.value) : ''}
+                      onChange={(e) => field.onChange(Number(e.target.value))}
                       isInvalid={!!errors.departmentId}
                     >
                       <option value="">Select Department</option>
-                      {departments.map(dept => (
-                        <option key={dept._id} value={String(dept._id)}>{dept.name}</option>
+                      {departments.map((dept) => (
+                        <option key={dept.id} value={String(dept.id)}>
+                          {dept.name}
+                        </option>
                       ))}
                     </Form.Select>
                   )}
                 />
-                <Form.Control.Feedback type="invalid">{errors.departmentId?.message}</Form.Control.Feedback>
+
+                <Form.Control.Feedback type="invalid">
+                  {errors.departmentId?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -560,10 +638,15 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 <Col md={8}>
                   <Form.Group className="mb-3">
                     <Form.Label>Branch</Form.Label>
-                    <Form.Select {...register(`branches.${index}.branch_id`)} isInvalid={!!errors.branches?.[index]?.branch_id}>
+                    <Form.Select
+                      {...register(`branches.${index}.branch_id`)}
+                      isInvalid={!!errors.branches?.[index]?.branch_id}
+                    >
                       <option value="">Select Branch</option>
-                      {branchesList.map(b => (
-                        <option key={b.branch_id} value={b.branch_id}>{b.name}</option>
+                      {branchesList.map((b) => (
+                        <option key={b.branch_id} value={b.branch_id}>
+                          {b.name}
+                        </option>
                       ))}
                     </Form.Select>
                     <Form.Control.Feedback type="invalid">
@@ -605,13 +688,19 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                   control={control}
                   name="status"
                   render={({ field }) => (
-                    <Form.Select {...field} value={field.value || 'active'} isInvalid={!!errors.status}>
+                    <Form.Select
+                      {...field}
+                      value={field.value || 'active'}
+                      isInvalid={!!errors.status}
+                    >
                       <option value="active">Active</option>
                       <option value="inactive">Inactive</option>
                     </Form.Select>
                   )}
                 />
-                <Form.Control.Feedback type="invalid">{errors.status?.message}</Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">
+                  {errors.status?.message}
+                </Form.Control.Feedback>
               </Form.Group>
             </Col>
             <Col md={4} className="mb-3">
@@ -640,7 +729,12 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
               </Button>
             </Col>
             <Col lg={2}>
-              <Button variant="danger" className="w-100" onClick={() => router.back()} disabled={isSubmitting}>
+              <Button
+                variant="danger"
+                className="w-100"
+                onClick={() => router.back()}
+                disabled={isSubmitting}
+              >
                 Cancel
               </Button>
             </Col>
@@ -651,8 +745,11 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
   );
 };
 
-
-export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({ nestIndex, control, register }) => {
+export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({
+  nestIndex,
+  control,
+  register,
+}) => {
   const { fields, append, remove } = useFieldArray({
     control,
     name: `branches.${nestIndex}.availability`,
@@ -663,27 +760,46 @@ export const AvailabilitySlots: React.FC<AvailabilitySlotsProps> = ({ nestIndex,
       {fields.map((field, k) => (
         <Row key={field.id} className="mb-2 align-items-center">
           <Col>
-            <Form.Control {...register(`branches.${nestIndex}.availability.${k}.day`)} placeholder="Day" />
+            <Form.Control
+              {...register(`branches.${nestIndex}.availability.${k}.day`)}
+              placeholder="Day"
+            />
           </Col>
           <Col>
-            <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.startTime`)} placeholder="Start" />
+            <Form.Control
+              type="time"
+              {...register(`branches.${nestIndex}.availability.${k}.startTime`)}
+              placeholder="Start"
+            />
           </Col>
           <Col>
-            <Form.Control type="time" {...register(`branches.${nestIndex}.availability.${k}.endTime`)} placeholder="End" />
+            <Form.Control
+              type="time"
+              {...register(`branches.${nestIndex}.availability.${k}.endTime`)}
+              placeholder="End"
+            />
           </Col>
           <Col xs="auto">
-            <Button type="button" variant="danger" onClick={() => remove(k)} disabled={fields.length === 1}>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={() => remove(k)}
+              disabled={fields.length === 1}
+            >
               Remove
             </Button>
           </Col>
         </Row>
       ))}
-      <Button type="button" variant="outline-primary" onClick={() => append({ day: '', startTime: '', endTime: '' })}>
+      <Button
+        type="button"
+        variant="outline-primary"
+        onClick={() => append({ day: '', startTime: '', endTime: '' })}
+      >
         Add Availability
       </Button>
     </div>
   );
 };
-
 
 export default AddTherapistTeamPage;
