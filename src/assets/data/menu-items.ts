@@ -138,4 +138,10 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri-organization-chart',
     url: '/department',
   },
+  {
+    key: 'specialization',
+    label: 'Spécialisation',
+    icon: 'ri-briefcase-4-line',
+    url: '/specialization',
+  },
 ];
