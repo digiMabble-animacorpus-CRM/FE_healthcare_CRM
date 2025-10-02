@@ -98,7 +98,7 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
           }
 
           if (isEditMode && (defaultValues as any)?._id) {
-            await axios.patch(
+            const res = await axios.patch(
               `${API_BASE_PATH}/specializations/${(defaultValues as any)._id}`,
               data,
               {
@@ -108,16 +108,17 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
                 },
               },
             );
-            console.log('Specialization updated:', data);
+            console.log('Specialization updated:', res.data);
             setMessage({ type: 'success', text: 'Spécialisation mise à jour avec succès !' });
           } else {
-            await axios.post(`${API_BASE_PATH}/specializations`, data, {
+            const res = await axios.post(`${API_BASE_PATH}/specializations`, data, {
               headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
               },
             });
-            console.log('Specialization created:', data);
+            console.log('Created specialization:', res.data);
+
             setMessage({ type: 'success', text: 'Spécialisation créée avec succès !' });
           }
 
@@ -154,9 +155,7 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
                   borderRadius: '6px',
                   color: message.type === 'success' ? '#0f5132' : '#842029',
                   backgroundColor: message.type === 'success' ? '#d1e7dd' : '#f8d7da',
-                  border: `1px solid ${
-                    message.type === 'success' ? '#badbcc' : '#f5c2c7'
-                  }`,
+                  border: `1px solid ${message.type === 'success' ? '#badbcc' : '#f5c2c7'}`,
                 }}
               >
                 {message.text}
@@ -195,13 +194,26 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
               </Col>
 
               <Col lg={6} className="mb-3">
-                <TextFormInput
-                  required
-                  control={control}
-                  name="specialization_type"
-                  label="Type de spécialisation"
-                  placeholder="Ex: Consultation, Operation, etc."
-                />
+                <Form.Group>
+                  <Form.Label>Type de spécialisation</Form.Label>
+                  <Controller
+                    control={control}
+                    name="specialization_type"
+                    render={({ field, fieldState }) => (
+                      <>
+                        <Form.Select {...field}>
+                          <option value="">-- Sélectionner un type --</option>
+                          <option value="Consultation">Consultation</option>
+                          <option value="Operation">Opération</option>
+                          <option value="Other">Autre</option>
+                        </Form.Select>
+                        {fieldState.error && (
+                          <div className="text-danger mt-1">{fieldState.error.message}</div>
+                        )}
+                      </>
+                    )}
+                  />
+                </Form.Group>
               </Col>
 
               <Col lg={12} className="mb-3">
@@ -235,4 +247,3 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
 };
 
 export default SpecializationForm;
-

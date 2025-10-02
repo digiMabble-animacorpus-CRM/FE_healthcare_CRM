@@ -1,4 +1,3 @@
-
 'use client';
 
 import PageTitle from '@/components/PageTitle';
@@ -22,14 +21,6 @@ import {
 } from 'react-bootstrap';
 
 const PAGE_LIMIT = 10;
-
-// Map specialization types to icons
-const specializationIcons: Record<string, string> = {
-  Consultation: 'ri-user-voice-line',
-  Operation: 'ri-scissors-2-line',
-  Other: 'ri-award-line',
-  default: 'ri-organization-chart',
-};
 
 const SpecializationListPage = () => {
   const [specializations, setSpecializations] = useState<SpecializationType[]>([]);
@@ -62,20 +53,11 @@ const SpecializationListPage = () => {
           department_name: spec.department?.name || 'Unknown',
         })),
       );
-
+      console.log('Fetched specializations:', specializationList);
       setTotalPages(Math.ceil(totalCount / PAGE_LIMIT));
     } catch (error) {
       console.error('Failed to fetch specializations:', error);
-      setSpecializations([
-        {
-          specialization_id: '1',
-          department_id: 1,
-          department_name: 'General',
-          specialization_type: 'Consultation',
-          description: 'General doctor consultation',
-          is_active: true,
-        } as any,
-      ]);
+      setSpecializations([]);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -91,7 +73,7 @@ const SpecializationListPage = () => {
   };
 
   const handleEditClick = (id: string) => {
-    router.push(`/specialization/${id}/edit`);
+    router.push(`/specialization/specialization-form/${id}/edit`);
   };
 
   const handleDeleteClick = (id: string) => {
@@ -118,27 +100,52 @@ const SpecializationListPage = () => {
     }
   };
 
+  // ✅ toggle active status with success/error message
   const handleToggleStatus = async (id: string, newStatus: boolean) => {
     try {
       const token = localStorage.getItem('access_token');
+      const spec = specializations.find((s) => s.specialization_id === id);
+      if (!spec) return;
+
       await axios.patch(
         `${API_BASE_PATH}/specializations/${id}`,
-        { is_active: newStatus },
-        { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } },
+        {
+          department_id: spec.department_id,
+          specialization_type: spec.specialization_type,
+          description: spec.description,
+          is_active: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
       );
 
       setSpecializations((prev) =>
-        prev.map((spec) =>
-          spec.specialization_id === id ? { ...spec, is_active: newStatus } : spec,
+        prev.map((s) =>
+          s.specialization_id === id ? { ...s, is_active: newStatus } : s,
         ),
       );
+
+      setMessage({
+        type: 'success',
+        text: `Statut mis à jour avec succès en ${newStatus ? 'Actif' : 'Inactif'}.`,
+      });
     } catch (error) {
       console.error('Failed to update status:', error);
       setSpecializations((prev) =>
-        prev.map((spec) =>
-          spec.specialization_id === id ? { ...spec, is_active: !newStatus } : spec,
+        prev.map((s) =>
+          s.specialization_id === id ? { ...s, is_active: !newStatus } : s,
         ),
       );
+      setMessage({
+        type: 'error',
+        text: "Échec de la mise à jour du statut de la spécialisation.",
+      });
+    } finally {
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
@@ -204,7 +211,7 @@ const SpecializationListPage = () => {
                         <th>Specialization</th>
                         <th>Description</th>
                         <th>Department</th>
-                        <th>Statut</th>
+                        <th>Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -323,4 +330,3 @@ const SpecializationListPage = () => {
 };
 
 export default SpecializationListPage;
-

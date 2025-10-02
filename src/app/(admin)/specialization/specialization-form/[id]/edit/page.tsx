@@ -36,16 +36,16 @@ const EditSpecializationPage = ({ params }: { params: { id?: string } }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-console.log('res.data in EditSpecializationPage', res.data);
+        console.log('res.data in EditSpecializationPage', res.data);
         const specialization = res.data;
 
-        if (specialization?.id) {
+        if (specialization?.specialization_id) {
           setDefaultValues({
-            department_id: specialization.department_id || '',
+            department_id: specialization.department?.id || '',
             specialization_type: specialization.specialization_type || '',
             description: specialization.description || '',
             is_active: specialization.is_active ?? true,
-            specialization_id: specialization.id,
+            specialization_id: specialization.specialization_id,
           });
         }
       } catch (err) {
@@ -82,8 +82,7 @@ console.log('res.data in EditSpecializationPage', res.data);
           },
         },
       );
-console.log('Specialization updated successfully', data);
-      // toast.success('Specialization updated successfully!');
+      console.log('Specialization updated successfully', data);
       router.push('/specialization');
     } catch (error) {
       console.log(error);
@@ -109,10 +108,13 @@ console.log('Specialization updated successfully', data);
           {message.text}
         </div>
       )}
-      <SpecializationForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
+      <SpecializationForm
+        defaultValues={defaultValues}
+        isEditMode
+        onSubmitHandler={onSubmitHandler}
+      />
     </div>
   );
 };
 
 export default EditSpecializationPage;
-

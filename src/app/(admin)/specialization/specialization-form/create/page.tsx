@@ -1,10 +1,9 @@
-
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
 import { useRouter } from 'next/navigation';
 import SpecializationForm, { SpecializationFormValues } from '../specializationForm';
-
+import axios from 'axios';
 const CreateSpecializationPage = () => {
   const router = useRouter();
 
@@ -13,14 +12,14 @@ const CreateSpecializationPage = () => {
       const token = localStorage.getItem('access_token');
       if (!token) throw new Error('No access token found');
 
-      const res = await fetch(`${API_BASE_PATH}/specializations`, {
-        method: 'POST',
+      const res = await axios.post(`${API_BASE_PATH}/specializations`, data, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(data),
       });
+      console.log('Created specialization:', res.data);
+
       console.log('Create specialization response:', res);
 
       if (!res.ok) throw new Error('Failed to create specialization');
@@ -37,4 +36,3 @@ const CreateSpecializationPage = () => {
 };
 
 export default CreateSpecializationPage;
-
