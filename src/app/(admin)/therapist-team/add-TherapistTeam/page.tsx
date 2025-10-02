@@ -1,16 +1,16 @@
 import PageTitle from '@/components/PageTitle';
 import { Metadata } from 'next';
-import AddTeamPage from './components/AddTherapistTeam';
+import AddTherapistTeamPage from './components/AddTherapistTeam';
 
 export const metadata: Metadata = { title: 'Ajouter des membres de léquipe' };
 
-const TeamAddPage = () => {
+const TherapistTeamAddPage = () => {
   return (
     <>
-      <PageTitle title="Ajouter une équipe" subName="" />
-      <AddTeamPage isEdit={false} />
+      <PageTitle title="Ajouter une thérapeutes équipe" subName="" />
+      <AddTherapistTeamPage isEdit={false} />
     </>
   );
 };
 
-export default TeamAddPage;
+export default TherapistTeamAddPage;
