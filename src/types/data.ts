@@ -796,33 +796,29 @@ export interface SpecializationType {
 }
 
 export interface TherapistTeamMember {
-  team_id: string;
   firstName: string;
   lastName: string;
-  full_name: string;
-  job_1?: string;
-  job_2?: string;
-  job_3?: string;
-  job_4?: string;
-  specific_audience?: string;
-  specializationIds?: string[];
-  departmentId?: string;   // ✅ ADD THIS
-  departmentName?: string; // optional if API returns department details
-  aboutMe?: string;
-  consultations?: any[];
-  office_address?: string;
-  contactEmail?: string;
-  contactPhone?: string;
-  availability?: any;
-  languagesSpoken?: string[];
-  payment_methods?: string[];
-  degreesTraining?: string;
-  website?: string;
-  faq?: string[];
-  calendar_links?: string[];
+  full_name?: string;
   imageUrl?: string;
-  branches?: any[];
-  primary_branch_id?: number;
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe?: string;
+  degreesTraining?: string;
+  inamiNumber?: number;
+  payment_methods?: string[];
+  faq?: { question: string; answer: string }[];
+  website?: string;
+  consultations?: string;
+  permissions: { admin?: boolean };
   role?: string;
-  status?: string;
+  status: 'active' | 'inactive';
+  languagesSpoken: string[];
+  isDelete?: boolean;
+  departmentId: number;
+  specializationIds?: number[];
+  branches: {
+    branch_id: number;
+    branch_name?: string;
+    availability: { day: string; startTime: string; endTime: string }[];
+  }[];
 }
