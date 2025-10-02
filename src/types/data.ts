@@ -145,6 +145,8 @@ export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_sh
 export type AppointmentSource = 'phone' | 'website' | 'walk_in' | 'referral' | 'other';
 
 export interface AppointmentType {
+  patient: any;
+  id: number | undefined;
   _id: string; // Unique appointment ID
   customerId: string; // Linked to Customer
   branchId: string; // Linked to Branch
