@@ -32,6 +32,7 @@ type TeamDetailsCardProps = {
   department?: Department;
   specializationIds?: (string | number)[];
   branches?: Branch[];
+  availability?: { day: string; startTime: string; endTime: string }[]; // ✅ add this
 };
 
 const TherapistTeamDetails = ({
@@ -54,6 +55,7 @@ const TherapistTeamDetails = ({
   department,
   specializationIds = [],
   branches = [],
+  availability = [],
 }: TeamDetailsCardProps) => {
   const displayName = full_name || `${firstName} ${lastName}`;
   const photoUrl = imageUrl?.match(/^https?:\/\//) ? imageUrl : '/placeholder-avatar.jpg';
@@ -82,7 +84,6 @@ const TherapistTeamDetails = ({
           <IconifyIcon icon="ri:arrow-left-line" className="me-1" />
           Retour à la liste
         </Button>
-        
       </div>
       {/* Profile Section */}
       <Card className="mb-4 shadow-sm" style={{ backgroundColor: '#f8f9fa' }}>
@@ -218,19 +219,21 @@ const TherapistTeamDetails = ({
       <Card className="mb-4">
         <CardBody>
           <h4>Calendrier</h4>
-          {Object.keys(scheduleObj).length > 0 ? (
+          {Array.isArray(availability) && availability.length > 0 ? (
             <Table striped bordered>
               <thead>
                 <tr>
-                  <th>Jour</th>
-                  <th>Temps</th>
+                  <th>Day</th>
+                  <th>Start time</th>
+                  <th>End time</th>
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(scheduleObj).map(([day, time]) => (
-                  <tr key={day}>
-                    <td style={{ textTransform: 'capitalize' }}>{day}</td>
-                    <td>{String(time)}</td>
+                {availability.map((slot, idx) => (
+                  <tr key={idx}>
+                    <td style={{ textTransform: 'capitalize' }}>{slot.day || '-'}</td>
+                    <td>{slot.startTime || '-'}</td>
+                    <td>{slot.endTime || '-'}</td>
                   </tr>
                 ))}
               </tbody>
@@ -240,6 +243,7 @@ const TherapistTeamDetails = ({
           )}
         </CardBody>
       </Card>
+
       {/* Consultations */}
       <Card className="mb-4">
         <CardBody>

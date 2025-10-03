@@ -208,26 +208,26 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
         if (rawData) {
           const adaptedData = {
             ...rawData,
-      
-  departmentId: rawData.department?.id ? Number(rawData.department.id) : 0,
 
-  // ✅ Specializations already array of ids
- specializationIds: (rawData.specializations || []).map((s: any) => Number(s.specialization_id)),
+            departmentId: rawData.department?.id ? Number(rawData.department.id) : 0,
 
-  // ✅ Languages are objects, pick names
-  languagesSpoken: (rawData.languagesSpoken || []).map((l: any) => l.language_name),
+            // ✅ Specializations already array of ids
+            specializationIds: (rawData.specializations || []).map((s: any) =>
+              Number(s.specialization_id),
+            ),
+
+            // ✅ Languages are objects, pick names
+            languagesSpoken: (rawData.languagesSpoken || []).map((l: any) => l.language_name),
             branches:
               Array.isArray(rawData.branches) && rawData.branches.length
-                ? rawData.branches.map(
-                    (branch: { branch_id: any; availability: string | any[] }) => ({
-                      ...branch,
-                      branch_id: Number(branch.branch_id),
-                      availability:
-                        Array.isArray(branch.availability) && branch.availability.length
-                          ? branch.availability
-                          : [{ day: '', startTime: '', endTime: '' }],
-                    }),
-                  )
+                ? rawData.branches.map((branch: any) => ({
+                    branch_id: Number(branch.branch_id),
+                    branch_name: branch.name || '',
+                    availability:
+                      Array.isArray(rawData.availability) && rawData.availability.length
+                        ? rawData.availability
+                        : [{ day: '', startTime: '', endTime: '' }],
+                  }))
                 : [
                     {
                       branch_id: 0,
@@ -235,6 +235,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                       availability: [{ day: '', startTime: '', endTime: '' }],
                     },
                   ],
+
             faq:
               Array.isArray(rawData.faq) && rawData.faq.length
                 ? rawData.faq
