@@ -795,30 +795,60 @@ export interface SpecializationType {
   };
 }
 
-export interface TherapistTeamMember {
+// export interface TherapistTeamMember {
+//   firstName: string;
+//   lastName: string;
+//   full_name?: string;
+//   imageUrl?: string;
+//   contactEmail: string;
+//   contactPhone: string;
+//   aboutMe?: string;
+//   degreesTraining?: string;
+//   inamiNumber?: number;
+//   payment_methods?: string[];
+//   faq?: { question: string; answer: string }[];
+//   website?: string;
+//   consultations?: string;
+//   permissions: { admin?: boolean };
+//   role?: string;
+//   status: 'active' | 'inactive';
+//   languagesSpoken: string[];
+//   isDelete?: boolean;
+//   departmentId: number;
+//   specializationIds?: number[];
+//   branches: {
+//     branch_id: number;
+//     branch_name?: string;
+//     availability: { day: string; startTime: string; endTime: string }[];
+//   }[];
+// }
+// // src/types/data.ts
+
+export type TherapistTeamMember = {
   firstName: string;
   lastName: string;
-  full_name?: string;
-  imageUrl?: string;
+  full_name: string;
+  imageUrl: string;
   contactEmail: string;
   contactPhone: string;
-  aboutMe?: string;
-  degreesTraining?: string;
-  inamiNumber?: number;
-  payment_methods?: string[];
-  faq?: { question: string; answer: string }[];
+  aboutMe: string;
+  degreesTraining: string;
+  inamiNumber: number;
+  payment_methods: string[];
+  faq: { question: string; answer: string }[];
   website?: string;
   consultations?: string;
-  permissions: { admin?: boolean };
-  role?: string;
-  status: 'active' | 'inactive';
+  permissions: { admin: boolean };
+  role: string;
+  status: string;
   languagesSpoken: string[];
-  isDelete?: boolean;
+  isDelete: boolean;
   departmentId: number;
-  specializationIds?: number[];
-  branches: {
-    branch_id: number;
-    branch_name?: string;
-    availability: { day: string; startTime: string; endTime: string }[];
+  specializationIds: number[];
+  branchIds: number[];
+  availability: {
+    day: string;
+    startTime: string;
+    endTime: string;
   }[];
-}
+};
