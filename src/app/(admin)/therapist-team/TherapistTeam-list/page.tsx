@@ -313,7 +313,7 @@ const TherapistTeamsListPage = () => {
                                 : ''}
                             </td>
                             <td>
-                              {item.role === 'super_admin'
+                              {item.role === 'super-admin'
                                 ? 'Super Admin'
                                 : item.role === 'staff'
                                   ? 'Staff'

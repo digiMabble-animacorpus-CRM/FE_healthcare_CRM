@@ -70,13 +70,13 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri-stethoscope-line',
     children: [
       {
-        key: 'therapists-list',
+        key: 'TherapistTeam-list',
         label: 'Liste des thérapeutes équipes',
         url: '/therapist-team/TherapistTeam-list',
         parentKey: 'therapistsTeam',
       },
       {
-        key: 'add-therapist',
+        key: 'add-TherapistTeam',
         label: 'Ajouter un thérapeute équipes',
         url: '/therapist-team/add-TherapistTeam',
         parentKey: 'therapistsTeam',

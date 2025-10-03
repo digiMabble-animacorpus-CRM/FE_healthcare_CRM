@@ -1,10 +1,11 @@
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { useRouter } from 'next/navigation';
 import { Badge, Button, Card, CardBody, Col, Row, Table } from 'react-bootstrap';
-import { FaEnvelope, FaGlobe, FaMapMarkerAlt, FaPhone } from 'react-icons/fa';
+import { FaEnvelope, FaPhone } from 'react-icons/fa';
 
 type Branch = {
   branch_id: number | string;
-  name?: string; // <-- add this
+  name?: string;
   availability?: { day: string; startTime: string; endTime: string }[];
 };
 type Department = {
@@ -13,6 +14,7 @@ type Department = {
   description?: string;
 };
 type TeamDetailsCardProps = {
+  therapistTeamId?: string | number;
   firstName?: string;
   lastName?: string;
   full_name?: string;
@@ -28,14 +30,15 @@ type TeamDetailsCardProps = {
   consultations?: string;
   role?: string;
   status?: string;
-  languagesSpoken?: string[];
+  languagesSpoken?: (string | { language_name: string })[];
   department?: Department;
   specializationIds?: (string | number)[];
   branches?: Branch[];
-  availability?: { day: string; startTime: string; endTime: string }[]; // ✅ add this
+  availability?: { day: string; startTime: string; endTime: string }[];
 };
 
 const TherapistTeamDetails = ({
+  therapistTeamId,
   firstName,
   lastName,
   full_name,
@@ -57,34 +60,34 @@ const TherapistTeamDetails = ({
   branches = [],
   availability = [],
 }: TeamDetailsCardProps) => {
-  const displayName = full_name || `${firstName} ${lastName}`;
-  const photoUrl = imageUrl?.match(/^https?:\/\//) ? imageUrl : '/placeholder-avatar.jpg';
+  const router = useRouter();
+  const displayName = full_name || `${firstName ?? ''} ${lastName ?? ''}`.trim();
 
-  // remove departmentId usage
-  const primaryBranch = branches.length > 0 ? branches[0] : undefined;
+  console.log('TherapistTeamDetails received therapistTeamId:', therapistTeamId);
 
-  const scheduleObj = primaryBranch?.availability?.length
-    ? primaryBranch.availability.reduce(
-        (
-          acc: Record<string, string>,
-          item: { day: string; startTime: string; endTime: string },
-        ) => {
-          acc[item.day] = `${item.startTime} - ${item.endTime}`;
-          return acc;
-        },
-        {} as Record<string, string>,
-      )
-    : {};
+  const handleEditClick = (id: string) => router.push(`/therapist-team/edit-TherapistTeam/${id}`);
 
   return (
     <div className="container py-4">
-      {/* Back Button */}
-      <div className="d-flex justify-content-left mb-3">
+      {/* Back + Edit Buttons in Row */}
+      <div className="d-flex justify-content-between mb-3">
         <Button variant="primary" onClick={() => window.history.back()}>
           <IconifyIcon icon="ri:arrow-left-line" className="me-1" />
           Retour à la liste
         </Button>
+        <Button
+          variant="primary"
+          className="avatar-sm d-flex align-items-center justify-content-center fs-20"
+          size="sm"
+          onClick={() =>
+            therapistTeamId && handleEditClick(therapistTeamId.toString())
+          }
+          disabled={!therapistTeamId}
+        >
+          <IconifyIcon icon="ri:edit-fill" />
+        </Button>
       </div>
+
       {/* Profile Section */}
       <Card className="mb-4 shadow-sm" style={{ backgroundColor: '#f8f9fa' }}>
         <CardBody>
@@ -109,11 +112,9 @@ const TherapistTeamDetails = ({
                     fontWeight: 'bold',
                   }}
                 >
-                  {displayName?.trim().charAt(0).toUpperCase() || 'U'}
+                  {displayName?.charAt(0).toUpperCase() || 'U'}
                 </div>
               )}
-
-              {/* ✅ Add therapist name below photo */}
               <h5 className="mt-3 text-center">{displayName}</h5>
             </Col>
 
@@ -169,37 +170,34 @@ const TherapistTeamDetails = ({
                   <div className="mb-2">
                     <strong>Département:</strong> {department?.name ?? '-'}
                   </div>
-
                   <div className="mb-2">
                     <strong>Branches:</strong>{' '}
                     {branches.length > 0
-                      ? branches.map((b: Branch) => b.name ?? `#${b.branch_id}`).join(', ')
+                      ? branches.map((b) => b.name ?? `#${b.branch_id}`).join(', ')
                       : '-'}
                   </div>
-
                   <div className="mb-2">
                     <strong>Spécialisations:</strong>{' '}
                     {specializationIds.length > 0 ? specializationIds.join(', ') : '-'}
                   </div>
-
                   <div className="mb-2">
-                    <strong>Méthodes de paiement:</strong>
+                    <strong>Méthodes de paiement:</strong>{' '}
                     {payment_methods.length > 0
-                      ? payment_methods.map((method: string, i: number) => (
-                          <Badge key={i} bg="primary" className="mx-1">
-                                  {method}   {' '}
-                          </Badge>
-                        ))
+                      ? payment_methods.map((method, i) => (
+                        <Badge key={i} bg="primary" className="mx-1">
+                          {method}
+                        </Badge>
+                      ))
                       : '-'}
                   </div>
                   <div className="mb-2">
-                    <strong>Languages Spoken:</strong>
+                    <strong>Languages Spoken:</strong>{' '}
                     {languagesSpoken.length > 0
-                      ? languagesSpoken.map((lang: any, i: number) => (
-                          <Badge key={i} bg="info" className="mx-1 text-dark">
-                            {typeof lang === 'string' ? lang : lang.language_name}
-                          </Badge>
-                        ))
+                      ? languagesSpoken.map((lang, i) => (
+                        <Badge key={i} bg="info" className="mx-1 text-dark">
+                          {typeof lang === 'string' ? lang : lang.language_name}
+                        </Badge>
+                      ))
                       : '-'}
                   </div>
                 </Col>
@@ -208,6 +206,7 @@ const TherapistTeamDetails = ({
           </Row>
         </CardBody>
       </Card>
+
       {/* About */}
       <Card className="mb-4">
         <CardBody>
@@ -215,11 +214,12 @@ const TherapistTeamDetails = ({
           <p>{aboutMe ?? '-'}</p>
         </CardBody>
       </Card>
+
       {/* Schedule */}
       <Card className="mb-4">
         <CardBody>
           <h4>Calendrier</h4>
-          {Array.isArray(availability) && availability.length > 0 ? (
+          {availability.length > 0 ? (
             <Table striped bordered>
               <thead>
                 <tr>
@@ -251,20 +251,19 @@ const TherapistTeamDetails = ({
           <p>{consultations ?? '-'}</p>
         </CardBody>
       </Card>
+
       {/* FAQ */}
       <Card className="mb-4">
         <CardBody>
           <h4>Questions fréquemment posées:</h4>
           {faq.length > 0 ? (
             <ol style={{ paddingLeft: '1.2rem' }}>
-              {faq.map(
-                ({ question, answer }: { question: string; answer: string }, idx: number) => (
-                  <li key={idx} style={{ marginBottom: '1rem' }}>
-                    <strong>{question}</strong>
-                    <div>{answer}</div>
-                  </li>
-                ),
-              )}
+              {faq.map(({ question, answer }, idx) => (
+                <li key={idx} style={{ marginBottom: '1rem' }}>
+                  <strong>{question}</strong>
+                  <div>{answer}</div>
+                </li>
+              ))}
             </ol>
           ) : (
             <p>-</p>
