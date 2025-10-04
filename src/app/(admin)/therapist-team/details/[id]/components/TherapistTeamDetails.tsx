@@ -71,7 +71,13 @@ const TherapistTeamDetails = ({
 
   console.log('TherapistTeamDetails received therapistTeamId:', therapistTeamId);
 
-  const handleEditClick = (id: string) => router.push(`/therapist-team/edit-TherapistTeam/${id}`);
+  const handleEditClick = (id?: string | number) => {
+    if (!id) {
+      console.error('Missing therapistTeamId');
+      return;
+    }
+    router.push(`/therapist-team/edit-TherapistTeam/${id}`);
+  };
 
   return (
     <div className="container py-4">
@@ -85,7 +91,7 @@ const TherapistTeamDetails = ({
           variant="primary"
           className="avatar-sm d-flex align-items-center justify-content-center fs-20"
           size="sm"
-          onClick={() => therapistTeamId && handleEditClick(therapistTeamId.toString())}
+          onClick={() => handleEditClick(therapistTeamId)}
           disabled={!therapistTeamId}
         >
           <IconifyIcon icon="ri:edit-fill" />

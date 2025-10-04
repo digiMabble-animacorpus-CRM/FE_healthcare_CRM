@@ -320,6 +320,7 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
+  id: string | number | null | undefined;
   centerAddress: any;
   appointmentStart: any;
   imageUrl?: string | null;

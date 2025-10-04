@@ -25,15 +25,10 @@ const TherapistDetails = ({
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, []);
-  const handleEditClick = (id: string | number | undefined) => {
-    if (!id) {
-      console.error('Therapist id missing');
-      return;
-    }
-    console.log('Navigating to:', `/therapists/edit-therapist/${id}`);
+
+  const handleEditClick = (id: string | number) => {
     router.push(`/therapists/edit-therapist/${id}`);
   };
-
   return (
     <Card className="mb-4 shadow-lg">
       {' '}
@@ -46,20 +41,21 @@ const TherapistDetails = ({
             {' '}
             <IconifyIcon icon="ri:arrow-left-line" className="me-1" /> Back{' '}
           </Button>{' '}
-         <div className="d-flex gap-1">
+          <div className="d-flex gap-1">
+            {' '}
             <Button
               variant="secondary"
               className="avatar-sm d-flex align-items-center justify-content-center fs-20"
-              // ✅ Use data.id fallback if therapistId is missing
-              onClick={() => handleEditClick(data.therapistId || data.id)}
+              onClick={() => handleEditClick(data.therapistId!)}
             >
+              {' '}
               <span>
-                <IconifyIcon icon="ri:edit-fill" />
-              </span>
-            </Button>
-          </div>
+                {' '}
+                <IconifyIcon icon="ri:edit-fill" />{' '}
+              </span>{' '}
+            </Button>{' '}
+          </div>{' '}
         </div>
-
         {/* Profile Section */}
         <Row className="align-items-center mb-4">
           <Col md={2} className="text-center">
