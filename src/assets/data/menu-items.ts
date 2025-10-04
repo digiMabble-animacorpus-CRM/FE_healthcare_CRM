@@ -65,6 +65,25 @@ export const MENU_ITEMS: MenuItemType[] = [
     ],
   },
   {
+    key: 'therapistsTeam',
+    label: 'Thérapeute Équipes',
+    icon: 'ri-stethoscope-line',
+    children: [
+      {
+        key: 'TherapistTeam-list',
+        label: 'Liste des thérapeutes équipes',
+        url: '/therapist-team/TherapistTeam-list',
+        parentKey: 'therapistsTeam',
+      },
+      {
+        key: 'add-TherapistTeam',
+        label: 'Ajouter un thérapeute équipes',
+        url: '/therapist-team/add-TherapistTeam',
+        parentKey: 'therapistsTeam',
+      },
+    ],
+  },
+  {
     key: 'patients',
     label: 'Patient',
     icon: 'ri-hospital-line',
@@ -128,7 +147,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
   {
     key: 'branchs',
-    label: 'Succursales',
+    label: 'succursales',
     icon: 'ri-building-2-line',
     url: '/branches',
   },
@@ -137,11 +156,5 @@ export const MENU_ITEMS: MenuItemType[] = [
     label: 'Département',
     icon: 'ri-organization-chart',
     url: '/department',
-  },
-  {
-    key: 'specialization',
-    label: 'Spécialisation',
-    icon: 'ri-briefcase-4-line',
-    url: '/specialization',
   },
 ];

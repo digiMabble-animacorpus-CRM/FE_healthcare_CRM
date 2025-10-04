@@ -1,6 +1,7 @@
 import { BranchWithAvailability } from '@/app/(admin)/therapists/add-therapist/components/AddTherapist';
 import { StaticImageData } from 'next/image';
 import { BootstrapVariantType } from './component-props';
+import { Key, ReactNode } from 'react';
 export type IdType = string;
 
 export type EmailLabelType = 'Primary' | 'Social' | 'Promotions' | 'Updates' | 'Forums';
@@ -70,8 +71,7 @@ export type PatientType = {
   emails: string;
   number: string;
   legalgender: string;
-
-  languageId: number | string
+  language: string;
   city: string;
   country: string;
   street: string;
@@ -145,8 +145,6 @@ export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_sh
 export type AppointmentSource = 'phone' | 'website' | 'walk_in' | 'referral' | 'other';
 
 export interface AppointmentType {
-  patient: any;
-  id: number | undefined;
   _id: string; // Unique appointment ID
   customerId: string; // Linked to Customer
   branchId: string; // Linked to Branch
@@ -322,6 +320,7 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
+  id: string | number | null | undefined;
   centerAddress: any;
   appointmentStart: any;
   imageUrl?: string | null;
@@ -654,41 +653,54 @@ export type ProfileCreatePayload = {
 };
 
 export type TeamMemberType = {
-  team_id: string;
-  last_name: string;
+  [x: string]: any;
+  departmentName: number;
   first_name: string;
-  full_name: string;
-  job_1?: string | null;
-  specific_audience?: string | null;
-  specialization_1?: string | null;
-  job_2?: string | null;
-  job_3?: string | null;
-  job_4?: string | null;
+  last_name: string;
+  job_1: string | null | undefined;
+  job_2: string | null | undefined;
+  job_3: string | null | undefined;
+  job_4: string | null | undefined;
+  specific_audience: string | null | undefined;
+  specializations: string[];
   who_am_i: string;
-  consultations: string;
   office_address: string;
   contact_email: string;
   contact_phone: string;
-  schedule: {
-    text: string | null;
-  };
+  schedule: Record<string, string> | { text?: string | null | undefined; };
   about: string;
-  languages_spoken: string[]; // always an array
-  payment_methods: string[]; // always an array
-  diplomas_and_training: string[]; // always an array
-  specializations: string[]; // always an array
-  website: string;
-  frequently_asked_questions: any; // JSON string or object
-  calendar_links: string[]; // always an array
+  languages_spoken: string[];
+  diplomas_and_training: string[];
+  frequently_asked_questions: string | Record<string, string> | FAQItem[];
+  calendar_links: string[];
   photo: string;
-  branch_ids?: (string | number)[]; // array of strings or numbers
+  branches: never[];
   primary_branch_id: number;
-  permissions: Record<string, any>; // object for permissions
+  team_id: string;
+  firstName: string;
+  lastName: string;
+  full_name: string;
+  imageUrl: string;
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe: string;
+  degreesTraining: string;
+  inamiNumber: number;
+  payment_methods: string[];
+  faq: { question: string; answer: string }[];
+  website: string;
+  consultations: string;
+  permissions: { admin: boolean };
   role: string;
-  status: 'active' | 'inactive' | string;
-  created_by_role?: string;
-  branches: any;
+  status: "active" | "inactive";
+  availability: { day: string; startTime: string; endTime: string }[];
+  languagesSpoken: string[];
+  isDelete: boolean;
+  departmentId: number;
+  specializationIds: number[];
+  branchIds: number[];
 };
+
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency
@@ -728,6 +740,7 @@ export type TeamMemberCreatePayload = {
 };
 
 export interface DepartmentType {
+  id: Key | null | undefined;
   _id: string;
   name: string;
   description?: string;
@@ -762,9 +775,83 @@ export type TherapistShortType = {
 
 
 export interface LanguageType {
+  key: Key | null | undefined;
+  label: ReactNode;
   id: number;
   language_name: string;
   language_description: string;
+  is_active: boolean;
   created_at: string;
   updated_at: string;
+};
+
+export interface SpecializationType {
+  specialization_id: Key | null | undefined;
+  specialization_type: ReactNode;
+  id: number;       // normalized from specialization_id
+  name: string;     // normalized from specialization_type
+  description?: string;
+  is_active?: boolean;
+  department?: {
+    id: number;
+    name: string;
+  };
 }
+
+// export interface TherapistTeamMember {
+//   firstName: string;
+//   lastName: string;
+//   full_name?: string;
+//   imageUrl?: string;
+//   contactEmail: string;
+//   contactPhone: string;
+//   aboutMe?: string;
+//   degreesTraining?: string;
+//   inamiNumber?: number;
+//   payment_methods?: string[];
+//   faq?: { question: string; answer: string }[];
+//   website?: string;
+//   consultations?: string;
+//   permissions: { admin?: boolean };
+//   role?: string;
+//   status: 'active' | 'inactive';
+//   languagesSpoken: string[];
+//   isDelete?: boolean;
+//   departmentId: number;
+//   specializationIds?: number[];
+//   branches: {
+//     branch_id: number;
+//     branch_name?: string;
+//     availability: { day: string; startTime: string; endTime: string }[];
+//   }[];
+// }
+// // src/types/data.ts
+
+export type TherapistTeamMember = {
+  firstName: string;
+  lastName: string;
+  full_name: string;
+  imageUrl: string;
+  contactEmail: string;
+  contactPhone: string;
+  aboutMe: string;
+  degreesTraining: string;
+  inamiNumber: number;
+  payment_methods: string[];
+  faq: { question: string; answer: string }[];
+  website?: string;
+  consultations?: string;
+  permissions: { admin: boolean };
+  role: string;
+  status: string;
+  languagesSpoken: string[];
+  isDelete: boolean;
+  departmentId: number;
+  specializationIds: number[];
+  branchIds: number[];
+  availability: {
+    day: string;
+    startTime: string;
+    endTime: string;
+  }[];
+};
