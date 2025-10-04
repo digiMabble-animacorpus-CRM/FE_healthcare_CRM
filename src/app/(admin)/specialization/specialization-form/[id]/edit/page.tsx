@@ -1,23 +1,22 @@
-
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import DepartmentForm, { DepartmentFormValues } from '../../departmentForm';
+import SpecializationForm, { SpecializationFormValues } from '../../specializationForm';
 
 export interface Props {
-  defaultValues?: Partial<DepartmentFormValues>;
+  defaultValues?: Partial<SpecializationFormValues>;
   isEditMode?: boolean;
-  onSubmitHandler?: (data: DepartmentFormValues & { department_id?: string }) => void;
+  onSubmitHandler?: (data: SpecializationFormValues & { specialization_id?: string }) => void;
 }
 
-const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
+const EditSpecializationPage = ({ params }: { params: { id?: string } }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
   const [defaultValues, setDefaultValues] = useState<
-    Partial<DepartmentFormValues & { department_id?: string }>
+    Partial<SpecializationFormValues & { specialization_id?: string }>
   >({});
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
@@ -32,25 +31,26 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
         const token = localStorage.getItem('access_token');
         if (!token) throw new Error('No access token found');
 
-        const res = await axios.get(`${API_BASE_PATH}/departments/${params.id}`, {
+        const res = await axios.get(`${API_BASE_PATH}/specializations/${params.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        console.log('res.data in EditSpecializationPage', res.data);
+        const specialization = res.data;
 
-        const department = res.data;
-
-        if (department?.id) {
+        if (specialization?.specialization_id) {
           setDefaultValues({
-            name: department.name || '',
-            description: department.description || '',
-            is_active: department.is_active ?? true,
-            department_id: department.id,
+            department_id: specialization.department?.id || '',
+            specialization_type: specialization.specialization_type || '',
+            description: specialization.description || '',
+            is_active: specialization.is_active ?? true,
+            specialization_id: specialization.specialization_id,
           });
         }
       } catch (err) {
-        console.error(err);
-        setMessage({ type: 'error', text: 'Failed to load department details' });
+        console.log(err);
+        setMessage({ type: 'error', text: 'Failed to load specialization details' });
       } finally {
         setLoading(false);
       }
@@ -59,7 +59,9 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
     fetchData();
   }, [params.id]);
 
-  const onSubmitHandler = async (data: DepartmentFormValues & { department_id?: string }) => {
+  const onSubmitHandler = async (
+    data: SpecializationFormValues & { specialization_id?: string },
+  ) => {
     if (!params.id) return;
 
     try {
@@ -67,9 +69,10 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
       if (!token) throw new Error('No access token found');
 
       await axios.patch(
-        `${API_BASE_PATH}/departments/${params.id}`,
+        `${API_BASE_PATH}/specializations/${params.id}`,
         {
-          name: data.name,
+          department_id: data.department_id,
+          specialization_type: data.specialization_type,
           description: data.description,
           is_active: data.is_active,
         },
@@ -79,16 +82,15 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
           },
         },
       );
-
-      // toast.success('Department updated successfully!');
-      router.push('/department');
+      console.log('Specialization updated successfully', data);
+      router.push('/specialization');
     } catch (error) {
-      console.error(error);
-      setMessage({ type: 'error', text: 'Error updating department' });
+      console.log(error);
+      setMessage({ type: 'error', text: 'Error updating specialization' });
     }
   };
 
-  if (loading) return <div>Loading department details...</div>;
+  if (loading) return <div>Loading specialization details...</div>;
 
   return (
     <div>
@@ -106,10 +108,13 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
           {message.text}
         </div>
       )}
-      <DepartmentForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
+      <SpecializationForm
+        defaultValues={defaultValues}
+        isEditMode
+        onSubmitHandler={onSubmitHandler}
+      />
     </div>
   );
 };
 
-export default EditDepartmentPage;
-
+export default EditSpecializationPage;

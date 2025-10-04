@@ -3,7 +3,7 @@
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { API_BASE_PATH } from '@/context/constants';
-import type { BranchType } from '@/types/data';
+import type { SpecializationType } from '@/types/data';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -22,55 +22,42 @@ import {
 
 const PAGE_LIMIT = 10;
 
-const BranchListPage = () => {
-  const [branches, setBranches] = useState<BranchType[]>([]);
+const SpecializationListPage = () => {
+  const [specializations, setSpecializations] = useState<SpecializationType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+  const [selectedSpecializationId, setSelectedSpecializationId] = useState<string | null>(null);
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
   const router = useRouter();
 
-  const fetchBranches = async (page: number) => {
+  const fetchSpecializations = async (page: number) => {
     setLoading(true);
     try {
       const token = localStorage.getItem('access_token');
-      const response = await axios.get(`${API_BASE_PATH}/branches`, {
-        params: {
-          page,
-          limit: PAGE_LIMIT,
-          search: searchTerm,
-        },
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      const response = await axios.get(`${API_BASE_PATH}/specializations`, {
+        params: { page, limit: PAGE_LIMIT, search: searchTerm },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
 
-      const data = response.data?.data || response.data || [];
-      const totalCount = response.data?.totalCount || data.length || 0;
+      const specializationList = response.data?.data || [];
+      const totalCount = response.data?.total || specializationList.length;
 
-      // ✅ Normalize branch data
-      setBranches(
-        data.map((branch: any) => ({
-          id:
-            branch.branch_id?.toString() ??
-            branch._id ??
-            branch.id ??
-            '', // branch_id is the correct field from backend
-          name: branch.name ?? '-',
-          code: branch.code ?? '-',
-          phone: branch.phone ?? '-',
-          email: branch.email ?? '-', // added email field
+      setSpecializations(
+        specializationList.map((spec: any) => ({
+          ...spec,
+          specialization_id: spec.specialization_id,
+          department_name: spec.department?.name || 'Unknown',
         })),
       );
-
-      console.log('Fetched branches:', data);
+      console.log('Fetched specializations:', specializationList);
       setTotalPages(Math.ceil(totalCount / PAGE_LIMIT));
     } catch (error) {
-      console.error('Failed to fetch branches:', error);
-      setBranches([]);
+      console.error('Failed to fetch specializations:', error);
+      setSpecializations([]);
       setTotalPages(1);
     } finally {
       setLoading(false);
@@ -78,56 +65,114 @@ const BranchListPage = () => {
   };
 
   useEffect(() => {
-    fetchBranches(currentPage);
+    fetchSpecializations(currentPage);
   }, [currentPage, searchTerm]);
 
   const handlePageChange = (page: number) => {
-    if (page !== currentPage) {
-      setCurrentPage(page);
-    }
+    if (page !== currentPage) setCurrentPage(page);
   };
 
   const handleEditClick = (id: string) => {
-    if (!id) return;
-    console.log('Edit branch with ID:', id);
-    router.push(`/branches/branch-form/${id}/edit`);
+    router.push(`/specialization/specialization-form/${id}/edit`);
   };
 
   const handleDeleteClick = (id: string) => {
-    if (!id) return;
-    console.log('Delete branch with ID:', id);
-    setSelectedBranchId(id);
+    setSelectedSpecializationId(id);
     setShowDeleteModal(true);
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedBranchId) return;
+    if (!selectedSpecializationId) return;
     try {
       const token = localStorage.getItem('access_token');
-      await axios.delete(`${API_BASE_PATH}/branches/${selectedBranchId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      await axios.delete(`${API_BASE_PATH}/specializations/${selectedSpecializationId}`, {
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
       });
-      fetchBranches(currentPage);
+      setMessage({ type: 'success', text: 'Spécialisation supprimée avec succès !' });
+      fetchSpecializations(currentPage);
     } catch (error) {
-      console.error('Failed to delete branch:', error);
+      console.error('Failed to delete specialization:', error);
+      setMessage({ type: 'error', text: 'Échec de la suppression de la spécialisation.' });
     } finally {
       setShowDeleteModal(false);
-      setSelectedBranchId(null);
+      setSelectedSpecializationId(null);
+      setTimeout(() => setMessage(null), 3000);
+    }
+  };
+
+  // ✅ toggle active status with success/error message
+  const handleToggleStatus = async (id: string, newStatus: boolean) => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const spec = specializations.find((s) => s.specialization_id === id);
+      if (!spec) return;
+
+      await axios.patch(
+        `${API_BASE_PATH}/specializations/${id}`,
+        {
+          department_id: spec.department_id,
+          specialization_type: spec.specialization_type,
+          description: spec.description,
+          is_active: newStatus,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      setSpecializations((prev) =>
+        prev.map((s) =>
+          s.specialization_id === id ? { ...s, is_active: newStatus } : s,
+        ),
+      );
+
+      setMessage({
+        type: 'success',
+        text: `Statut mis à jour avec succès en ${newStatus ? 'Actif' : 'Inactif'}.`,
+      });
+    } catch (error) {
+      console.error('Failed to update status:', error);
+      setSpecializations((prev) =>
+        prev.map((s) =>
+          s.specialization_id === id ? { ...s, is_active: !newStatus } : s,
+        ),
+      );
+      setMessage({
+        type: 'error',
+        text: "Échec de la mise à jour du statut de la spécialisation.",
+      });
+    } finally {
+      setTimeout(() => setMessage(null), 3000);
     }
   };
 
   return (
     <>
-      <PageTitle subName="Succursales" title="Liste des succursales" />
+      <PageTitle subName="Spécialisations" title="Liste des spécialisations" />
+      {message && (
+        <div
+          style={{
+            margin: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '6px',
+            color: message.type === 'success' ? '#0f5132' : '#842029',
+            backgroundColor: message.type === 'success' ? '#d1e7dd' : '#f8d7da',
+            border: `1px solid ${message.type === 'success' ? '#badbcc' : '#f5c2c7'}`,
+          }}
+        >
+          {message.text}
+        </div>
+      )}
+
       <Row>
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex flex-wrap justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                Liste de toutes les succursales ({branches.length} Total)
+                Liste de toutes les spécialisations ({specializations.length} Total)
               </CardTitle>
 
               <div className="d-flex flex-wrap align-items-center gap-2">
@@ -135,7 +180,7 @@ const BranchListPage = () => {
                   <input
                     type="text"
                     className="form-control form-control-sm"
-                    placeholder="Rechercher par nom..."
+                    placeholder="Rechercher par type..."
                     value={searchTerm}
                     onChange={(e) => {
                       setSearchTerm(e.target.value);
@@ -145,9 +190,9 @@ const BranchListPage = () => {
                 </div>
                 <Button
                   variant="primary"
-                  onClick={() => router.push('/branches/branch-form/create')}
+                  onClick={() => router.push('/specialization/specialization-form/create')}
                 >
-                  Ajouter une succursale
+                  Add Spécialisation
                 </Button>
               </div>
             </CardHeader>
@@ -162,27 +207,42 @@ const BranchListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>No</th>
-                        <th>Nom de la succursale</th>
-                        <th>Téléphone</th>
-                        <th>Email</th> {/* ✅ Added Email column */}
+                        <th style={{ width: 20 }}>No</th>
+                        <th>Specialization</th>
+                        <th>Description</th>
+                        <th>Department</th>
+                        <th>Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {branches.map((branch: any, idx: number) => (
-                        <tr key={branch.id || idx}>
+                      {specializations.map((spec: SpecializationType, idx: number) => (
+                        <tr key={spec.specialization_id}>
                           <td>{idx + 1}</td>
-                          <td>{branch.name}</td>
-                          <td>{branch.phone}</td>
-                          <td>{branch.email}</td> {/* ✅ Show email */}
+                          <td>{spec.specialization_type}</td>
+                          <td>{spec.description}</td>
+                          <td>{spec.department_name}</td>
+                          <td>
+                            <div className="form-check form-switch">
+                              <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={spec.is_active}
+                                onChange={(e) =>
+                                  handleToggleStatus(spec.specialization_id, e.target.checked)
+                                }
+                              />
+                              <label className="form-check-label">
+                                {spec.is_active ? 'Active' : 'Inactive'}
+                              </label>
+                            </div>
+                          </td>
                           <td>
                             <div className="d-flex gap-2">
                               <Button
                                 variant="soft-primary"
                                 size="sm"
-                                onClick={() => handleEditClick(branch.id)}
-                                disabled={!branch.id}
+                                onClick={() => handleEditClick(spec.specialization_id)}
                               >
                                 <IconifyIcon
                                   icon="solar:pen-2-broken"
@@ -192,8 +252,7 @@ const BranchListPage = () => {
                               <Button
                                 variant="soft-danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(branch.id)}
-                                disabled={!branch.id}
+                                onClick={() => handleDeleteClick(spec.specialization_id)}
                               >
                                 <IconifyIcon
                                   icon="solar:trash-bin-minimalistic-2-broken"
@@ -256,9 +315,7 @@ const BranchListPage = () => {
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
-          Êtes-vous sûr de vouloir supprimer cette succursale ? Cette action est irréversible.
-        </Modal.Body>
+        <Modal.Body>Êtes-vous sûr de vouloir supprimer cette spécialisation ?</Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Annuler
@@ -272,4 +329,4 @@ const BranchListPage = () => {
   );
 };
 
-export default BranchListPage;
+export default SpecializationListPage;

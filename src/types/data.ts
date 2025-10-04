@@ -71,7 +71,8 @@ export type PatientType = {
   emails: string;
   number: string;
   legalgender: string;
-  language: string;
+
+  languageId: number | string
   city: string;
   country: string;
   street: string;
@@ -145,6 +146,8 @@ export type AppointmentStatus = 'scheduled' | 'completed' | 'cancelled' | 'no_sh
 export type AppointmentSource = 'phone' | 'website' | 'walk_in' | 'referral' | 'other';
 
 export interface AppointmentType {
+  patient: any;
+  id: number | undefined;
   _id: string; // Unique appointment ID
   customerId: string; // Linked to Customer
   branchId: string; // Linked to Branch
@@ -775,12 +778,9 @@ export type TherapistShortType = {
 
 
 export interface LanguageType {
-  key: Key | null | undefined;
-  label: ReactNode;
   id: number;
   language_name: string;
   language_description: string;
-  is_active: boolean;
   created_at: string;
   updated_at: string;
 };

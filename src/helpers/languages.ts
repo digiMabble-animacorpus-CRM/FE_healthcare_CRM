@@ -1,6 +1,7 @@
 import { API_BASE_PATH } from '@/context/constants';
 import { LanguageType } from '@/types/data';
 
+
 export const getAllLanguages = async (): Promise<LanguageType[]> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -13,16 +14,21 @@ export const getAllLanguages = async (): Promise<LanguageType[]> => {
       },
     });
 
-    if (!res.ok) throw new Error('Failed to fetch all languages');
+    if (!res.ok) {
+      throw new Error(`Failed to fetch all languages. Status: ${res.status}`);
+    }
 
     const response = await res.json();
-    console.log('API response in helper:', response);
-    return response || [];
+    console.log(" getAllLanguages raw API response:", response);
+
+    
+    return Array.isArray(response) ? response : response?.data || [];
   } catch (error) {
-    console.error('Error fetching all languages:', error);
+    console.error(' Error fetching all languages:', error);
     return [];
   }
 };
+
 
 export const getLanguages = async (
   page: number = 1,
@@ -49,21 +55,27 @@ export const getLanguages = async (
       },
     });
 
-    if (!res.ok) throw new Error('Failed to fetch languages');
+    if (!res.ok) {
+      throw new Error(`Failed to fetch paginated languages. Status: ${res.status}`);
+    }
 
     const response = await res.json();
+    console.log(" getLanguages paginated response:", response);
 
     return {
       data: response?.data || [],
       totalCount: response?.totalCount || 0,
     };
   } catch (error) {
-    console.error('Error fetching languages:', error);
+    console.error(' Error fetching paginated languages:', error);
     return { data: [], totalCount: 0 };
   }
 };
 
-export const getLanguageById = async (id?: string): Promise<{ data: LanguageType[] }> => {
+
+export const getLanguageById = async (
+  id?: string
+): Promise<{ data: LanguageType[] }> => {
   try {
     if (!id) return { data: [] };
 
@@ -77,12 +89,17 @@ export const getLanguageById = async (id?: string): Promise<{ data: LanguageType
       },
     });
 
-    if (!res.ok) throw new Error('Failed to fetch language by ID');
+    if (!res.ok) {
+      throw new Error(`Failed to fetch language by ID. Status: ${res.status}`);
+    }
 
     const response = await res.json();
+    console.log(" getLanguageById response:", response);
+
+    
     return { data: response?.data ? [response.data] : [] };
   } catch (error) {
-    console.error('Error fetching language by ID:', error);
+    console.error(' Error fetching language by ID:', error);
     return { data: [] };
   }
 };

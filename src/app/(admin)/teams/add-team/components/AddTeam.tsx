@@ -1058,16 +1058,21 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
               </Form.Group>
             </Col>
           </Row>
+          <Row className="justify-content-end">
+            <Col xs={12} md={3}>
+              <Button
+                type="submit"
+                variant="primary"
+                disabled={isSubmitting}
+                className="w-100 mb-3"
+              >
+                Sauvegarder
+              </Button>
+              {isSubmitting && <Spinner animation="border" variant="primary" className="ms-2" />}
+            </Col>
+          </Row>
         </CardBody>
       </Card>
-      <Row className="justify-content-end">
-        <Col xs={12} md={3}>
-          <Button type="submit" variant="primary" disabled={isSubmitting} className="w-100 mb-3">
-            Sauvegarder
-          </Button>
-          {isSubmitting && <Spinner animation="border" variant="primary" className="ms-2" />}
-        </Col>
-      </Row>
     </form>
   );
 };

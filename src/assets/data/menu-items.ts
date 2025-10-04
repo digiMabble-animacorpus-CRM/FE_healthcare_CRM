@@ -147,7 +147,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
   {
     key: 'branchs',
-    label: 'succursales',
+    label: 'Succursales',
     icon: 'ri-building-2-line',
     url: '/branches',
   },
@@ -156,5 +156,11 @@ export const MENU_ITEMS: MenuItemType[] = [
     label: 'Département',
     icon: 'ri-organization-chart',
     url: '/department',
+  },
+  {
+    key: 'specialization',
+    label: 'Spécialisation',
+    icon: 'ri-briefcase-4-line',
+    url: '/specialization',
   },
 ];

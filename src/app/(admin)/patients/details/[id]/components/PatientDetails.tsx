@@ -37,7 +37,8 @@ export type PatientDetailsCardProps = {
   city?: string;
   country?: string;
   zipcode?: string;
-  language?: string;
+  language?: { id: number; language_name: string; language_description?: string } | null;
+
   ssin?: string;
   mutualitynumber?: string;
   mutualityregistrationnumber?: string;
@@ -165,7 +166,7 @@ const PatientDetails = ({
             </Col>
             <Col lg={4}>
               <p className="text-dark fw-semibold fs-16 mb-1">Langue:</p>
-              <p className="mb-0">{language || 'N/A'}</p>
+              <p className="mb-0"> {language ? language.language_name : 'N/A'}</p>
             </Col>
           </Row>
 
