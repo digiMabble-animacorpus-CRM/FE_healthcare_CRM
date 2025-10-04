@@ -1041,7 +1041,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Statut</Form.Label>
+                <Form.Label>Status</Form.Label>
                 <Controller
                   control={control}
                   name="status"

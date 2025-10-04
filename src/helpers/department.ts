@@ -26,10 +26,12 @@ export const getDepartments = async (
     if (!res.ok) throw new Error('Failed to fetch departments');
 
     const response = await res.json();
+    console.log('Raw Departments API response:', response);
 
+    // ✅ since API returns a raw array
     return {
-      data: response?.data || [],
-      totalCount: response?.totalCount || 0,
+      data: Array.isArray(response) ? response : [],
+      totalCount: Array.isArray(response) ? response.length : 0,
     };
   } catch (error) {
     console.error('Error fetching departments:', error);
