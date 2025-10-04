@@ -27,8 +27,10 @@ const TherapistDetails = ({
   }, []);
 
   const handleEditClick = (id: string | number) => {
-    router.push(`/therapists/edit-therapist/${id}`);
-  };
+  console.log("Navigating to:", `/therapists/edit-therapist/${id}`);
+  router.push(`/therapists/edit-therapist/${id}`);
+};
+
   return (
     <Card className="mb-4 shadow-lg">
       {' '}

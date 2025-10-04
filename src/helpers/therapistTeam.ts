@@ -267,23 +267,33 @@ export const deleteTherapistTeamMember = async (
       return false;
     }
 
-    // If your API supports DELETE method
-    const response = await fetch(`${API_BASE_PATH}/therapist-team/${encodeURIComponent(String(id))}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+    const response = await fetch(
+      `${API_BASE_PATH}/therapist-team/${encodeURIComponent(String(id))}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
 
-    const result = await response.json();
+    // If 204 No Content, treat as success
+    if (response.status === 204) return true;
 
-    if (!response.ok || result.status === false) {
-      console.error('Delete failed:', result.message || 'Unknown error');
-      return false;
+    // For other 2xx responses, try parsing JSON
+    if (response.ok) {
+      try {
+        const result = await response.json();
+        return result?.status !== false;
+      } catch {
+        // If no JSON body, still treat as success
+        return true;
+      }
     }
 
-    return true;
+    console.error('Delete failed:', response.status);
+    return false;
   } catch (error) {
     console.error('Error deleting therapist team member:', error);
     return false;

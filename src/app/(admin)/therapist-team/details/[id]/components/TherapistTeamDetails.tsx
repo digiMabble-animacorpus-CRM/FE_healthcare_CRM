@@ -13,6 +13,12 @@ type Department = {
   name: string;
   description?: string;
 };
+type Specialization = {
+  specialization_id: number | string;
+  specialization_type: string;
+  description?: string;
+};
+
 type TeamDetailsCardProps = {
   therapistTeamId?: string | number;
   firstName?: string;
@@ -32,7 +38,7 @@ type TeamDetailsCardProps = {
   status?: string;
   languagesSpoken?: (string | { language_name: string })[];
   department?: Department;
-  specializationIds?: (string | number)[];
+  specializations?: Specialization[];
   branches?: Branch[];
   availability?: { day: string; startTime: string; endTime: string }[];
 };
@@ -56,7 +62,7 @@ const TherapistTeamDetails = ({
   status,
   languagesSpoken = [],
   department,
-  specializationIds = [],
+  specializations = [],
   branches = [],
   availability = [],
 }: TeamDetailsCardProps) => {
@@ -79,9 +85,7 @@ const TherapistTeamDetails = ({
           variant="primary"
           className="avatar-sm d-flex align-items-center justify-content-center fs-20"
           size="sm"
-          onClick={() =>
-            therapistTeamId && handleEditClick(therapistTeamId.toString())
-          }
+          onClick={() => therapistTeamId && handleEditClick(therapistTeamId.toString())}
           disabled={!therapistTeamId}
         >
           <IconifyIcon icon="ri:edit-fill" />
@@ -178,26 +182,29 @@ const TherapistTeamDetails = ({
                   </div>
                   <div className="mb-2">
                     <strong>Spécialisations:</strong>{' '}
-                    {specializationIds.length > 0 ? specializationIds.join(', ') : '-'}
+                    {specializations.length > 0
+                      ? specializations.map((spec) => spec.specialization_type).join(', ')
+                      : '-'}
                   </div>
+
                   <div className="mb-2">
                     <strong>Méthodes de paiement:</strong>{' '}
                     {payment_methods.length > 0
                       ? payment_methods.map((method, i) => (
-                        <Badge key={i} bg="primary" className="mx-1">
-                          {method}
-                        </Badge>
-                      ))
+                          <Badge key={i} bg="primary" className="mx-1">
+                            {method}
+                          </Badge>
+                        ))
                       : '-'}
                   </div>
                   <div className="mb-2">
                     <strong>Languages Spoken:</strong>{' '}
                     {languagesSpoken.length > 0
                       ? languagesSpoken.map((lang, i) => (
-                        <Badge key={i} bg="info" className="mx-1 text-dark">
-                          {typeof lang === 'string' ? lang : lang.language_name}
-                        </Badge>
-                      ))
+                          <Badge key={i} bg="info" className="mx-1 text-dark">
+                            {typeof lang === 'string' ? lang : lang.language_name}
+                          </Badge>
+                        ))
                       : '-'}
                   </div>
                 </Col>

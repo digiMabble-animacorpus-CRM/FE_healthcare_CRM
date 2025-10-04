@@ -785,6 +785,8 @@ export interface LanguageType {
 };
 
 export interface SpecializationType {
+  specialization_id: Key | null | undefined;
+  specialization_type: ReactNode;
   id: number;       // normalized from specialization_id
   name: string;     // normalized from specialization_type
   description?: string;
