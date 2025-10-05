@@ -2,7 +2,7 @@
 
 import React from 'react';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { Card, CardBody, CardHeader, CardTitle, Col, Container, Row } from 'react-bootstrap';
+import { Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 
 export type BranchSummaryItem = {
   branchId: number | string;
@@ -26,7 +26,7 @@ const num = (n: number) => new Intl.NumberFormat().format(n);
 // Utility to chunk summary array into rows of 2 cards
 function chunk<T>(arr: T[], size = 2): T[][] {
   return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
-    arr.slice(i * size, i * size + size)
+    arr.slice(i * size, i * size + size),
   );
 }
 
@@ -52,7 +52,9 @@ const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFil
   return (
     <Card className="mb-4">
       <CardHeader>
-        <CardTitle as="h4" className="mb-0">Points de vue des Branche</CardTitle>
+        <CardTitle as="h4" className="mb-0">
+          Points de vue des Branche
+        </CardTitle>
       </CardHeader>
       <CardBody>
         {summaryRows.map((row, rowIdx) => (
@@ -87,7 +89,12 @@ const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFil
                         <Col>
                           <div className="d-flex flex-column align-items-center">
                             <div className="avatar-md bg-primary bg-opacity-10 rounded flex-centered mb-2">
-                              <IconifyIcon icon="mdi:doctor" width={24} height={24} className="text-primary" />
+                              <IconifyIcon
+                                icon="mdi:doctor"
+                                width={24}
+                                height={24}
+                                className="text-primary"
+                              />
                             </div>
                             <div className="fw-semibold fs-4">{num(b.doctors)}</div>
                             <div className="text-muted">Thérapeutes</div>
@@ -96,7 +103,12 @@ const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFil
                         <Col>
                           <div className="d-flex flex-column align-items-center">
                             <div className="avatar-md bg-success bg-opacity-10 rounded flex-centered mb-2">
-                              <IconifyIcon icon="mdi:account-multiple" width={24} height={24} className="text-success" />
+                              <IconifyIcon
+                                icon="mdi:account-multiple"
+                                width={24}
+                                height={24}
+                                className="text-success"
+                              />
                             </div>
                             <div className="fw-semibold fs-4">{num(b.patients)}</div>
                             <div className="text-muted">Patients</div>
@@ -105,7 +117,12 @@ const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFil
                         <Col>
                           <div className="d-flex flex-column align-items-center">
                             <div className="avatar-md bg-warning bg-opacity-10 rounded flex-centered mb-2">
-                              <IconifyIcon icon="mdi:calendar-check" width={24} height={24} className="text-warning" />
+                              <IconifyIcon
+                                icon="mdi:calendar-check"
+                                width={24}
+                                height={24}
+                                className="text-warning"
+                              />
                             </div>
                             <div className="fw-semibold fs-4">{num(filteredAppointments)}</div>
                             <div className="text-muted">Rendez-vous</div>

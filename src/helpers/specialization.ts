@@ -4,7 +4,7 @@ import { SpecializationType } from '@/types/data';
 export const getSpecializations = async (
   page: number = 1,
   limit: number = 100,
-  search: string = ''
+  search: string = '',
 ): Promise<{ data: SpecializationType[]; totalCount: number }> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -35,8 +35,8 @@ export const getSpecializations = async (
             is_active: item.is_active,
             department: item.department,
           } as SpecializationType,
-        ])
-      ).values()
+        ]),
+      ).values(),
     );
 
     console.log('Normalized Specializations:', unique);

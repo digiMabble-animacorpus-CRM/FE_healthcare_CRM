@@ -73,7 +73,9 @@ const ProfileDetails = () => {
           schedule: {
             array: apiProfile.availability || [],
             text: apiProfile.availability
-              ? apiProfile.availability.map((a: any) => `${a.day} ${a.startTime}-${a.endTime}`).join('\n')
+              ? apiProfile.availability
+                  .map((a: any) => `${a.day} ${a.startTime}-${a.endTime}`)
+                  .join('\n')
               : '',
           },
           languages_spoken: apiProfile.languagesSpoken || [],
@@ -209,7 +211,6 @@ const ProfileDetails = () => {
               <p className="fw-semibold mb-1">Méthodes de paiement:</p>
               <p>{payment_methods.join(', ') || '-'}</p>
             </Col>
-            
           </Row>
 
           <Row className="my-4">
@@ -304,4 +305,3 @@ const ProfileDetails = () => {
 };
 
 export default ProfileDetails;
-

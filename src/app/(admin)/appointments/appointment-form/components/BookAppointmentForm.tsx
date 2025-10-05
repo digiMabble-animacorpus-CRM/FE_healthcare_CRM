@@ -46,35 +46,35 @@ const BookAppointmentForm = ({
   const [saving, setSaving] = useState(false);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
   const router = useRouter();
-  const token =  localStorage.getItem('access_token');
+  const token = localStorage.getItem('access_token');
 
   const getDefaultValues = (): AppointmentFormValues => {
     if (mode === 'edit' && appointmentData) {
       console.log('Appointment Data:', appointmentData); // Debug log
-      
-      const startTime = appointmentData.startTime 
+
+      const startTime = appointmentData.startTime
         ? new Date(appointmentData.startTime).toTimeString().slice(0, 5)
         : '';
-      
-      const date = appointmentData.startTime 
+
+      const date = appointmentData.startTime
         ? new Date(appointmentData.startTime).toISOString().split('T')[0]
         : '';
-      
+
       // Extract IDs from nested objects
       const branchId = appointmentData.branch?.branch_id || 0;
       const departmentId = appointmentData.department?.id || 0;
       const specializationId = appointmentData.specialization?.specialization_id || 0;
       const therapistId = appointmentData.therapist?.therapistId || 0;
-      
-      console.log('Extracted IDs:', { 
-        branchId, 
-        departmentId, 
-        specializationId, 
+
+      console.log('Extracted IDs:', {
+        branchId,
+        departmentId,
+        specializationId,
         therapistId,
         date,
-        startTime
+        startTime,
       }); // Debug log
-      
+
       return {
         branchId,
         departmentId,
@@ -86,7 +86,7 @@ const BookAppointmentForm = ({
         description: appointmentData.description || '',
       };
     }
-    
+
     return {
       branchId: 0,
       departmentId: 0,
@@ -110,19 +110,19 @@ const BookAppointmentForm = ({
     if (mode === 'edit' && appointmentData && !isDataLoaded) {
       const defaultValues = getDefaultValues();
       console.log('Setting form values:', defaultValues); // Debug log
-      
+
       // Set each value individually to ensure they're properly set
       Object.entries(defaultValues).forEach(([key, value]) => {
         setValue(key as keyof AppointmentFormValues, value);
       });
-      
+
       setIsDataLoaded(true);
     }
   }, [mode, appointmentData, setValue, isDataLoaded]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
     console.log('Form data being submitted:', data); // Debug log
-    
+
     const payload = {
       patientId,
       branchId: data.branchId,
@@ -144,23 +144,23 @@ const BookAppointmentForm = ({
       setSaving(true);
       const url = `${API_BASE_PATH}/appointments${mode === 'edit' && appointmentId ? `/${appointmentId}` : ''}`;
       const method = mode === 'edit' ? 'PATCH' : 'POST';
-      
+
       const res = await fetch(url, {
         method,
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify(payload),
-      });      
+      });
 
       if (!res.ok) {
         const errorText = await res.text();
         throw new Error(`Failed to save appointment: ${errorText}`);
       }
-      
+
       const responseData = await res.json();
-      console.log("API Response:", responseData);
+      console.log('API Response:', responseData);
       reset();
       router.push('/appointments/appointment-list');
       onSubmitHandler?.(data);
@@ -176,7 +176,9 @@ const BookAppointmentForm = ({
       <form onSubmit={handleSubmit(onSubmit)}>
         <Card className="mb-4">
           <CardHeader className="d-flex justify-content-between align-items-center">
-            <CardTitle as="h6">{mode === 'edit' ? 'Edit Appointment' : 'Prendre rendez-vous'}</CardTitle>
+            <CardTitle as="h6">
+              {mode === 'edit' ? 'Edit Appointment' : 'Prendre rendez-vous'}
+            </CardTitle>
             {selectedPatient && (
               <small className="text-muted">
                 {mode === 'edit' ? 'Editing appointment for: ' : 'Booking for: '}
@@ -190,8 +192,8 @@ const BookAppointmentForm = ({
             <AppointmentFields mode={mode} appointmentData={appointmentData} />
 
             <div className="d-flex justify-content-end gap-2 mt-4">
-              <Button 
-                variant="outline-secondary" 
+              <Button
+                variant="outline-secondary"
                 onClick={() => router.push('/appointments/appointment-list')}
               >
                 Cancel

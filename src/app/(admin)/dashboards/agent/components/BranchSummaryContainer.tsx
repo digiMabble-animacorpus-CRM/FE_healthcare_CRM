@@ -51,7 +51,10 @@ const BranchSummaryContainer: React.FC = () => {
   }, []);
 
   // Simulated filtering logic on data based on filter type
-  const applyFilterToData = (branch: BranchSummaryItem, filter: FilterOption): BranchSummaryItem => {
+  const applyFilterToData = (
+    branch: BranchSummaryItem,
+    filter: FilterOption,
+  ): BranchSummaryItem => {
     let filteredAppointments = branch.appointmentsMonth; // fallback to monthly data
 
     switch (filter) {
@@ -87,7 +90,13 @@ const BranchSummaryContainer: React.FC = () => {
   if (loading) return <div>Loading branch summaries...</div>;
   if (error) return <div>{error}</div>;
 
-  return <BranchSummary summaries={summaries} filters={branchFilters} onFilterChange={handleFilterChange} />;
+  return (
+    <BranchSummary
+      summaries={summaries}
+      filters={branchFilters}
+      onFilterChange={handleFilterChange}
+    />
+  );
 };
 
 export default BranchSummaryContainer;

@@ -39,7 +39,7 @@ const Schedules = () => {
           </DropdownMenu>
         </Dropdown>
         <CardTitle as={'h5'} className="mb-3">
-        Aujourdhui&apos;s Horaires
+          Aujourdhui&apos;s Horaires
         </CardTitle>
         {scheduleData.map((schedule, idx) => (
           <Row className="align-items-center" key={idx}>

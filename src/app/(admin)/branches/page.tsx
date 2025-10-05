@@ -54,11 +54,7 @@ const BranchListPage = () => {
       // ✅ Normalize branch data
       setBranches(
         data.map((branch: any) => ({
-          id:
-            branch.branch_id?.toString() ??
-            branch._id ??
-            branch.id ??
-            '', // branch_id is the correct field from backend
+          id: branch.branch_id?.toString() ?? branch._id ?? branch.id ?? '', // branch_id is the correct field from backend
           name: branch.name ?? '-',
           code: branch.code ?? '-',
           phone: branch.phone ?? '-',

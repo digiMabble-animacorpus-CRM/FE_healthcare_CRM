@@ -63,7 +63,9 @@ export const getAllTherapistTeamMembers = async (
 };
 
 // Fetch a therapist team member by ID
-export const getTherapistTeamMemberById = async (teamMemberId: string | number): Promise<TherapistTeamMember | null> => {
+export const getTherapistTeamMemberById = async (
+  teamMemberId: string | number,
+): Promise<TherapistTeamMember | null> => {
   const token = localStorage.getItem('access_token');
   if (!token) {
     console.warn('No access token found.');
@@ -84,7 +86,7 @@ export const getTherapistTeamMemberById = async (teamMemberId: string | number):
       return null;
     }
     const result = await response.json();
-    return result ? result as TherapistTeamMember : null;
+    return result ? (result as TherapistTeamMember) : null;
   } catch (error) {
     console.error('Exception during therapist fetch:', error);
     return null;
@@ -99,7 +101,6 @@ export async function getTeamMemberById(id: number) {
   }
   return res.json();
 }
-
 
 // Create a therapist team member
 export const createTherapistTeamMember = async (payload: TherapistTeamMember): Promise<boolean> => {
@@ -147,7 +148,6 @@ export const createTherapistTeamMember = async (payload: TherapistTeamMember): P
   }
 };
 
-
 // Update a therapist team member
 export const updateTherapistTeamMember = async (
   id: string | number,
@@ -175,7 +175,7 @@ export const updateTherapistTeamMember = async (
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(safePayload),
-      }
+      },
     );
     const result = await response.json();
     if (!response.ok || result.status === false) {
@@ -211,7 +211,9 @@ export const transformToBackendDto = (formData: TherapistTeamMember): TherapistT
   languagesSpoken: Array.isArray(formData.languagesSpoken) ? formData.languagesSpoken : [],
   isDelete: !!formData.isDelete,
   departmentId: Number(formData.departmentId),
-  specializationIds: Array.isArray(formData.specializationIds) ? formData.specializationIds.map(Number) : [],
+  specializationIds: Array.isArray(formData.specializationIds)
+    ? formData.specializationIds.map(Number)
+    : [],
   branchIds: Array.isArray(formData.branchIds) ? formData.branchIds.map(Number) : [],
 });
 
@@ -257,9 +259,7 @@ export const getAllAccessLevels = async (): Promise<any[]> => {
   }
 };
 
-export const deleteTherapistTeamMember = async (
-  id: string | number
-): Promise<boolean> => {
+export const deleteTherapistTeamMember = async (id: string | number): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) {
@@ -275,7 +275,7 @@ export const deleteTherapistTeamMember = async (
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
 
     // If 204 No Content, treat as success

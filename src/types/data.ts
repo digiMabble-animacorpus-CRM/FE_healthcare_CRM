@@ -94,7 +94,7 @@ export type PatientType = {
   mutualityregistrationnumber?: string;
   zipcode?: string;
   branch?: string;
-   therapistId?: number | null;
+  therapistId?: number | null;
   therapist?: TherapistShortType | null;
 };
 
@@ -667,7 +667,7 @@ export type TeamMemberType = {
   office_address: string;
   contact_email: string;
   contact_phone: string;
-  schedule: Record<string, string> | { text?: string | null | undefined; };
+  schedule: Record<string, string> | { text?: string | null | undefined };
   about: string;
   languages_spoken: string[];
   diplomas_and_training: string[];
@@ -692,7 +692,7 @@ export type TeamMemberType = {
   consultations: string;
   permissions: { admin: boolean };
   role: string;
-  status: "active" | "inactive";
+  status: 'active' | 'inactive';
   availability: { day: string; startTime: string; endTime: string }[];
   languagesSpoken: string[];
   isDelete: boolean;
@@ -700,7 +700,6 @@ export type TeamMemberType = {
   specializationIds: number[];
   branchIds: number[];
 };
-
 
 export type TeamMemberCreatePayload = {
   teamId: string; // camelCase for consistency
@@ -767,12 +766,11 @@ export type TherapistShortType = {
   paymentMethods?: string | null;
   faq?: string | null;
   departmentId?: number | null;
-  //  departmentName?: string; 
+  //  departmentName?: string;
   availability?: any[];
   isDelete?: boolean;
   deletedAt?: string | null;
 };
-
 
 export interface LanguageType {
   key: Key | null | undefined;
@@ -783,13 +781,13 @@ export interface LanguageType {
   is_active: boolean;
   created_at: string;
   updated_at: string;
-};
+}
 
 export interface SpecializationType {
   specialization_id: Key | null | undefined;
   specialization_type: ReactNode;
-  id: number;       // normalized from specialization_id
-  name: string;     // normalized from specialization_type
+  id: number; // normalized from specialization_id
+  name: string; // normalized from specialization_type
   description?: string;
   is_active?: boolean;
   department?: {

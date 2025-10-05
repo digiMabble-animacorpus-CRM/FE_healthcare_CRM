@@ -131,45 +131,43 @@ const TherapistTeamsListPage = () => {
   };
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
- const handleConfirmDelete = async () => {
-  if (!selectedTherapistTeamId) return;
+  const handleConfirmDelete = async () => {
+    if (!selectedTherapistTeamId) return;
 
-  setDeletingId(selectedTherapistTeamId);
-  setShowDeleteModal(false);
+    setDeletingId(selectedTherapistTeamId);
+    setShowDeleteModal(false);
 
-  try {
-    const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
+    try {
+      const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
 
-    if (success) {
-      // Optimistically remove deleted member
-      setAllTeamMembers((prev) => {
-        const updated = prev.filter(
-          (t) => String(t.team_id) !== String(selectedTherapistTeamId)
-        );
+      if (success) {
+        // Optimistically remove deleted member
+        setAllTeamMembers((prev) => {
+          const updated = prev.filter((t) => String(t.team_id) !== String(selectedTherapistTeamId));
 
-        // If the current page has no more items after deletion, go to previous page
-        if (updated.length === 0 && currentPage > 1) {
-          setCurrentPage((prevPage) => prevPage - 1);
-        }
+          // If the current page has no more items after deletion, go to previous page
+          if (updated.length === 0 && currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+          }
 
-        return updated;
-      });
+          return updated;
+        });
 
-      // Decrease total count
-      setTotalCount((prev) => prev - 1);
+        // Decrease total count
+        setTotalCount((prev) => prev - 1);
 
-      // Clear selected ID
-      setSelectedTeamId(null);
-      setSelectedTeamMemberId(null);
-    } else {
-      setError('Failed to delete therapist team member.');
+        // Clear selected ID
+        setSelectedTeamId(null);
+        setSelectedTeamMemberId(null);
+      } else {
+        setError('Failed to delete therapist team member.');
+      }
+    } catch (err) {
+      setError('An error occurred while deleting the member.');
+    } finally {
+      setDeletingId(null);
     }
-  } catch (err) {
-    setError('An error occurred while deleting the member.');
-  } finally {
-    setDeletingId(null);
-  }
-};
+  };
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;

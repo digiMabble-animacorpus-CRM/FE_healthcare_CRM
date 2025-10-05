@@ -1,4 +1,3 @@
-
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
@@ -112,4 +111,3 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
 };
 
 export default EditDepartmentPage;
-

@@ -40,10 +40,7 @@ const AgeDistributionWidget = ({
   const getIcon = (label: string) => {
     if (label.toLowerCase().includes('kid')) return FaChild;
     if (label.toLowerCase().includes('men')) return FaMale;
-    if (
-      label.toLowerCase().includes('woman') ||
-      label.toLowerCase().includes('female')
-    )
+    if (label.toLowerCase().includes('woman') || label.toLowerCase().includes('female'))
       return FaFemale;
     return FaChild; // fallback
   };
@@ -137,12 +134,7 @@ const PatientInsights = ({
               aria-expanded="false"
             >
               Semaine{' '}
-              <IconifyIcon
-                className="ms-1"
-                width={16}
-                height={16}
-                icon="ri:arrow-down-s-line"
-              />
+              <IconifyIcon className="ms-1" width={16} height={16} icon="ri:arrow-down-s-line" />
             </DropdownToggle>
             <DropdownMenu className="dropdown-menu-end">
               <DropdownItem>Semaine</DropdownItem>
@@ -190,8 +182,7 @@ const PatientInsights = ({
                     </div>
                     <ProgressBar
                       now={
-                        (c.count / Math.max(...demographics.topCities.map((t) => t.count))) *
-                        100
+                        (c.count / Math.max(...demographics.topCities.map((t) => t.count))) * 100
                       }
                       variant="success"
                       className="progress-sm rounded"
@@ -302,7 +293,7 @@ const PatientInsightsContainer = () => {
       filteredData = {
         ...data,
         branch_distribution: (data.branch_distribution || []).filter(
-          (item: any) => item.branch_id === branchId
+          (item: any) => item.branch_id === branchId,
         ),
       };
     }
@@ -313,9 +304,15 @@ const PatientInsightsContainer = () => {
       (filteredData.gender_distribution?.other ?? 0);
 
     const genderPercentages = {
-      male: totalGenderCount ? ((filteredData.gender_distribution?.male ?? 0) / totalGenderCount) * 100 : 0,
-      female: totalGenderCount ? ((filteredData.gender_distribution?.female ?? 0) / totalGenderCount) * 100 : 0,
-      other: totalGenderCount ? ((filteredData.gender_distribution?.other ?? 0) / totalGenderCount) * 100 : 0,
+      male: totalGenderCount
+        ? ((filteredData.gender_distribution?.male ?? 0) / totalGenderCount) * 100
+        : 0,
+      female: totalGenderCount
+        ? ((filteredData.gender_distribution?.female ?? 0) / totalGenderCount) * 100
+        : 0,
+      other: totalGenderCount
+        ? ((filteredData.gender_distribution?.other ?? 0) / totalGenderCount) * 100
+        : 0,
     };
 
     const demographics: Demographics = {

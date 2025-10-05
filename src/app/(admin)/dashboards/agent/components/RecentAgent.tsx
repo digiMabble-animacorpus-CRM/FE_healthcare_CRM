@@ -17,10 +17,9 @@ import { currency } from '@/context/constants';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import dynamic from 'next/dynamic';
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
-
 
 const RecentAgent = () => {
   return (

@@ -96,11 +96,7 @@ const EditLanguagePage = ({ params }: Props) => {
   if (loading) return <div>Loading language details...</div>;
 
   return (
-    <LanguageForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
+    <LanguageForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
   );
 };
 

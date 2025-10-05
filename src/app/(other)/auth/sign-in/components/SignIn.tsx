@@ -33,8 +33,8 @@ const SignIn = () => {
                 </div>
                 <h2 className="fw-bold text-uppercase text-center fs-18">Se connecter</h2>
                 <p className="text-muted text-center mt-1 mb-4">
-                  Entrez votre adresse e-mail et votre mot de passe pour accéder au panneau
-                  d administration.
+                  Entrez votre adresse e-mail et votre mot de passe pour accéder au panneau d
+                  administration.
                 </p>
                 <div className="px-4">
                   <form className="authentication-form" onSubmit={login}>

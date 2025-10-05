@@ -144,7 +144,7 @@ const PatientDetailsPage = () => {
                 paymentMethods: rawPatient.therapist.paymentMethods || null,
                 faq: rawPatient.therapist.faq || null,
                 departmentId: rawPatient.therapist.departmentId || null,
-                
+
                 availability: Array.isArray(rawPatient.therapist.availability)
                   ? rawPatient.therapist.availability
                   : [],
@@ -179,7 +179,7 @@ const PatientDetailsPage = () => {
         // 👇 Now showing Age along with DOB + Gender
         birthdate={
           data.birthdate
-            ? `${data.birthdate || 'N\A'} | ${data.legalgender || 'N\A'} | ${calculateAge(data.birthdate ||'N\A')} yrs`
+            ? `${data.birthdate || 'N\A'} | ${data.legalgender || 'N\A'} | ${calculateAge(data.birthdate || 'N\A')} yrs`
             : ''
         }
         email={data.emails}

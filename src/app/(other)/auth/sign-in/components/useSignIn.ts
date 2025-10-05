@@ -85,7 +85,10 @@ const useSignIn = () => {
         showNotification({ message: data.message || 'Identifiants invalides', variant: 'danger' });
       }
     } catch (err) {
-      showNotification({ message: 'Une erreur sest produite lors de la connexion', variant: 'danger' });
+      showNotification({
+        message: 'Une erreur sest produite lors de la connexion',
+        variant: 'danger',
+      });
     }
 
     setLoading(false);

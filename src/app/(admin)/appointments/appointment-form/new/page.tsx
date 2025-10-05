@@ -34,7 +34,7 @@ export default function NewAppointmentPage() {
   }, []);
 
   const handlePatientSave = (saved: PatientType) => {
-    console.log(saved,"saved")
+    console.log(saved, 'saved');
     setPatient(saved);
   };
 
@@ -52,12 +52,8 @@ export default function NewAppointmentPage() {
   return (
     <div className="p-3">
       <h1 className="text-2xl font-bold mb-4">Create New Appointment</h1>
-      
-      <PatientInfoCard
-        onSave={handlePatientSave}
-        onReset={handleReset}
-        key={resetTrigger}
-      />
+
+      <PatientInfoCard onSave={handlePatientSave} onReset={handleReset} key={resetTrigger} />
 
       {patient?.id && (
         <BookAppointmentForm

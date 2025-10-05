@@ -198,8 +198,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     getDepartments(1, 100, '').then(({ data }) => setDepartments(data));
   }, []);
   useEffect(() => {
-   getSpecializations().then(({ data }) => setSpecializations(data));
-
+    getSpecializations().then(({ data }) => setSpecializations(data));
   }, []);
 
   useEffect(() => {

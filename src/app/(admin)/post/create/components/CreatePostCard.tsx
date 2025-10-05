@@ -63,7 +63,7 @@ const CreatePostCard = () => {
           </Col>
           <Col lg={6}>
             <Button variant="danger" className="w-100">
-            Annuler
+              Annuler
             </Button>
           </Col>
         </Row>

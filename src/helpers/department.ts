@@ -4,7 +4,7 @@ import { DepartmentType } from '@/types/data';
 export const getDepartments = async (
   page: number,
   limit: number,
-  search: string
+  search: string,
 ): Promise<{ data: DepartmentType[]; totalCount: number }> => {
   try {
     const token = localStorage.getItem('access_token');

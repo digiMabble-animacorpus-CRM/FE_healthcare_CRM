@@ -5,13 +5,23 @@ import dayjs from 'dayjs';
 import { AppointmentStats, getAppointmentStats } from '@/helpers/dashboard';
 import { getAllBranch } from '@/helpers/branch';
 
-export type Appointment = { id: string; date: string; time: string; patient: string; doctor: string; branch: string; status: 'Programmé' | 'Terminée' | 'Annulée'; };
-export type BranchType = { _id: string; name: string; };
+export type Appointment = {
+  id: string;
+  date: string;
+  time: string;
+  patient: string;
+  doctor: string;
+  branch: string;
+  status: 'Programmé' | 'Terminée' | 'Annulée';
+};
+export type BranchType = { _id: string; name: string };
 export type AppointmentsOverviewProps = { upcoming: Appointment[] };
 
 // Utility to chunk array into groups of 2
 function chunk<T>(arr: T[], size = 2): T[][] {
-    return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) => arr.slice(i * size, i * size + size));
+  return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size),
+  );
 }
 
 const BranchAppointmentCard = ({ branch, branchId }: { branch: string; branchId: string }) => {
@@ -19,16 +29,18 @@ const BranchAppointmentCard = ({ branch, branchId }: { branch: string; branchId:
   const [appointmentStats, setAppointmentStats] = useState<AppointmentStats | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const startDate = timeFilter === 'thisWeek'
+  const startDate =
+    timeFilter === 'thisWeek'
       ? dayjs().startOf('week').format('YYYY-MM-DD')
       : timeFilter === 'lastWeek'
-      ? dayjs().subtract(1, 'week').startOf('week').format('YYYY-MM-DD')
-      : dayjs().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
-  const endDate = timeFilter === 'thisWeek'
+        ? dayjs().subtract(1, 'week').startOf('week').format('YYYY-MM-DD')
+        : dayjs().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
+  const endDate =
+    timeFilter === 'thisWeek'
       ? dayjs().endOf('week').format('YYYY-MM-DD')
       : timeFilter === 'lastWeek'
-      ? dayjs().subtract(1, 'week').endOf('week').format('YYYY-MM-DD')
-      : dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
+        ? dayjs().subtract(1, 'week').endOf('week').format('YYYY-MM-DD')
+        : dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -53,14 +65,18 @@ const BranchAppointmentCard = ({ branch, branchId }: { branch: string; branchId:
           </div>
           <div role="group" className="d-flex gap-2">
             {(['thisWeek', 'lastWeek', 'lastMonth'] as const).map((period) => (
-                <button
-                  key={period}
-                  type="button"
-                  className={`btn btn-sm ${timeFilter === period ? 'btn-primary' : 'btn-outline-primary'} rounded-pill`}
-                  onClick={() => setTimeFilter(period)}
-                >
-                  {period === 'thisWeek' ? 'This Week' : period === 'lastWeek' ? 'Last Week' : 'Last Month'}
-                </button>
+              <button
+                key={period}
+                type="button"
+                className={`btn btn-sm ${timeFilter === period ? 'btn-primary' : 'btn-outline-primary'} rounded-pill`}
+                onClick={() => setTimeFilter(period)}
+              >
+                {period === 'thisWeek'
+                  ? 'This Week'
+                  : period === 'lastWeek'
+                    ? 'Last Week'
+                    : 'Last Month'}
+              </button>
             ))}
           </div>
         </CardHeader>
@@ -68,15 +84,33 @@ const BranchAppointmentCard = ({ branch, branchId }: { branch: string; branchId:
           <Row className="text-center">
             <Col>
               <p className="text-muted mb-1">Programmé</p>
-              <h5>{loading ? <Spinner animation="border" size="sm" /> : appointmentStats?.totalAppointments ?? 0}</h5>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.totalAppointments ?? 0)
+                )}
+              </h5>
             </Col>
             <Col>
               <p className="text-muted mb-1">Terminée</p>
-              <h5>{loading ? <Spinner animation="border" size="sm" /> : appointmentStats?.completed ?? 0}</h5>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.completed ?? 0)
+                )}
+              </h5>
             </Col>
             <Col>
               <p className="text-muted mb-1">Annulée</p>
-              <h5>{loading ? <Spinner animation="border" size="sm" /> : appointmentStats?.cancellations ?? 0}</h5>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.cancellations ?? 0)
+                )}
+              </h5>
             </Col>
           </Row>
         </CardBody>
@@ -112,7 +146,9 @@ const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle as="h4" className="mb-0">Points de vue de Rendez-vous</CardTitle>
+        <CardTitle as="h4" className="mb-0">
+          Points de vue de Rendez-vous
+        </CardTitle>
       </CardHeader>
       <CardBody>
         {branchRows.map((rowBranches, idx) => (
