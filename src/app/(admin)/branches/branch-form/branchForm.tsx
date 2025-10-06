@@ -140,7 +140,14 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
                   placeholder="Ex: branch@example.com"
                 />
               </Col>
-
+              <Col lg={6}>
+                <TextFormInput
+                  control={control}
+                  name="location"
+                  label="Localisation Google (facultatif)"
+                  placeholder="Ex: https://maps.google.com/?q=12.9716,77.5946"
+                />
+              </Col>
               <Col lg={12}>
                 <Form.Group>
                   <Form.Label>Adresse</Form.Label>
@@ -151,15 +158,6 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
                     {...register('address')}
                   />
                 </Form.Group>
-              </Col>
-
-              <Col lg={12}>
-                <TextFormInput
-                  control={control}
-                  name="location"
-                  label="Localisation Google (facultatif)"
-                  placeholder="Ex: https://maps.google.com/?q=12.9716,77.5946"
-                />
               </Col>
             </Row>
 
