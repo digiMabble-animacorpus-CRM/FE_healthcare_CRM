@@ -49,7 +49,6 @@ const EditBranchPage = ({ params }: Props) => {
           });
         }
       } catch (err) {
-        console.log(err);
         toast.error('Failed to load branch details');
       } finally {
         setLoading(false);

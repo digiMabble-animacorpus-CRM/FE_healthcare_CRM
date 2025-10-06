@@ -119,10 +119,6 @@ const PatientDetailsPage = () => {
           zipcode: rawPatient.zipcode || '',
           number: rawPatient.number || '',
           phones: Array.isArray(rawPatient.phones) ? rawPatient.phones : [],
-          // created_at: rawPatient.created_at || null,
-          // is_delete: rawPatient.is_delete || false,
-          // deleted_at: rawPatient.deleted_at || null,
-
           // 🔥 Therapist mapping
           therapistId: rawPatient.therapistId ?? null,
           therapist: rawPatient.therapist

@@ -34,7 +34,6 @@ export default function NewAppointmentPage() {
   }, []);
 
   const handlePatientSave = (saved: PatientType) => {
-    console.log(saved, 'saved');
     setPatient(saved);
   };
 
@@ -43,9 +42,7 @@ export default function NewAppointmentPage() {
     setResetTrigger((prev) => prev + 1);
   };
 
-  const handleAppointmentSubmit = (appointmentData: any) => {
-    console.log('Appointment Data:', appointmentData);
-  };
+  const handleAppointmentSubmit = (appointmentData: any) => {};
 
   if (!isClient) return null;
 

@@ -69,8 +69,6 @@ const TherapistTeamDetails = ({
   const router = useRouter();
   const displayName = full_name || `${firstName ?? ''} ${lastName ?? ''}`.trim();
 
-  console.log('TherapistTeamDetails received therapistTeamId:', therapistTeamId);
-
   const handleEditClick = (id: any) => router.push(`/therapist-team/edit-TherapistTeam/${id}`);
 
   return (
@@ -81,17 +79,17 @@ const TherapistTeamDetails = ({
           <IconifyIcon icon="ri:arrow-left-line" className="me-1" />
           Retour à la liste
         </Button>
-        {/* <Button
+        <Button
           variant="primary"
           className="avatar-sm d-flex align-items-center justify-content-center fs-20"
           size="sm"
           onClick={() =>
-            handleEditClick(id)
+            handleEditClick(therapistTeamId)
           }
           disabled={!therapistTeamId}
         >
           <IconifyIcon icon="ri:edit-fill" />
-        </Button> */}
+        </Button>
       </div>
 
       {/* Profile Section */}

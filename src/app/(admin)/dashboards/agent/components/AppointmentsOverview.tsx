@@ -5,6 +5,8 @@ import dayjs from 'dayjs';
 import { AppointmentStats, getAppointmentStats } from '@/helpers/dashboard';
 import { getAllBranch } from '@/helpers/branch';
 
+// types.ts or inside the same file
+
 export type Appointment = {
   id: string;
   date: string;
@@ -15,7 +17,12 @@ export type Appointment = {
   status: 'Programmé' | 'Terminée' | 'Annulée';
 };
 export type BranchType = { _id: string; name: string };
-export type AppointmentsOverviewProps = { upcoming: Appointment[] };
+export type AppointmentsOverviewProps = {
+  upcomingCount: number;
+  cancellationsWeek: number;
+  completedWeek: number;
+  upcoming: Appointment[];
+};
 
 // Utility to chunk array into groups of 2
 function chunk<T>(arr: T[], size = 2): T[][] {
@@ -51,8 +58,8 @@ const CumulativeAppointmentCard = ({ branchIds }: { branchIds: string[] }) => {
         // Fetch for each branch and sum up stats
         const statsResults = await Promise.all(
           branchIds.map((branchId) =>
-            getAppointmentStats({ startDate, endDate, branchId: Number(branchId) })
-          )
+            getAppointmentStats({ startDate, endDate, branchId: Number(branchId) }),
+          ),
         );
         // Aggregate stats from all branches
         const totals = statsResults.reduce(
@@ -64,7 +71,7 @@ const CumulativeAppointmentCard = ({ branchIds }: { branchIds: string[] }) => {
               cancellations: acc.cancellations + (stat.cancellations || 0),
             };
           },
-          { totalAppointments: 0, completed: 0, cancellations: 0 }
+          { totalAppointments: 0, completed: 0, cancellations: 0 },
         );
         setAppointmentStats(totals);
       } finally {
@@ -160,7 +167,6 @@ const BranchAppointmentCard = ({ branch, branchId }: { branch: string; branchId:
         : dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
 
   useEffect(() => {
-    console.log('Fetching cumulative stats for branches:', branchId, startDate, endDate);
     const fetchStats = async () => {
       setLoading(true);
       try {

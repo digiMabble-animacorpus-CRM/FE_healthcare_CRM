@@ -1,7 +1,7 @@
 'use client';
 
-import { TherapistTeamMember } from '@/app/(admin)/therapist-team/add-TherapistTeam/components/AddTherapistTeam';
 import { API_BASE_PATH } from '@/context/constants';
+import { TherapistTeamMember } from '@/types/data';
 import { decryptAES } from '@/utils/encryption';
 
 // Fetch all therapist team members with revised query mapping
@@ -106,7 +106,6 @@ export async function getTeamMemberById(id: number) {
 export const createTherapistTeamMember = async (payload: TherapistTeamMember): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
-    console.log('createTherapistTeamMember called, token exists:', !!token);
     if (!token) {
       console.error('No access token found');
       return false;
@@ -123,8 +122,6 @@ export const createTherapistTeamMember = async (payload: TherapistTeamMember): P
       permissions: payload.permissions || { admin: false },
     };
 
-    console.log('Sending payload to API:', safePayload);
-
     const response = await fetch(`${API_BASE_PATH}/therapist-team`, {
       method: 'POST',
       headers: {
@@ -135,7 +132,6 @@ export const createTherapistTeamMember = async (payload: TherapistTeamMember): P
     });
 
     const result = await response.json();
-    console.log('API response status:', response.status, 'body:', result);
 
     if (!response.ok || result.status === false) {
       console.error('Create failed:', result.message || 'Unknown error');
@@ -215,6 +211,8 @@ export const transformToBackendDto = (formData: TherapistTeamMember): TherapistT
     ? formData.specializationIds.map(Number)
     : [],
   branchIds: Array.isArray(formData.branchIds) ? formData.branchIds.map(Number) : [],
+  department: formData.department,
+  specializations: formData.specializations,
 });
 
 // Fetch all roles for therapist setup (unchanged)

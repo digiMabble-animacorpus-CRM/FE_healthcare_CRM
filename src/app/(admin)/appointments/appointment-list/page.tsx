@@ -71,6 +71,14 @@ interface Specialization {
   color?: string;
 }
 
+type AppointmentStatus =
+  | 'Programmé'
+  | 'Terminée'
+  | 'Annulée'
+  | 'SCHEDULED'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
 interface Appointment {
   id: string;
   calendarId: string;
@@ -92,6 +100,7 @@ interface Appointment {
     notes: string;
     original: any;
   };
+  status: AppointmentStatus;
 }
 
 // Helper: normalize API response (handles array | {data:[]} | {data:{data:[]}})

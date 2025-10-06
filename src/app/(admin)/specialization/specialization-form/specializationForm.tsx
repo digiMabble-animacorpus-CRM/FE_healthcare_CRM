@@ -74,7 +74,6 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
         const response = await axios.get(`${API_BASE_PATH}/departments`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Fetched departments:', response.data);
         setDepartments(response.data || []);
       } catch (err) {
         console.error('Error fetching departments:', err);
@@ -107,7 +106,6 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
                 },
               },
             );
-            console.log('Specialization updated:', res.data);
             setMessage({ type: 'success', text: 'Spécialisation mise à jour avec succès !' });
           } else {
             const res = await axios.post(`${API_BASE_PATH}/specializations`, data, {
@@ -116,8 +114,6 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
                 'Content-Type': 'application/json',
               },
             });
-            console.log('Created specialization:', res.data);
-
             setMessage({ type: 'success', text: 'Spécialisation créée avec succès !' });
           }
 
@@ -126,7 +122,6 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
             router.push('/specialization');
           }, 2000);
         } catch (err) {
-          console.log('Error saving specialization:', err);
           setMessage({ type: 'error', text: 'Échec de l’enregistrement de la spécialisation.' });
 
           setTimeout(() => setMessage(null), 3000);

@@ -116,7 +116,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   useEffect(() => {
     const fetchLanguages = async () => {
       const response = await getAllLanguages();
-      console.log('📌 Languages for dropdown:', response);
       setAllLanguages(response || []);
     };
     fetchLanguages();
@@ -127,8 +126,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       setLoading(true);
       getPatientById(params.id)
         .then((patient) => {
-          console.log('🧾 Fetched patient data:', patient);
-
           const mappedPatient: Partial<PatientType> = {
             ...patient,
             phones: patient.phones?.length ? patient.phones : [''],

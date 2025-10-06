@@ -64,15 +64,15 @@ const StaffRoleListPage = () => {
     }
   };
 
-  const handleView = (id: string) => {
+  const handleView = (id: any) => {
     router.push(`/staff-role/details/${id}`);
   };
 
-  const handleEditClick = (id: string) => {
+  const handleEditClick = (id: any) => {
     router.push(`/staff-role/staffRole-form/${id}/edit`);
   };
 
-  const handleDeleteClick = (id: string) => {
+  const handleDeleteClick = (id: any) => {
     setSelectedRoleId(id);
     setShowDeleteModal(true);
   };

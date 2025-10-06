@@ -77,9 +77,6 @@ const TherapistTeamsListPage = () => {
         to,
         searchTerm || undefined,
       );
-
-      console.log('API RAW Response:', response);
-
       const members = response?.data || [];
       if (!members || members.length === 0) {
         setAllTeamMembers([]);

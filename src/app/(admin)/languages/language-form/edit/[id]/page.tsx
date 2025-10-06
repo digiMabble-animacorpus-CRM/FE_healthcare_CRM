@@ -36,9 +36,6 @@ const EditLanguagePage = ({ params }: Props) => {
             Authorization: `Bearer ${token}`,
           },
         });
-
-        console.log('API Response:', res.data);
-
         // Adjust this if your API wraps data
         const language = res.data.data || res.data;
 

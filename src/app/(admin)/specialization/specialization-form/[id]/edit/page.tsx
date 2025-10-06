@@ -36,7 +36,6 @@ const EditSpecializationPage = ({ params }: { params: { id?: string } }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-        console.log('res.data in EditSpecializationPage', res.data);
         const specialization = res.data;
 
         if (specialization?.specialization_id) {
@@ -49,7 +48,6 @@ const EditSpecializationPage = ({ params }: { params: { id?: string } }) => {
           });
         }
       } catch (err) {
-        console.log(err);
         setMessage({ type: 'error', text: 'Failed to load specialization details' });
       } finally {
         setLoading(false);
@@ -82,10 +80,8 @@ const EditSpecializationPage = ({ params }: { params: { id?: string } }) => {
           },
         },
       );
-      console.log('Specialization updated successfully', data);
       router.push('/specialization');
     } catch (error) {
-      console.log(error);
       setMessage({ type: 'error', text: 'Error updating specialization' });
     }
   };

@@ -62,7 +62,6 @@ const BranchListPage = () => {
         })),
       );
 
-      console.log('Fetched branches:', data);
       setTotalPages(Math.ceil(totalCount / PAGE_LIMIT));
     } catch (error) {
       console.error('Failed to fetch branches:', error);
@@ -85,13 +84,11 @@ const BranchListPage = () => {
 
   const handleEditClick = (id: string) => {
     if (!id) return;
-    console.log('Edit branch with ID:', id);
     router.push(`/branches/branch-form/${id}/edit`);
   };
 
   const handleDeleteClick = (id: string) => {
     if (!id) return;
-    console.log('Delete branch with ID:', id);
     setSelectedBranchId(id);
     setShowDeleteModal(true);
   };

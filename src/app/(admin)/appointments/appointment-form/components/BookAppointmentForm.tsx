@@ -50,8 +50,6 @@ const BookAppointmentForm = ({
 
   const getDefaultValues = (): AppointmentFormValues => {
     if (mode === 'edit' && appointmentData) {
-      console.log('Appointment Data:', appointmentData); // Debug log
-
       const startTime = appointmentData.startTime
         ? new Date(appointmentData.startTime).toTimeString().slice(0, 5)
         : '';
@@ -65,15 +63,6 @@ const BookAppointmentForm = ({
       const departmentId = appointmentData.department?.id || 0;
       const specializationId = appointmentData.specialization?.specialization_id || 0;
       const therapistId = appointmentData.therapist?.therapistId || 0;
-
-      console.log('Extracted IDs:', {
-        branchId,
-        departmentId,
-        specializationId,
-        therapistId,
-        date,
-        startTime,
-      }); // Debug log
 
       return {
         branchId,
@@ -109,7 +98,6 @@ const BookAppointmentForm = ({
   useEffect(() => {
     if (mode === 'edit' && appointmentData && !isDataLoaded) {
       const defaultValues = getDefaultValues();
-      console.log('Setting form values:', defaultValues); // Debug log
 
       // Set each value individually to ensure they're properly set
       Object.entries(defaultValues).forEach(([key, value]) => {
@@ -121,8 +109,6 @@ const BookAppointmentForm = ({
   }, [mode, appointmentData, setValue, isDataLoaded]);
 
   const onSubmit = async (data: AppointmentFormValues) => {
-    console.log('Form data being submitted:', data); // Debug log
-
     const payload = {
       patientId,
       branchId: data.branchId,
@@ -137,8 +123,6 @@ const BookAppointmentForm = ({
       description: data.description || '',
       ...(mode === 'edit' ? { modifiedById } : { createdById }),
     };
-
-    console.log('Payload being sent:', payload); // Debug log
 
     try {
       setSaving(true);
@@ -160,7 +144,6 @@ const BookAppointmentForm = ({
       }
 
       const responseData = await res.json();
-      console.log('API Response:', responseData);
       reset();
       router.push('/appointments/appointment-list');
       onSubmitHandler?.(data);

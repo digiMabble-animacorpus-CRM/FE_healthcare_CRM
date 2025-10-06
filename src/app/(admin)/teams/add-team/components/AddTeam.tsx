@@ -432,11 +432,11 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
               ? Object.fromEntries(
                   (data.schedule.text ?? '')
                     .split('\n')
-                    .map((line) => {
+                    .map((line: { split: (arg0: string) => [any, ...any[]]; }) => {
                       const [day, ...rest] = line.split(':');
                       return [day.trim().toLowerCase(), rest.join(':').trim()];
                     })
-                    .filter(([day, value]) => day && value),
+                    .filter(([day, value]: [string, string]) => day && value),
                 )
               : {},
           about: data.about ?? '',

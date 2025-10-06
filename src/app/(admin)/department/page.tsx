@@ -60,6 +60,7 @@ const DepartmentListPage = () => {
     } catch (error) {
       setDepartments([
         {
+          id: 1,
           _id: '1',
           name: 'Cardiology',
           is_active: true,
