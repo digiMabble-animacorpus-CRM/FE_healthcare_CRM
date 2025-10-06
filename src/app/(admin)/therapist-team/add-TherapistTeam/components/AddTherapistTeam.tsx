@@ -30,7 +30,7 @@ import { useNotificationContext } from '@/context/useNotificationContext';
 import { DepartmentType, LanguageType, SpecializationType } from '@/types/data';
 
 const PAYMENT_METHODS = ['Cash', 'Card', 'Insurance'];
-const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
@@ -46,7 +46,7 @@ const schema = yup.object().shape({
   imageUrl: yup.string().url('Must be a valid URL'),
   aboutMe: yup.string(),
   degreesTraining: yup.string(),
-  inamiNumber: yup.number().typeError('Must be a number'),
+  inamiNumber: yup.string().optional().nullable(),
   payment_methods: yup.array().of(yup.string()),
   faq: yup.array().of(
     yup.object().shape({
@@ -88,7 +88,7 @@ const defaultValues: TherapistTeamMember = {
   contactPhone: '',
   aboutMe: '',
   degreesTraining: '',
-  inamiNumber: 0,
+  inamiNumber: '',
   payment_methods: [],
   faq: [{ question: '', answer: '' }],
   website: '',
@@ -134,7 +134,7 @@ type TherapistTeamMember = {
   contactPhone: string;
   aboutMe?: string;
   degreesTraining?: string;
-  inamiNumber?: number;
+  inamiNumber?: any;
   payment_methods?: string[];
   faq?: { question: string; answer: string }[];
   website?: string;
@@ -314,7 +314,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
 
     return (
       <div className="mb-3">
-        <label>Availability for Branch</label>
+        {/* <label>Availability for Branch</label> */}
         <Controller
           name={`branches.${nestIndex}.availability`}
           control={control}
@@ -330,7 +330,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                       field.onChange(newAvailability);
                     }}
                   >
-                    <option value="">Select Day</option>
+                    <option value="">Select Jour</option>
                     {DAYS_OF_WEEK.map((day) => (
                       <option key={day} value={day}>
                         {day}
@@ -371,7 +371,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                     }}
                     disabled={field.value.length === 1}
                   >
-                    Remove
+                    Retirer
                   </Button>
                 </Col>
               </Row>
@@ -389,7 +389,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             ]);
           }}
         >
-          Add Availability
+          Add disponibilité
         </Button>
       </div>
     );
@@ -410,7 +410,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>First Name *</Form.Label>
+                <Form.Label> Prénom <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('firstName')} isInvalid={!!errors.firstName} />
                 <Form.Control.Feedback type="invalid">
                   {errors.firstName?.message}
@@ -419,7 +421,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Last Name *</Form.Label>
+                <Form.Label> Nom de famille <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('lastName')} isInvalid={!!errors.lastName} />
                 <Form.Control.Feedback type="invalid">
                   {errors.lastName?.message}
@@ -432,7 +436,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Profile Image URL</Form.Label>
+                <Form.Label>Photo (URL)</Form.Label>
                 <Form.Control {...register('imageUrl')} isInvalid={!!errors.imageUrl} />
                 <Form.Control.Feedback type="invalid">
                   {errors.imageUrl?.message}
@@ -441,7 +445,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Email *</Form.Label>
+                <Form.Label> E-mail <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('contactEmail')} isInvalid={!!errors.contactEmail} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactEmail?.message}
@@ -454,7 +460,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Contact Phone *</Form.Label>
+                <Form.Label> Numéro de téléphone <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('contactPhone')} isInvalid={!!errors.contactPhone} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactPhone?.message}
@@ -463,15 +471,13 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Inami Number</Form.Label>
+                <Form.Label>Numéro INAMI</Form.Label>
                 <Form.Control
                   type="number"
                   {...register('inamiNumber')}
                   isInvalid={!!errors.inamiNumber}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.inamiNumber?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{!!errors.inamiNumber}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -480,7 +486,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>About Me</Form.Label>
+                <Form.Label>Sur moi</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
@@ -498,7 +504,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>Degrees & Training</Form.Label>
+                <Form.Label>Diplômes et formations</Form.Label>
                 <Form.Control
                   {...register('degreesTraining')}
                   isInvalid={!!errors.degreesTraining}
@@ -545,62 +551,73 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Languages Spoken *</Form.Label>
-                {languages.map(({ id, language_name }) => (
-                  <Form.Check
-                    key={id}
-                    type="checkbox"
-                    label={language_name}
-                    checked={(watch('languagesSpoken') || []).includes(language_name)}
-                    onChange={(e) => {
-                      const current: string[] = watch('languagesSpoken') || [];
-                      if (e.target.checked) {
-                        setValue('languagesSpoken', [...current, language_name]); // ✅ send names
-                      } else {
-                        setValue(
-                          'languagesSpoken',
-                          current.filter((lang) => lang !== language_name),
-                        );
-                      }
-                    }}
-                  />
-                ))}
+                <Form.Label>Languages <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
+                <div className="d-flex flex-wrap gap-3">
+                  {languages.map(({ id, language_name }) => (
+                    <Form.Check
+                      key={id}
+                      type="checkbox"
+                      label={language_name}
+                      checked={(watch('languagesSpoken') || []).includes(language_name)}
+                      onChange={(e) => {
+                        const current: string[] = watch('languagesSpoken') || [];
+                        if (e.target.checked) {
+                          setValue('languagesSpoken', [...current, language_name]); // ✅ send names
+                        } else {
+                          setValue(
+                            'languagesSpoken',
+                            current.filter((lang) => lang !== language_name),
+                          );
+                        }
+                      }}
+                      className="me-2"
+                    />
+                  ))}
+                </div>
                 {errors.languagesSpoken && (
                   <div className="text-danger">{errors.languagesSpoken.message}</div>
                 )}
               </Form.Group>
             </Col>
+
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Payment Methods</Form.Label>
-                {PAYMENT_METHODS.map((pm) => (
-                  <Form.Check
-                    key={pm}
-                    type="checkbox"
-                    label={pm}
-                    checked={(watch('payment_methods') || []).includes(pm)}
-                    onChange={(e) => {
-                      const current = watch('payment_methods') || [];
-                      if (e.target.checked) {
-                        setValue('payment_methods', [...current, pm]);
-                      } else {
-                        setValue(
-                          'payment_methods',
-                          current.filter((p) => p !== pm),
-                        );
-                      }
-                    }}
-                  />
-                ))}
+                <Form.Label>Méthodes de paiement</Form.Label>
+
+                {/* ✅ Flex container for horizontal layout */}
+                <div className="d-flex flex-wrap gap-3">
+                  {PAYMENT_METHODS.map((pm) => (
+                    <Form.Check
+                      key={pm}
+                      type="checkbox"
+                      label={pm}
+                      checked={(watch('payment_methods') || []).includes(pm)}
+                      onChange={(e) => {
+                        const current = watch('payment_methods') || [];
+                        if (e.target.checked) {
+                          setValue('payment_methods', [...current, pm]);
+                        } else {
+                          setValue(
+                            'payment_methods',
+                            current.filter((p) => p !== pm),
+                          );
+                        }
+                      }}
+                      className="me-2"
+                    />
+                  ))}
+                </div>
               </Form.Group>
             </Col>
           </Row>
 
-          {/* FAQ */}
+          {/* FAQ
           <Row>
             <Col md={12}>
               <Form.Group>
-                <Form.Label>FAQ</Form.Label>
+                <Form.Label>Questions fréquemment posées</Form.Label>
                 {faqs.map((item, idx) => (
                   <Row key={idx} className="mb-2">
                     <Col>
@@ -631,7 +648,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                         onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))}
                         disabled={faqs.length === 1}
                       >
-                        Remove
+                         Retirer
                       </Button>
                     </Col>
                   </Row>
@@ -640,17 +657,19 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                   variant="outline-primary"
                   onClick={() => setFaqs([...faqs, { question: '', answer: '' }])}
                 >
-                  Add FAQ
+                   Ajouter une FAQ
                 </Button>
               </Form.Group>
             </Col>
-          </Row>
+          </Row> */}
 
           {/* Department Select */}
           <Row>
-            <Col md={12} className="mb-3">
+            <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Department *</Form.Label>
+                <Form.Label> Département <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Controller
                   control={control}
                   name="departmentId"
@@ -676,46 +695,52 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-
-            <Col md={12} className="mb-3">
+            <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Specialization *</Form.Label>
-                {specializations.map((spec) => (
-                  <Form.Check
-                    key={spec.id}
-                    type="checkbox"
-                    label={spec.name} // show name instead of id
-                    checked={(watch('specializationIds') || []).includes(spec.id)}
-                    onChange={(e) => {
-                      const current = watch('specializationIds') || [];
-                      if (e.target.checked) {
-                        setValue('specializationIds', [...current, spec.id]);
-                      } else {
-                        setValue(
-                          'specializationIds',
-                          current.filter((id) => id !== spec.id),
-                        );
-                      }
-                    }}
-                  />
-                ))}
+                <Form.Label>Spécialisation <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
+
+                {/* ✅ Flex container for horizontal layout */}
+                <div className="d-flex flex-wrap gap-3">
+                  {specializations.map((spec) => (
+                    <Form.Check
+                      key={spec.id}
+                      type="checkbox"
+                      label={spec.name} // show name instead of id
+                      checked={(watch('specializationIds') || []).includes(spec.id)}
+                      onChange={(e) => {
+                        const current = watch('specializationIds') || [];
+                        if (e.target.checked) {
+                          setValue('specializationIds', [...current, spec.id]);
+                        } else {
+                          setValue(
+                            'specializationIds',
+                            current.filter((id) => id !== spec.id),
+                          );
+                        }
+                      }}
+                      className="me-2"
+                    />
+                  ))}
+                </div>
               </Form.Group>
             </Col>
           </Row>
 
           {/* Branch & Availability */}
-          <Form.Label>Branch & Availability</Form.Label>
+          <Form.Label>Succursale et disponibilité</Form.Label>
           {branchFields.map((branch, nestIndex) => (
             <Card key={branch.id || nestIndex} className="mb-3 p-3">
               <Row className="align-items-center">
-                <Col md={8}>
+                <Col md={6}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Branch</Form.Label>
+                    <Form.Label>Sélectionnez une succursale</Form.Label>
                     <Form.Select
                       {...register(`branches.${nestIndex}.branch_id`, { valueAsNumber: true })}
                       isInvalid={!!errors.branches?.[nestIndex]?.branch_id}
                     >
-                      <option value="">Select Branch</option>
+                      <option value="">Select succursale</option>
                       {branchesList.map((b) => (
                         <option key={b.branch_id} value={b.branch_id}>
                           {b.name}
@@ -729,7 +754,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 </Col>
                 <Col md={4} className="d-flex align-items-center justify-content-start">
                   <Button type="button" variant="danger" onClick={() => removeBranch(nestIndex)}>
-                    Remove Branch
+                    Supprimer la branche
                   </Button>
                 </Col>
               </Row>
@@ -749,14 +774,64 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
               })
             }
           >
-            Add Branch
+            Ajouter une succursale
           </Button>
+
+          {/* FAQ */}
+          <Row>
+            <Col md={12}>
+              <Form.Group>
+                <Form.Label>Questions fréquemment posées</Form.Label>
+                {faqs.map((item, idx) => (
+                  <Row key={idx} className="mb-2">
+                    <Col>
+                      <Form.Control
+                        placeholder="Question"
+                        value={item.question}
+                        onChange={(e) => {
+                          const newFaqs = [...faqs];
+                          newFaqs[idx].question = e.target.value;
+                          setFaqs(newFaqs);
+                        }}
+                      />
+                    </Col>
+                    <Col>
+                      <Form.Control
+                        placeholder="Answer"
+                        value={item.answer}
+                        onChange={(e) => {
+                          const newFaqs = [...faqs];
+                          newFaqs[idx].answer = e.target.value;
+                          setFaqs(newFaqs);
+                        }}
+                      />
+                    </Col>
+                    <Col xs="auto">
+                      <Button
+                        variant="danger"
+                        onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))}
+                        disabled={faqs.length === 1}
+                      >
+                        Retirer
+                      </Button>
+                    </Col>
+                  </Row>
+                ))}
+                <Button
+                  variant="outline-primary"
+                  onClick={() => setFaqs([...faqs, { question: '', answer: '' }])}
+                >
+                  Ajouter une FAQ
+                </Button>
+              </Form.Group>
+            </Col>
+          </Row>
 
           {/* Status & Role */}
           <Row>
             <Col md={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Status</Form.Label>
+                <Form.Label>Statut</Form.Label>
                 <Controller
                   control={control}
                   name="status"
@@ -778,7 +853,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Role</Form.Label>
+                <Form.Label>Rôle</Form.Label>
                 <Controller
                   control={control}
                   name="role"
@@ -799,7 +874,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row className="justify-content-end g-2 mt-2">
             <Col lg={2}>
               <Button type="submit" variant="primary" className="w-100" disabled={isSubmitting}>
-                {editId ? 'Update' : 'Create'} Therapist Team
+                {editId ? 'Update' : 'Create'} Therapist
               </Button>
             </Col>
             <Col lg={2}>
@@ -809,7 +884,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 onClick={() => router.back()}
                 disabled={isSubmitting}
               >
-                Cancel
+                Annuler
               </Button>
             </Col>
           </Row>
