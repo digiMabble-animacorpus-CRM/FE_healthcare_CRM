@@ -30,7 +30,7 @@ import { useNotificationContext } from '@/context/useNotificationContext';
 import { DepartmentType, LanguageType, SpecializationType } from '@/types/data';
 
 const PAYMENT_METHODS = ['Cash', 'Card', 'Insurance'];
-const DAYS_OF_WEEK = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS_OF_WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche'];
 
 const schema = yup.object().shape({
   firstName: yup.string().required('First name is required'),
@@ -315,7 +315,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
 
     return (
       <div className="mb-3">
-        <label>Availability for Branch</label>
+        {/* <label>Availability for Branch</label> */}
         <Controller
           name={`branches.${nestIndex}.availability`}
           control={control}
@@ -372,7 +372,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                     }}
                     disabled={field.value.length === 1}
                   >
-                    Remove
+                   Retirer
                   </Button>
                 </Col>
               </Row>
@@ -390,7 +390,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             ]);
           }}
         >
-          Add Availability
+          Add disponibilité
         </Button>
       </div>
     );
@@ -411,7 +411,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>First Name *</Form.Label>
+                <Form.Label> Prénom *</Form.Label>
                 <Form.Control {...register('firstName')} isInvalid={!!errors.firstName} />
                 <Form.Control.Feedback type="invalid">
                   {errors.firstName?.message}
@@ -420,7 +420,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Last Name *</Form.Label>
+                <Form.Label> Nom de famille *</Form.Label>
                 <Form.Control {...register('lastName')} isInvalid={!!errors.lastName} />
                 <Form.Control.Feedback type="invalid">
                   {errors.lastName?.message}
@@ -433,7 +433,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Profile Image URL</Form.Label>
+                <Form.Label>Photo (URL)</Form.Label>
                 <Form.Control {...register('imageUrl')} isInvalid={!!errors.imageUrl} />
                 <Form.Control.Feedback type="invalid">
                   {errors.imageUrl?.message}
@@ -442,7 +442,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Email *</Form.Label>
+                <Form.Label> E-mail *</Form.Label>
                 <Form.Control {...register('contactEmail')} isInvalid={!!errors.contactEmail} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactEmail?.message}
@@ -455,7 +455,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Contact Phone *</Form.Label>
+                <Form.Label> Numéro de téléphone *</Form.Label>
                 <Form.Control {...register('contactPhone')} isInvalid={!!errors.contactPhone} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactPhone?.message}
@@ -464,7 +464,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Inami Number</Form.Label>
+                <Form.Label>Numéro INAMI</Form.Label>
                 <Form.Control
                   type="number"
                   {...register('inamiNumber')}
@@ -481,7 +481,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>About Me</Form.Label>
+                <Form.Label>Sur moi</Form.Label>
                 <Form.Control
                   as="textarea"
                   rows={3}
@@ -499,7 +499,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>Degrees & Training</Form.Label>
+                <Form.Label>Diplômes et formations</Form.Label>
                 <Form.Control
                   {...register('degreesTraining')}
                   isInvalid={!!errors.degreesTraining}
@@ -546,7 +546,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Languages Spoken *</Form.Label>
+                <Form.Label>Languages *</Form.Label>
                 {languages.map(({ id, language_name }) => (
                   <Form.Check
                     key={id}
@@ -573,7 +573,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Payment Methods</Form.Label>
+                <Form.Label>Méthodes de paiement</Form.Label>
                 {PAYMENT_METHODS.map((pm) => (
                   <Form.Check
                     key={pm}
@@ -601,7 +601,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={12}>
               <Form.Group>
-                <Form.Label>FAQ</Form.Label>
+                <Form.Label>Questions fréquemment posées</Form.Label>
                 {faqs.map((item, idx) => (
                   <Row key={idx} className="mb-2">
                     <Col>
@@ -632,7 +632,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                         onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))}
                         disabled={faqs.length === 1}
                       >
-                        Remove
+                         Retirer
                       </Button>
                     </Col>
                   </Row>
@@ -641,7 +641,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                   variant="outline-primary"
                   onClick={() => setFaqs([...faqs, { question: '', answer: '' }])}
                 >
-                  Add FAQ
+                   Ajouter une FAQ
                 </Button>
               </Form.Group>
             </Col>
@@ -651,7 +651,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>Department *</Form.Label>
+                <Form.Label> Département *</Form.Label>
                 <Controller
                   control={control}
                   name="departmentId"
@@ -680,7 +680,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
 
             <Col md={12} className="mb-3">
               <Form.Group>
-                <Form.Label>Specialization *</Form.Label>
+                <Form.Label>Spécialisation  *</Form.Label>
                 {specializations.map((spec) => (
                   <Form.Check
                     key={spec.id}
@@ -705,18 +705,18 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           </Row>
 
           {/* Branch & Availability */}
-          <Form.Label>Branch & Availability</Form.Label>
+          <Form.Label>Succursale et disponibilité</Form.Label>
           {branchFields.map((branch, nestIndex) => (
             <Card key={branch.id || nestIndex} className="mb-3 p-3">
               <Row className="align-items-center">
                 <Col md={8}>
                   <Form.Group className="mb-3">
-                    <Form.Label>Branch</Form.Label>
+                    <Form.Label>Sélectionnez une succursale</Form.Label>
                     <Form.Select
                       {...register(`branches.${nestIndex}.branch_id`, { valueAsNumber: true })}
                       isInvalid={!!errors.branches?.[nestIndex]?.branch_id}
                     >
-                      <option value="">Select Branch</option>
+                      <option value="">Select succursale</option>
                       {branchesList.map((b) => (
                         <option key={b.branch_id} value={b.branch_id}>
                           {b.name}
@@ -730,7 +730,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 </Col>
                 <Col md={4} className="d-flex align-items-center justify-content-start">
                   <Button type="button" variant="danger" onClick={() => removeBranch(nestIndex)}>
-                    Remove Branch
+                     Supprimer la branche
                   </Button>
                 </Col>
               </Row>
@@ -750,7 +750,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
               })
             }
           >
-            Add Branch
+            Ajouter une succursale
           </Button>
 
           {/* Status & Role */}
@@ -779,7 +779,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Role</Form.Label>
+                <Form.Label>Rôle</Form.Label>
                 <Controller
                   control={control}
                   name="role"
@@ -800,7 +800,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row className="justify-content-end g-2 mt-2">
             <Col lg={2}>
               <Button type="submit" variant="primary" className="w-100" disabled={isSubmitting}>
-                {editId ? 'Update' : 'Create'} Therapist Team
+                {editId ? 'Update' : 'Create'} Therapist
               </Button>
             </Col>
             <Col lg={2}>
@@ -810,7 +810,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 onClick={() => router.back()}
                 disabled={isSubmitting}
               >
-                Cancel
+                 Annuler
               </Button>
             </Col>
           </Row>
