@@ -2,7 +2,13 @@
 'use client';
 
 import { API_BASE_PATH } from '@/context/constants';
-import type { BranchType, DepartmentType, SpecializationType, TherapistType, AvailabilityType, AppointmentType } from '../types/appointment';
+import type {
+  BranchType,
+  DepartmentType,
+  SpecializationType,
+  TherapistType,
+  AppointmentType,
+} from '../types/appointment';
 import dayjs from 'dayjs';
 import { useEffect, useState, useMemo } from 'react';
 import { Button, Col, Form, Row } from 'react-bootstrap';
@@ -55,9 +61,11 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
       return [];
     }
 
-    return therapists.filter(therapist => {
+    return therapists.filter((therapist) => {
       // Check if therapist works in the selected branch
-      const worksInBranch = therapist.branches?.some((branch: { branch_id: any; }) => branch.branch_id === branchId);
+      const worksInBranch = therapist.branches?.some(
+        (branch: { branch_id: any }) => branch.branch_id === branchId,
+      );
 
       // Check if therapist works in the selected department
       const worksInDepartment = therapist.department?.id === departmentId;
@@ -82,13 +90,13 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
           }),
           fetch(`${API_BASE_PATH}/therapists`, {
             headers: { Authorization: `Bearer ${token}` },
-          })
+          }),
         ]);
 
         const [branchesData, specializationsData, therapistsData] = await Promise.all([
           branchesRes.json(),
           specializationsRes.json(),
-          therapistsRes.json()
+          therapistsRes.json(),
         ]);
 
         setBranches(safeArray(branchesData));
@@ -99,8 +107,8 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
         if (mode === 'edit' && appointmentData) {
           // Set initial therapist if available
           if (appointmentData.therapist) {
-            const therapist = safeArray(therapistsData).find((t: any) =>
-              t.therapistId === appointmentData.therapist?.therapistId
+            const therapist = safeArray(therapistsData).find(
+              (t: any) => t.therapistId === appointmentData.therapist?.therapistId,
             );
             if (therapist) {
               setSelectedTherapist(therapist);
@@ -109,9 +117,12 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
 
           // Load departments for the specific branch
           if (appointmentData.branch?.branch_id) {
-            const departmentsRes = await fetch(`${API_BASE_PATH}/departments?branchId=${appointmentData.branch.branch_id}`, {
-              headers: { Authorization: `Bearer ${token}` },
-            });
+            const departmentsRes = await fetch(
+              `${API_BASE_PATH}/departments?branchId=${appointmentData.branch.branch_id}`,
+              {
+                headers: { Authorization: `Bearer ${token}` },
+              },
+            );
             const departmentsData = await departmentsRes.json();
             setDepartments(safeArray(departmentsData));
           }
@@ -155,7 +166,9 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
     if (branchId && departmentId) {
       // Reset therapist selection if current therapist is not in filtered list
       if (selectedTherapist && filteredTherapists.length > 0) {
-        const isCurrentTherapistValid = filteredTherapists.some(t => t.therapistId === selectedTherapist.therapistId);
+        const isCurrentTherapistValid = filteredTherapists.some(
+          (t) => t.therapistId === selectedTherapist.therapistId,
+        );
         if (!isCurrentTherapistValid) {
           setSelectedTherapist(null);
           setValue('therapistId', 0);
@@ -185,7 +198,9 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
         setValue('therapistId', appointmentData.therapist.therapistId);
 
         // Set selected therapist
-        const therapist = therapists.find(t => t.therapistId === appointmentData.therapist?.therapistId);
+        const therapist = therapists.find(
+          (t) => t.therapistId === appointmentData.therapist?.therapistId,
+        );
         if (therapist) {
           setSelectedTherapist(therapist);
         }
@@ -263,7 +278,7 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
 
     // If we're in edit mode and have a time value, try to select it
     if (mode === 'edit' && timeValue && !selectedTime) {
-      const matchingSlot = slots.find(slot => slot.startsWith(timeValue));
+      const matchingSlot = slots.find((slot) => slot.startsWith(timeValue));
       if (matchingSlot) {
         setSelectedTime(timeValue);
       }
@@ -292,7 +307,9 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
     <Row>
       <Col md={6}>
         <Form.Group className="mb-3">
-          <Form.Label>Branch <span className="text-danger">*</span></Form.Label>
+          <Form.Label>
+            Branch <span className="text-danger">*</span>
+          </Form.Label>
           <Form.Select
             {...register('branchId', {
               valueAsNumber: true,
@@ -305,7 +322,7 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
                 setValue('time', '');
                 setTimeSlots([]);
                 setSelectedTime(null);
-              }
+              },
             })}
           >
             <option value={0}>Select Branch</option>
@@ -323,7 +340,9 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
 
       <Col md={6}>
         <Form.Group className="mb-3">
-          <Form.Label>Département <span className="text-danger">*</span></Form.Label>
+          <Form.Label>
+            Département <span className="text-danger">*</span>
+          </Form.Label>
           <Form.Select
             {...register('departmentId', {
               valueAsNumber: true,
@@ -335,7 +354,7 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
                 setValue('time', '');
                 setTimeSlots([]);
                 setSelectedTime(null);
-              }
+              },
             })}
           >
             <option value={0}>Select Department</option>
@@ -353,7 +372,9 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
 
       <Col md={6}>
         <Form.Group className="mb-3">
-          <Form.Label>Specialization <span className="text-danger">*</span></Form.Label>
+          <Form.Label>
+            Specialization <span className="text-danger">*</span>
+          </Form.Label>
           <Form.Select
             {...register('specializationId', {
               valueAsNumber: true,
@@ -364,7 +385,7 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
                 setValue('time', '');
                 setTimeSlots([]);
                 setSelectedTime(null);
-              }
+              },
             })}
           >
             <option value={0}>Select Specialization</option>
@@ -375,23 +396,29 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
             ))}
           </Form.Select>
           {errors.specializationId && (
-            <Form.Text className="text-danger">{String(errors.specializationId?.message)}</Form.Text>
+            <Form.Text className="text-danger">
+              {String(errors.specializationId?.message)}
+            </Form.Text>
           )}
         </Form.Group>
       </Col>
 
       <Col md={6}>
         <Form.Group className="mb-3">
-          <Form.Label>Therapist <span className="text-danger">*</span></Form.Label>
+          <Form.Label>
+            Therapist <span className="text-danger">*</span>
+          </Form.Label>
           <Form.Select
             {...register('therapistId', {
               valueAsNumber: true,
-              onChange: handleTherapistChange
+              onChange: handleTherapistChange,
             })}
             disabled={!branchId || !departmentId}
           >
             <option value={0}>
-              {!branchId || !departmentId ? 'Select Branch and Department first' : 'Select Therapist'}
+              {!branchId || !departmentId
+                ? 'Select Branch and Department first'
+                : 'Select Therapist'}
             </option>
             {filteredTherapists.map((t) => (
               <option key={t.therapistId} value={t.therapistId}>
@@ -402,13 +429,14 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
           {errors.therapistId && (
             <Form.Text className="text-danger">{String(errors.therapistId?.message)}</Form.Text>
           )}
-
         </Form.Group>
       </Col>
 
       <Col lg={6}>
         <div className="mb-3">
-          <Form.Label>Appointment Date <span className="text-danger">*</span></Form.Label>
+          <Form.Label>
+            Appointment Date <span className="text-danger">*</span>
+          </Form.Label>
           <Controller
             name="date"
             control={control}
@@ -447,7 +475,9 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
 
       <Col lg={6}>
         <div className="mb-3">
-          <Form.Label>Select Time <span className="text-danger">*</span></Form.Label>
+          <Form.Label>
+            Select Time <span className="text-danger">*</span>
+          </Form.Label>
           {timeSlots.length > 0 ? (
             <div className="d-flex flex-wrap gap-2">
               {timeSlots.map((slot) => {
@@ -471,8 +501,8 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
           ) : selectedDate ? (
             <div className="alert alert-info">
               {selectedTherapist
-                ? "No available time slots for this therapist on the selected date"
-                : "Please select a therapist first"}
+                ? 'No available time slots for this therapist on the selected date'
+                : 'Please select a therapist first'}
             </div>
           ) : (
             <div className="alert alert-info">Please select a date first</div>
@@ -490,7 +520,9 @@ const AppointmentFields = ({ mode = 'create', appointmentData }: AppointmentFiel
 
       <Col md={12}>
         <Form.Group className="mb-3">
-          <Form.Label>Purpose of Visit <span className="text-danger">*</span></Form.Label>
+          <Form.Label>
+            Purpose of Visit <span className="text-danger">*</span>
+          </Form.Label>
           <Form.Control
             type="text"
             {...register('purposeOfVisit')}

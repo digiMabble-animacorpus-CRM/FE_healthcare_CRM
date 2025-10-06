@@ -74,11 +74,11 @@ interface PatientInfoCardProps {
   mode?: 'search' | 'view' | 'edit' | 'new';
 }
 
-const PatientInfoCard = ({ 
-  onSave, 
-  onReset, 
-  initialData, 
-  mode: initialMode = 'search' 
+const PatientInfoCard = ({
+  onSave,
+  onReset,
+  initialData,
+  mode: initialMode = 'search',
 }: PatientInfoCardProps) => {
   const [formData, setFormData] = useState<PatientType>(emptyPatient);
   const [searchTerm, setSearchTerm] = useState('');
@@ -193,7 +193,7 @@ const PatientInfoCard = ({
       } else if (mode === 'new') {
         ok = await createPatient(formData);
         if (ok) {
-          console.log(ok,"Patient created successfully")
+          console.log(ok, 'Patient created successfully');
           setSuccessMsg('Patient created successfully');
           setMode('view');
           onSave?.(formData);

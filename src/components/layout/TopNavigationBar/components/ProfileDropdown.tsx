@@ -19,35 +19,35 @@ const ProfileDropdown = () => {
   const [fullName, setFullName] = useState<string>('User');
   const [avatarUrl, setAvatarUrl] = useState<string>(avatar1.src); // Default to local image
 
-useEffect(() => {
-  const fetchProfile = async () => {
-    try {
-      const token = localStorage.getItem('access_token');
-      if (!token) return;
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (!token) return;
 
-      const res = await axios.get(`${API_BASE_PATH}/profile`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+        const res = await axios.get(`${API_BASE_PATH}/profile`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
 
-      const apiProfile = res.data?.therapistTeamMembers;
-      if (!apiProfile) return;
+        const apiProfile = res.data?.therapistTeamMembers;
+        if (!apiProfile) return;
 
-      if (apiProfile.fullName) {
-        setFullName(apiProfile.fullName);
+        if (apiProfile.fullName) {
+          setFullName(apiProfile.fullName);
+        }
+        if (apiProfile.imageUrl) {
+          setAvatarUrl(apiProfile.imageUrl); // Use new API imageUrl field
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
       }
-      if (apiProfile.imageUrl) {
-        setAvatarUrl(apiProfile.imageUrl); // Use new API imageUrl field
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
-  };
+    };
 
-  fetchProfile();
-}, []);
+    fetchProfile();
+  }, []);
 
   return (
     <Dropdown className="topbar-item" drop="down">

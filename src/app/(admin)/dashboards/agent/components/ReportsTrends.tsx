@@ -20,9 +20,9 @@ import {
 } from 'react-bootstrap';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { currency } from '@/context/constants';
-import dynamic from "next/dynamic"; 
+import dynamic from 'next/dynamic';
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
 

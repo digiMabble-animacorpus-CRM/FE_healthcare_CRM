@@ -19,7 +19,7 @@ interface UserType {
 export default function EditAppointmentPage() {
   const [patient, setPatient] = useState<PatientType | null>(null);
   const [appointment, setAppointment] = useState<AppointmentType | null>(null);
-  console.log(appointment,"appointment")
+  console.log(appointment, 'appointment');
   const [user, setUser] = useState<UserType | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -51,12 +51,12 @@ export default function EditAppointmentPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response, "refshdjfdj")
-      
+      console.log(response, 'refshdjfdj');
+
       if (response.ok) {
         const data = await response.json();
         setAppointment(data.data);
-        
+
         if (data.data.patient) {
           setPatient(data.data.patient);
         }
@@ -95,12 +95,8 @@ export default function EditAppointmentPage() {
   return (
     <div className="p-3">
       <h1 className="text-2xl font-bold mb-4">Edit Appointment</h1>
-      
-      <PatientInfoCard
-        onSave={setPatient}
-        initialData={appointment.patient}
-        mode="view"
-      />
+
+      <PatientInfoCard onSave={setPatient} initialData={appointment.patient} mode="view" />
 
       {patient?.id && (
         <BookAppointmentForm

@@ -6,10 +6,9 @@ import { goalsOptions } from '../data';
 import { currency } from '@/context/constants';
 import dynamic from 'next/dynamic';
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
-
 
 const Goals = () => {
   return (

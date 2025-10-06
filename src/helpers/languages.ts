@@ -1,7 +1,6 @@
 import { API_BASE_PATH } from '@/context/constants';
 import { LanguageType } from '@/types/data';
 
-
 export const getAllLanguages = async (): Promise<LanguageType[]> => {
   try {
     const token = localStorage.getItem('access_token');
@@ -19,9 +18,8 @@ export const getAllLanguages = async (): Promise<LanguageType[]> => {
     }
 
     const response = await res.json();
-    console.log(" getAllLanguages raw API response:", response);
+    console.log(' getAllLanguages raw API response:', response);
 
-    
     return Array.isArray(response) ? response : response?.data || [];
   } catch (error) {
     console.error(' Error fetching all languages:', error);
@@ -29,11 +27,10 @@ export const getAllLanguages = async (): Promise<LanguageType[]> => {
   }
 };
 
-
 export const getLanguages = async (
   page: number = 1,
   limit: number = 10,
-  search: string = ''
+  search: string = '',
 ): Promise<{
   data: LanguageType[];
   totalCount: number;
@@ -60,7 +57,7 @@ export const getLanguages = async (
     }
 
     const response = await res.json();
-    console.log(" getLanguages paginated response:", response);
+    console.log(' getLanguages paginated response:', response);
 
     return {
       data: response?.data || [],
@@ -72,10 +69,7 @@ export const getLanguages = async (
   }
 };
 
-
-export const getLanguageById = async (
-  id?: string
-): Promise<{ data: LanguageType[] }> => {
+export const getLanguageById = async (id?: string): Promise<{ data: LanguageType[] }> => {
   try {
     if (!id) return { data: [] };
 
@@ -94,9 +88,8 @@ export const getLanguageById = async (
     }
 
     const response = await res.json();
-    console.log(" getLanguageById response:", response);
+    console.log(' getLanguageById response:', response);
 
-    
     return { data: response?.data ? [response.data] : [] };
   } catch (error) {
     console.error(' Error fetching language by ID:', error);

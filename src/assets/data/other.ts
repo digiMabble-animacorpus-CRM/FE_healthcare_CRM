@@ -66,16 +66,14 @@ export const therapistData: TherapistType[] = [
     imageUrl: null, // ✅ Optional image URL if different from photo
     jobTitle:
       'Psychologue clinicienne, Psychothérapeute, Coordinateur du centre, Psychothérapeute systémique',
-    aboutMe:
-      "Je suis psychologue clinicienne, diplômée de l'Université Catholique de Louvain...",
+    aboutMe: "Je suis psychologue clinicienne, diplômée de l'Université Catholique de Louvain...",
     consultations: 'Mon rôle à Anima Corpus...',
     degreesAndTraining:
       'Diplôme en psychologie clinique, Louvain la Neuve\nDiplôme en psychothérapie systémique, ULB...',
     contactEmail: 'hajiba.bounouch@animacorpus.be',
     contactPhone: '0488/45.89.44',
     inamiNumber: '', // ✅ Provide a value if available
-    centerAddress:
-      "Anima Corpus Gembloux - Orneau Place de l'Orneau, 15 5030 Gembloux, ...",
+    centerAddress: "Anima Corpus Gembloux - Orneau Place de l'Orneau, 15 5030 Gembloux, ...",
     appointmentStart: null, // ✅ Placeholder for appointment start
     departmentId: null, // ✅ No department assigned yet
     branches: [], // ✅ Empty array until branches are provided
@@ -85,7 +83,6 @@ export const therapistData: TherapistType[] = [
     specializations: [], // ✅ Converted to array
   },
 ];
-
 
 export const userData: UserType[] = [
   {

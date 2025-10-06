@@ -47,7 +47,7 @@ export const MENU_ITEMS: MenuItemType[] = [
   },
   {
     key: 'therapists',
-    label: 'Thérapeute',
+    label: 'Thérapeute old',
     icon: 'ri-stethoscope-line',
     children: [
       {
@@ -61,6 +61,25 @@ export const MENU_ITEMS: MenuItemType[] = [
         label: 'Ajouter un thérapeute',
         url: '/therapists/add-therapist',
         parentKey: 'therapists',
+      },
+    ],
+  },
+  {
+    key: 'therapistsTeam',
+    label: 'Thérapeute',
+    icon: 'ri-stethoscope-line',
+    children: [
+      {
+        key: 'TherapistTeam-list',
+        label: 'Liste des thérapeutes',
+        url: '/therapist-team/TherapistTeam-list',
+        parentKey: 'therapistsTeam',
+      },
+      {
+        key: 'add-TherapistTeam',
+        label: 'Ajouter un thérapeute',
+        url: '/therapist-team/add-TherapistTeam',
+        parentKey: 'therapistsTeam',
       },
     ],
   },
@@ -83,30 +102,47 @@ export const MENU_ITEMS: MenuItemType[] = [
       },
     ],
   },
-  {
-    key: 'teams',
-    label: 'Équipes',
-    icon: 'ri-team-line',
-    children: [
-      {
-        key: 'teams-list',
-        label: 'Liste des équipes',
-        url: '/teams/teams-list',
-        parentKey: 'teams',
-      },
-      {
-        key: 'add-teams',
-        label: 'Ajouter des équipes',
-        url: '/teams/add-team/',
-        parentKey: 'teams',
-      },
-    ],
-  },
-
+  // {
+  //   key: 'teams',
+  //   label: 'Équipes',
+  //   icon: 'ri-team-line',
+  //   children: [
+  //     {
+  //       key: 'teams-list',
+  //       label: 'Liste des équipes',
+  //       url: '/teams/teams-list',
+  //       parentKey: 'teams',
+  //     },
+  //     {
+  //       key: 'add-teams',
+  //       label: 'Ajouter des équipes',
+  //       url: '/teams/add-team/',
+  //       parentKey: 'teams',
+  //     },
+  //   ],
+  // },
   {
     key: 'settings',
     label: 'Paramètres',
     isTitle: true,
+  },
+  {
+    key: 'branchs',
+    label: 'succursales',
+    icon: 'ri-building-2-line',
+    url: '/branches',
+  },
+  {
+    key: 'department',
+    label: 'Département',
+    icon: 'ri-organization-chart',
+    url: '/department',
+  },
+  {
+    key: 'specialization',
+    label: 'Spécialisation',
+    icon: 'ri-briefcase-4-line',
+    url: '/specialization',
   },
   {
     key: 'languages',
@@ -125,23 +161,5 @@ export const MENU_ITEMS: MenuItemType[] = [
     label: 'Autorisations',
     icon: 'ri-shield-line',
     url: '/permissions',
-  },
-  {
-    key: 'branchs',
-    label: 'Succursales',
-    icon: 'ri-building-2-line',
-    url: '/branches',
-  },
-  {
-    key: 'department',
-    label: 'Département',
-    icon: 'ri-organization-chart',
-    url: '/department',
-  },
-  {
-    key: 'specialization',
-    label: 'Spécialisation',
-    icon: 'ri-briefcase-4-line',
-    url: '/specialization',
   },
 ];

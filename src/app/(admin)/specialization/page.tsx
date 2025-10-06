@@ -124,9 +124,7 @@ const SpecializationListPage = () => {
       );
 
       setSpecializations((prev) =>
-        prev.map((s) =>
-          s.specialization_id === id ? { ...s, is_active: newStatus } : s,
-        ),
+        prev.map((s) => (s.specialization_id === id ? { ...s, is_active: newStatus } : s)),
       );
 
       setMessage({
@@ -136,13 +134,11 @@ const SpecializationListPage = () => {
     } catch (error) {
       console.error('Failed to update status:', error);
       setSpecializations((prev) =>
-        prev.map((s) =>
-          s.specialization_id === id ? { ...s, is_active: !newStatus } : s,
-        ),
+        prev.map((s) => (s.specialization_id === id ? { ...s, is_active: !newStatus } : s)),
       );
       setMessage({
         type: 'error',
-        text: "Échec de la mise à jour du statut de la spécialisation.",
+        text: 'Échec de la mise à jour du statut de la spécialisation.',
       });
     } finally {
       setTimeout(() => setMessage(null), 3000);
@@ -207,11 +203,11 @@ const SpecializationListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>No</th>
-                        <th>Specialization</th>
+                        <th style={{ width: 20 }}>Nom</th>
+                        <th>Spécialisation</th>
                         <th>Description</th>
-                        <th>Department</th>
-                        <th>Status</th>
+                        <th>Département</th>
+                        <th>Statut</th>
                         <th>Action</th>
                       </tr>
                     </thead>

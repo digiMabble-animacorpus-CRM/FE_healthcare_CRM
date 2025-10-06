@@ -197,7 +197,7 @@ const DepartmentListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>No</th>
+                        <th style={{ width: 20 }}>Nom</th>
                         <th>Département Name</th>
                         <th>Description</th>
                         <th>Statut</th>

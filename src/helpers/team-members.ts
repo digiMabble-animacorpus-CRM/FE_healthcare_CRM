@@ -171,7 +171,6 @@ export const updateTeamMember = async (
 };
 
 export const transformToBackendDto = (formData: TeamMemberType): TeamMemberCreatePayload => {
-
   const BRANCHES = [
     { id: 1, name: 'Gembloux - Orneau' },
     { id: 2, name: 'Gembloux - Tout Vent' },

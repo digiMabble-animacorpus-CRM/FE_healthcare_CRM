@@ -17,10 +17,9 @@ import { salesFunnelOptions } from '../data';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import dynamic from 'next/dynamic';
 
-const ReactApexChart = dynamic(() => import("react-apexcharts"), {
+const ReactApexChart = dynamic(() => import('react-apexcharts'), {
   ssr: false,
 });
-
 
 const SalesFunnel = () => {
   return (

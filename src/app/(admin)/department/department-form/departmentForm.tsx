@@ -1,19 +1,9 @@
-
 'use client';
 
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Row,
-  Form,
-} from 'react-bootstrap';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row, Form } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import TextFormInput from '@/components/from/TextFormInput';
 import axios from 'axios';
@@ -40,9 +30,7 @@ interface Props {
 
 const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
   const router = useRouter();
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(
-    null,
-  );
+  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   const methods = useForm<DepartmentFormValues>({
     resolver: yupResolver(schema),
@@ -115,9 +103,7 @@ const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
                   borderRadius: '6px',
                   color: message.type === 'success' ? '#0f5132' : '#842029',
                   backgroundColor: message.type === 'success' ? '#d1e7dd' : '#f8d7da',
-                  border: `1px solid ${
-                    message.type === 'success' ? '#badbcc' : '#f5c2c7'
-                  }`,
+                  border: `1px solid ${message.type === 'success' ? '#badbcc' : '#f5c2c7'}`,
                 }}
               >
                 {message.text}
@@ -167,4 +153,3 @@ const DepartmentForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: 
 };
 
 export default DepartmentForm;
-

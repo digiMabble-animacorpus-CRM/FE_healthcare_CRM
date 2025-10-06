@@ -28,7 +28,7 @@ import Link from 'next/link';
 
 const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
   ssr: false,
-  loading: () => <div>Loading calendar...</div>
+  loading: () => <div>Loading calendar...</div>,
 });
 
 type CalendarInstance = {
@@ -127,35 +127,62 @@ const AppointmentCalendarPage = () => {
   const [deleting, setDeleting] = useState(false);
 
   const calendarRef = useRef<{
-    getInstance(): any; setDate: (date: Date) => void
+    getInstance(): any;
+    setDate: (date: Date) => void;
   }>(null);
-
-
 
   const router = useRouter();
   const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   // Enhanced color palettes for different categories
   const BRANCH_COLORS = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
-    '#DDA0DD', '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E9'
+    '#FF6B6B',
+    '#4ECDC4',
+    '#45B7D1',
+    '#96CEB4',
+    '#FFEAA7',
+    '#DDA0DD',
+    '#98D8C8',
+    '#F7DC6F',
+    '#BB8FCE',
+    '#85C1E9',
   ];
 
   const DEPARTMENT_COLORS = [
-    '#6C5CE7', '#A29BFE', '#74B9FF', '#00CEC9', '#55A3FF',
-    '#FDCB6E', '#E17055', '#FD79A8', '#FDCB6E', '#E84393'
+    '#6C5CE7',
+    '#A29BFE',
+    '#74B9FF',
+    '#00CEC9',
+    '#55A3FF',
+    '#FDCB6E',
+    '#E17055',
+    '#FD79A8',
+    '#FDCB6E',
+    '#E84393',
   ];
 
   const SPECIALIZATION_COLORS = [
-    '#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1',
-    '#e83e8c', '#fd7e14', '#20c997', '#17a2b8', '#6c757d',
-    '#6610f2', '#d63384', '#0dcaf0', '#198754', '#ff6b35'
+    '#007bff',
+    '#28a745',
+    '#ffc107',
+    '#dc3545',
+    '#6f42c1',
+    '#e83e8c',
+    '#fd7e14',
+    '#20c997',
+    '#17a2b8',
+    '#6c757d',
+    '#6610f2',
+    '#d63384',
+    '#0dcaf0',
+    '#198754',
+    '#ff6b35',
   ];
 
   const assignColorsToItems = <T extends { [key: string]: any }>(
     items: T[],
     colors: string[],
-    idKey: string
+    idKey: string,
   ): T[] =>
     items.map((item, index) => ({
       ...item,
@@ -177,7 +204,6 @@ const AppointmentCalendarPage = () => {
       calendarRef.current.setDate(new Date(2026, 0, 1));
     }
   }, []);
-
 
   // Handle calendar navigation
   // const handleCalendarNav = (action: 'today' | 'prev' | 'next') => {
@@ -202,22 +228,25 @@ const AppointmentCalendarPage = () => {
   //   }
   // };
 
-  const handleDateChange = useCallback((newDate: Dayjs | null) => {
-    if (newDate) {
-      setSelectedDate(newDate);
-      setCalendarDate(newDate);
+  const handleDateChange = useCallback(
+    (newDate: Dayjs | null) => {
+      if (newDate) {
+        setSelectedDate(newDate);
+        setCalendarDate(newDate);
 
-      // Sync with Toast UI Calendar
-      if (calendarRef.current) {
-        calendarRef.current.setDate(newDate.toDate()); // Call setDate on the child component
-      }
+        // Sync with Toast UI Calendar
+        if (calendarRef.current) {
+          calendarRef.current.setDate(newDate.toDate()); // Call setDate on the child component
+        }
 
-      // Auto-switch to day view when clicking on a specific date
-      if (view === 'month') {
-        setView('day');
+        // Auto-switch to day view when clicking on a specific date
+        if (view === 'month') {
+          setView('day');
+        }
       }
-    }
-  }, [view]);
+    },
+    [view],
+  );
 
   // Sync calendar on navigation and view changes
   // useEffect(() => {
@@ -247,7 +276,7 @@ const AppointmentCalendarPage = () => {
           const branches: Branch[] = normalizeApiResponse(data);
           const branchesWithColors = assignColorsToItems(branches, BRANCH_COLORS, 'branch_id');
           setAllBranches(branchesWithColors);
-          setSelectedBranches(branchesWithColors.map(b => b.branch_id));
+          setSelectedBranches(branchesWithColors.map((b) => b.branch_id));
         }
 
         // Departments
@@ -259,7 +288,7 @@ const AppointmentCalendarPage = () => {
           const departments: Department[] = normalizeApiResponse(data);
           const departmentsWithColors = assignColorsToItems(departments, DEPARTMENT_COLORS, 'id');
           setAllDepartments(departmentsWithColors);
-          setSelectedDepartments(departmentsWithColors.map(d => d.id));
+          setSelectedDepartments(departmentsWithColors.map((d) => d.id));
         }
 
         // Specializations
@@ -269,9 +298,13 @@ const AppointmentCalendarPage = () => {
         if (specializationsRes.ok) {
           const data = await specializationsRes.json();
           const specializations: Specialization[] = normalizeApiResponse(data);
-          const specializationsWithColors = assignColorsToItems(specializations, SPECIALIZATION_COLORS, 'specialization_id');
+          const specializationsWithColors = assignColorsToItems(
+            specializations,
+            SPECIALIZATION_COLORS,
+            'specialization_id',
+          );
           setAllSpecializations(specializationsWithColors);
-          setSelectedSpecializations(specializationsWithColors.map(s => s.specialization_id));
+          setSelectedSpecializations(specializationsWithColors.map((s) => s.specialization_id));
         }
       } catch (err) {
         // Handle error silently or add proper error handling
@@ -326,9 +359,13 @@ const AppointmentCalendarPage = () => {
           const isPast = appointmentStart.isBefore(now);
 
           // Find colors from our loaded data
-          const branchColor = allBranches.find(b => b.branch_id === appt.branch_id)?.color || BRANCH_COLORS[0];
-          const departmentColor = allDepartments.find(d => d.id === appt.department_id)?.color || DEPARTMENT_COLORS[0];
-          const specializationColor = allSpecializations.find(s => s.specialization_id === appt.specialization_id)?.color || SPECIALIZATION_COLORS[0];
+          const branchColor =
+            allBranches.find((b) => b.branch_id === appt.branch_id)?.color || BRANCH_COLORS[0];
+          const departmentColor =
+            allDepartments.find((d) => d.id === appt.department_id)?.color || DEPARTMENT_COLORS[0];
+          const specializationColor =
+            allSpecializations.find((s) => s.specialization_id === appt.specialization_id)?.color ||
+            SPECIALIZATION_COLORS[0];
 
           let bgColor = specializationColor;
           let borderColor = specializationColor;
@@ -368,7 +405,9 @@ const AppointmentCalendarPage = () => {
           // Extract participant names
           const participants = [];
           if (appt.patient?.firstname || appt.patient?.lastname) {
-            participants.push(`${appt.patient.firstname || ''} ${appt.patient.lastname || ''}`.trim());
+            participants.push(
+              `${appt.patient.firstname || ''} ${appt.patient.lastname || ''}`.trim(),
+            );
           }
           if (appt.therapist?.fullName) {
             participants.push(appt.therapist.fullName);
@@ -382,8 +421,11 @@ const AppointmentCalendarPage = () => {
 
           const result = {
             id: String(appt.id),
-            calendarId: String(specialization?.specialization_id || appt.specialization_id || 'unknown'),
-            title: `${specialization?.specialization_type || 'Unknown'} - ${appt.patient?.firstname || ''} ${appt.patient?.lastname || ''}`.trim(),
+            calendarId: String(
+              specialization?.specialization_id || appt.specialization_id || 'unknown',
+            ),
+            title:
+              `${specialization?.specialization_type || 'Unknown'} - ${appt.patient?.firstname || ''} ${appt.patient?.lastname || ''}`.trim(),
             category: 'time',
             start: start?.toISOString() || '',
             end: end?.toISOString() || '',
@@ -432,25 +474,27 @@ const AppointmentCalendarPage = () => {
     if (view === 'month') {
       const start = selectedDate.startOf('month');
       const end = selectedDate.endOf('month');
-      dateFiltered = allAppointments.filter(appt =>
-        appt.start && dayjs(appt.start).isBetween(start, end, null, '[]')
+      dateFiltered = allAppointments.filter(
+        (appt) => appt.start && dayjs(appt.start).isBetween(start, end, null, '[]'),
       );
     } else if (view === 'week') {
       const start = selectedDate.startOf('week');
       const end = selectedDate.endOf('week');
-      dateFiltered = allAppointments.filter(appt =>
-        appt.start && dayjs(appt.start).isBetween(start, end, null, '[]')
+      dateFiltered = allAppointments.filter(
+        (appt) => appt.start && dayjs(appt.start).isBetween(start, end, null, '[]'),
       );
     } else if (view === 'day') {
-      dateFiltered = allAppointments.filter(appt =>
-        appt.start && dayjs(appt.start).isSame(selectedDate, 'day')
+      dateFiltered = allAppointments.filter(
+        (appt) => appt.start && dayjs(appt.start).isSame(selectedDate, 'day'),
       );
     }
 
     // Enhanced filtering logic with null safety
-    const finalFiltered = dateFiltered.filter(appt => {
+    const finalFiltered = dateFiltered.filter((appt) => {
       const branchId = appt.raw.original?.branch_id || appt.raw.original?.branch?.branch_id;
-      const specId = appt.raw.original?.specialization_id || appt.raw.original?.specialization?.specialization_id;
+      const specId =
+        appt.raw.original?.specialization_id ||
+        appt.raw.original?.specialization?.specialization_id;
       const deptId = appt.raw.original?.department_id || appt.raw.original?.department?.id;
 
       // If IDs are missing (undefined), include them in all filters
@@ -473,7 +517,7 @@ const AppointmentCalendarPage = () => {
   ]);
 
   // Enhanced calendars configuration with proper colors
-  const calendars = allSpecializations.map(spec => ({
+  const calendars = allSpecializations.map((spec) => ({
     id: String(spec.specialization_id),
     name: spec.specialization_type,
     color: '#ffffff',
@@ -483,20 +527,20 @@ const AppointmentCalendarPage = () => {
   }));
 
   const handleBranchChange = (branchId: number) => {
-    setSelectedBranches(prev =>
-      prev.includes(branchId) ? prev.filter(id => id !== branchId) : [...prev, branchId]
+    setSelectedBranches((prev) =>
+      prev.includes(branchId) ? prev.filter((id) => id !== branchId) : [...prev, branchId],
     );
   };
 
   const handleSpecializationChange = (specId: number) => {
-    setSelectedSpecializations(prev =>
-      prev.includes(specId) ? prev.filter(id => id !== specId) : [...prev, specId]
+    setSelectedSpecializations((prev) =>
+      prev.includes(specId) ? prev.filter((id) => id !== specId) : [...prev, specId],
     );
   };
 
   const handleDepartmentChange = (deptId: number) => {
-    setSelectedDepartments(prev =>
-      prev.includes(deptId) ? prev.filter(id => id !== deptId) : [...prev, deptId]
+    setSelectedDepartments((prev) =>
+      prev.includes(deptId) ? prev.filter((id) => id !== deptId) : [...prev, deptId],
     );
   };
 
@@ -519,9 +563,9 @@ const AppointmentCalendarPage = () => {
   };
 
   const resetAllFilters = () => {
-    setSelectedBranches(allBranches.map(b => b.branch_id));
-    setSelectedSpecializations(allSpecializations.map(s => s.specialization_id));
-    setSelectedDepartments(allDepartments.map(d => d.id));
+    setSelectedBranches(allBranches.map((b) => b.branch_id));
+    setSelectedSpecializations(allSpecializations.map((s) => s.specialization_id));
+    setSelectedDepartments(allDepartments.map((d) => d.id));
     setSelectedDate(dayjs());
     setCalendarDate(dayjs());
     setView('month');
@@ -537,15 +581,17 @@ const AppointmentCalendarPage = () => {
   const toggleAllSelection = (type: 'branches' | 'specializations' | 'departments') => {
     if (type === 'branches') {
       setSelectedBranches(
-        selectedBranches.length === allBranches.length ? [] : allBranches.map(b => b.branch_id)
+        selectedBranches.length === allBranches.length ? [] : allBranches.map((b) => b.branch_id),
       );
     } else if (type === 'specializations') {
       setSelectedSpecializations(
-        selectedSpecializations.length === allSpecializations.length ? [] : allSpecializations.map(s => s.specialization_id)
+        selectedSpecializations.length === allSpecializations.length
+          ? []
+          : allSpecializations.map((s) => s.specialization_id),
       );
     } else if (type === 'departments') {
       setSelectedDepartments(
-        selectedDepartments.length === allDepartments.length ? [] : allDepartments.map(d => d.id)
+        selectedDepartments.length === allDepartments.length ? [] : allDepartments.map((d) => d.id),
       );
     }
   };
@@ -553,11 +599,16 @@ const AppointmentCalendarPage = () => {
   // Helper function to get status badge color
   const getStatusBadgeColor = (status: string) => {
     switch (status?.toLowerCase()) {
-      case 'confirmed': return 'success';
-      case 'pending': return 'warning';
-      case 'cancelled': return 'danger';
-      case 'completed': return 'primary';
-      default: return 'secondary';
+      case 'confirmed':
+        return 'success';
+      case 'pending':
+        return 'warning';
+      case 'cancelled':
+        return 'danger';
+      case 'completed':
+        return 'primary';
+      default:
+        return 'secondary';
     }
   };
 
@@ -577,9 +628,9 @@ const AppointmentCalendarPage = () => {
 
       if (response.ok) {
         // Remove the deleted appointment from state
-        setAllAppointments(prev => prev.filter(appt => appt.id !== selectedEvent.id));
+        setAllAppointments((prev) => prev.filter((appt) => appt.id !== selectedEvent.id));
         setShowDeleteModal(false);
-        setShowModal(false)
+        setShowModal(false);
         setSelectedEvent(null);
       } else {
         console.error('Failed to delete appointment');
@@ -603,7 +654,10 @@ const AppointmentCalendarPage = () => {
                 : 'Liste de rendez-vous'}
               <small className="text-muted ms-2">({appointments.length} rendez-vous)</small>
             </CardTitle>
-            <Button variant="primary" onClick={() => router.push('/appointments/appointment-form/new')}>
+            <Button
+              variant="primary"
+              onClick={() => router.push('/appointments/appointment-form/new')}
+            >
               <Icon icon="mdi:plus" className="me-1" />
               Nouveau rendez-vous
             </Button>
@@ -611,8 +665,11 @@ const AppointmentCalendarPage = () => {
         </Card>
 
         {/* Enhanced Sidebar */}
-        <Col md={3} style={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }}>
-          <div className="p-2 border rounded mb-3" style={{ background: 'white' }} >
+        <Col
+          md={3}
+          style={{ display: 'flex', flexDirection: 'column', height: '100%', minWidth: 0 }}
+        >
+          <div className="p-2 border rounded mb-3" style={{ background: 'white' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DateCalendar
                 value={selectedDate}
@@ -620,25 +677,30 @@ const AppointmentCalendarPage = () => {
                 showDaysOutsideCurrentMonth
                 fixedWeekNumber={6}
                 sx={{
-                  width: "100%",
-                  maxWidth: "100%",
+                  width: '100%',
+                  maxWidth: '100%',
                   minWidth: 0,
-                  overflow: "hidden",
-                  "& .MuiPickersCalendarHeader-root": { px: 1, mb: 0.5 },
-                  "& .MuiPickersCalendarHeader-label": { fontSize: "0.9rem" },
-                  "& .MuiPickersArrowSwitcher-root .MuiIconButton-root": {
+                  overflow: 'hidden',
+                  '& .MuiPickersCalendarHeader-root': { px: 1, mb: 0.5 },
+                  '& .MuiPickersCalendarHeader-label': { fontSize: '0.9rem' },
+                  '& .MuiPickersArrowSwitcher-root .MuiIconButton-root': {
                     p: 0.5,
                   },
-                  "& .MuiDayCalendar-weekDayLabel": { fontSize: "0.75rem" },
-                  "& .MuiPickersDay-root": { fontSize: "0.75rem" },
-                  "& .MuiDayCalendar-monthContainer": { mx: 0.5 },
+                  '& .MuiDayCalendar-weekDayLabel': { fontSize: '0.75rem' },
+                  '& .MuiPickersDay-root': { fontSize: '0.75rem' },
+                  '& .MuiDayCalendar-monthContainer': { mx: 0.5 },
                 }}
               />
             </LocalizationProvider>
           </div>
 
           <div className="mb-3">
-            <Button variant="outline-secondary" size="sm" onClick={resetAllFilters} className="w-100">
+            <Button
+              variant="outline-secondary"
+              size="sm"
+              onClick={resetAllFilters}
+              className="w-100"
+            >
               <Icon icon="mdi:refresh" className="me-1" />
               Réinitialiser tous les filtres
             </Button>
@@ -652,13 +714,17 @@ const AppointmentCalendarPage = () => {
                 Succursales
               </h6>
               <Button variant="link" size="sm" onClick={() => toggleAllSelection('branches')}>
-                {selectedBranches.length === allBranches.length ? 'Désélectionner tout' : 'Sélectionner tout'}
+                {selectedBranches.length === allBranches.length
+                  ? 'Désélectionner tout'
+                  : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
-              <div className="text-center"><Spinner animation="border" size="sm" /></div>
+              <div className="text-center">
+                <Spinner animation="border" size="sm" />
+              </div>
             ) : (
-              allBranches.map(branch => (
+              allBranches.map((branch) => (
                 <Form.Check
                   key={branch.branch_id}
                   type="checkbox"
@@ -671,7 +737,7 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: branch.color,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       {branch.name}
@@ -698,11 +764,13 @@ const AppointmentCalendarPage = () => {
               </Button>
             </div>
             {loadingFilters ? (
-              <div className="text-center"><Spinner animation="border" size="sm" /></div>
+              <div className="text-center">
+                <Spinner animation="border" size="sm" />
+              </div>
             ) : allDepartments.length === 0 ? (
               <div className="text-muted small">Aucun département trouvé</div>
             ) : (
-              allDepartments.map(dept => (
+              allDepartments.map((dept) => (
                 <Form.Check
                   key={dept.id}
                   type="checkbox"
@@ -715,7 +783,7 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: dept.color,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       {dept.name}
@@ -746,9 +814,11 @@ const AppointmentCalendarPage = () => {
               </Button>
             </div>
             {loadingFilters ? (
-              <div className="text-center"><Spinner animation="border" size="sm" /></div>
+              <div className="text-center">
+                <Spinner animation="border" size="sm" />
+              </div>
             ) : (
-              allSpecializations.map(spec => (
+              allSpecializations.map((spec) => (
                 <Form.Check
                   key={spec.specialization_id}
                   type="checkbox"
@@ -761,7 +831,7 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: spec.color,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       {spec.specialization_type}
@@ -783,7 +853,9 @@ const AppointmentCalendarPage = () => {
                 <Icon icon={`mdi:calendar-${view}`} className="me-1" />
                 {view.charAt(0).toUpperCase() + view.slice(1)}
               </Button>
-              <Dropdown.Toggle split variant="outline-primary" size="sm" ><IconifyIcon icon="ri:arrow-down-s-line" className="fs-18" /></Dropdown.Toggle>
+              <Dropdown.Toggle split variant="outline-primary" size="sm">
+                <IconifyIcon icon="ri:arrow-down-s-line" className="fs-18" />
+              </Dropdown.Toggle>
               <Dropdown.Menu>
                 <Dropdown.Item onClick={() => handleViewChange('day')}>
                   <Icon icon="mdi:calendar-today" className="me-2 d-none d-sm-inline" />
@@ -845,7 +917,10 @@ const AppointmentCalendarPage = () => {
                 events={appointments}
                 isReadOnly
                 onClickEvent={handleEventClick}
-                onClickMore={(e: { event: { stop: () => void; }; events: SetStateAction<any[]>; }) => {
+                onClickMore={(e: {
+                  event: { stop: () => void };
+                  events: SetStateAction<any[]>;
+                }) => {
                   // ✅ Prevent Toast UI’s built-in popup
                   e.event.stop();
 
@@ -853,15 +928,14 @@ const AppointmentCalendarPage = () => {
                   setMoreEvents(e.events);
                   setShowMoreModal(true);
                 }}
-
                 month={{
                   startDayOfWeek: 0,
                   daynames: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
                   visibleWeeksCount: 6,
                   moreLayerSize: {
                     width: '300px',
-                    height: 'auto'
-                  }
+                    height: 'auto',
+                  },
                 }}
                 week={{
                   startDayOfWeek: 0,
@@ -870,10 +944,12 @@ const AppointmentCalendarPage = () => {
                   hourEnd: 20,
                 }}
                 timezone={{
-                  zones: [{
-                    timezoneName: 'Asia/Kolkata',
-                    displayLabel: 'IST',
-                  }]
+                  zones: [
+                    {
+                      timezoneName: 'Asia/Kolkata',
+                      displayLabel: 'IST',
+                    },
+                  ],
                 }}
               />
             </div>
@@ -892,7 +968,7 @@ const AppointmentCalendarPage = () => {
                 </div>
               ) : (
                 <div className="row">
-                  {appointments.map(event => {
+                  {appointments.map((event) => {
                     const isToday = dayjs(event.start).isSame(dayjs(), 'day');
                     const isPast = dayjs(event.start).isBefore(dayjs());
 
@@ -913,7 +989,7 @@ const AppointmentCalendarPage = () => {
                                     height: 16,
                                     backgroundColor: event.bgColor,
                                     marginRight: 8,
-                                    borderRadius: '3px'
+                                    borderRadius: '3px',
                                   }}
                                 />
                                 <strong className="text-truncate">{event.title}</strong>
@@ -926,7 +1002,8 @@ const AppointmentCalendarPage = () => {
                             <div className="mb-2">
                               <small className="text-muted">
                                 <Icon icon="mdi:clock-outline" className="me-1" />
-                                {dayjs(event.start).format('MMM D, YYYY h:mm A')} - {dayjs(event.end).format('h:mm A')}
+                                {dayjs(event.start).format('MMM D, YYYY h:mm A')} -{' '}
+                                {dayjs(event.end).format('h:mm A')}
                                 {isToday && <span className="badge bg-info ms-2">Today</span>}
                               </small>
                             </div>
@@ -998,7 +1075,9 @@ const AppointmentCalendarPage = () => {
                   <h5 className="mb-0">{selectedEvent.title}</h5>
 
                   <div className="d-flex align-items-center">
-                    <span className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto me-1`}>
+                    <span
+                      className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto me-1`}
+                    >
                       {selectedEvent.raw.status || 'Unknown'}
                     </span>
                     {/* Edit Button */}
@@ -1022,7 +1101,6 @@ const AppointmentCalendarPage = () => {
                       <Icon icon="mdi:delete" />
                     </Button>
                   </div>
-
                 </div>
               </div>
 
@@ -1220,14 +1298,15 @@ const AppointmentCalendarPage = () => {
                           height: 12,
                           backgroundColor: event.bgColor,
                           marginRight: 8,
-                          borderRadius: '2px'
+                          borderRadius: '2px',
                         }}
                       />
                       <div>
                         <h6 className="mb-1">{event.title}</h6>
                         <small className="text-muted">
                           <Icon icon="mdi:clock-outline" className="me-1" />
-                          {dayjs(event.start).format('h:mm A')} - {dayjs(event.end).format('h:mm A')}
+                          {dayjs(event.start).format('h:mm A')} -{' '}
+                          {dayjs(event.end).format('h:mm A')}
                         </small>
                       </div>
                     </div>
@@ -1270,10 +1349,13 @@ const AppointmentCalendarPage = () => {
             <strong>Titre:</strong> {selectedEvent?.title}
           </p>
           <p className="mb-0">
-            <strong>Date:</strong> {selectedEvent ? dayjs(selectedEvent.start).format('MMMM D, YYYY') : ''}
+            <strong>Date:</strong>{' '}
+            {selectedEvent ? dayjs(selectedEvent.start).format('MMMM D, YYYY') : ''}
           </p>
           <p className="mb-0">
-            <strong>Heure:</strong> {selectedEvent ? dayjs(selectedEvent.start).format('h:mm A') : ''} - {selectedEvent ? dayjs(selectedEvent.end).format('h:mm A') : ''}
+            <strong>Heure:</strong>{' '}
+            {selectedEvent ? dayjs(selectedEvent.start).format('h:mm A') : ''} -{' '}
+            {selectedEvent ? dayjs(selectedEvent.end).format('h:mm A') : ''}
           </p>
         </Modal.Body>
         <Modal.Footer>
