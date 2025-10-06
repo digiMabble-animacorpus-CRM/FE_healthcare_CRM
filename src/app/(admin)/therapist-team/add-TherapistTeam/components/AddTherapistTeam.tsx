@@ -46,7 +46,7 @@ const schema = yup.object().shape({
   imageUrl: yup.string().url('Must be a valid URL'),
   aboutMe: yup.string(),
   degreesTraining: yup.string(),
-  inamiNumber: yup.number().typeError('Must be a number'),
+   inamiNumber: yup.string().optional().nullable(),
   payment_methods: yup.array().of(yup.string()),
   faq: yup.array().of(
     yup.object().shape({
@@ -88,7 +88,7 @@ const defaultValues: TherapistTeamMember = {
   contactPhone: '',
   aboutMe: '',
   degreesTraining: '',
-  inamiNumber: 0,
+  inamiNumber: '',
   payment_methods: [],
   faq: [{ question: '', answer: '' }],
   website: '',
@@ -134,7 +134,7 @@ type TherapistTeamMember = {
   contactPhone: string;
   aboutMe?: string;
   degreesTraining?: string;
-  inamiNumber?: number;
+  inamiNumber?: any;
   payment_methods?: string[];
   faq?: { question: string; answer: string }[];
   website?: string;
