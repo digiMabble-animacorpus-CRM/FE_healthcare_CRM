@@ -177,7 +177,7 @@ const TherapistTeamDetails = ({
                     <strong>Département:</strong> {department?.name ?? '-'}
                   </div>
                   <div className="mb-2">
-                    <strong>Branches:</strong>{' '}
+                    <strong>Succursales:</strong>{' '}
                     {branches.length > 0
                       ? branches.map((b) => b.name ?? `#${b.branch_id}`).join(', ')
                       : '-'}
@@ -200,7 +200,7 @@ const TherapistTeamDetails = ({
                       : '-'}
                   </div>
                   <div className="mb-2">
-                    <strong>Languages Spoken:</strong>{' '}
+                    <strong>Languages:</strong>{' '}
                     {languagesSpoken.length > 0
                       ? languagesSpoken.map((lang, i) => (
                           <Badge key={i} bg="info" className="mx-1 text-dark">
@@ -227,14 +227,14 @@ const TherapistTeamDetails = ({
       {/* Schedule */}
       <Card className="mb-4">
         <CardBody>
-          <h4>Calendrier</h4>
+          <h4>disponibilité</h4>
           {availability.length > 0 ? (
             <Table striped bordered>
               <thead>
                 <tr>
-                  <th>Day</th>
-                  <th>Start time</th>
-                  <th>End time</th>
+                  <th>Jour</th>
+                  <th>Heure de début</th>
+                  <th>Heure de fin</th>
                 </tr>
               </thead>
               <tbody>

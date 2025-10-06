@@ -207,11 +207,11 @@ const SpecializationListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>No</th>
-                        <th>Specialization</th>
+                        <th style={{ width: 20 }}>Nom</th>
+                        <th>Spécialisation</th>
                         <th>Description</th>
-                        <th>Department</th>
-                        <th>Status</th>
+                        <th>Département</th>
+                        <th>Statut</th>
                         <th>Action</th>
                       </tr>
                     </thead>

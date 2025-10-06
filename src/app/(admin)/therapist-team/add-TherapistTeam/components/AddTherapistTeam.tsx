@@ -46,7 +46,7 @@ const schema = yup.object().shape({
   imageUrl: yup.string().url('Must be a valid URL'),
   aboutMe: yup.string(),
   degreesTraining: yup.string(),
-   inamiNumber: yup.string().optional().nullable(),
+  inamiNumber: yup.string().optional().nullable(),
   payment_methods: yup.array().of(yup.string()),
   faq: yup.array().of(
     yup.object().shape({
@@ -198,8 +198,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
     getDepartments(1, 100, '').then(({ data }) => setDepartments(data));
   }, []);
   useEffect(() => {
-   getSpecializations().then(({ data }) => setSpecializations(data));
-
+    getSpecializations().then(({ data }) => setSpecializations(data));
   }, []);
 
   useEffect(() => {
@@ -331,7 +330,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                       field.onChange(newAvailability);
                     }}
                   >
-                    <option value="">Select Day</option>
+                    <option value="">Select Jour</option>
                     {DAYS_OF_WEEK.map((day) => (
                       <option key={day} value={day}>
                         {day}
@@ -372,7 +371,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                     }}
                     disabled={field.value.length === 1}
                   >
-                   Retirer
+                    Retirer
                   </Button>
                 </Col>
               </Row>
@@ -411,7 +410,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label> Prénom *</Form.Label>
+                <Form.Label> Prénom <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('firstName')} isInvalid={!!errors.firstName} />
                 <Form.Control.Feedback type="invalid">
                   {errors.firstName?.message}
@@ -420,7 +421,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label> Nom de famille *</Form.Label>
+                <Form.Label> Nom de famille <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('lastName')} isInvalid={!!errors.lastName} />
                 <Form.Control.Feedback type="invalid">
                   {errors.lastName?.message}
@@ -442,7 +445,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label> E-mail *</Form.Label>
+                <Form.Label> E-mail <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('contactEmail')} isInvalid={!!errors.contactEmail} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactEmail?.message}
@@ -455,7 +460,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label> Numéro de téléphone *</Form.Label>
+                <Form.Label> Numéro de téléphone <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Form.Control {...register('contactPhone')} isInvalid={!!errors.contactPhone} />
                 <Form.Control.Feedback type="invalid">
                   {errors.contactPhone?.message}
@@ -470,9 +477,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                   {...register('inamiNumber')}
                   isInvalid={!!errors.inamiNumber}
                 />
-                <Form.Control.Feedback type="invalid">
-                  {errors.inamiNumber?.message}
-                </Form.Control.Feedback>
+                <Form.Control.Feedback type="invalid">{!!errors.inamiNumber}</Form.Control.Feedback>
               </Form.Group>
             </Col>
           </Row>
@@ -546,58 +551,69 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Languages *</Form.Label>
-                {languages.map(({ id, language_name }) => (
-                  <Form.Check
-                    key={id}
-                    type="checkbox"
-                    label={language_name}
-                    checked={(watch('languagesSpoken') || []).includes(language_name)}
-                    onChange={(e) => {
-                      const current: string[] = watch('languagesSpoken') || [];
-                      if (e.target.checked) {
-                        setValue('languagesSpoken', [...current, language_name]); // ✅ send names
-                      } else {
-                        setValue(
-                          'languagesSpoken',
-                          current.filter((lang) => lang !== language_name),
-                        );
-                      }
-                    }}
-                  />
-                ))}
+                <Form.Label>Languages <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
+                <div className="d-flex flex-wrap gap-3">
+                  {languages.map(({ id, language_name }) => (
+                    <Form.Check
+                      key={id}
+                      type="checkbox"
+                      label={language_name}
+                      checked={(watch('languagesSpoken') || []).includes(language_name)}
+                      onChange={(e) => {
+                        const current: string[] = watch('languagesSpoken') || [];
+                        if (e.target.checked) {
+                          setValue('languagesSpoken', [...current, language_name]); // ✅ send names
+                        } else {
+                          setValue(
+                            'languagesSpoken',
+                            current.filter((lang) => lang !== language_name),
+                          );
+                        }
+                      }}
+                      className="me-2"
+                    />
+                  ))}
+                </div>
                 {errors.languagesSpoken && (
                   <div className="text-danger">{errors.languagesSpoken.message}</div>
                 )}
               </Form.Group>
             </Col>
+
             <Col md={6} className="mb-3">
               <Form.Group>
                 <Form.Label>Méthodes de paiement</Form.Label>
-                {PAYMENT_METHODS.map((pm) => (
-                  <Form.Check
-                    key={pm}
-                    type="checkbox"
-                    label={pm}
-                    checked={(watch('payment_methods') || []).includes(pm)}
-                    onChange={(e) => {
-                      const current = watch('payment_methods') || [];
-                      if (e.target.checked) {
-                        setValue('payment_methods', [...current, pm]);
-                      } else {
-                        setValue(
-                          'payment_methods',
-                          current.filter((p) => p !== pm),
-                        );
-                      }
-                    }}
-                  />
-                ))}
+
+                {/* ✅ Flex container for horizontal layout */}
+                <div className="d-flex flex-wrap gap-3">
+                  {PAYMENT_METHODS.map((pm) => (
+                    <Form.Check
+                      key={pm}
+                      type="checkbox"
+                      label={pm}
+                      checked={(watch('payment_methods') || []).includes(pm)}
+                      onChange={(e) => {
+                        const current = watch('payment_methods') || [];
+                        if (e.target.checked) {
+                          setValue('payment_methods', [...current, pm]);
+                        } else {
+                          setValue(
+                            'payment_methods',
+                            current.filter((p) => p !== pm),
+                          );
+                        }
+                      }}
+                      className="me-2"
+                    />
+                  ))}
+                </div>
               </Form.Group>
             </Col>
           </Row>
 
-          {/* FAQ */}
+          {/* FAQ
           <Row>
             <Col md={12}>
               <Form.Group>
@@ -645,13 +661,15 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 </Button>
               </Form.Group>
             </Col>
-          </Row>
+          </Row> */}
 
           {/* Department Select */}
           <Row>
-            <Col md={12} className="mb-3">
+            <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label> Département *</Form.Label>
+                <Form.Label> Département <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
                 <Controller
                   control={control}
                   name="departmentId"
@@ -677,29 +695,35 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 </Form.Control.Feedback>
               </Form.Group>
             </Col>
-
-            <Col md={12} className="mb-3">
+            <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Spécialisation  *</Form.Label>
-                {specializations.map((spec) => (
-                  <Form.Check
-                    key={spec.id}
-                    type="checkbox"
-                    label={spec.name} // show name instead of id
-                    checked={(watch('specializationIds') || []).includes(spec.id)}
-                    onChange={(e) => {
-                      const current = watch('specializationIds') || [];
-                      if (e.target.checked) {
-                        setValue('specializationIds', [...current, spec.id]);
-                      } else {
-                        setValue(
-                          'specializationIds',
-                          current.filter((id) => id !== spec.id),
-                        );
-                      }
-                    }}
-                  />
-                ))}
+                <Form.Label>Spécialisation <span style={{ color: 'red' }}>*</span>
+
+                </Form.Label>
+
+                {/* ✅ Flex container for horizontal layout */}
+                <div className="d-flex flex-wrap gap-3">
+                  {specializations.map((spec) => (
+                    <Form.Check
+                      key={spec.id}
+                      type="checkbox"
+                      label={spec.name} // show name instead of id
+                      checked={(watch('specializationIds') || []).includes(spec.id)}
+                      onChange={(e) => {
+                        const current = watch('specializationIds') || [];
+                        if (e.target.checked) {
+                          setValue('specializationIds', [...current, spec.id]);
+                        } else {
+                          setValue(
+                            'specializationIds',
+                            current.filter((id) => id !== spec.id),
+                          );
+                        }
+                      }}
+                      className="me-2"
+                    />
+                  ))}
+                </div>
               </Form.Group>
             </Col>
           </Row>
@@ -709,7 +733,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           {branchFields.map((branch, nestIndex) => (
             <Card key={branch.id || nestIndex} className="mb-3 p-3">
               <Row className="align-items-center">
-                <Col md={8}>
+                <Col md={6}>
                   <Form.Group className="mb-3">
                     <Form.Label>Sélectionnez une succursale</Form.Label>
                     <Form.Select
@@ -730,7 +754,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 </Col>
                 <Col md={4} className="d-flex align-items-center justify-content-start">
                   <Button type="button" variant="danger" onClick={() => removeBranch(nestIndex)}>
-                     Supprimer la branche
+                    Supprimer la branche
                   </Button>
                 </Col>
               </Row>
@@ -753,11 +777,61 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
             Ajouter une succursale
           </Button>
 
+          {/* FAQ */}
+          <Row>
+            <Col md={12}>
+              <Form.Group>
+                <Form.Label>Questions fréquemment posées</Form.Label>
+                {faqs.map((item, idx) => (
+                  <Row key={idx} className="mb-2">
+                    <Col>
+                      <Form.Control
+                        placeholder="Question"
+                        value={item.question}
+                        onChange={(e) => {
+                          const newFaqs = [...faqs];
+                          newFaqs[idx].question = e.target.value;
+                          setFaqs(newFaqs);
+                        }}
+                      />
+                    </Col>
+                    <Col>
+                      <Form.Control
+                        placeholder="Answer"
+                        value={item.answer}
+                        onChange={(e) => {
+                          const newFaqs = [...faqs];
+                          newFaqs[idx].answer = e.target.value;
+                          setFaqs(newFaqs);
+                        }}
+                      />
+                    </Col>
+                    <Col xs="auto">
+                      <Button
+                        variant="danger"
+                        onClick={() => setFaqs(faqs.filter((_, i) => i !== idx))}
+                        disabled={faqs.length === 1}
+                      >
+                        Retirer
+                      </Button>
+                    </Col>
+                  </Row>
+                ))}
+                <Button
+                  variant="outline-primary"
+                  onClick={() => setFaqs([...faqs, { question: '', answer: '' }])}
+                >
+                  Ajouter une FAQ
+                </Button>
+              </Form.Group>
+            </Col>
+          </Row>
+
           {/* Status & Role */}
           <Row>
             <Col md={4} className="mb-3">
               <Form.Group>
-                <Form.Label>Status</Form.Label>
+                <Form.Label>Statut</Form.Label>
                 <Controller
                   control={control}
                   name="status"
@@ -810,7 +884,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
                 onClick={() => router.back()}
                 disabled={isSubmitting}
               >
-                 Annuler
+                Annuler
               </Button>
             </Col>
           </Row>
