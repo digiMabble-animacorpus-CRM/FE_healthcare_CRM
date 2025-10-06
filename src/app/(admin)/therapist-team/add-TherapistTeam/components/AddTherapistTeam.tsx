@@ -47,7 +47,7 @@ const schema = yup.object().shape({
   aboutMe: yup.string(),
   degreesTraining: yup.string(),
   inamiNumber: yup.string().optional().nullable(),
-  payment_methods: yup.array().of(yup.string()),
+  payment_methods: yup.array().of(yup.string().required()),
   faq: yup.array().of(
     yup.object().shape({
       question: yup.string(),
@@ -111,6 +111,7 @@ const defaultValues: TherapistTeamMember = {
 
 interface AddTherapistProps {
   editId?: string;
+  isEdit?: boolean;
 }
 
 interface BranchType {
@@ -240,9 +241,9 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
               Array.isArray(rawData.faq) && rawData.faq.length
                 ? rawData.faq
                 : [{ question: '', answer: '' }],
-            status: rawData.status === 'inactive' ? 'inactive' : 'active',
+            status: rawData.status === 'inactive' ? 'inactive' : 'active' as 'active' | 'inactive',
           };
-          reset(adaptedData); // React Hook Form resets all fields to these values
+          reset(adaptedData as TherapistTeamMember); // React Hook Form resets all fields to these values
           setFaqs(adaptedData.faq);
         }
         setLoading(false);
@@ -271,15 +272,23 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
       (branch.availability || []).filter((slot) => slot.day && slot.startTime && slot.endTime),
     );
 
-    const sanitizedData = {
+    const sanitizedData: any = {
       ...data,
       departmentId: departmentIdNum,
       specializationIds: (data.specializationIds || []).map(Number),
       payment_methods: (data.payment_methods || []).filter(Boolean),
       faq: faqs,
-      languagesSpoken: (data.languagesSpoken || []).map(String), // send actual strings
-      branchIds, // ✅ match backend
-      availability, // ✅ match backend
+      languagesSpoken: (data.languagesSpoken || []).map(String),
+      // Add required fields for API compatibility
+      department: departments.find((d) => d.id === departmentIdNum) || null,
+      specializations: (data.specializationIds || []).map((id) => {
+        const spec = specializations.find((s) => s.id === id);
+        return spec ? { specialization_id: spec.id, name: spec.name } : null;
+      }).filter(Boolean),
+      branchIds: (data.branches || []).map((b) => Number(b.branch_id)).filter((id) => id > 0),
+      availability: (data.branches || []).flatMap((branch) =>
+        (branch.availability || []).filter((slot) => slot.day && slot.startTime && slot.endTime)
+      ),
     };
 
     try {
@@ -761,21 +770,24 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
               <AvailabilitySlots nestIndex={nestIndex} control={control} register={register} />
             </Card>
           ))}
-          <Button
-            type="button"
-            variant="primary"
-            size="sm"
-            className="mb-3"
-            onClick={() =>
-              appendBranch({
-                branch_id: 0,
-                branch_name: '',
-                availability: [...defaultAvailability],
-              })
-            }
-          >
-            Ajouter une succursale
-          </Button>
+          <Row>
+            <Button
+              type="button"
+              variant="primary"
+              size="sm"
+              style={{ width: '200px', borderRadius: '5px' }}
+              className="narrow-btn"
+              onClick={() =>
+                appendBranch({
+                  branch_id: 0,
+                  branch_name: '',
+                  availability: [...defaultAvailability],
+                })
+              }
+            >
+              Ajouter une succursale
+            </Button>
+          </Row>
 
           {/* FAQ */}
           <Row>
