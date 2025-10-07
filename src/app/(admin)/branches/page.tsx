@@ -7,6 +7,7 @@ import type { BranchType } from '@/types/data';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Button,
   Card,
@@ -31,6 +32,7 @@ const BranchListPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const router = useRouter();
+   const { showNotification } = useNotificationContext();
 
   const fetchBranches = async (page: number) => {
     setLoading(true);
@@ -93,24 +95,39 @@ const BranchListPage = () => {
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!selectedBranchId) return;
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.delete(`${API_BASE_PATH}/branches/${selectedBranchId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      fetchBranches(currentPage);
-    } catch (error) {
-      console.error('Failed to delete branch:', error);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedBranchId(null);
-    }
-  };
+ const handleConfirmDelete = async () => {
+  if (!selectedBranchId) return;
+  try {
+    const token = localStorage.getItem('access_token');
+    await axios.delete(`${API_BASE_PATH}/branches/${selectedBranchId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    setShowDeleteModal(false);
+    setSelectedBranchId(null);
+
+    showNotification({
+      message: 'succursale supprimée avec succès',
+      variant: 'success',
+    });
+
+    fetchBranches(currentPage);
+  } catch (error) {
+    console.error('Failed to delete branch:', error);
+
+    setShowDeleteModal(false);
+    setSelectedBranchId(null);
+
+    showNotification({
+      message: 'Échec de la suppression de la succursale',
+      variant: 'danger',
+    });
+  }
+};
+
 
   return (
     <>
