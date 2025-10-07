@@ -13,7 +13,7 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
-import { useForm, Controller, useFieldArray, Control, UseFormRegister } from 'react-hook-form';
+import { useForm, Controller, useFieldArray, Control, UseFormRegister, Resolver } from 'react-hook-form';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
 
@@ -166,17 +166,18 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
   const [specializations, setSpecializations] = useState<SpecializationType[]>([]);
 
   const {
-    control,
-    register,
-    setValue,
-    watch,
-    reset,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<TherapistTeamMember>({
-    resolver: yupResolver(schema),
-    defaultValues,
-  });
+  control,
+  register,
+  setValue,
+  watch,
+  reset,
+  handleSubmit,
+  formState: { errors, isSubmitting },
+} = useForm<TherapistTeamMember>({
+  resolver: yupResolver(schema) as unknown as Resolver<TherapistTeamMember>, // ✅ add this cast
+  defaultValues,
+});
+
 
   const selectedLanguages = watch('languagesSpoken') || [];
 
@@ -298,16 +299,16 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
 
       if (success) {
         showNotification({
-          message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`,
+          message: `Thérapeute ${editId ? 'Mis à jour' : 'Ajouté'} Avec succès`,
           variant: 'success',
         });
         router.push('/therapist-team/TherapistTeam-list');
       } else {
-        showNotification({ message: 'Something Went Wrong', variant: 'danger' });
+        showNotification({ message: "Quelque chose s'est mal passé", variant: 'danger' });
       }
     } catch (error) {
       console.error(error);
-      showNotification({ message: 'Submission failed due to error', variant: 'danger' });
+      showNotification({ message: "La soumission a échoué en raison d'une erreur", variant: 'danger' });
     }
   };
 

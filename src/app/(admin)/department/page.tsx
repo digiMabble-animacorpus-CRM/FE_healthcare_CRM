@@ -7,6 +7,7 @@ import type { DepartmentType } from '@/types/data';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Button,
   Card,
@@ -30,8 +31,8 @@ const DepartmentListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
+  // const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+const { showNotification } = useNotificationContext();
   const router = useRouter();
 
   const fetchDepartments = async (page: number) => {
@@ -87,64 +88,92 @@ const DepartmentListPage = () => {
     router.push(`/department/department-form/${id}/edit`);
   };
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedDepartmentId(id);
-    setShowDeleteModal(true);
-  };
+ const handleDeleteClick = (departmentId: string) => {
+  setSelectedDepartmentId(departmentId);
+  setShowDeleteModal(true);
+};
 
-  const handleConfirmDelete = async () => {
-    if (!selectedDepartmentId) return;
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.delete(`${API_BASE_PATH}/departments/${selectedDepartmentId}`, {
+const handleConfirmDelete = async () => {
+  if (!selectedDepartmentId) return;
+
+  try {
+    const token = localStorage.getItem('access_token');
+    await axios.delete(`${API_BASE_PATH}/departments/${selectedDepartmentId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // ✅ show notification for successful deletion
+    showNotification({
+      message: 'Département supprimé avec succès !',
+      variant: 'success',
+    });
+
+    // refresh department list
+    fetchDepartments(currentPage);
+  } catch (error) {
+    console.error('Failed to delete department:', error);
+
+    // ✅ show notification for error
+    showNotification({
+      message: 'Échec de la suppression du département.',
+      variant: 'danger',
+    });
+  } finally {
+    setShowDeleteModal(false);
+    setSelectedDepartmentId(null);
+  }
+};
+
+const handleToggleStatus = async (departmentId: string, newStatus: boolean) => {
+  try {
+    const token = localStorage.getItem('access_token');
+    await axios.patch(
+      `${API_BASE_PATH}/departments/${departmentId}`,
+      { is_active: newStatus },
+      {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      });
-      setMessage({ type: 'success', text: 'Département supprimé avec succès !' });
-      fetchDepartments(currentPage);
-    } catch (error) {
-      console.error('Failed to delete department:', error);
-      setMessage({ type: 'error', text: 'Échec de la suppression du département.' });
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedDepartmentId(null);
+      },
+    );
 
-      // auto-clear message after 3s
-      setTimeout(() => setMessage(null), 3000);
-    }
-  };
+    setDepartments((prevDepartments) =>
+      prevDepartments.map((dept) =>
+        dept._id === departmentId ? { ...dept, is_active: newStatus } : dept
+      )
+    );
 
-  const handleToggleStatus = async (id: string, newStatus: boolean) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.patch(
-        `${API_BASE_PATH}/departments/${id}`,
-        { is_active: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+    // ✅ show notification for status change
+    showNotification({
+      message: `Département ${newStatus ? 'activé' : 'désactivé'} avec succès !`,
+      variant: 'success',
+    });
+  } catch (error) {
+    console.error('Failed to update status:', error);
 
-      setDepartments((prev) =>
-        prev.map((dept) => (dept._id === id ? { ...dept, is_active: newStatus } : dept)),
-      );
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      setDepartments((prev) =>
-        prev.map((dept) => (dept._id === id ? { ...dept, is_active: !newStatus } : dept)),
-      );
-    }
-  };
+    // revert status in local state
+    setDepartments((prevDepartments) =>
+      prevDepartments.map((dept) =>
+        dept._id === departmentId ? { ...dept, is_active: !newStatus } : dept
+      )
+    );
+
+    // ✅ show notification for error
+    showNotification({
+      message: "Échec de la mise à jour du statut du département.",
+      variant: 'danger',
+    });
+  }
+};
 
   return (
     <>
       <PageTitle subName="Départements" title="Liste des départements" />{' '}
-      {message && (
+      {/* {message && (
         <div
           style={{
             margin: '1rem',
@@ -157,7 +186,7 @@ const DepartmentListPage = () => {
         >
           {message.text}
         </div>
-      )}
+      )} */}
       <Row>
         <Col xl={12}>
           <Card>

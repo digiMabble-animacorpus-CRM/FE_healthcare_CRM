@@ -2,6 +2,7 @@
 
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import * as yup from 'yup';
 import {
   Button,
@@ -45,8 +46,8 @@ interface Props {
 const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
+  // const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  const { showNotification } = useNotificationContext();
   const methods = useForm<BranchFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -60,41 +61,52 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
 
   const { handleSubmit, control, register } = methods;
 
-  const handleFormSubmit = async (data: BranchFormValues) => {
-    try {
-      setSubmitting(true);
-      setMessage(null);
-      const token = localStorage.getItem('access_token');
-      if (!token) throw new Error('No access token found');
+const handleFormSubmit = async (data: BranchFormValues) => {
+  try {
+    setSubmitting(true);
+    postMessage(null);
+    const token = localStorage.getItem('access_token');
+    if (!token) throw new Error('No access token found');
 
-      if (isEditMode && defaultValues?.branch_id) {
-        // UPDATE branch (no branch_id in body, only in URL)
-        await axios.patch(`${API_BASE_PATH}/branches/${defaultValues.branch_id}`, data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        setMessage({ type: 'success', text: 'Succursale mise à jour avec succès.' });
-      } else {
-        // CREATE branch
-        await axios.post(`${API_BASE_PATH}/branches`, data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        });
-        setMessage({ type: 'success', text: 'Succursale créée avec succès.' });
-      }
-
-      setTimeout(() => router.push('/branches'), 1500);
-    } catch (error) {
-      console.error(error);
-      setMessage({ type: 'error', text: 'Une erreur est survenue. Veuillez réessayer.' });
-    } finally {
-      setSubmitting(false);
+    if (isEditMode && defaultValues?.branch_id) {
+      // ✅ UPDATE branch
+      await axios.patch(`${API_BASE_PATH}/branches/${defaultValues.branch_id}`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      showNotification({
+        message: 'succursale mise à jour avec succès',
+        variant: 'success',
+      });
+    } else {
+      // ✅ CREATE branch
+      await axios.post(`${API_BASE_PATH}/branches`, data, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      showNotification({
+        message: 'succursale ajoutée avec succès',
+        variant: 'success',
+      });
     }
-  };
+
+    // redirect after short delay
+    setTimeout(() => router.push('/branches'), 1500);
+  } catch (error) {
+    console.error(error);
+    showNotification({
+      message: "Une erreur s'est produite. Veuillez réessayer.",
+      variant: 'danger',
+    });
+  } finally {
+    setSubmitting(false);
+  }
+};
+
 
   return (
     <FormProvider {...methods}>
@@ -106,11 +118,11 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
             </CardTitle>
           </CardHeader>
           <CardBody>
-            {message && (
+            {/* {message && (
               <Alert variant={message.type === 'success' ? 'success' : 'danger'}>
                 {message.text}
               </Alert>
-            )}
+            )} */}
 
             <Row className="mb-4">
               <Col lg={6} className="mb-3">
