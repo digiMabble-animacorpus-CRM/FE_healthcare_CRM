@@ -805,6 +805,8 @@ export interface SpecializationType {
 }
 
 export type TherapistTeamMember = {
+  therapistId: any;
+  id: any;
   department: any;
   specializations: never[];
   branches?: any;
