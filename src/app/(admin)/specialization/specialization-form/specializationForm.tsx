@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
 import { useState, useEffect } from 'react';
-
+import { useNotificationContext } from '@/context/useNotificationContext';
 export interface DepartmentOption {
   id: number;
   name: string;
@@ -49,10 +49,10 @@ interface Props {
 
 const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
   const router = useRouter();
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+  // const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const [departments, setDepartments] = useState<DepartmentOption[]>([]);
   const [loadingDepartments, setLoadingDepartments] = useState(false);
-
+const { showNotification } = useNotificationContext();
   const methods = useForm<SpecializationFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -85,48 +85,61 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
     fetchDepartments();
   }, []);
 
-  const handleFormSubmit = onSubmitHandler
-    ? onSubmitHandler
-    : async (data: SpecializationFormValues) => {
-        try {
-          const token = localStorage.getItem('access_token');
-          if (!token) {
-            console.warn('No access token found');
-            return;
-          }
+ const handleFormSubmit = onSubmitHandler
+  ? onSubmitHandler
+  : async (data: SpecializationFormValues) => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          console.warn('No access token found');
+          return;
+        }
 
-          if (isEditMode && (defaultValues as any)?._id) {
-            const res = await axios.patch(
-              `${API_BASE_PATH}/specializations/${(defaultValues as any)._id}`,
-              data,
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                },
-              },
-            );
-            setMessage({ type: 'success', text: 'Spécialisation mise à jour avec succès !' });
-          } else {
-            const res = await axios.post(`${API_BASE_PATH}/specializations`, data, {
+        if (isEditMode && (defaultValues as any)?._id) {
+          // ✅ UPDATE specialization
+          await axios.patch(
+            `${API_BASE_PATH}/specializations/${(defaultValues as any)._id}`,
+            data,
+            {
               headers: {
                 Authorization: `Bearer ${token}`,
                 'Content-Type': 'application/json',
               },
-            });
-            setMessage({ type: 'success', text: 'Spécialisation créée avec succès !' });
-          }
+            }
+          );
 
-          setTimeout(() => {
-            setMessage(null);
-            router.push('/specialization');
-          }, 2000);
-        } catch (err) {
-          setMessage({ type: 'error', text: 'Échec de l’enregistrement de la spécialisation.' });
+          showNotification({
+            message: 'Spécialisation mise à jour avec succès !',
+            variant: 'success',
+          });
+        } else {
+          // ✅ CREATE specialization
+          await axios.post(`${API_BASE_PATH}/specializations`, data, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
+            },
+          });
 
-          setTimeout(() => setMessage(null), 3000);
+          showNotification({
+            message: 'Spécialisation créée avec succès !',
+            variant: 'success',
+          });
         }
-      };
+
+        // redirect after short delay
+        setTimeout(() => {
+          router.push('/specialization');
+        }, 2000);
+      } catch (err) {
+        console.error('Error saving specialization:', err);
+
+        showNotification({
+          message: 'Échec de l’enregistrement de la spécialisation.',
+          variant: 'danger',
+        });
+      }
+    };
 
   return (
     <FormProvider {...methods}>
@@ -141,7 +154,7 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
           </CardHeader>
 
           <CardBody>
-            {message && (
+            {/* {message && (
               <div
                 style={{
                   marginBottom: '1rem',
@@ -154,7 +167,7 @@ const SpecializationForm = ({ defaultValues, isEditMode = false, onSubmitHandler
               >
                 {message.text}
               </div>
-            )}
+            )} */}
 
             <Row className="mb-4">
               <Col lg={6} className="mb-3">

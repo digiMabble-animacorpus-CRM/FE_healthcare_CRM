@@ -18,6 +18,7 @@ import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { API_BASE_PATH } from '@/context/constants';
 import axios from 'axios';
+import { useNotificationContext } from '@/context/useNotificationContext';
 
 export interface LanguageType {
   id: number;
@@ -39,7 +40,7 @@ const LanguageListPage = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedLanguageId, setSelectedLanguageId] = useState<number | null>(null);
-
+const { showNotification } = useNotificationContext();
   const token = localStorage.getItem('access_token');
 
   const fetchLanguages = async (page: number) => {
@@ -91,47 +92,74 @@ const LanguageListPage = () => {
     router.push(`/languages/language-form/edit/${id}`);
   };
 
-  const handleDeleteClick = (id: number) => {
-    setSelectedLanguageId(id);
-    setShowDeleteModal(true);
-  };
+  const handleDeleteClick = (languageId: number) => {
+  setSelectedLanguageId(languageId);
+  setShowDeleteModal(true);
+};
 
-  const handleConfirmDelete = async () => {
-    if (!selectedLanguageId) return;
-    try {
-      await axios.delete(`${API_BASE_PATH}/languages/${selectedLanguageId}`, {
+const handleConfirmDelete = async () => {
+  if (!selectedLanguageId) return;
+
+  try {
+    await axios.delete(`${API_BASE_PATH}/languages/${selectedLanguageId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    // ✅ show success notification
+    showNotification({
+      message: 'Language supprimé avec succès',
+      variant: 'success',
+    });
+
+    fetchLanguages(currentPage);
+  } catch (error) {
+    console.error('Failed to delete language:', error);
+
+    // ✅ show error notification
+    showNotification({
+      message: 'Échec de la suppression language',
+      variant: 'danger',
+    });
+  } finally {
+    setShowDeleteModal(false);
+    setSelectedLanguageId(null);
+  }
+};
+
+const handleToggleStatus = async (languageId: number, newStatus: boolean) => {
+  try {
+    await axios.patch(
+      `${API_BASE_PATH}/languages/${languageId}`,
+      { is_active: newStatus },
+      {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      });
-      fetchLanguages(currentPage);
-    } catch (error) {
-      console.error('Failed to delete language:', error);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedLanguageId(null);
-    }
-  };
+      }
+    );
 
-  const handleToggleStatus = async (id: number, newStatus: boolean) => {
-    try {
-      await axios.patch(
-        `${API_BASE_PATH}/languages/${id}`,
-        { is_active: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+    setLanguages((prevLanguages) =>
+      prevLanguages.map((lang) =>
+        lang.id === languageId ? { ...lang, is_active: newStatus } : lang
+      )
+    );
 
-      setLanguages((prev) =>
-        prev.map((lang) => (lang.id === id ? { ...lang, is_active: newStatus } : lang)),
-      );
-    } catch (error) {
-      console.error('Failed to update status:', error);
-    }
-  };
+    showNotification({
+      message: `Language ${newStatus ? 'activé' : 'désactivé'} avec succès`,
+      variant: 'success',
+    });
+  } catch (error) {
+    console.error('Failed to update status:', error);
+
+    showNotification({
+      message: 'Échec de la suppression language',
+      variant: 'danger',
+    });
+  }
+};
+
 
   return (
     <>

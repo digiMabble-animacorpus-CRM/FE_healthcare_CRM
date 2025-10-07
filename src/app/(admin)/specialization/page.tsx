@@ -7,6 +7,7 @@ import type { SpecializationType } from '@/types/data';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Button,
   Card,
@@ -30,8 +31,8 @@ const SpecializationListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedSpecializationId, setSelectedSpecializationId] = useState<string | null>(null);
-  const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
+  // const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+const { showNotification } = useNotificationContext();
   const router = useRouter();
 
   const fetchSpecializations = async (page: number) => {
@@ -75,79 +76,98 @@ const SpecializationListPage = () => {
     router.push(`/specialization/specialization-form/${id}/edit`);
   };
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedSpecializationId(id);
-    setShowDeleteModal(true);
-  };
+ const handleDeleteClick = (specializationId: string) => {
+  setSelectedSpecializationId(specializationId);
+  setShowDeleteModal(true);
+};
 
-  const handleConfirmDelete = async () => {
-    if (!selectedSpecializationId) return;
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.delete(`${API_BASE_PATH}/specializations/${selectedSpecializationId}`, {
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-      });
-      setMessage({ type: 'success', text: 'Spécialisation supprimée avec succès !' });
-      fetchSpecializations(currentPage);
-    } catch (error) {
-      console.error('Failed to delete specialization:', error);
-      setMessage({ type: 'error', text: 'Échec de la suppression de la spécialisation.' });
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedSpecializationId(null);
-      setTimeout(() => setMessage(null), 3000);
-    }
-  };
+const handleConfirmDelete = async () => {
+  if (!selectedSpecializationId) return;
 
-  // ✅ toggle active status with success/error message
-  const handleToggleStatus = async (id: string, newStatus: boolean) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      const spec = specializations.find((s) => s.specialization_id === id);
-      if (!spec) return;
+  try {
+    const token = localStorage.getItem('access_token');
+    await axios.delete(`${API_BASE_PATH}/specializations/${selectedSpecializationId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
 
-      await axios.patch(
-        `${API_BASE_PATH}/specializations/${id}`,
-        {
-          department_id: spec.department_id,
-          specialization_type: spec.specialization_type,
-          description: spec.description,
-          is_active: newStatus,
+    // ✅ show success notification
+    showNotification({
+      message: 'Spécialisation supprimée avec succès !',
+      variant: 'success',
+    });
+
+    fetchSpecializations(currentPage);
+  } catch (error) {
+    console.error('Failed to delete specialization:', error);
+
+    // ✅ show error notification
+    showNotification({
+      message: 'Échec de la suppression de la spécialisation.',
+      variant: 'danger',
+    });
+  } finally {
+    setShowDeleteModal(false);
+    setSelectedSpecializationId(null);
+  }
+};
+
+// ✅ toggle active status with success/error notification
+const handleToggleStatus = async (specializationId: string, newStatus: boolean) => {
+  try {
+    const token = localStorage.getItem('access_token');
+    const spec = specializations.find((s) => s.specialization_id === specializationId);
+    if (!spec) return;
+
+    await axios.patch(
+      `${API_BASE_PATH}/specializations/${specializationId}`,
+      {
+        department_id: spec.department_id,
+        specialization_type: spec.specialization_type,
+        description: spec.description,
+        is_active: newStatus,
+      },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+      }
+    );
 
-      setSpecializations((prev) =>
-        prev.map((s) => (s.specialization_id === id ? { ...s, is_active: newStatus } : s)),
-      );
+    setSpecializations((prev) =>
+      prev.map((s) =>
+        s.specialization_id === specializationId ? { ...s, is_active: newStatus } : s
+      )
+    );
 
-      setMessage({
-        type: 'success',
-        text: `Statut mis à jour avec succès en ${newStatus ? 'Actif' : 'Inactif'}.`,
-      });
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      setSpecializations((prev) =>
-        prev.map((s) => (s.specialization_id === id ? { ...s, is_active: !newStatus } : s)),
-      );
-      setMessage({
-        type: 'error',
-        text: 'Échec de la mise à jour du statut de la spécialisation.',
-      });
-    } finally {
-      setTimeout(() => setMessage(null), 3000);
-    }
-  };
+    showNotification({
+      message: `Statut mis à jour avec succès en ${newStatus ? 'Actif' : 'Inactif'}.`,
+      variant: 'success',
+    });
+  } catch (error) {
+    console.error('Failed to update status:', error);
+
+    setSpecializations((prev) =>
+      prev.map((s) =>
+        s.specialization_id === specializationId ? { ...s, is_active: !newStatus } : s
+      )
+    );
+
+    showNotification({
+      message: 'Échec de la mise à jour du statut de la spécialisation.',
+      variant: 'danger',
+    });
+  }
+};
+
 
   return (
     <>
       <PageTitle subName="Spécialisations" title="Liste des spécialisations" />
-      {message && (
+      {/* {message && (
         <div
           style={{
             margin: '1rem',
@@ -160,7 +180,7 @@ const SpecializationListPage = () => {
         >
           {message.text}
         </div>
-      )}
+      )} */}
 
       <Row>
         <Col xl={12}>
