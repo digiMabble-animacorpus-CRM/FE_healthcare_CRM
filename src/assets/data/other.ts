@@ -14,10 +14,9 @@ import {
   PricingType,
   ProjectType,
   PropertyType,
-  TherapistType,
   TimelineType,
   TransactionType,
-  UserType,
+  UserType
 } from '@/types/data';
 import { addOrSubtractDaysFromDate, addOrSubtractMinutesFromDate } from '@/utils/date';
 

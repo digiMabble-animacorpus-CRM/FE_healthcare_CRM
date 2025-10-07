@@ -1,9 +1,12 @@
 'use client';
 
-import { FormProvider, useForm } from 'react-hook-form';
-import { yupResolver } from '@hookform/resolvers/yup';
+import TextFormInput from '@/components/from/TextFormInput';
+import { API_BASE_PATH } from '@/context/constants';
 import { useNotificationContext } from '@/context/useNotificationContext';
-import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+import axios from 'axios';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 import {
   Button,
   Card,
@@ -11,16 +14,12 @@ import {
   CardHeader,
   CardTitle,
   Col,
-  Row,
   Form,
-  Spinner,
-  Alert,
+  Row,
+  Spinner
 } from 'react-bootstrap';
-import { useRouter } from 'next/navigation';
-import TextFormInput from '@/components/from/TextFormInput';
-import { API_BASE_PATH } from '@/context/constants';
-import axios from 'axios';
-import { useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import * as yup from 'yup';
 
 export interface BranchFormValues {
   name: string;
@@ -61,52 +60,51 @@ const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
 
   const { handleSubmit, control, register } = methods;
 
-const handleFormSubmit = async (data: BranchFormValues) => {
-  try {
-    setSubmitting(true);
-    postMessage(null);
-    const token = localStorage.getItem('access_token');
-    if (!token) throw new Error('No access token found');
+  const handleFormSubmit = async (data: BranchFormValues) => {
+    try {
+      setSubmitting(true);
+      postMessage(null);
+      const token = localStorage.getItem('access_token');
+      if (!token) throw new Error('No access token found');
 
-    if (isEditMode && defaultValues?.branch_id) {
-      // ✅ UPDATE branch
-      await axios.patch(`${API_BASE_PATH}/branches/${defaultValues.branch_id}`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
+      if (isEditMode && defaultValues?.branch_id) {
+        // ✅ UPDATE branch
+        await axios.patch(`${API_BASE_PATH}/branches/${defaultValues.branch_id}`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        showNotification({
+          message: 'succursale mise à jour avec succès',
+          variant: 'success',
+        });
+      } else {
+        // ✅ CREATE branch
+        await axios.post(`${API_BASE_PATH}/branches`, data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        });
+        showNotification({
+          message: 'succursale ajoutée avec succès',
+          variant: 'success',
+        });
+      }
+
+      // redirect after short delay
+      setTimeout(() => router.push('/branches'), 1500);
+    } catch (error) {
+      console.error(error);
       showNotification({
-        message: 'succursale mise à jour avec succès',
-        variant: 'success',
+        message: "Une erreur s'est produite. Veuillez réessayer.",
+        variant: 'danger',
       });
-    } else {
-      // ✅ CREATE branch
-      await axios.post(`${API_BASE_PATH}/branches`, data, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      showNotification({
-        message: 'succursale ajoutée avec succès',
-        variant: 'success',
-      });
+    } finally {
+      setSubmitting(false);
     }
-
-    // redirect after short delay
-    setTimeout(() => router.push('/branches'), 1500);
-  } catch (error) {
-    console.error(error);
-    showNotification({
-      message: "Une erreur s'est produite. Veuillez réessayer.",
-      variant: 'danger',
-    });
-  } finally {
-    setSubmitting(false);
-  }
-};
-
+  };
 
   return (
     <FormProvider {...methods}>
