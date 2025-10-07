@@ -187,7 +187,7 @@ const TherapistTeamDetails = ({
 
                   <div className="mb-2">
                     <strong>Méthodes de paiement:</strong>{' '}
-                    {payment_methods.length > 0
+                    {Array.isArray(payment_methods) && payment_methods.length > 0
                       ? payment_methods.map((method, i) => (
                           <Badge key={i} bg="primary" className="mx-1">
                             {method}
@@ -195,6 +195,7 @@ const TherapistTeamDetails = ({
                         ))
                       : '-'}
                   </div>
+
                   <div className="mb-2">
                     <strong>Languages:</strong>{' '}
                     {languagesSpoken.length > 0
