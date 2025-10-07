@@ -19,7 +19,6 @@ interface UserType {
 export default function EditAppointmentPage() {
   const [patient, setPatient] = useState<PatientType | null>(null);
   const [appointment, setAppointment] = useState<AppointmentType | null>(null);
-  console.log(appointment, 'appointment');
   const [user, setUser] = useState<UserType | null>(null);
   const [isClient, setIsClient] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -51,7 +50,6 @@ export default function EditAppointmentPage() {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response, 'refshdjfdj');
 
       if (response.ok) {
         const data = await response.json();
@@ -72,9 +70,7 @@ export default function EditAppointmentPage() {
     }
   };
 
-  const handleAppointmentSubmit = (appointmentData: any) => {
-    console.log('Appointment Data:', appointmentData);
-  };
+  const handleAppointmentSubmit = (appointmentData: any) => {};
 
   if (!isClient || loading) {
     return (

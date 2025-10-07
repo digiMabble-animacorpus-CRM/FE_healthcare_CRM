@@ -7,6 +7,7 @@ import type { TeamMemberType } from '@/types/data';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Badge,
   Button,
@@ -40,7 +41,7 @@ const TherapistTeamsListPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedTherapistId, setSelectedTeamMemberId] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
-
+const { showNotification } = useNotificationContext();
   const router = useRouter();
 
   const getDateRange = () => {
@@ -77,9 +78,6 @@ const TherapistTeamsListPage = () => {
         to,
         searchTerm || undefined,
       );
-
-      console.log('API RAW Response:', response);
-
       const members = response?.data || [];
       if (!members || members.length === 0) {
         setAllTeamMembers([]);
@@ -138,36 +136,52 @@ const TherapistTeamsListPage = () => {
     setShowDeleteModal(false);
 
     try {
-      const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
+  const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
 
-      if (success) {
-        // Optimistically remove deleted member
-        setAllTeamMembers((prev) => {
-          const updated = prev.filter((t) => String(t.team_id) !== String(selectedTherapistTeamId));
+  if (success) {
+    // Optimistically remove deleted member
+    setAllTeamMembers((prev) => {
+      const updated = prev.filter(
+        (t) => String(t.team_id) !== String(selectedTherapistTeamId)
+      );
 
-          // If the current page has no more items after deletion, go to previous page
-          if (updated.length === 0 && currentPage > 1) {
-            setCurrentPage((prevPage) => prevPage - 1);
-          }
-
-          return updated;
-        });
-
-        // Decrease total count
-        setTotalCount((prev) => prev - 1);
-
-        // Clear selected ID
-        setSelectedTeamId(null);
-        setSelectedTeamMemberId(null);
-      } else {
-        setError('Failed to delete therapist team member.');
+      // If current page has no more items after deletion, go to previous page
+      if (updated.length === 0 && currentPage > 1) {
+        setCurrentPage((prevPage) => prevPage - 1);
       }
-    } catch (err) {
-      setError('An error occurred while deleting the member.');
-    } finally {
-      setDeletingId(null);
-    }
-  };
+
+      return updated;
+    });
+
+    // Decrease total count
+    setTotalCount((prev) => prev - 1);
+
+    // Clear selected ID
+    setSelectedTeamId(null);
+    setSelectedTeamMemberId(null);
+
+    // ✅ Success notification
+    showNotification({
+      message: 'Thérapeute supprimé avec succès',
+      variant: 'success',
+    });
+  } else {
+    // ❌ Failure notification
+    showNotification({
+      message: 'Échec de la suppression du thérapeute.',
+      variant: 'danger',
+    });
+  }
+} catch (err) {
+  console.error(err);
+  // ❌ Error notification
+  showNotification({
+    message: "Une erreur s'est produite lors de la suppression du thérapeute.",
+    variant: 'danger',
+  });
+} finally {
+  setDeletingId(null);
+}}
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;

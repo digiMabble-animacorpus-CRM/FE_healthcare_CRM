@@ -193,7 +193,6 @@ const PatientInfoCard = ({
       } else if (mode === 'new') {
         ok = await createPatient(formData);
         if (ok) {
-          console.log(ok, 'Patient created successfully');
           setSuccessMsg('Patient created successfully');
           setMode('view');
           onSave?.(formData);

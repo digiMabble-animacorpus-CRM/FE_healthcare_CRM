@@ -3,6 +3,7 @@
 import { yupResolver } from '@hookform/resolvers/yup';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Alert,
   Button,
@@ -76,7 +77,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [allLanguages, setAllLanguages] = useState<LanguageType[]>([]);
-
+const { showNotification } = useNotificationContext();
   const [defaultValues, setDefaultValues] = useState<Partial<PatientType>>({
     createdAt: '',
     _id: '',
@@ -116,7 +117,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   useEffect(() => {
     const fetchLanguages = async () => {
       const response = await getAllLanguages();
-      console.log('📌 Languages for dropdown:', response);
       setAllLanguages(response || []);
     };
     fetchLanguages();
@@ -127,8 +127,6 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       setLoading(true);
       getPatientById(params.id)
         .then((patient) => {
-          console.log('🧾 Fetched patient data:', patient);
-
           const mappedPatient: Partial<PatientType> = {
             ...patient,
             phones: patient.phones?.length ? patient.phones : [''],
@@ -153,28 +151,44 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
       languageId: data.languageId ? Number(data.languageId) : undefined,
     };
 
-    try {
-      if (isEditMode && params?.id) {
-        const success = await updatePatient(params.id, payload as any);
-        if (success) {
-          setSuccessMessage(' Patient mis à jour avec succès !');
-          setTimeout(() => router.back(), 2000);
-        } else {
-          setErrorMessage(' Échec de la mise à jour du patient');
-        }
-      } else {
-        const success = await createPatient(payload as any);
-        if (success) {
-          setSuccessMessage(' Patient créé avec succès !');
-          setTimeout(() => router.back(), 2000);
-        } else {
-          setErrorMessage(' Échec de la création du patient');
-        }
-      }
-    } catch (error) {
-      setErrorMessage('Une erreur est survenue. Veuillez réessayer.');
+   try {
+  if (isEditMode && params?.id) {
+    const success = await updatePatient(params.id, payload as any);
+    if (success) {
+      showNotification({
+        message: 'Patient mis à jour avec succès !',
+        variant: 'success',
+      });
+      setTimeout(() => router.back(), 2000);
+    } else {
+      showNotification({
+        message: 'Échec de la mise à jour du patient',
+        variant: 'danger',
+      });
     }
-  };
+  } else {
+    const success = await createPatient(payload as any);
+    if (success) {
+      showNotification({
+        message: 'Patient créé avec succès !',
+        variant: 'success',
+      });
+      setTimeout(() => router.back(), 2000);
+    } else {
+      showNotification({
+        message: 'Échec de la création du patient',
+        variant: 'danger',
+      });
+    }
+  }
+} catch (error) {
+  console.error(error);
+  showNotification({
+    message: 'Une erreur est survenue. Veuillez réessayer.',
+    variant: 'danger',
+  });
+}}
+
 
   if (loading)
     return (

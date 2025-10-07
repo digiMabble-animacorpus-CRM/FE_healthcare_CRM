@@ -56,34 +56,6 @@ export const customerEnquiriesData: any[] = [
   },
 ];
 
-export const therapistData: TherapistType[] = [
-  {
-    therapistId: '2', // ✅ Mapped from id
-    firstName: 'Hajiba',
-    lastName: 'Bounouch',
-    fullName: 'Bounouch Hajiba',
-    photo: '457264826_478108485_478108485141765_7923440431478900254_n.jpg',
-    imageUrl: null, // ✅ Optional image URL if different from photo
-    jobTitle:
-      'Psychologue clinicienne, Psychothérapeute, Coordinateur du centre, Psychothérapeute systémique',
-    aboutMe: "Je suis psychologue clinicienne, diplômée de l'Université Catholique de Louvain...",
-    consultations: 'Mon rôle à Anima Corpus...',
-    degreesAndTraining:
-      'Diplôme en psychologie clinique, Louvain la Neuve\nDiplôme en psychothérapie systémique, ULB...',
-    contactEmail: 'hajiba.bounouch@animacorpus.be',
-    contactPhone: '0488/45.89.44',
-    inamiNumber: '', // ✅ Provide a value if available
-    centerAddress: "Anima Corpus Gembloux - Orneau Place de l'Orneau, 15 5030 Gembloux, ...",
-    appointmentStart: null, // ✅ Placeholder for appointment start
-    departmentId: null, // ✅ No department assigned yet
-    branches: [], // ✅ Empty array until branches are provided
-    languages: [], // ✅ Replace with IDs if using numeric language codes
-    faq: 'Les nouveaux patients sont-ils acceptés ? Oui, Hajiba Bounouch accepte de nouveaux patients...',
-    paymentMethods: [], // ✅ Empty array until payment methods are defined
-    specializations: [], // ✅ Converted to array
-  },
-];
-
 export const userData: UserType[] = [
   {
     id: '1',

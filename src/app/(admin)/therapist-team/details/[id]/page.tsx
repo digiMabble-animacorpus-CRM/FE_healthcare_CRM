@@ -36,7 +36,8 @@ const TherapistTeamDetailsPage = () => {
   if (loading) return <p>Loading...</p>;
   if (!data) return <p>No team member found.</p>;
 
-  return <TeamDetails {...data} />;
+  return <TeamDetails {...data} therapistTeamId={data.therapistId ?? data.id} />;
+
 };
 
 export default TherapistTeamDetailsPage;

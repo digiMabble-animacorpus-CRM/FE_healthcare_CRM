@@ -71,13 +71,13 @@ export type PatientType = {
   emails: string;
   number: string;
   legalgender: string;
-  language: string;
+  language?: any;
   city: string;
   country: string;
   street: string;
   note: string;
   tags?: string[];
-
+  languageId?: string;
   // Optional fields
   id?: string;
   _id?: string;
@@ -192,16 +192,21 @@ export type PermissionType = {
 };
 
 export type StaffRoleType = {
-  _id: string;
-  tag: 'Role' | 'AccessLevel';
-  key: string;
-  label: string;
+  id?: string;
+  _id?: string;
+  tag?: 'Role' | 'AccessLevel';
+  key?: string;
+  label?: string;
   description?: string;
   defaultPermissions?: string[];
   defaultPermissionsDetailed?: PermissionType[];
   internal?: boolean;
   requiresDetails?: boolean;
   requiresAvailability?: boolean;
+  role_name?: string;
+  role_description?: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type AccessLevelType = StaffRoleType;
@@ -667,14 +672,14 @@ export type TeamMemberType = {
   office_address: string;
   contact_email: string;
   contact_phone: string;
-  schedule: Record<string, string> | { text?: string | null | undefined };
+  schedule: any;
   about: string;
   languages_spoken: string[];
   diplomas_and_training: string[];
   frequently_asked_questions: string | Record<string, string> | FAQItem[];
   calendar_links: string[];
   photo: string;
-  branches: never[];
+  branches: any[];
   primary_branch_id: number;
   team_id: string;
   firstName: string;
@@ -775,15 +780,18 @@ export type TherapistShortType = {
 export interface LanguageType {
   key: Key | null | undefined;
   label: ReactNode;
-  id: number;
-  language_name: string;
-  language_description: string;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  id?: number;
+  _id?: string;
+  language_name?: any;
+  language_description?: string;
+  is_active?: boolean;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface SpecializationType {
+  department_id: any;
+  department_name: ReactNode;
   specialization_id: Key | null | undefined;
   specialization_type: ReactNode;
   id: number; // normalized from specialization_id
@@ -796,55 +804,31 @@ export interface SpecializationType {
   };
 }
 
-// export interface TherapistTeamMember {
-//   firstName: string;
-//   lastName: string;
-//   full_name?: string;
-//   imageUrl?: string;
-//   contactEmail: string;
-//   contactPhone: string;
-//   aboutMe?: string;
-//   degreesTraining?: string;
-//   inamiNumber?: number;
-//   payment_methods?: string[];
-//   faq?: { question: string; answer: string }[];
-//   website?: string;
-//   consultations?: string;
-//   permissions: { admin?: boolean };
-//   role?: string;
-//   status: 'active' | 'inactive';
-//   languagesSpoken: string[];
-//   isDelete?: boolean;
-//   departmentId: number;
-//   specializationIds?: number[];
-//   branches: {
-//     branch_id: number;
-//     branch_name?: string;
-//     availability: { day: string; startTime: string; endTime: string }[];
-//   }[];
-// }
-// // src/types/data.ts
-
 export type TherapistTeamMember = {
+  therapistId: any;
+  id: any;
+  department: any;
+  specializations: never[];
+  branches?: any;
   firstName: string;
   lastName: string;
-  full_name: string;
-  imageUrl: string;
+  full_name?: any;
+  imageUrl?: any;
   contactEmail: string;
   contactPhone: string;
-  aboutMe: string;
-  degreesTraining: string;
-  inamiNumber: number;
+  aboutMe?: string;
+  degreesTraining?: string;
+  inamiNumber?: number;
   payment_methods: string[];
-  faq: { question: string; answer: string }[];
+  faq?: { question: string; answer: string }[];
   website?: string;
   consultations?: string;
-  permissions: { admin: boolean };
-  role: string;
-  status: string;
-  languagesSpoken: string[];
-  isDelete: boolean;
-  departmentId: number;
+  permissions?: { admin?: boolean };
+  role?: string;
+  status?: string;
+  languagesSpoken?: string[];
+  isDelete?: boolean;
+  departmentId?: number;
   specializationIds: number[];
   branchIds: number[];
   availability: {
@@ -853,3 +837,5 @@ export type TherapistTeamMember = {
     endTime: string;
   }[];
 };
+
+type FAQItem = { question: string; answer: string };

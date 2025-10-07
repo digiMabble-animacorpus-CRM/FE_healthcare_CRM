@@ -13,10 +13,7 @@ const CreateStaffRolePage = () => {
 
   const handleCreate = async (data: Omit<StaffRoleType, '_id'>) => {
     try {
-      // await createStaffRoleAPI(data);
-
       toast.success('StaffRole created successfully!');
-      // router.push("/StaffRoles");
     } catch (error) {
       toast.error('Failed to create StaffRole.');
     }

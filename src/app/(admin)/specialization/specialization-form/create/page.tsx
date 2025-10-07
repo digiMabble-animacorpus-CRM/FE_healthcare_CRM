@@ -18,11 +18,7 @@ const CreateSpecializationPage = () => {
           'Content-Type': 'application/json',
         },
       });
-      console.log('Created specialization:', res.data);
-
-      console.log('Create specialization response:', res);
-
-      if (!res.ok) throw new Error('Failed to create specialization');
+      if (!res) throw new Error('Failed to create specialization');
 
       // toast.success('Specialization created successfully!');
       router.push('/specialization');

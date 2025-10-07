@@ -53,7 +53,6 @@ const SpecializationListPage = () => {
           department_name: spec.department?.name || 'Unknown',
         })),
       );
-      console.log('Fetched specializations:', specializationList);
       setTotalPages(Math.ceil(totalCount / PAGE_LIMIT));
     } catch (error) {
       console.error('Failed to fetch specializations:', error);
@@ -224,9 +223,14 @@ const SpecializationListPage = () => {
                                 className="form-check-input"
                                 type="checkbox"
                                 checked={spec.is_active}
-                                onChange={(e) =>
-                                  handleToggleStatus(spec.specialization_id, e.target.checked)
-                                }
+                                onChange={(e) => {
+                                  if (spec?.specialization_id) {
+                                    handleToggleStatus(
+                                      String(spec.specialization_id),
+                                      e.target.checked,
+                                    );
+                                  }
+                                }}
                               />
                               <label className="form-check-label">
                                 {spec.is_active ? 'Active' : 'Inactive'}
@@ -238,7 +242,11 @@ const SpecializationListPage = () => {
                               <Button
                                 variant="soft-primary"
                                 size="sm"
-                                onClick={() => handleEditClick(spec.specialization_id)}
+                                onClick={() => {
+                                  if (spec?.specialization_id) {
+                                    handleEditClick(String(spec.specialization_id));
+                                  }
+                                }}
                               >
                                 <IconifyIcon
                                   icon="solar:pen-2-broken"
@@ -248,7 +256,11 @@ const SpecializationListPage = () => {
                               <Button
                                 variant="soft-danger"
                                 size="sm"
-                                onClick={() => handleDeleteClick(spec.specialization_id)}
+                                onClick={() => {
+                                  if (spec?.specialization_id) {
+                                    handleDeleteClick(String(spec.specialization_id));
+                                  }
+                                }}
                               >
                                 <IconifyIcon
                                   icon="solar:trash-bin-minimalistic-2-broken"

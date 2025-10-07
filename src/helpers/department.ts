@@ -26,8 +26,6 @@ export const getDepartments = async (
     if (!res.ok) throw new Error('Failed to fetch departments');
 
     const response = await res.json();
-    console.log('Raw Departments API response:', response);
-
     // ✅ since API returns a raw array
     return {
       data: Array.isArray(response) ? response : [],

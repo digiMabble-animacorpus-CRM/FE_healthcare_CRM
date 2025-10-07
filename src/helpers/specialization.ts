@@ -19,7 +19,6 @@ export const getSpecializations = async (
     if (!res.ok) throw new Error('Failed to fetch specializations');
 
     const response = await res.json();
-    console.log('Raw Specializations API:', response);
 
     const rawData = (response?.data as any[]) || [];
 
@@ -38,8 +37,6 @@ export const getSpecializations = async (
         ]),
       ).values(),
     );
-
-    console.log('Normalized Specializations:', unique);
 
     return { data: unique, totalCount: unique.length };
   } catch (error) {
