@@ -299,16 +299,16 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
 
       if (success) {
         showNotification({
-          message: `Therapist ${editId ? 'Updated' : 'Added'} Successfully`,
+          message: `Thérapeute ${editId ? 'Mis à jour' : 'Ajouté'} Avec succès`,
           variant: 'success',
         });
         router.push('/therapist-team/TherapistTeam-list');
       } else {
-        showNotification({ message: 'Something Went Wrong', variant: 'danger' });
+        showNotification({ message: "Quelque chose s'est mal passé", variant: 'danger' });
       }
     } catch (error) {
       console.error(error);
-      showNotification({ message: 'Submission failed due to error', variant: 'danger' });
+      showNotification({ message: "La soumission a échoué en raison d'une erreur", variant: 'danger' });
     }
   };
 

@@ -8,6 +8,7 @@ import type { PatientType } from '@/types/data';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Alert,
   Button,
@@ -34,7 +35,7 @@ const PatientsListPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-
+const { showNotification } = useNotificationContext();
   const router = useRouter();
 
   // Fetch patients
@@ -87,16 +88,16 @@ const PatientsListPage = () => {
       data = data.filter((p) => p.city === selectedBranch);
     }
 
-    if (searchTerm.trim()) {
-      const term = searchTerm.trim().toLowerCase();
-      data = data.filter(
-        (p) =>
-          (p?.firstname ?? '').toLowerCase().includes(term) ||
-          (p?.lastname ?? '').toLowerCase().includes(term) ||
-          (p?.emails ?? '').toLowerCase().includes(term) ||
-          (p?.phones ? p.phones.join(' ').toLowerCase() : '').includes(term),
-      );
-    }
+   if (searchTerm.trim()) {
+  const term = searchTerm.trim().toLowerCase();
+  data = data.filter((p) => {
+    const fullName = `${p?.firstname ?? ''} ${p?.lastname ?? ''}`.toLowerCase();
+    const emails = (p?.emails ?? '').toLowerCase();
+    const phones = Array.isArray(p.phones) ? p.phones.join(' ').toLowerCase() : (p.phones ?? '');
+    
+    return fullName.includes(term) || emails.includes(term) || phones.includes(term);
+  });
+}
 
     const range = getDateRange();
     if (range) {
@@ -139,41 +140,45 @@ const PatientsListPage = () => {
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!selectedPatientId) return;
+const handleDeletePatient = async () => {
+  if (!selectedPatientId) return; // exit early if null
 
-    try {
-      const success = await deletePatient(selectedPatientId);
-      if (success) {
-        setAllPatients((prev) => prev.filter((p) => p.id !== selectedPatientId));
-        setShowSuccessMessage(true);
-      } else {
-        console.error('Failed to delete patient');
-      }
-    } catch (err) {
-      console.error('Delete error:', err);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedPatientId(null);
+  try {
+    const success = await deletePatient(selectedPatientId);
+    if (success) {
+      setAllPatients((prev) => prev.filter((p) => p.id !== selectedPatientId));
+      showNotification({ message: 'Patient supprimé avec succès !', variant: 'success' });
+    } else {
+      showNotification({ message: "Échec de la suppression du patient", variant: 'danger' });
     }
-  };
+  } catch (err) {
+    console.error('Delete error:', err);
+    showNotification({ message: "Une erreur est survenue lors de la suppression", variant: 'danger' });
+  } finally {
+    setShowDeleteModal(false);
+    setSelectedPatientId(null);
+  }
+};
 
-  const handlePageChange = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
-  };
+const handlePageChange = (page: number) => {
+  if (page < 1 || page > totalPages) return;
+  setCurrentPage(page);
+};
+
+  function handleConfirmDelete(event: React.MouseEvent<HTMLButtonElement, MouseEvent>): void {
+    event.preventDefault();
+    handleDeletePatient();
+  }
 
   return (
     <>
       {showSuccessMessage && (
-        <Alert
-          variant="success"
-          onClose={() => setShowSuccessMessage(false)}
-          dismissible
-          style={{ position: 'fixed', top: 20, right: 20, zIndex: 1050, minWidth: 200 }}
-        >
-          Patient supprimé avec succès !
-        </Alert>
+         <>
+    {/* Your table / content goes here */}
+
+    {/* No more inline Alert needed, notifications are handled via showNotification */}
+  </>
+
       )}
 
       <PageTitle subName="Patient" title="Liste des patients" />

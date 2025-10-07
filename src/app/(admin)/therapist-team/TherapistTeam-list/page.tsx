@@ -162,13 +162,13 @@ const { showNotification } = useNotificationContext();
 
     // ✅ Success notification
     showNotification({
-      message: 'Therapist Deleted Successfully',
+      message: 'Thérapeute supprimé avec succès',
       variant: 'success',
     });
   } else {
     // ❌ Failure notification
     showNotification({
-      message: 'Failed to delete therapist team member.',
+      message: 'Échec de la suppression du thérapeute.',
       variant: 'danger',
     });
   }
@@ -176,7 +176,7 @@ const { showNotification } = useNotificationContext();
   console.error(err);
   // ❌ Error notification
   showNotification({
-    message: 'An error occurred while deleting the member.',
+    message: "Une erreur s'est produite lors de la suppression du thérapeute.",
     variant: 'danger',
   });
 } finally {
