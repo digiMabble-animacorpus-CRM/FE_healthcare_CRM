@@ -14,7 +14,7 @@ import {
   CardTitle,
   Col,
   Row,
-  Spinner
+  Spinner,
 } from 'react-bootstrap';
 
 const PAGE_LIMIT = 10;

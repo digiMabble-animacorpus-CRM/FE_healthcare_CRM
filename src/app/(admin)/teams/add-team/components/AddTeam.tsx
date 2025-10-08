@@ -432,11 +432,11 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
               ? Object.fromEntries(
                   (data.schedule.text ?? '')
                     .split('\n')
-                    .map((line) => {
+                    .map((line: { split: (arg0: string) => [any, ...any[]]; }) => {
                       const [day, ...rest] = line.split(':');
                       return [day.trim().toLowerCase(), rest.join(':').trim()];
                     })
-                    .filter(([day, value]) => day && value),
+                    .filter(([day, value]: [string, string]) => day && value),
                 )
               : {},
           about: data.about ?? '',
@@ -1041,7 +1041,7 @@ const AddTeamPage: React.FC<AddTeamProps> = ({ teamMemberId, isEdit }) => {
             </Col>
             <Col md={6} className="mb-3">
               <Form.Group>
-                <Form.Label>Statut</Form.Label>
+                <Form.Label>Status</Form.Label>
                 <Controller
                   control={control}
                   name="status"

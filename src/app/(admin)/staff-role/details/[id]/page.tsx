@@ -21,7 +21,6 @@ const StaffRoleDetailsPage = async ({ params }: Props) => {
       role_description: 'Has full access to all modules.',
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      // extra fields if StaffRoleType has more, add here with mock values
     },
   ];
 

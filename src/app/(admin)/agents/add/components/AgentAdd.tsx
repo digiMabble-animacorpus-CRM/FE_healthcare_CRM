@@ -217,7 +217,7 @@ const AgentAdd = () => {
           </Col>
           <Col lg={2}>
             <Button variant="danger" className="w-100">
-            Annuler
+              Annuler
             </Button>
           </Col>
         </Row>

@@ -7,6 +7,7 @@ import type { BranchType } from '@/types/data';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Button,
   Card,
@@ -31,6 +32,7 @@ const BranchListPage = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
   const router = useRouter();
+   const { showNotification } = useNotificationContext();
 
   const fetchBranches = async (page: number) => {
     setLoading(true);
@@ -51,21 +53,17 @@ const BranchListPage = () => {
       const data = response.data?.data || response.data || [];
       const totalCount = response.data?.totalCount || data.length || 0;
 
-      // ✅ Normalize branch data → always keep an `id`
+      // ✅ Normalize branch data
       setBranches(
         data.map((branch: any) => ({
-          id:
-            branch.branch_id?.toString() ??
-            branch._id ??
-            branch.id ??
-            '', // branch_id is the correct field from backend
+          id: branch.branch_id?.toString() ?? branch._id ?? branch.id ?? '', // branch_id is the correct field from backend
           name: branch.name ?? '-',
           code: branch.code ?? '-',
           phone: branch.phone ?? '-',
+          email: branch.email ?? '-', // added email field
         })),
       );
 
-      console.log('Fetched branches:', data);
       setTotalPages(Math.ceil(totalCount / PAGE_LIMIT));
     } catch (error) {
       console.error('Failed to fetch branches:', error);
@@ -88,35 +86,48 @@ const BranchListPage = () => {
 
   const handleEditClick = (id: string) => {
     if (!id) return;
-    console.log('Edit branch with ID:', id);
     router.push(`/branches/branch-form/${id}/edit`);
   };
 
   const handleDeleteClick = (id: string) => {
     if (!id) return;
-    console.log('Delete branch with ID:', id);
     setSelectedBranchId(id);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
-    if (!selectedBranchId) return;
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.delete(`${API_BASE_PATH}/branches/${selectedBranchId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      fetchBranches(currentPage);
-    } catch (error) {
-      console.error('Failed to delete branch:', error);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedBranchId(null);
-    }
-  };
+ const handleConfirmDelete = async () => {
+  if (!selectedBranchId) return;
+  try {
+    const token = localStorage.getItem('access_token');
+    await axios.delete(`${API_BASE_PATH}/branches/${selectedBranchId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    setShowDeleteModal(false);
+    setSelectedBranchId(null);
+
+    showNotification({
+      message: 'succursale supprimée avec succès',
+      variant: 'success',
+    });
+
+    fetchBranches(currentPage);
+  } catch (error) {
+    console.error('Failed to delete branch:', error);
+
+    setShowDeleteModal(false);
+    setSelectedBranchId(null);
+
+    showNotification({
+      message: 'Échec de la suppression de la succursale',
+      variant: 'danger',
+    });
+  }
+};
+
 
   return (
     <>
@@ -164,6 +175,7 @@ const BranchListPage = () => {
                         <th>No</th>
                         <th>Nom de la succursale</th>
                         <th>Téléphone</th>
+                        <th>Email</th> {/* ✅ Added Email column */}
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -173,6 +185,7 @@ const BranchListPage = () => {
                           <td>{idx + 1}</td>
                           <td>{branch.name}</td>
                           <td>{branch.phone}</td>
+                          <td>{branch.email}</td> {/* ✅ Show email */}
                           <td>
                             <div className="d-flex gap-2">
                               <Button

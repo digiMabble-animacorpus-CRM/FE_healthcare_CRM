@@ -1,24 +1,11 @@
-'use client';
-
-import dayjs from 'dayjs';
-import dynamic from 'next/dynamic';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Card, CardBody, CardHeader, CardTitle, Col, Row, Spinner } from 'react-bootstrap';
+import dayjs from 'dayjs';
 
-import avatar1 from '@/assets/images/users/avatar-1.jpg';
-import avatar2 from '@/assets/images/users/avatar-2.jpg';
-import avatar3 from '@/assets/images/users/avatar-3.jpg';
-import avatar4 from '@/assets/images/users/avatar-4.jpg';
-import {
-  AppointmentDistributionItem,
-  AppointmentStats,
-  getAppointmentDistribution,
-  getAppointmentStats,
-} from '@/helpers/dashboard';
+import { AppointmentStats, getAppointmentStats } from '@/helpers/dashboard';
+import { getAllBranch } from '@/helpers/branch';
 
-const ReactApexChart = dynamic(() => import('react-apexcharts'), {
-  ssr: false,
-});
+// types.ts or inside the same file
 
 export type Appointment = {
   id: string;
@@ -27,303 +14,278 @@ export type Appointment = {
   patient: string;
   doctor: string;
   branch: string;
-  status: 'SCHEDULED' | 'COMPLETED' | 'CANCELLED';
+  status: 'Programmé' | 'Terminée' | 'Annulée';
 };
-
+export type BranchType = { _id: string; name: string };
 export type AppointmentsOverviewProps = {
-  upcoming: Appointment[];
   upcomingCount: number;
   cancellationsWeek: number;
   completedWeek: number;
+  upcoming: Appointment[];
 };
 
-const AVATARS = [avatar1, avatar2, avatar3, avatar4];
+// Utility to chunk array into groups of 2
+function chunk<T>(arr: T[], size = 2): T[][] {
+  return Array.from({ length: Math.ceil(arr.length / size) }, (_, i) =>
+    arr.slice(i * size, i * size + size),
+  );
+}
 
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
-
-const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
-  const [selectedDoctor, setSelectedDoctor] = useState<string>('All Doctors');
-  const [selectedBranch, setSelectedBranch] = useState<string>('All Branches');
-  const [chartMode, setChartMode] = useState<'doctor' | 'branch'>('doctor');
-  // const [view, setView] = useState<'month' | 'week' | 'day'>('month');
-  // const [calendarViewMode, setCalendarViewMode] = useState<'calendar' | 'list'>('calendar');
-  // const [calendarHeight] = useState('750px');
-  const [loading] = useState(false);
+// Cumulative "All Branches" card
+const CumulativeAppointmentCard = ({ branchIds }: { branchIds: string[] }) => {
+  const [timeFilter, setTimeFilter] = useState<'thisWeek' | 'lastWeek' | 'lastMonth'>('thisWeek');
   const [appointmentStats, setAppointmentStats] = useState<AppointmentStats | null>(null);
-  const [statsLoading, setStatsLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
 
-  const [distributionData, setDistributionData] = useState<AppointmentDistributionItem[]>([]);
-  const [distributionTotal, setDistributionTotal] = useState<number>(0);
+  // Calculate date ranges depending on filter
+  const startDate =
+    timeFilter === 'thisWeek'
+      ? dayjs().startOf('week').format('YYYY-MM-DD')
+      : timeFilter === 'lastWeek'
+        ? dayjs().subtract(1, 'week').startOf('week').format('YYYY-MM-DD')
+        : dayjs().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
+  const endDate =
+    timeFilter === 'thisWeek'
+      ? dayjs().endOf('week').format('YYYY-MM-DD')
+      : timeFilter === 'lastWeek'
+        ? dayjs().subtract(1, 'week').endOf('week').format('YYYY-MM-DD')
+        : dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
 
-  const calendarRef = useRef<any>(null);
-
-  // Date range for API calls
-  const startDate = dayjs().startOf('week').format('YYYY-MM-DD');
-  const endDate = dayjs().endOf('week').format('YYYY-MM-DD');
-
-  // TODO: Map selectedDoctor/selectedBranch to IDs if you have
-  const doctorId = selectedDoctor !== 'All Doctors' ? undefined : undefined;
-  const branchId = selectedBranch !== 'All Branches' ? undefined : undefined;
-
-  // Fetch appointment stats
   useEffect(() => {
     const fetchStats = async () => {
-      setStatsLoading(true);
+      setLoading(true);
       try {
-        const response = await getAppointmentStats({
-          startDate,
-          endDate,
-          doctorId,
-          branchId,
-          timeFilter: 'thisWeek',
-        });
-        if (response?.stats) setAppointmentStats(response.stats);
-        else setAppointmentStats(null);
-      } catch {
-        setAppointmentStats(null);
+        // Fetch for each branch and sum up stats
+        const statsResults = await Promise.all(
+          branchIds.map((branchId) =>
+            getAppointmentStats({ startDate, endDate, branchId: Number(branchId) }),
+          ),
+        );
+        // Aggregate stats from all branches
+        const totals = statsResults.reduce(
+          (acc, res) => {
+            const stat = res?.stats || { totalAppointments: 0, completed: 0, cancellations: 0 };
+            return {
+              totalAppointments: acc.totalAppointments + (stat.totalAppointments || 0),
+              completed: acc.completed + (stat.completed || 0),
+              cancellations: acc.cancellations + (stat.cancellations || 0),
+            };
+          },
+          { totalAppointments: 0, completed: 0, cancellations: 0 },
+        );
+        setAppointmentStats(totals);
       } finally {
-        setStatsLoading(false);
+        setLoading(false);
       }
     };
-    fetchStats();
-  }, [selectedDoctor, selectedBranch, startDate, endDate]);
-
-  // Fetch appointment distribution
-  useEffect(() => {
-    const fetchDistribution = async () => {
-      try {
-        const response = await getAppointmentDistribution({
-          startDate,
-          endDate,
-          doctorId,
-          branchId,
-          timeFilter: 'thisWeek',
-          groupBy: chartMode,
-        });
-        if (response) {
-          setDistributionData(response.distribution);
-          setDistributionTotal(response.totalAppointments || 1);
-        } else {
-          setDistributionData([]);
-          setDistributionTotal(1);
-        }
-      } catch {
-        setDistributionData([]);
-        setDistributionTotal(1);
-      }
-    };
-    fetchDistribution();
-  }, [selectedDoctor, selectedBranch, startDate, endDate, chartMode]);
-
-  // Compute total count for percentage calculations
-  const totalAppointments = Array.isArray(distributionData)
-    ? distributionData.reduce((sum, item) => sum + item.count, 0) || 1
-    : 1;
-
-  // Dropdown source lists from upcoming appointments
-  const allDoctors = Array.from(new Set(upcoming.map((a) => a.doctor)));
-  const allBranches = Array.from(new Set(upcoming.map((a) => a.branch)));
-
-  // Prepare chart data from distributionData
-  const chartCategories = distributionData.map((item) => item.name);
-  const chartData = distributionData.map((item) => item.count);
-
-  /*
-  // Chart options and series for ApexCharts
-  const chartOptions: ApexOptions = {
-    chart: { id: 'appointments-chart', toolbar: { show: false } },
-    xaxis: {
-      categories: chartCategories,
-      labels: { rotate: -45 },
-      title: { text: chartMode === 'doctor' ? 'Doctor' : 'Branch' },
-    },
-    stroke: { curve: 'smooth' },
-    dataLabels: { enabled: false },
-    colors: ['#0d6efd'],
-    tooltip: { shared: true, intersect: false },
-    markers: { size: 4 },
-    yaxis: { title: { text: 'Appointments' } },
-  };
-  const chartSeries = [{ name: 'Appointments', data: chartData }];
-  */
+    if (branchIds.length) {
+      fetchStats();
+    }
+  }, [startDate, endDate, branchIds]);
 
   return (
-    <Col lg={12}>
+    <Col md={6} className="mb-4">
       <Card>
         <CardHeader className="d-flex justify-content-between align-items-center border-0">
           <div>
-            <CardTitle as="h4">Aperçu des rendez-vous</CardTitle>
-            <p className="text-muted mb-0">Résumé hebdomadaire</p>
+            <CardTitle as="h5">Tous</CardTitle>
+            <p className="text-primary mb-0 small">Résumé cumulatif des rendez-vous</p>
           </div>
-
-          {/*
-          <div className="d-flex gap-2">
-            {/* Doctor Dropdown */}
-          {/* <Dropdown>
-              <DropdownToggle
-                as="a"
-                className="btn btn-sm btn-outline-light rounded content-none icons-center"
+          <div role="group" className="d-flex gap-2">
+            {(['thisWeek', 'lastWeek', 'lastMonth'] as const).map((period) => (
+              <button
+                key={period}
+                type="button"
+                className={`btn btn-sm ${timeFilter === period ? 'btn-primary' : 'btn-outline-primary'} rounded-pill`}
+                onClick={() => setTimeFilter(period)}
               >
-                {selectedDoctor} <IconifyIcon icon="ri:arrow-down-s-line" className="ms-1" />
-              </DropdownToggle>
-              <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem onClick={() => setSelectedDoctor('All Doctors')}>
-                  Tous les thérapeutes
-                </DropdownItem>
-                {allDoctors.map((doc) => (
-                  <DropdownItem key={doc} onClick={() => setSelectedDoctor(doc)}>
-                    {doc}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown> */}
-
-          {/* Branch Dropdown */}
-          {/* <Dropdown>
-              <DropdownToggle
-                as="a"
-                className="btn btn-sm btn-outline-light rounded content-none icons-center"
-              >
-                {selectedBranch} <IconifyIcon icon="ri:arrow-down-s-line" className="ms-1" />
-              </DropdownToggle>
-              <DropdownMenu className="dropdown-menu-end">
-                <DropdownItem onClick={() => setSelectedBranch('All Branches')}>
-                  Toutes les succursales
-                </DropdownItem>
-                {allBranches.map((b) => (
-                  <DropdownItem key={b} onClick={() => setSelectedBranch(b)}>
-                    {b}
-                  </DropdownItem>
-                ))}
-              </DropdownMenu>
-            </Dropdown> */}
-          {/*
+                {period === 'thisWeek'
+                  ? 'This Week'
+                  : period === 'lastWeek'
+                    ? 'Last Week'
+                    : 'Last Month'}
+              </button>
+            ))}
           </div>
-          */}
         </CardHeader>
-
         <CardBody>
-          {/* Top Metrics */}
-          <Row className="g-2 text-center mb-3">
-            <Col lg={4}>
-              <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Nombre total de rendez-vous</p>
-                <h5 className="text-dark mb-1">
-                  {statsLoading ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    (appointmentStats?.totalAppointments ?? totalAppointments)
-                  )}
-                </h5>
-              </div>
-            </Col>
-            <Col lg={4}>
-              <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Complété</p>
-                <h5 className="text-dark mb-1">
-                  {statsLoading ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    (appointmentStats?.completed ?? 0)
-                  )}
-                </h5>
-              </div>
-            </Col>
-            <Col lg={4}>
-              <div className="border bg-light-subtle p-2 rounded">
-                <p className="text-muted mb-1">Annulations</p>
-                <h5 className="text-dark mb-1">
-                  {statsLoading ? (
-                    <Spinner animation="border" size="sm" />
-                  ) : (
-                    (appointmentStats?.cancellations ?? 0)
-                  )}
-                </h5>
-              </div>
-            </Col>
-          </Row>
-
-          {/*
-          // Chart + Calendar
-          <Row className="g-3">
-            <Col lg={6}>
-              <ReactApexChart options={chartOptions} series={chartSeries} type="area" height={250} />
-            </Col>
-
-            <Col lg={6} style={{ display: 'flex', flexDirection: 'column', minWidth: 0 }}>
-              <div style={{ flex: 1, minHeight: 0 }}>
+          <Row className="text-center">
+            <Col>
+              <p className="text-muted mb-1">Programmé</p>
+              <h5>
                 {loading ? (
-                  <div className="text-center py-5">
-                    <Spinner animation="border" />
-                  </div>
-                ) : calendarViewMode === 'calendar' ? (
-                  <Calendar />
+                  <Spinner animation="border" size="sm" />
                 ) : (
-                  <div className="p-3 border rounded bg-white" style={{ height: calendarHeight, overflowY: 'auto' }}>
-                    {upcoming.length === 0 ? (
-                      <p className="text-muted">Aucun rendez-vous trouvé.</p>
-                    ) : (
-                      upcoming.map((appt) => (
-                        <div key={appt.id} className="border-bottom py-2">
-                          <strong>{appt.patient}</strong>
-                          <div>{dayjs(`${appt.date}T${appt.time}`).format('MMM D, YYYY h:mm A')}</div>
-                          <small className="text-muted">
-                            {appt.doctor} - {appt.branch}
-                          </small>
-                        </div>
-                      ))
-                    )}
-                  </div>
+                  (appointmentStats?.totalAppointments ?? 0)
                 )}
-              </div>
+              </h5>
+            </Col>
+            <Col>
+              <p className="text-muted mb-1">Terminée</p>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.completed ?? 0)
+                )}
+              </h5>
+            </Col>
+            <Col>
+              <p className="text-muted mb-1">Annulée</p>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.cancellations ?? 0)
+                )}
+              </h5>
             </Col>
           </Row>
-
-
-          // Appointments Breakdown
-          <h5 className="mt-4 mb-2 text-primary fw-bold">Répartition des rendez-vous</h5>
-          <p className="text-muted mb-3">
-            Affichage des rendez-vous pour{' '}
-            <strong>{chartMode === 'doctor' ? selectedDoctor : selectedBranch}</strong>.
-          </p>
-
-          {distributionLoading ? (
-            <Spinner animation="border" />
-          ) : (
-            <Row className="g-3 mb-3">
-              {distributionData.map((item, idx) => {
-                const percent = Math.round((item.count / totalAppointments) * 100);
-                const avatar = AVATARS[idx % AVATARS.length];
-                return (
-                  <Col lg={3} key={item.id}>
-                    <div className="border rounded p-2 d-flex align-items-center gap-3">
-                      <div className="avatar-md flex-centered bg-light rounded-circle">
-                        <Image src={avatar} alt={item.name} width={40} height={40} className="rounded-circle" />
-                      </div>
-                      <div className="flex-grow-1">
-                        <p className="mb-1 text-muted">{item.name}</p>
-                        <p className="fs-18 text-dark fw-medium">
-                          {item.count} <span className="text-muted fs-14">({percent}%)</span>
-                        </p>
-                        <div className="progress" style={{ height: 10 }}>
-                          <div
-                            className={`progress-bar ${
-                              chartMode === 'doctor' ? 'bg-primary' : 'bg-warning'
-                            }`}
-                            style={{ width: `${percent}%` }}
-                          />
-                        </div>
-                      </div>
-                    </div>
-                  </Col>
-                );
-              })}
-            </Row>
-          )}
-          */}
         </CardBody>
       </Card>
     </Col>
+  );
+};
+
+// Single-branch card (no change)
+const BranchAppointmentCard = ({ branch, branchId }: { branch: string; branchId: string }) => {
+  const [timeFilter, setTimeFilter] = useState<'thisWeek' | 'lastWeek' | 'lastMonth'>('thisWeek');
+  const [appointmentStats, setAppointmentStats] = useState<AppointmentStats | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const startDate =
+    timeFilter === 'thisWeek'
+      ? dayjs().startOf('week').format('YYYY-MM-DD')
+      : timeFilter === 'lastWeek'
+        ? dayjs().subtract(1, 'week').startOf('week').format('YYYY-MM-DD')
+        : dayjs().subtract(1, 'month').startOf('month').format('YYYY-MM-DD');
+  const endDate =
+    timeFilter === 'thisWeek'
+      ? dayjs().endOf('week').format('YYYY-MM-DD')
+      : timeFilter === 'lastWeek'
+        ? dayjs().subtract(1, 'week').endOf('week').format('YYYY-MM-DD')
+        : dayjs().subtract(1, 'month').endOf('month').format('YYYY-MM-DD');
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoading(true);
+      try {
+        const res = await getAppointmentStats({ startDate, endDate, branchId: Number(branchId) });
+        setAppointmentStats(res?.stats || null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchStats();
+  }, [startDate, endDate, branchId]);
+
+  return (
+    <Col md={6} className="mb-4">
+      <Card>
+        <CardHeader className="d-flex justify-content-between align-items-center border-0">
+          <div>
+            <CardTitle as="h5">{branch}</CardTitle>
+            <p className="text-muted mb-0 small">Résumé du rendez-vous</p>
+          </div>
+          <div role="group" className="d-flex gap-2">
+            {(['thisWeek', 'lastWeek', 'lastMonth'] as const).map((period) => (
+              <button
+                key={period}
+                type="button"
+                className={`btn btn-sm ${timeFilter === period ? 'btn-primary' : 'btn-outline-primary'} rounded-pill`}
+                onClick={() => setTimeFilter(period)}
+              >
+                {period === 'thisWeek'
+                  ? 'This Week'
+                  : period === 'lastWeek'
+                    ? 'Last Week'
+                    : 'Last Month'}
+              </button>
+            ))}
+          </div>
+        </CardHeader>
+        <CardBody>
+          <Row className="text-center">
+            <Col>
+              <p className="text-muted mb-1">Programmé</p>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.totalAppointments ?? 0)
+                )}
+              </h5>
+            </Col>
+            <Col>
+              <p className="text-muted mb-1">Terminée</p>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.completed ?? 0)
+                )}
+              </h5>
+            </Col>
+            <Col>
+              <p className="text-muted mb-1">Annulée</p>
+              <h5>
+                {loading ? (
+                  <Spinner animation="border" size="sm" />
+                ) : (
+                  (appointmentStats?.cancellations ?? 0)
+                )}
+              </h5>
+            </Col>
+          </Row>
+        </CardBody>
+      </Card>
+    </Col>
+  );
+};
+
+const AppointmentsOverview = ({ upcoming }: AppointmentsOverviewProps) => {
+  const [branches, setBranches] = useState<BranchType[]>([]);
+  const [loadingBranches, setLoadingBranches] = useState(true);
+
+  useEffect(() => {
+    const loadBranches = () => {
+      const allBranches = getAllBranch();
+      setBranches(allBranches);
+      setLoadingBranches(false);
+    };
+    loadBranches();
+  }, []);
+
+  if (loadingBranches) {
+    return (
+      <div className="text-center py-4">
+        <Spinner animation="border" />
+      </div>
+    );
+  }
+
+  // Group the branches into arrays of 2 for row rendering
+  const branchRows = chunk(branches, 2);
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle as="h4" className="mb-0">
+          Points de vue de Rendez-vous
+        </CardTitle>
+      </CardHeader>
+      <CardBody>
+        <Row>
+          {/* Render cumulative card first */}
+          <CumulativeAppointmentCard branchIds={branches.map((b) => b._id)} />
+
+          {/* Render all branch cards continuously after */}
+          {branches.map((branch) => (
+            <BranchAppointmentCard key={branch._id} branch={branch.name} branchId={branch._id} />
+          ))}
+        </Row>
+      </CardBody>
+    </Card>
   );
 };
 

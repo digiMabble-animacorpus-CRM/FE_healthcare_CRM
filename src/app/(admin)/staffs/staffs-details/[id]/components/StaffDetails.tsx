@@ -1,15 +1,15 @@
-"use client";
+'use client';
 
-import avatar2 from "@/assets/images/users/avatar-2.jpg";
-import IconifyIcon from "@/components/wrappers/IconifyIcon";
-import Image from "next/image";
-import { Button, Card, CardBody, Col, Row } from "react-bootstrap";
-import type { StaffType } from "@/types/data";
-import { useRouter } from "next/navigation";
+import avatar2 from '@/assets/images/users/avatar-2.jpg';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import Image from 'next/image';
+import { Button, Card, CardBody, Col, Row } from 'react-bootstrap';
+import type { StaffType } from '@/types/data';
+import { useRouter } from 'next/navigation';
 
 const languageMap: Record<string, string> = {
-  "lang-001": "Dutch",
-  "lang-002": "French",
+  'lang-001': 'Dutch',
+  'lang-002': 'French',
 };
 
 const StaffDetails = ({ data }: { data: StaffType }) => {
@@ -38,7 +38,7 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
             <div>
               <h3 className="fw-semibold mb-1">{data?.name}</h3>
               <p className="link-primary fw-medium fs-14">
-                {data?.dob || "DOB not provided"} | {data?.gender}
+                {data?.dob || 'DOB not provided'} | {data?.gender}
               </p>
             </div>
           </div>
@@ -72,9 +72,7 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
           </Col>
           <Col lg={4}>
             <p className="text-dark fw-semibold fs-16 mb-1">Primary Branch :</p>
-            <p className="mb-0">
-              {data?.selectedBranchDetailed?.name || data?.selectedBranch}
-            </p>
+            <p className="mb-0">{data?.selectedBranchDetailed?.name || data?.selectedBranch}</p>
           </Col>
         </Row>
 
@@ -83,16 +81,12 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
           <Col lg={8}>
             <p className="text-dark fw-semibold fs-16 mb-1">Address :</p>
             <p className="mb-0">
-              {data?.address?.line1}{" "}
-              {data?.address?.line2 ? `${data.address.line2}, ` : ""}
-              {data?.address?.city}, {data?.address?.country} -{" "}
-              {data?.address?.zip_code}
+              {data?.address?.line1} {data?.address?.line2 ? `${data.address.line2}, ` : ''}
+              {data?.address?.city}, {data?.address?.country} - {data?.address?.zip_code}
             </p>
           </Col>
           <Col lg={4}>
-            <p className="text-dark fw-semibold fs-16 mb-1">
-              Mode of Register :
-            </p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Mode of Register :</p>
             <p className="mb-0">Online</p>
           </Col>
         </Row>
@@ -103,8 +97,8 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
             <p className="text-dark fw-semibold fs-16 mb-1">Languages :</p>
             <p className="mb-0">
               {Array.isArray(data?.languages) && data.languages.length > 0
-                ? data.languages.map((code) => languageMap[code] || code).join(", ")
-                : "Not specified"}
+                ? data.languages.map((code) => languageMap[code] || code).join(', ')
+                : 'Not specified'}
             </p>
           </Col>
           <Col lg={4}>
@@ -134,35 +128,30 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
           </Col>
           <Col lg={6}>
             <p className="text-dark fw-semibold fs-16 mb-1">Experience :</p>
-            <p className="mb-0">{data?.experience || "Not specified"}</p>
+            <p className="mb-0">{data?.experience || 'Not specified'}</p>
           </Col>
         </Row>
 
         <Row className="my-4">
           <Col lg={6}>
             <p className="text-dark fw-semibold fs-16 mb-1">Education :</p>
-            <p className="mb-0">{data?.education || "Not specified"}</p>
+            <p className="mb-0">{data?.education || 'Not specified'}</p>
           </Col>
           <Col lg={6}>
-            <p className="text-dark fw-semibold fs-16 mb-1">
-              Registration Number :
-            </p>
-            <p className="mb-0">
-              {data?.registrationNumber || "Not specified"}
-            </p>
+            <p className="text-dark fw-semibold fs-16 mb-1">Registration Number :</p>
+            <p className="mb-0">{data?.registrationNumber || 'Not specified'}</p>
           </Col>
         </Row>
 
         <Row className="my-4">
           <Col lg={6}>
             <p className="text-dark fw-semibold fs-16 mb-1">Certification Files :</p>
-            {Array.isArray(data?.certificationFiles) &&
-            data.certificationFiles.length > 0 ? (
+            {Array.isArray(data?.certificationFiles) && data.certificationFiles.length > 0 ? (
               <ul className="mb-0">
                 {data.certificationFiles.map((file, i) => (
                   <li key={i}>
                     {file.path}
-                    {file.formattedSize ? ` (${file.formattedSize})` : ""}
+                    {file.formattedSize ? ` (${file.formattedSize})` : ''}
                   </li>
                 ))}
               </ul>
@@ -193,8 +182,8 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
               <ul className="mb-0">
                 {data.permissions.map((perm, i) => (
                   <li key={i}>
-                    {"_id" in perm ? `ID: ${perm._id}, ` : ""}
-                    {"enabled" in perm ? `Enabled: ${perm.enabled}` : ""}
+                    {'_id' in perm ? `ID: ${perm._id}, ` : ''}
+                    {'enabled' in perm ? `Enabled: ${perm.enabled}` : ''}
                   </li>
                 ))}
               </ul>
@@ -220,10 +209,7 @@ const StaffDetails = ({ data }: { data: StaffType }) => {
               {Array.isArray(data?.tags) &&
                 data.tags.map((tag, i) => (
                   <p className="mb-0 d-flex align-items-center" key={i}>
-                    <IconifyIcon
-                      icon="ri:circle-fill"
-                      className="fs-10 me-2 text-success"
-                    />
+                    <IconifyIcon icon="ri:circle-fill" className="fs-10 me-2 text-success" />
                     {tag}
                   </p>
                 ))}

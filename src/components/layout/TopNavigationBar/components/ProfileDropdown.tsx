@@ -32,11 +32,14 @@ const ProfileDropdown = () => {
           },
         });
 
-        if (res.data?.user?.team.full_name) {
-          setFullName(res.data.user.team.full_name);
+        const apiProfile = res.data?.therapistTeamMembers;
+        if (!apiProfile) return;
+
+        if (apiProfile.fullName) {
+          setFullName(apiProfile.fullName);
         }
-        if (res.data?.user?.team.photo) {
-          setAvatarUrl(res.data.user.team.photo); // Use API photo field
+        if (apiProfile.imageUrl) {
+          setAvatarUrl(apiProfile.imageUrl); // Use new API imageUrl field
         }
       } catch (error) {
         console.error('Error fetching profile:', error);

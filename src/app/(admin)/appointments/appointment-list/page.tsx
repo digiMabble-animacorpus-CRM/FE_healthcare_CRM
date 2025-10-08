@@ -10,6 +10,7 @@ import { API_BASE_PATH } from '@/context/constants';
 import { Icon } from '@iconify/react';
 import '@toast-ui/calendar/dist/toastui-calendar.min.css';
 import dynamic from 'next/dynamic';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   Button,
@@ -25,20 +26,16 @@ import {
   Spinner,
 } from 'react-bootstrap';
 
-const TuiCalendar = dynamic(() => import('@/components/TuiCalendarWrapper'), {
+const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
   ssr: false,
+  loading: () => <div>Loading calendar...</div>,
 });
 
-// const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
-//   ssr: false,
-//   loading: () => <div>Loading calendar...</div>,
-// });
+type CalendarInstance = {
+  getInstance: () => any;
+};
 
-// type CalendarInstance = {
-//   getInstance: () => any;
-// };
-
-// import TuiCalendar from '@/components/TuiCalendarWrapper';
+import TuiCalendar from '@/components/TuiCalendarWrapper';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
@@ -74,6 +71,14 @@ interface Specialization {
   color?: string;
 }
 
+type AppointmentStatus =
+  | 'Programmé'
+  | 'Terminée'
+  | 'Annulée'
+  | 'SCHEDULED'
+  | 'COMPLETED'
+  | 'CANCELLED';
+
 interface Appointment {
   id: string;
   calendarId: string;
@@ -95,6 +100,7 @@ interface Appointment {
     notes: string;
     original: any;
   };
+  status: AppointmentStatus;
 }
 
 // Helper: normalize API response (handles array | {data:[]} | {data:{data:[]}})
@@ -126,6 +132,8 @@ const AppointmentCalendarPage = () => {
   const [showMoreModal, setShowMoreModal] = useState(false);
   const [moreEvents, setMoreEvents] = useState<any[]>([]);
   const [calendarInstance, setCalendarInstance] = useState<any | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const calendarRef = useRef<{
     getInstance(): any;
@@ -133,14 +141,7 @@ const AppointmentCalendarPage = () => {
   }>(null);
 
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('access_token');
-      setToken(storedToken);
-    }
-  }, []);
+  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
 
   // Enhanced color palettes for different categories
   const BRANCH_COLORS = [
@@ -620,6 +621,36 @@ const AppointmentCalendarPage = () => {
     }
   };
 
+  // Delete appointment function
+  const handleDeleteAppointment = async () => {
+    if (!selectedEvent || !token) return;
+
+    try {
+      setDeleting(true);
+      const response = await fetch(`${API_BASE_PATH}/appointments/${selectedEvent.id}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (response.ok) {
+        // Remove the deleted appointment from state
+        setAllAppointments((prev) => prev.filter((appt) => appt.id !== selectedEvent.id));
+        setShowDeleteModal(false);
+        setShowModal(false);
+        setSelectedEvent(null);
+      } else {
+        console.error('Failed to delete appointment');
+      }
+    } catch (error) {
+      console.error('Error deleting appointment:', error);
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <>
       <PageTitle subName="Rendez-vous" title="Calendrier de rendez-vous" />
@@ -632,7 +663,10 @@ const AppointmentCalendarPage = () => {
                 : 'Liste de rendez-vous'}
               <small className="text-muted ms-2">({appointments.length} rendez-vous)</small>
             </CardTitle>
-            <Button variant="primary" onClick={() => router.push('/appointments/appointment-form')}>
+            <Button
+              variant="primary"
+              onClick={() => router.push('/appointments/appointment-form/new')}
+            >
               <Icon icon="mdi:plus" className="me-1" />
               Nouveau rendez-vous
             </Button>
@@ -689,7 +723,9 @@ const AppointmentCalendarPage = () => {
                 Succursales
               </h6>
               <Button variant="link" size="sm" onClick={() => toggleAllSelection('branches')}>
-                {selectedBranches.length === allBranches.length ? 'Désélectionner tout' : 'Sélectionner tout'}
+                {selectedBranches.length === allBranches.length
+                  ? 'Désélectionner tout'
+                  : 'Sélectionner tout'}
               </Button>
             </div>
             {loadingFilters ? (
@@ -880,8 +916,6 @@ const AppointmentCalendarPage = () => {
             </div>
           ) : calendarViewMode === 'calendar' ? (
             <div className="flex-grow-1 border rounded overflow-hidden">
-              {/* <button onClick={handleSetDate}>Set Date to Jan 2026</button>
-              <TuiCalendar ref={calendarRef} /> */}
               <TuiCalendar
                 ref={calendarRef}
                 height={calendarHeight}
@@ -1036,23 +1070,46 @@ const AppointmentCalendarPage = () => {
           {selectedEvent ? (
             <div className="row">
               <div className="col-12 mb-4">
-                <div className="d-flex align-items-center mb-3">
-                  <span
+                <div className="d-flex justify-content-between align-items-center mb-1">
+                  {/* <span
                     style={{
                       display: 'inline-block',
                       width: 20,
                       height: 20,
                       backgroundColor: selectedEvent.bgColor,
                       marginRight: 12,
-                      borderRadius: '4px',
+                      borderRadius: '4px'
                     }}
-                  />
+                  /> */}
                   <h5 className="mb-0">{selectedEvent.title}</h5>
-                  <span
-                    className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto`}
-                  >
-                    {selectedEvent.raw.status || 'Unknown'}
-                  </span>
+
+                  <div className="d-flex align-items-center">
+                    <span
+                      className={`badge bg-${getStatusBadgeColor(selectedEvent.raw.status)} ms-auto me-1`}
+                    >
+                      {selectedEvent.raw.status || 'Unknown'}
+                    </span>
+                    {/* Edit Button */}
+                    <Link
+                      href={`/appointments/appointment-form/edit/${selectedEvent.id}`}
+                      className="btn btn-sm btn-outline-primary me-1"
+                      title="Edit Appointment"
+                    >
+                      <Icon icon="mdi:pencil" />
+                    </Link>
+                    {/* Delete Button */}
+                    <Button
+                      variant="outline-danger"
+                      size="sm"
+                      title="Delete Appointment"
+                      onClick={() => {
+                        setSelectedEvent(selectedEvent);
+                        setShowDeleteModal(true);
+                      }}
+                    >
+                      <Icon icon="mdi:delete" />
+                    </Button>
+                  </div>
                 </div>
               </div>
 
@@ -1210,12 +1267,6 @@ const AppointmentCalendarPage = () => {
             </div>
           )}
         </Modal.Body>
-        <Modal.Footer>
-          <Button variant="outline-secondary" onClick={() => setShowModal(false)}>
-            <Icon icon="mdi:close" className="me-1" />
-            Fermer
-          </Button>
-        </Modal.Footer>
       </Modal>
 
       {/* Modal for "More" events in month view */}
@@ -1289,6 +1340,49 @@ const AppointmentCalendarPage = () => {
           <Button variant="outline-secondary" onClick={() => setShowMoreModal(false)}>
             <Icon icon="mdi:close" className="me-1" />
             Fermer
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
+        <Modal.Header closeButton>
+          <Modal.Title>
+            <Icon icon="mdi:alert-circle-outline" className="me-2 text-danger" />
+            Confirmer la suppression
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <p>Êtes-vous sûr de vouloir supprimer ce rendez-vous?</p>
+          <p className="mb-0">
+            <strong>Titre:</strong> {selectedEvent?.title}
+          </p>
+          <p className="mb-0">
+            <strong>Date:</strong>{' '}
+            {selectedEvent ? dayjs(selectedEvent.start).format('MMMM D, YYYY') : ''}
+          </p>
+          <p className="mb-0">
+            <strong>Heure:</strong>{' '}
+            {selectedEvent ? dayjs(selectedEvent.start).format('h:mm A') : ''} -{' '}
+            {selectedEvent ? dayjs(selectedEvent.end).format('h:mm A') : ''}
+          </p>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)} disabled={deleting}>
+            Annuler
+          </Button>
+          <Button variant="danger" onClick={handleDeleteAppointment} disabled={deleting}>
+            {deleting ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Suppression...
+              </>
+            ) : (
+              <>
+                <Icon icon="mdi:delete" className="me-1" />
+                Supprimer
+              </>
+            )}
           </Button>
         </Modal.Footer>
       </Modal>

@@ -68,7 +68,7 @@ const GridViewPage = () => {
             </li>
             <li className="page-item">
               <Link className="page-link" href="">
-              Suivant
+                Suivant
               </Link>
             </li>
           </ul>

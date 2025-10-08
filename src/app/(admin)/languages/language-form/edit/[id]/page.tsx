@@ -36,9 +36,6 @@ const EditLanguagePage = ({ params }: Props) => {
             Authorization: `Bearer ${token}`,
           },
         });
-
-        console.log('API Response:', res.data);
-
         // Adjust this if your API wraps data
         const language = res.data.data || res.data;
 
@@ -96,11 +93,7 @@ const EditLanguagePage = ({ params }: Props) => {
   if (loading) return <div>Loading language details...</div>;
 
   return (
-    <LanguageForm
-      defaultValues={defaultValues}
-      isEditMode
-      onSubmitHandler={onSubmitHandler}
-    />
+    <LanguageForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />
   );
 };
 

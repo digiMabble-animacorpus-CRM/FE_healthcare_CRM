@@ -46,31 +46,13 @@ const AgentPage = () => {
                 patient: `Patient ${i + 1}`,
                 doctor: ['Dr. Martin', 'Dr. Clara', 'Dr. Paul'][i % 3],
                 branch: ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'][i % 3],
-                status: 'SCHEDULED',
+                status: 'Programmé',
               }))}
             />
           </Col>
 
           <Col lg={12}>
-            <PatientInsightsContainer
-              newPatientsWeek={22}
-              newPatientsMonth={93}
-              demographics={{
-                gender: { male: 48, female: 52, other: 0 },
-                ageBuckets: [
-                  { label: '0-12', value: 12 },
-                  { label: '13-25', value: 18 },
-                  { label: '26-40', value: 34 },
-                  { label: '41-60', value: 22 },
-                  { label: '60+', value: 14 },
-                ],
-                topCities: [
-                  { city: 'Gembloux - Orneau', count: 140 },
-                  { city: 'Gembloux - Tout Vent', count: 120 },
-                  { city: 'Namur', count: 60 },
-                ],
-              }}
-            />
+            <PatientInsightsContainer />
           </Col>
         </Row>
       )}

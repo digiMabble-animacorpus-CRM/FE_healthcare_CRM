@@ -2,22 +2,15 @@
 
 import { FormProvider, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import * as yup from 'yup';
-import {
-  Button,
-  Card,
-  CardBody,
-  CardHeader,
-  CardTitle,
-  Col,
-  Row,
-  Form,
-} from 'react-bootstrap';
+import { Button, Card, CardBody, CardHeader, CardTitle, Col, Row } from 'react-bootstrap';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import TextFormInput from '@/components/from/TextFormInput';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
+
 
 export interface LanguageFormValues {
   key: string;
@@ -37,13 +30,9 @@ interface Props {
   onSubmitHandler?: (data: LanguageFormValues) => void;
 }
 
-const LanguageForm = ({
-  defaultValues,
-  isEditMode = false,
-  onSubmitHandler,
-}: Props) => {
+const LanguageForm = ({ defaultValues, isEditMode = false, onSubmitHandler }: Props) => {
   const router = useRouter();
-
+ const { showNotification } = useNotificationContext();
   const methods = useForm<LanguageFormValues>({
     resolver: yupResolver(schema),
     defaultValues: {
@@ -74,54 +63,73 @@ const LanguageForm = ({
    * - Otherwise performs API call internally
    */
   const handleFormSubmit = onSubmitHandler
-    ? onSubmitHandler
-    : async (data: LanguageFormValues) => {
-        try {
-          const token = localStorage.getItem('access_token');
-          if (!token) {
-            console.warn('No access token found');
-            return;
-          }
-
-          if (isEditMode && defaultValues?._id) {
-            // Update existing language
-            await axios.patch(
-              `${API_BASE_PATH}/languages/${defaultValues._id}`,
-              {
-                language_name: data.key,
-                language_description: data.label,
-                is_active: data.is_active,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                },
-              },
-            );
-          } else {
-            // Create new language
-            await axios.post(
-              `${API_BASE_PATH}/languages`,
-              {
-                language_name: data.key,
-                language_description: data.label,
-                is_active: data.is_active,
-              },
-              {
-                headers: {
-                  Authorization: `Bearer ${token}`,
-                  'Content-Type': 'application/json',
-                },
-              },
-            );
-          }
-
-          router.push('/languages'); // redirect after success
-        } catch (err) {
-          console.error('Error saving language:', err);
+  ? onSubmitHandler
+  : async (data: LanguageFormValues) => {
+      try {
+        const token = localStorage.getItem('access_token');
+        if (!token) {
+          console.warn('No access token found');
+          return;
         }
-      };
+
+        if (isEditMode && defaultValues?._id) {
+          // ✅ UPDATE existing language
+          await axios.patch(
+            `${API_BASE_PATH}/languages/${defaultValues._id}`,
+            {
+              language_name: data.key,
+              language_description: data.label,
+              is_active: data.is_active,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          showNotification({
+            message: 'Language mis à jour avec succès',
+            variant: 'success',
+          });
+        } else {
+          // ✅ CREATE new language
+          await axios.post(
+            `${API_BASE_PATH}/languages`,
+            {
+              language_name: data.key,
+              language_description: data.label,
+              is_active: data.is_active,
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          showNotification({
+            message: 'Language créé avec succès',
+            variant: 'success',
+          });
+        }
+
+        // redirect after short delay
+        setTimeout(() => {
+          router.push('/languages');
+        }, 1500);
+      } catch (err) {
+        console.error('Error saving language:', err);
+
+        showNotification({
+          message: 'Échec de la sauvegarde language',
+          variant: 'danger',
+        });
+      }
+    };
+
 
   return (
     <FormProvider {...methods}>

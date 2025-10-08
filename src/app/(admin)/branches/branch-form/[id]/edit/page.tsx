@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'react-toastify';
 import BranchForm, { BranchFormValues } from '../../branchForm';
 import { API_BASE_PATH } from '@/context/constants';
-import { Alert, Spinner } from 'react-bootstrap';
+import { Spinner } from 'react-bootstrap';
+import axios from 'axios';
 
 interface Props {
   params: { id?: string };
@@ -17,8 +18,6 @@ const EditBranchPage = ({ params }: Props) => {
   const [defaultValues, setDefaultValues] = useState<
     Partial<BranchFormValues & { branch_id?: string }>
   >({});
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const isEditMode = Boolean(params.id);
 
   useEffect(() => {
     if (!params.id) {
@@ -31,19 +30,17 @@ const EditBranchPage = ({ params }: Props) => {
         const token = localStorage.getItem('access_token');
         if (!token) throw new Error('No access token found');
 
-        const res = await fetch(`${API_BASE_PATH}/branches/${params.id}`, {
+        const res = await axios.get(`${API_BASE_PATH}/branches/${params.id}`, {
           headers: {
             Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
           },
         });
 
-        if (!res.ok) throw new Error('Failed to fetch branch');
-
-        const branch = await res.json();
+        const branch = res.data;
 
         if (branch?.branch_id) {
           setDefaultValues({
+            branch_id: branch.branch_id, // pass to BranchForm so it knows it's edit
             name: branch.name || '',
             phone: branch.phone || '',
             email: branch.email || '',
@@ -52,7 +49,6 @@ const EditBranchPage = ({ params }: Props) => {
           });
         }
       } catch (err) {
-        console.error(err);
         toast.error('Failed to load branch details');
       } finally {
         setLoading(false);
@@ -61,36 +57,6 @@ const EditBranchPage = ({ params }: Props) => {
 
     fetchData();
   }, [params.id]);
-
-  const onSubmitHandler = async (data: BranchFormValues & { branch_id?: string }) => {
-    if (!params.id) return;
-
-    try {
-      const token = localStorage.getItem('access_token');
-      if (!token) throw new Error('No access token found');
-
-      const res = await fetch(`${API_BASE_PATH}/branches/${params.id}`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
-      });
-
-      if (!res.ok) throw new Error('Failed to update branch');
-
-      // toast.success('Branch updated successfully!');
-      setSuccessMessage('✅ Branch updated successfully!');
-      // Optional: redirect after a short delay
-      setTimeout(() => {
-        router.push('/branches');
-      }, 2000);
-    } catch (error) {
-      console.error(error);
-      // toast.error('Error updating branch');
-    }
-  };
 
   if (loading) {
     return (
@@ -101,21 +67,7 @@ const EditBranchPage = ({ params }: Props) => {
     );
   }
 
-  return (
-    <div>
-      {successMessage && (
-        <Alert variant="success" className="mb-3">
-          {successMessage}
-        </Alert>
-      )}
-
-      <BranchForm
-        defaultValues={defaultValues}
-        isEditMode
-        onSubmitHandler={onSubmitHandler}
-      />
-    </div>
-  );
+  return <BranchForm defaultValues={defaultValues} isEditMode />;
 };
 
 export default EditBranchPage;

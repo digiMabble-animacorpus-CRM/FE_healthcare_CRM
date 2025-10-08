@@ -48,9 +48,7 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
     <SessionProvider>
       <LayoutProvider>
         <NotificationProvider>
-          <div style={{ backgroundColor: '#FAF5FF', minHeight: '100vh' }}>
-            {children}
-          </div>
+          <div style={{ backgroundColor: '#FAF5FF', minHeight: '100vh' }}>{children}</div>
           <ToastContainer theme="colored" />
         </NotificationProvider>
       </LayoutProvider>

@@ -34,6 +34,7 @@ const TherapistDetailsPage = () => {
       }
 
       const transformedData: TherapistType = {
+        id: rawTherapist.therapistId ?? null,
         therapistId: rawTherapist.therapistId ?? null,
         firstName: rawTherapist.firstName || '',
         lastName: rawTherapist.lastName || '',

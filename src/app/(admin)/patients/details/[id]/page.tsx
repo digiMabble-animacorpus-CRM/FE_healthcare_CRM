@@ -119,10 +119,6 @@ const PatientDetailsPage = () => {
           zipcode: rawPatient.zipcode || '',
           number: rawPatient.number || '',
           phones: Array.isArray(rawPatient.phones) ? rawPatient.phones : [],
-          // created_at: rawPatient.created_at || null,
-          // is_delete: rawPatient.is_delete || false,
-          // deleted_at: rawPatient.deleted_at || null,
-
           // 🔥 Therapist mapping
           therapistId: rawPatient.therapistId ?? null,
           therapist: rawPatient.therapist
@@ -144,7 +140,7 @@ const PatientDetailsPage = () => {
                 paymentMethods: rawPatient.therapist.paymentMethods || null,
                 faq: rawPatient.therapist.faq || null,
                 departmentId: rawPatient.therapist.departmentId || null,
-                
+
                 availability: Array.isArray(rawPatient.therapist.availability)
                   ? rawPatient.therapist.availability
                   : [],
@@ -179,7 +175,7 @@ const PatientDetailsPage = () => {
         // 👇 Now showing Age along with DOB + Gender
         birthdate={
           data.birthdate
-            ? `${data.birthdate || 'N\A'} | ${data.legalgender || 'N\A'} | ${calculateAge(data.birthdate ||'N\A')} yrs`
+            ? `${data.birthdate || 'N\A'} | ${data.legalgender || 'N\A'} | ${calculateAge(data.birthdate || 'N\A')} yrs`
             : ''
         }
         email={data.emails}

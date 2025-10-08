@@ -17,7 +17,10 @@ interface TuiCalendarProps {
 }
 
 // Use React.forwardRef to forward the ref to the component
-const TuiCalendar = ({ date,height = '600px', ...restProps }: TuiCalendarProps, ref: React.Ref<CalendarHandle>) => {
+const TuiCalendar = (
+  { date, height = '600px', ...restProps }: TuiCalendarProps,
+  ref: React.Ref<CalendarHandle>,
+) => {
   const calendarRef = useRef<any>(null); // Ref for the Calendar instance
 
   // Expose setDate function to the parent via the ref
@@ -26,7 +29,7 @@ const TuiCalendar = ({ date,height = '600px', ...restProps }: TuiCalendarProps, 
       if (calendarRef.current) {
         const calendarInstance = calendarRef.current.getInstance();
         calendarInstance.setDate(newDate);
-        calendarInstance.render(); 
+        calendarInstance.render();
       }
     },
   }));

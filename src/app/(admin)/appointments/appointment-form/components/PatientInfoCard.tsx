@@ -1,8 +1,9 @@
+// /appointments/components/PatientInfoCard/index.tsx
 'use client';
 
 import { createPatient, findPatient, updatePatient } from '@/helpers/patient';
-import type { PatientType } from '@/types/data';
-import { useState } from 'react';
+import type { PatientType } from '../types/appointment';
+import { useState, useEffect } from 'react';
 import {
   Badge,
   Button,
@@ -17,7 +18,6 @@ import {
 } from 'react-bootstrap';
 import * as yup from 'yup';
 
-// Yup validation schema
 const patientSchema = yup.object().shape({
   firstname: yup.string().required('Le prénom est obligatoire'),
   lastname: yup.string().required('Le nom de famille est obligatoire'),
@@ -56,24 +56,48 @@ const emptyPatient: PatientType = {
   zipcode: '',
   street: '',
   note: '',
+  middlename: '',
+  ssin: '',
+  primarypatientrecordid: '',
+  mutualitynumber: '',
+  mutualityregistrationnumber: '',
+  therapistId: null,
+  created_at: '',
+  is_delete: false,
+  deleted_at: null,
 };
 
-interface CustomerInfoCardProps {
+interface PatientInfoCardProps {
   onSave?: (patient: PatientType) => void;
   onReset?: () => void;
+  initialData?: PatientType;
+  mode?: 'search' | 'view' | 'edit' | 'new';
 }
 
-const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
+const PatientInfoCard = ({
+  onSave,
+  onReset,
+  initialData,
+  mode: initialMode = 'search',
+}: PatientInfoCardProps) => {
   const [formData, setFormData] = useState<PatientType>(emptyPatient);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [mode, setMode] = useState<'search' | 'view' | 'edit' | 'new'>(initialMode);
 
-  const [mode, setMode] = useState<'search' | 'view' | 'edit' | 'new'>('search');
+  useEffect(() => {
+    if (initialData) {
+      setFormData(initialData);
+      if (initialMode === 'view') {
+        setMode('view');
+        onSave?.(initialData);
+      }
+    }
+  }, [initialData, initialMode, onSave]);
 
-  // Reset the form completely
   const handleReset = () => {
     setFormData(emptyPatient);
     setSearchTerm('');
@@ -84,7 +108,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
     onReset?.();
   };
 
-  // 🔍 Handle search
   const handleSearch = async () => {
     if (!searchTerm.trim()) {
       setErrorMsg('Please enter a search term');
@@ -110,14 +133,12 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
     }
   };
 
-  // 🔄 Handle form change
   const handleChange = (field: keyof PatientType, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
 
-    // Clear validation error for this field when user starts typing
     if (validationErrors[field]) {
       setValidationErrors((prev) => {
         const newErrors = { ...prev };
@@ -127,7 +148,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
     }
   };
 
-  // Validate form using Yup
   const validateForm = async () => {
     try {
       await patientSchema.validate(formData, { abortEarly: false });
@@ -147,11 +167,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
     }
   };
 
-  // 💾 Save / Update
   const handleSave = async () => {
     setLoading(true);
     try {
-      // Validate form
       const isValid = await validateForm();
       if (!isValid) {
         setErrorMsg('Please fix the validation errors');
@@ -197,7 +215,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
         </CardTitle>
       </CardHeader>
       <CardBody>
-        {/* Messages */}
         {errorMsg && (
           <div className="alert alert-danger alert-dismissible fade show" role="alert">
             {errorMsg}
@@ -216,10 +233,9 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
           </div>
         )}
 
-        {/* 🔎 Search Section */}
         {mode === 'search' && (
           <div className="mb-4">
-            <div className="d-flex mb-3 gap-2">
+            <div className="d-flex flex-column flex-md-row mb-3 gap-2">
               <input
                 type="text"
                 className="form-control"
@@ -244,7 +260,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
           </div>
         )}
 
-        {/* 👁 View Mode */}
         {mode === 'view' && (
           <div className="border p-4 rounded bg-light">
             <div className="d-flex justify-content-between align-items-start mb-3">
@@ -312,10 +327,8 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
           </div>
         )}
 
-        {/* 📝 Edit / New Patient Form */}
         {(mode === 'edit' || mode === 'new') && (
           <Form>
-            {/* Name + E-mail */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
@@ -395,7 +408,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
             </Row>
 
-            {/* Gender + DOB */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
@@ -429,7 +441,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
             </Row>
 
-            {/* Language + Status */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
@@ -471,7 +482,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
             </Row>
 
-            {/* Country + City */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
@@ -512,7 +522,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
             </Row>
 
-            {/* Zip + Address */}
             <Row className="mb-3">
               <Col md={6}>
                 <Form.Group>
@@ -549,7 +558,6 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
               </Col>
             </Row>
 
-            {/* Description */}
             <Form.Group className="mb-4">
               <Form.Label>Description</Form.Label>
               <Form.Control
@@ -584,4 +592,4 @@ const CustomerInfoCard = ({ onSave, onReset }: CustomerInfoCardProps) => {
   );
 };
 
-export default CustomerInfoCard;
+export default PatientInfoCard;

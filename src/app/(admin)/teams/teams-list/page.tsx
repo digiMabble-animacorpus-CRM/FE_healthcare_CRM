@@ -8,7 +8,8 @@ import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import {
-  Badge, Button,
+  Badge,
+  Button,
   Card,
   CardBody,
   CardFooter,
@@ -21,7 +22,7 @@ import {
   DropdownToggle,
   Modal,
   Row,
-  Spinner
+  Spinner,
 } from 'react-bootstrap';
 
 const PAGE_SIZE = 500;

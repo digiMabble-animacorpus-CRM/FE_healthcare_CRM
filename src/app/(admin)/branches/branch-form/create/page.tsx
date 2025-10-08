@@ -6,11 +6,12 @@ import BranchForm, { BranchFormValues } from '../branchForm';
 import { API_BASE_PATH } from '@/context/constants';
 
 const CreateBranchPage = () => {
-  const token = localStorage.getItem('access_token');
   const router = useRouter();
 
   const handleCreate = async (data: BranchFormValues) => {
     try {
+      const token = localStorage.getItem('access_token');
+
       const res = await fetch(`${API_BASE_PATH}/branches`, {
         method: 'POST',
         headers: {
@@ -26,11 +27,11 @@ const CreateBranchPage = () => {
       router.push('/branches');
     } catch (error) {
       console.error(error);
-      toast.error('Failed to create Branch.');
+      toast.error('Failed to create branch.');
     }
   };
 
-  return <BranchForm onSubmitHandler={handleCreate} />;
+  return <BranchForm />;
 };
 
 export default CreateBranchPage;

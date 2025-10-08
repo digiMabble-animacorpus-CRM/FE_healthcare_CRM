@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
 // Dynamically import client-only components
-const CustomerInfoCard = dynamic(() => import('./components/CustomerInfoCard'), { ssr: false });
+// const CustomerInfoCard = dynamic(() => import('./components/CustomerInfoCard'), { ssr: false });
 const BookAppointmentForm = dynamic(() => import('./components/BookAppointmentForm'), {
   ssr: false,
 });
@@ -50,20 +50,20 @@ export default function AppointmentPage() {
 
   return (
     <div className="p-3">
-      <CustomerInfoCard
+      {/* <CustomerInfoCard
         onSave={handleCustomerSave}
         onReset={handleReset}
         key={resetTrigger} // Force re-render when reset is triggered
-      />
+      /> */}
 
-      {customer?.id && (
+      {/* {customer?.id && (
         <BookAppointmentForm
           patientId={customer.id}
           createdById={user?.team_id ? String(user.team_id) : ''}
           onSubmitHandler={handleAppointmentSubmit}
           selectedCustomer={customer}
         />
-      )}
+      )} */}
     </div>
   );
 }

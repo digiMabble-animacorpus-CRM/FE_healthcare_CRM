@@ -1,13 +1,13 @@
-import PageTitle from "@/components/PageTitle";
-import { getAllProperty } from "@/helpers/data";
-import type { StaffType } from "@/types/data";
-import { Col, Row } from "react-bootstrap";
-import { Metadata } from "next";
-import StaffDetails from "./components/StaffDetails";
-import { getStaffById } from "@/helpers/staff";
-import WeeklyInquiry from "@/app/(admin)/therapists/details/[id]/components/WeeklyInquiry";
+import PageTitle from '@/components/PageTitle';
+import { getAllProperty } from '@/helpers/data';
+import type { StaffType } from '@/types/data';
+import { Col, Row } from 'react-bootstrap';
+import { Metadata } from 'next';
+import StaffDetails from './components/StaffDetails';
+import { getStaffById } from '@/helpers/staff';
+import WeeklyInquiry from '@/app/(admin)/therapists/details/[id]/components/WeeklyInquiry';
 
-export const metadata: Metadata = { title: "Staff Overview" };
+export const metadata: Metadata = { title: 'Staff Overview' };
 
 interface Props {
   params: { id: string };
@@ -19,9 +19,7 @@ const StaffDetailPage = async ({ params }: Props) => {
   const response = await getStaffById(staffId);
 
   if (!response || !response.data || response.data.length === 0) {
-    return (
-        <p>No staff found.</p>
-    );
+    return <p>No staff found.</p>;
   }
 
   const staffs: StaffType[] = response.data;

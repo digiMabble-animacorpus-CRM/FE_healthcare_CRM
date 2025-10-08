@@ -3,7 +3,7 @@
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import type { PermissionType, StaffRoleType } from '@/types/data';
 import { useRouter } from 'next/navigation';
-import { Button, Card, CardBody, Col, Row } from 'react-bootstrap';
+import { Card, CardBody, Col, Row } from 'react-bootstrap';
 
 const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
   const router = useRouter();
@@ -11,7 +11,6 @@ const StaffRoleDetail = ({ data }: { data: StaffRoleType }) => {
   if (!data) {
     return <div>Loading...</div>; // Handle loading state or error
   }
-
 
   const handleEditClick = (id: string) => {
     router.push(`/staff-role/edit-staffRole/${id}`);

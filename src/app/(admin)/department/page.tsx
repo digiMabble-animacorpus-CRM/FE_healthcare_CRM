@@ -7,6 +7,7 @@ import type { DepartmentType } from '@/types/data';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Button,
   Card,
@@ -30,6 +31,8 @@ const DepartmentListPage = () => {
   const [loading, setLoading] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedDepartmentId, setSelectedDepartmentId] = useState<string | null>(null);
+  // const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+const { showNotification } = useNotificationContext();
   const router = useRouter();
 
   const fetchDepartments = async (page: number) => {
@@ -40,7 +43,7 @@ const DepartmentListPage = () => {
         params: {
           page,
           limit: PAGE_LIMIT,
-          search: searchTerm, // Pass search term to API
+          search: searchTerm,
         },
         headers: {
           Authorization: `Bearer ${token}`,
@@ -56,9 +59,9 @@ const DepartmentListPage = () => {
       );
       setTotalPages(Math.ceil((response.data.length || 0) / PAGE_LIMIT));
     } catch (error) {
-      // fallback mock data
       setDepartments([
         {
+          id: 1,
           _id: '1',
           name: 'Cardiology',
           is_active: true,
@@ -85,60 +88,105 @@ const DepartmentListPage = () => {
     router.push(`/department/department-form/${id}/edit`);
   };
 
-  const handleDeleteClick = (id: string) => {
-    setSelectedDepartmentId(id);
-    setShowDeleteModal(true);
-  };
+ const handleDeleteClick = (departmentId: string) => {
+  setSelectedDepartmentId(departmentId);
+  setShowDeleteModal(true);
+};
 
-  const handleConfirmDelete = async () => {
-    if (!selectedDepartmentId) return;
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.delete(`${API_BASE_PATH}/departments/${selectedDepartmentId}`, {
+const handleConfirmDelete = async () => {
+  if (!selectedDepartmentId) return;
+
+  try {
+    const token = localStorage.getItem('access_token');
+    await axios.delete(`${API_BASE_PATH}/departments/${selectedDepartmentId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    // ✅ show notification for successful deletion
+    showNotification({
+      message: 'Département supprimé avec succès !',
+      variant: 'success',
+    });
+
+    // refresh department list
+    fetchDepartments(currentPage);
+  } catch (error) {
+    console.error('Failed to delete department:', error);
+
+    // ✅ show notification for error
+    showNotification({
+      message: 'Échec de la suppression du département.',
+      variant: 'danger',
+    });
+  } finally {
+    setShowDeleteModal(false);
+    setSelectedDepartmentId(null);
+  }
+};
+
+const handleToggleStatus = async (departmentId: string, newStatus: boolean) => {
+  try {
+    const token = localStorage.getItem('access_token');
+    await axios.patch(
+      `${API_BASE_PATH}/departments/${departmentId}`,
+      { is_active: newStatus },
+      {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      });
-      fetchDepartments(currentPage);
-    } catch (error) {
-      console.error('Failed to delete department:', error);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedDepartmentId(null);
-    }
-  };
+      },
+    );
 
-  const handleToggleStatus = async (id: string, newStatus: boolean) => {
-    try {
-      const token = localStorage.getItem('access_token');
-      await axios.patch(
-        `${API_BASE_PATH}/departments/${id}`,
-        { is_active: newStatus },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
+    setDepartments((prevDepartments) =>
+      prevDepartments.map((dept) =>
+        dept._id === departmentId ? { ...dept, is_active: newStatus } : dept
+      )
+    );
 
-      // update UI immediately
-      setDepartments((prev) =>
-        prev.map((dept) => (dept._id === id ? { ...dept, is_active: newStatus } : dept)),
-      );
-    } catch (error) {
-      console.error('Failed to update status:', error);
-      // rollback UI if API fails
-      setDepartments((prev) =>
-        prev.map((dept) => (dept._id === id ? { ...dept, is_active: !newStatus } : dept)),
-      );
-    }
-  };
+    // ✅ show notification for status change
+    showNotification({
+      message: `Département ${newStatus ? 'activé' : 'désactivé'} avec succès !`,
+      variant: 'success',
+    });
+  } catch (error) {
+    console.error('Failed to update status:', error);
+
+    // revert status in local state
+    setDepartments((prevDepartments) =>
+      prevDepartments.map((dept) =>
+        dept._id === departmentId ? { ...dept, is_active: !newStatus } : dept
+      )
+    );
+
+    // ✅ show notification for error
+    showNotification({
+      message: "Échec de la mise à jour du statut du département.",
+      variant: 'danger',
+    });
+  }
+};
 
   return (
     <>
-      <PageTitle subName="Départements" title="Liste des départements" />
+      <PageTitle subName="Départements" title="Liste des départements" />{' '}
+      {/* {message && (
+        <div
+          style={{
+            margin: '1rem',
+            padding: '0.75rem 1rem',
+            borderRadius: '6px',
+            color: message.type === 'success' ? '#0f5132' : '#842029',
+            backgroundColor: message.type === 'success' ? '#d1e7dd' : '#f8d7da',
+            border: `1px solid ${message.type === 'success' ? '#badbcc' : '#f5c2c7'}`,
+          }}
+        >
+          {message.text}
+        </div>
+      )} */}
       <Row>
         <Col xl={12}>
           <Card>
@@ -179,7 +227,7 @@ const DepartmentListPage = () => {
                   <table className="table align-middle text-nowrap table-hover table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 20 }}>No</th>
+                        <th style={{ width: 20 }}>Nom</th>
                         <th>Département Name</th>
                         <th>Description</th>
                         <th>Statut</th>
@@ -280,7 +328,6 @@ const DepartmentListPage = () => {
           </Card>
         </Col>
       </Row>
-
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
