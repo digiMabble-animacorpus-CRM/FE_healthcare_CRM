@@ -26,16 +26,19 @@ import {
   Spinner,
 } from 'react-bootstrap';
 
+
+
+const TuiCalendar = dynamic(() => import('@/components/TuiCalendarWrapper'), {
+  ssr: false,
+});
 const Calendar = dynamic(() => import('@toast-ui/react-calendar'), {
-  ssr: false,
-  loading: () => <div>Loading calendar...</div>,
+  ssr: false,
+  loading: () => <div>Loading calendar...</div>,
 });
 
 type CalendarInstance = {
   getInstance: () => any;
 };
-
-import TuiCalendar from '@/components/TuiCalendarWrapper';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
