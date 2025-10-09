@@ -3,14 +3,13 @@
 import '@/assets/scss/components/_edittogglebtn.scss';
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import { deletePatient, getAllPatient } from '@/helpers/patient';
 import type { PatientType } from '@/types/data';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import { useNotificationContext } from '@/context/useNotificationContext';
 import {
-  Alert,
   Button,
   Card,
   CardBody,
@@ -20,7 +19,7 @@ import {
   Col,
   Modal,
   Row,
-  Spinner,
+  Spinner
 } from 'react-bootstrap';
 
 const PAGE_SIZE = 100;

@@ -45,25 +45,25 @@ export const MENU_ITEMS: MenuItemType[] = [
       },
     ],
   },
-  {
-    key: 'therapists',
-    label: 'Thérapeute old',
-    icon: 'ri-stethoscope-line',
-    children: [
-      {
-        key: 'therapists-list',
-        label: 'Liste des thérapeutes',
-        url: '/therapists/therapists-list',
-        parentKey: 'therapists',
-      },
-      {
-        key: 'add-therapist',
-        label: 'Ajouter un thérapeute',
-        url: '/therapists/add-therapist',
-        parentKey: 'therapists',
-      },
-    ],
-  },
+  // {
+  //   key: 'therapists',
+  //   label: 'Thérapeute old',
+  //   icon: 'ri-stethoscope-line',
+  //   children: [
+  //     {
+  //       key: 'therapists-list',
+  //       label: 'Liste des thérapeutes',
+  //       url: '/therapists/therapists-list',
+  //       parentKey: 'therapists',
+  //     },
+  //     {
+  //       key: 'add-therapist',
+  //       label: 'Ajouter un thérapeute',
+  //       url: '/therapists/add-therapist',
+  //       parentKey: 'therapists',
+  //     },
+  //   ],
+  // },
   {
     key: 'therapistsTeam',
     label: 'Thérapeute',

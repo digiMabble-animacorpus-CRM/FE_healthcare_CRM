@@ -805,12 +805,12 @@ export interface SpecializationType {
 }
 
 export type TherapistTeamMember = {
-  therapistId: any;
-  id: any;
+  therapistId?: any;
+  id?: any;
   department: any;
-  specializations: never[];
+  specializations?: any[];
   branches?: any;
-  firstName: string;
+  firstName?: string;
   lastName: string;
   full_name?: any;
   imageUrl?: any;

@@ -4,6 +4,7 @@ import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { deleteTherapistTeamMember, getAllTherapistTeamMembers } from '@/helpers/therapistTeam';
 import type { TeamMemberType } from '@/types/data';
+import { getBranches } from '@/helpers/branch';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -27,12 +28,12 @@ import {
 } from 'react-bootstrap';
 
 const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
 
 const TherapistTeamsListPage = () => {
   const [allTeamMembers, setAllTeamMembers] = useState<TeamMemberType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
+  const [branchesList, setBranchesList] = useState<{ branch_id: number; name: string }[]>([]);
+  const [selectedBranchId, setSelectedBranchId] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
@@ -41,7 +42,7 @@ const TherapistTeamsListPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedTherapistId, setSelectedTeamMemberId] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
-const { showNotification } = useNotificationContext();
+  const { showNotification } = useNotificationContext();
   const router = useRouter();
 
   const getDateRange = () => {
@@ -61,6 +62,9 @@ const { showNotification } = useNotificationContext();
         return null;
     }
   };
+  useEffect(() => {
+    getBranches(1, 100).then(({ data }) => setBranchesList(data));
+  }, []);
 
   const fetchTeamMembers = async (page = 1) => {
     setLoading(true);
@@ -73,10 +77,10 @@ const { showNotification } = useNotificationContext();
       const response = await getAllTherapistTeamMembers(
         page,
         PAGE_SIZE,
-        selectedBranch || undefined,
+        undefined,
         from,
         to,
-        searchTerm || undefined,
+        // searchTerm || undefined
       );
       const members = response?.data || [];
       if (!members || members.length === 0) {
@@ -111,10 +115,25 @@ const { showNotification } = useNotificationContext();
   useEffect(() => {
     fetchTeamMembers(currentPage);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentPage, selectedBranch, searchTerm, dateFilter]);
+  }, [currentPage, searchTerm, dateFilter]);
 
   const totalPages = Math.ceil(totalCount / PAGE_SIZE);
-  const currentData = allTeamMembers;
+
+  const filteredTeamMembers = allTeamMembers.filter((member) => {
+    // Branch filter
+    const matchBranch = selectedBranchId
+      ? member.branches?.some((b: any) => Number(b.branch_id) === selectedBranchId)
+      : true;
+
+    // Search filter (name, email, phone)
+    const matchSearch = searchTerm
+      ? `${member.firstName || ''} ${member.lastName || ''} ${member.contactEmail || ''} ${member.contactPhone || ''}`
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase())
+      : true;
+
+    return matchBranch && matchSearch;
+  });
 
   const handleView = (id: string) => {
     router.push(`/therapist-team/details/${id}`);
@@ -136,52 +155,51 @@ const { showNotification } = useNotificationContext();
     setShowDeleteModal(false);
 
     try {
-  const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
+      const success = await deleteTherapistTeamMember(selectedTherapistTeamId);
 
-  if (success) {
-    // Optimistically remove deleted member
-    setAllTeamMembers((prev) => {
-      const updated = prev.filter(
-        (t) => String(t.team_id) !== String(selectedTherapistTeamId)
-      );
+      if (success) {
+        // Optimistically remove deleted member
+        setAllTeamMembers((prev) => {
+          const updated = prev.filter((t) => String(t.team_id) !== String(selectedTherapistTeamId));
 
-      // If current page has no more items after deletion, go to previous page
-      if (updated.length === 0 && currentPage > 1) {
-        setCurrentPage((prevPage) => prevPage - 1);
+          // If current page has no more items after deletion, go to previous page
+          if (updated.length === 0 && currentPage > 1) {
+            setCurrentPage((prevPage) => prevPage - 1);
+          }
+
+          return updated;
+        });
+
+        // Decrease total count
+        setTotalCount((prev) => prev - 1);
+
+        // Clear selected ID
+        setSelectedTeamId(null);
+        setSelectedTeamMemberId(null);
+
+        // ✅ Success notification
+        showNotification({
+          message: 'Thérapeute supprimé avec succès',
+          variant: 'success',
+        });
+      } else {
+        // ❌ Failure notification
+        showNotification({
+          message: 'Échec de la suppression du thérapeute.',
+          variant: 'danger',
+        });
       }
-
-      return updated;
-    });
-
-    // Decrease total count
-    setTotalCount((prev) => prev - 1);
-
-    // Clear selected ID
-    setSelectedTeamId(null);
-    setSelectedTeamMemberId(null);
-
-    // ✅ Success notification
-    showNotification({
-      message: 'Thérapeute supprimé avec succès',
-      variant: 'success',
-    });
-  } else {
-    // ❌ Failure notification
-    showNotification({
-      message: 'Échec de la suppression du thérapeute.',
-      variant: 'danger',
-    });
-  }
-} catch (err) {
-  console.error(err);
-  // ❌ Error notification
-  showNotification({
-    message: "Une erreur s'est produite lors de la suppression du thérapeute.",
-    variant: 'danger',
-  });
-} finally {
-  setDeletingId(null);
-}}
+    } catch (err) {
+      console.error(err);
+      // ❌ Error notification
+      showNotification({
+        message: "Une erreur s'est produite lors de la suppression du thérapeute.",
+        variant: 'danger',
+      });
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
@@ -244,37 +262,33 @@ const { showNotification } = useNotificationContext();
                   className="form-control form-control-sm"
                   placeholder="Rechercher par nom, email, numéro..."
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ minWidth: 200 }}
                 />
 
                 <Dropdown>
                   <DropdownToggle className="btn btn-sm btn-primary dropdown-toggle text-white">
-                    {selectedBranch || 'Filtrer par succursale'}
+                    {selectedBranchId
+                      ? branchesList.find((b) => b.branch_id === selectedBranchId)?.name
+                      : 'Filtrer par succursale'}
                   </DropdownToggle>
                   <DropdownMenu>
-                    {BRANCHES.map((branch) => (
+                    {branchesList.map((branch) => (
                       <DropdownItem
-                        key={branch}
+                        key={branch.branch_id}
                         onClick={() => {
-                          setSelectedBranch(branch);
+                          setSelectedBranchId(branch.branch_id);
                           setCurrentPage(1);
                         }}
-                        active={selectedBranch === branch}
+                        active={selectedBranchId === branch.branch_id}
                       >
-                        {branch}
+                        {branch.name}
                       </DropdownItem>
                     ))}
-                    {selectedBranch && (
+                    {selectedBranchId && (
                       <DropdownItem
                         className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null);
-                          setCurrentPage(1);
-                        }}
+                        onClick={() => setSelectedBranchId(null)}
                       >
                         Clear Branch Filter
                       </DropdownItem>
@@ -309,14 +323,14 @@ const { showNotification } = useNotificationContext();
                       </tr>
                     </thead>
                     <tbody>
-                      {currentData.length === 0 ? (
+                      {filteredTeamMembers.length === 0 ? (
                         <tr>
                           <td colSpan={10} className="text-center py-4 text-muted">
                             No data found
                           </td>
                         </tr>
                       ) : (
-                        currentData.map((item, idx) => (
+                        filteredTeamMembers.map((item, idx) => (
                           <tr key={item.team_id ?? `team-member-${idx}`}>
                             <td>{(currentPage - 1) * PAGE_SIZE + idx + 1}</td>
                             <td>{getProfileDisplay(item)}</td>
