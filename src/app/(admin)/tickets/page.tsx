@@ -325,7 +325,7 @@ const TicketPage = () => {
                 </Col>
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Nom</Form.Label>
+                    <Form.Label>Nom de famille </Form.Label>
                     <Form.Control
                       type="text"
                       value={editTicket.last_name}
