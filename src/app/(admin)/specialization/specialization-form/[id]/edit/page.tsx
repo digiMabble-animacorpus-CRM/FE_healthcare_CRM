@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import SpecializationForm, { SpecializationFormValues } from '../../specializationForm';
+import { useNotificationContext } from '@/context/useNotificationContext';
 
 export interface Props {
   defaultValues?: Partial<SpecializationFormValues>;
@@ -19,7 +20,7 @@ const EditSpecializationPage = ({ params }: { params: { id?: string } }) => {
     Partial<SpecializationFormValues & { specialization_id?: string }>
   >({});
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
-
+  const { showNotification } = useNotificationContext();
   useEffect(() => {
     if (!params.id) {
       setLoading(false);
@@ -80,9 +81,19 @@ const EditSpecializationPage = ({ params }: { params: { id?: string } }) => {
           },
         },
       );
-      router.push('/specialization');
+      showNotification({
+        message: 'Spécialisation mise à jour avec succès !',
+        variant: 'success',
+      });
+
+      setTimeout(() => {
+        router.push('/specialization');
+      }, 500);
     } catch (error) {
-      setMessage({ type: 'error', text: 'Error updating specialization' });
+      showNotification({
+        message: 'Échec de la modification de la spécialisation.',
+        variant: 'danger',
+      });
     }
   };
 

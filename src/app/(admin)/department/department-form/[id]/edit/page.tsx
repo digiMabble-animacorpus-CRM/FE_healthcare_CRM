@@ -5,6 +5,7 @@ import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import DepartmentForm, { DepartmentFormValues } from '../../departmentForm';
+import { useNotificationContext } from '@/context/useNotificationContext';
 
 export interface Props {
   defaultValues?: Partial<DepartmentFormValues>;
@@ -14,6 +15,7 @@ export interface Props {
 
 const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
   const router = useRouter();
+  const { showNotification } = useNotificationContext();
   const [loading, setLoading] = useState(true);
   const [defaultValues, setDefaultValues] = useState<
     Partial<DepartmentFormValues & { department_id?: string }>
@@ -79,7 +81,11 @@ const EditDepartmentPage = ({ params }: { params: { id?: string } }) => {
         },
       );
 
-      // toast.success('Department updated successfully!');
+      showNotification({
+        message: 'Département mis à jour avec succès !',
+        variant: 'success',
+      });
+
       router.push('/department');
     } catch (error) {
       console.error(error);
