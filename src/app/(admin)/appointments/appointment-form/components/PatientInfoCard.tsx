@@ -4,6 +4,7 @@
 import { createPatient, findPatient, updatePatient } from '@/helpers/patient';
 import type { PatientType } from '../types/appointment';
 import { useState, useEffect } from 'react';
+import { useNotificationContext } from '@/context/useNotificationContext';
 import {
   Badge,
   Button,
@@ -87,7 +88,7 @@ const PatientInfoCard = ({
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [mode, setMode] = useState<'search' | 'view' | 'edit' | 'new'>(initialMode);
-
+ const { showNotification } = useNotificationContext();
   useEffect(() => {
     if (initialData) {
       setFormData(initialData);
@@ -108,30 +109,55 @@ const PatientInfoCard = ({
     onReset?.();
   };
 
-  const handleSearch = async () => {
-    if (!searchTerm.trim()) {
-      setErrorMsg('Please enter a search term');
-      return;
+const handleSearch = async () => {
+  if (!searchTerm.trim()) {
+    // setErrorMsg('Veuillez entrer un terme de recherche');
+    showNotification({
+      message: 'Veuillez entrer un terme de recherche',
+      variant: 'danger',
+    });
+    return;
+  }
+
+  setLoading(true);
+  try {
+    const result = await findPatient(searchTerm.trim());
+
+    if (result) {
+      setFormData(result);
+      setMode('view');
+      setErrorMsg(null);
+      onSave?.(result);
+
+     
+      showNotification({
+        message: 'Patient trouvé avec succès !',
+        variant: 'success',
+      });
+    } else {
+      // setErrorMsg('Aucun patient trouvé. Essayez d’en ajouter un nouveau.');
+      setFormData(emptyPatient);
+      setMode('search');
+
+     
+      showNotification({
+        message: 'Aucun patient trouvé. Essayez d’en ajouter un nouveau.',
+        variant: 'danger',
+      });
     }
-    setLoading(true);
-    try {
-      const result = await findPatient(searchTerm.trim());
-      if (result) {
-        setFormData(result);
-        setMode('view');
-        setErrorMsg(null);
-        onSave?.(result);
-      } else {
-        setErrorMsg('Aucun patient trouvé. Essayez den ajouter un nouveau.');
-        setFormData(emptyPatient);
-        setMode('search');
-      }
-    } catch (err: any) {
-      setErrorMsg(err.message || 'La recherche a échoué');
-    } finally {
-      setLoading(false);
-    }
-  };
+  } catch (err: any) {
+    // setErrorMsg(err.message || 'La recherche a échoué');
+
+    
+    showNotification({
+      message: 'Échec de la recherche du patient. Veuillez réessayer.',
+      variant: 'danger',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   const handleChange = (field: keyof PatientType, value: any) => {
     setFormData((prev) => ({
@@ -167,45 +193,62 @@ const PatientInfoCard = ({
     }
   };
 
-  const handleSave = async () => {
-    setLoading(true);
-    try {
-      const isValid = await validateForm();
-      if (!isValid) {
-        setErrorMsg('Please fix the validation errors');
-        setLoading(false);
-        return;
-      }
-
-      if (formData.birthdate) {
-        formData.birthdate = new Date(formData.birthdate).toISOString();
-      }
-
-      let ok = false;
-
-      if (mode === 'edit' && formData.id) {
-        ok = await updatePatient(formData.id, formData);
-        if (ok) {
-          setSuccessMsg('Patient updated successfully');
-          setMode('view');
-          onSave?.(formData);
-        }
-      } else if (mode === 'new') {
-        ok = await createPatient(formData);
-        if (ok) {
-          setSuccessMsg('Patient created successfully');
-          setMode('view');
-          onSave?.(formData);
-        }
-      }
-
-      if (!ok) setErrorMsg('Failed to save patient');
-    } catch (err: any) {
-      setErrorMsg(err.message || 'Save failed');
-    } finally {
+const handleSave = async () => {
+  setLoading(true);
+  try {
+    const isValid = await validateForm();
+    if (!isValid) {
+      showNotification({
+        message: 'Veuillez corriger les erreurs de validation.',
+        variant: 'danger',
+      });
       setLoading(false);
+      return;
     }
-  };
+
+    if (formData.birthdate) {
+      formData.birthdate = new Date(formData.birthdate).toISOString();
+    }
+
+    let ok = false;
+
+    if (mode === 'edit' && formData.id) {
+      ok = await updatePatient(formData.id, formData);
+      if (ok) {
+        showNotification({
+          message: 'Patient mis à jour avec succès !',
+          variant: 'success',
+        });
+        setMode('view');
+        onSave?.(formData);
+      }
+    } else if (mode === 'new') {
+      ok = await createPatient(formData);
+      if (ok) {
+        showNotification({
+          message: 'Patient créé avec succès !',
+          variant: 'success',
+        });
+        setMode('view');
+        onSave?.(formData);
+      }
+    }
+
+    if (!ok) {
+      showNotification({
+        message: 'Échec de l’enregistrement du patient.',
+        variant: 'danger',
+      });
+    }
+  } catch (err: any) {
+    showNotification({
+      message: err.message || 'Échec de la sauvegarde du patient.',
+      variant: 'danger',
+    });
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <Card className="shadow-sm">
@@ -215,7 +258,7 @@ const PatientInfoCard = ({
         </CardTitle>
       </CardHeader>
       <CardBody>
-        {errorMsg && (
+        {/* {errorMsg && (
           <div className="alert alert-danger alert-dismissible fade show" role="alert">
             {errorMsg}
             <button type="button" className="btn-close" onClick={() => setErrorMsg(null)}></button>
@@ -230,8 +273,8 @@ const PatientInfoCard = ({
               className="btn-close"
               onClick={() => setSuccessMsg(null)}
             ></button>
-          </div>
-        )}
+          </div> */}
+        {/* )} */}
 
         {mode === 'search' && (
           <div className="mb-4">
