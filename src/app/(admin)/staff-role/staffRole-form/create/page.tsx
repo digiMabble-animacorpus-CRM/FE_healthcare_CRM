@@ -1,9 +1,8 @@
 'use client';
 
-import { toast } from 'react-toastify';
-import { useRouter } from 'next/navigation';
 import type { StaffRoleType } from '@/types/data';
 import dynamic from 'next/dynamic';
+import { useRouter } from 'next/navigation';
 
 // Dynamic import prevents SSR from executing DOM-dependent code
 const StaffRoleForm = dynamic(() => import('../staffRoleForm'), { ssr: false });
