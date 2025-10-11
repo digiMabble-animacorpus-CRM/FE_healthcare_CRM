@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast } from 'react-toastify';
+// import { toast } from 'react-toastify';
 import BranchForm, { BranchFormValues } from '../../branchForm';
 import { API_BASE_PATH } from '@/context/constants';
 import { Spinner } from 'react-bootstrap';
 import axios from 'axios';
+import { useNotificationContext } from '@/context/useNotificationContext';
 
 interface Props {
   params: { id?: string };
@@ -14,6 +15,7 @@ interface Props {
 
 const EditBranchPage = ({ params }: Props) => {
   const router = useRouter();
+  const { showNotification } = useNotificationContext();
   const [loading, setLoading] = useState(true);
   const [defaultValues, setDefaultValues] = useState<
     Partial<BranchFormValues & { branch_id?: string }>
@@ -49,7 +51,7 @@ const EditBranchPage = ({ params }: Props) => {
           });
         }
       } catch (err) {
-        toast.error('Failed to load branch details');
+        // toast.error('Failed to load branch details');
       } finally {
         setLoading(false);
       }
@@ -57,6 +59,30 @@ const EditBranchPage = ({ params }: Props) => {
 
     fetchData();
   }, [params.id]);
+
+  const onSubmitHandler = async (data: BranchFormValues) => {
+    if (!params.id) return;
+    try {
+      const token = localStorage.getItem('access_token');
+      await axios.patch(`${API_BASE_PATH}/branches/${params.id}`, data, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      showNotification({
+        message: 'Succursale mise à jour avec succès !',
+        variant: 'success',
+      });
+
+      setTimeout(() => {
+        router.push('/branches');
+      }, 500); // Wait 500ms before redirecting
+    } catch (error) {
+      showNotification({
+        message: "Échec de la modification de la succursale.",
+        variant: 'danger',
+      });
+    }
+  };
 
   if (loading) {
     return (
@@ -67,7 +93,7 @@ const EditBranchPage = ({ params }: Props) => {
     );
   }
 
-  return <BranchForm defaultValues={defaultValues} isEditMode />;
+  return <BranchForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />;
 };
 
 export default EditBranchPage;

@@ -1,37 +1,39 @@
 'use client';
 
-import { toast } from 'react-toastify';
 import { useRouter } from 'next/navigation';
 import BranchForm, { BranchFormValues } from '../branchForm';
 import { API_BASE_PATH } from '@/context/constants';
+import { useNotificationContext } from '@/context/useNotificationContext';
+import axios from 'axios';
 
 const CreateBranchPage = () => {
   const router = useRouter();
+  const { showNotification } = useNotificationContext();
 
-  const handleCreate = async (data: BranchFormValues) => {
+  const onSubmitHandler = async (data: BranchFormValues) => {
     try {
       const token = localStorage.getItem('access_token');
-
-      const res = await fetch(`${API_BASE_PATH}/branches`, {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data),
+      await axios.post(`${API_BASE_PATH}/branches`, data, {
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      if (!res.ok) throw new Error('Failed to create branch');
+      showNotification({
+        message: 'Succursale ajoutée avec succès !',
+        variant: 'success',
+      });
 
-      toast.success('Branch created successfully!');
-      router.push('/branches');
+      setTimeout(() => {
+        router.push('/branches');
+      }, 500); // Wait 500ms before redirecting
     } catch (error) {
-      console.error(error);
-      toast.error('Failed to create branch.');
+      showNotification({
+        message: "Échec de l'ajout de la succursale.",
+        variant: 'danger',
+      });
     }
   };
 
-  return <BranchForm />;
+  return <BranchForm onSubmitHandler={onSubmitHandler} />;
 };
 
 export default CreateBranchPage;
