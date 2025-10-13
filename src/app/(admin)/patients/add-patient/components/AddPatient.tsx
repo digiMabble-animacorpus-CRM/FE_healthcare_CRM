@@ -48,7 +48,13 @@ export const schema: yup.ObjectSchema<Partial<any>> = yup
     middlename: yup.string(),
     emails: yup.string().email('E-mail invalide').required('Veuillez saisir votre adresse e-mail'),
 
-    phones: yup.array().of(yup.string().optional()),
+    phones: yup.array().of(
+      yup
+        .string()
+        .matches(/^\+?[0-9]{6,15}$/, 'Numéro de téléphone invalide')
+        .required('Veuillez saisir un numéro de téléphone'),
+    ),
+
     birthdate: yup.string().required('Veuillez saisir votre date de naissance'),
 
     street: yup.string().optional(),
@@ -77,7 +83,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   const [successMessage, setSuccessMessage] = useState<string>('');
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [allLanguages, setAllLanguages] = useState<LanguageType[]>([]);
-const { showNotification } = useNotificationContext();
+  const { showNotification } = useNotificationContext();
   const [defaultValues, setDefaultValues] = useState<Partial<PatientType>>({
     createdAt: '',
     _id: '',
@@ -151,44 +157,44 @@ const { showNotification } = useNotificationContext();
       languageId: data.languageId ? Number(data.languageId) : undefined,
     };
 
-   try {
-  if (isEditMode && params?.id) {
-    const success = await updatePatient(params.id, payload as any);
-    if (success) {
+    try {
+      if (isEditMode && params?.id) {
+        const success = await updatePatient(params.id, payload as any);
+        if (success) {
+          showNotification({
+            message: 'Patient mis à jour avec succès !',
+            variant: 'success',
+          });
+          setTimeout(() => router.back(), 2000);
+        } else {
+          showNotification({
+            message: 'Échec de la mise à jour du patient',
+            variant: 'danger',
+          });
+        }
+      } else {
+        const success = await createPatient(payload as any);
+        if (success) {
+          showNotification({
+            message: 'Patient créé avec succès !',
+            variant: 'success',
+          });
+          setTimeout(() => router.back(), 2000);
+        } else {
+          showNotification({
+            message: 'Échec de la création du patient',
+            variant: 'danger',
+          });
+        }
+      }
+    } catch (error) {
+      console.error(error);
       showNotification({
-        message: 'Patient mis à jour avec succès !',
-        variant: 'success',
-      });
-      setTimeout(() => router.back(), 2000);
-    } else {
-      showNotification({
-        message: 'Échec de la mise à jour du patient',
+        message: 'Une erreur est survenue. Veuillez réessayer.',
         variant: 'danger',
       });
     }
-  } else {
-    const success = await createPatient(payload as any);
-    if (success) {
-      showNotification({
-        message: 'Patient créé avec succès !',
-        variant: 'success',
-      });
-      setTimeout(() => router.back(), 2000);
-    } else {
-      showNotification({
-        message: 'Échec de la création du patient',
-        variant: 'danger',
-      });
-    }
-  }
-} catch (error) {
-  console.error(error);
-  showNotification({
-    message: 'Une erreur est survenue. Veuillez réessayer.',
-    variant: 'danger',
-  });
-}}
-
+  };
 
   if (loading)
     return (
@@ -257,10 +263,11 @@ const { showNotification } = useNotificationContext();
               <TextFormInput
                 control={control}
                 name={`phones.0`}
-                label={renderLabel('Numéro de téléphone')}
+                label={renderLabel('Numéro de téléphone', true)}
                 placeholder="Entrez le numéro de téléphone"
-                type="number"
+                type="text"
               />
+              {errors.phones?.[0] && <div className="text-danger">{errors.phones[0]?.message}</div>}
             </Col>
             <Col lg={6} className="mb-3">
               <TextFormInput

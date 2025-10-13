@@ -93,7 +93,7 @@ const EditBranchPage = ({ params }: Props) => {
     );
   }
 
-  return <BranchForm defaultValues={defaultValues} isEditMode onSubmitHandler={onSubmitHandler} />;
+  return <BranchForm defaultValues={defaultValues} isEditMode />;
 };
 
 export default EditBranchPage;

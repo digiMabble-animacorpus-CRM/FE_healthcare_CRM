@@ -16,7 +16,7 @@ import {
   Col,
   Form,
   Row,
-  Spinner
+  Spinner,
 } from 'react-bootstrap';
 import { FormProvider, useForm } from 'react-hook-form';
 import * as yup from 'yup';
@@ -45,7 +45,6 @@ interface Props {
 const BranchForm = ({ defaultValues, isEditMode = false }: Props) => {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
-  // const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
   const { showNotification } = useNotificationContext();
   const methods = useForm<BranchFormValues>({
     resolver: yupResolver(schema),

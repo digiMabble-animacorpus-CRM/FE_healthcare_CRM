@@ -33,7 +33,7 @@ const CreateBranchPage = () => {
     }
   };
 
-  return <BranchForm onSubmitHandler={onSubmitHandler} />;
+  return <BranchForm />;
 };
 
 export default CreateBranchPage;

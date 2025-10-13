@@ -96,10 +96,10 @@ const PatientDetails = ({
           <IconifyIcon icon="ri:arrow-left-line" />
           Retour à la liste
         </Button>
-        <Button variant="primary">
+        {/* <Button variant="primary">
           <IconifyIcon icon="ri:calendar-event-line" />
           Prendre rendez-vous
-        </Button>
+        </Button> */}
       </div>
 
       {/* Profile Section */}
