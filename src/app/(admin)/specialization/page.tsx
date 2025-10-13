@@ -118,17 +118,9 @@ const handleConfirmDelete = async () => {
 const handleToggleStatus = async (specializationId: string, newStatus: boolean) => {
   try {
     const token = localStorage.getItem('access_token');
-    const spec = specializations.find((s) => s.specialization_id === specializationId);
-    if (!spec) return;
-
     await axios.patch(
       `${API_BASE_PATH}/specializations/${specializationId}`,
-      {
-        department_id: spec.department_id,
-        specialization_type: spec.specialization_type,
-        description: spec.description,
-        is_active: newStatus,
-      },
+      { is_active: newStatus },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -137,11 +129,8 @@ const handleToggleStatus = async (specializationId: string, newStatus: boolean) 
       }
     );
 
-    setSpecializations((prev) =>
-      prev.map((s) =>
-        s.specialization_id === specializationId ? { ...s, is_active: newStatus } : s
-      )
-    );
+    // Refetch to get the latest status from backend
+    fetchSpecializations(currentPage);
 
     showNotification({
       message: `Statut mis à jour avec succès en ${newStatus ? 'Actif' : 'Inactif'}.`,
@@ -149,12 +138,6 @@ const handleToggleStatus = async (specializationId: string, newStatus: boolean) 
     });
   } catch (error) {
     console.error('Failed to update status:', error);
-
-    setSpecializations((prev) =>
-      prev.map((s) =>
-        s.specialization_id === specializationId ? { ...s, is_active: !newStatus } : s
-      )
-    );
 
     showNotification({
       message: 'Échec de la mise à jour du statut de la spécialisation.',
@@ -226,7 +209,7 @@ const handleToggleStatus = async (specializationId: string, newStatus: boolean) 
                         <th>Spécialisation</th>
                         <th>Description</th>
                         <th>Département</th>
-                        <th>Statut</th>
+                        <th>Status</th>
                         <th>Action</th>
                       </tr>
                     </thead>

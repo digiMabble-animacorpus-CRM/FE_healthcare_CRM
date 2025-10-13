@@ -128,37 +128,37 @@ const handleConfirmDelete = async () => {
   }
 };
 
-const handleToggleStatus = async (languageId: number, newStatus: boolean) => {
-  try {
-    await axios.patch(
-      `${API_BASE_PATH}/languages/${languageId}`,
-      { is_active: newStatus },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
+// const handleToggleStatus = async (languageId: number, newStatus: boolean) => {
+//   try {
+//     await axios.patch(
+//       `${API_BASE_PATH}/languages/${languageId}`,
+//       { is_active: newStatus },
+//       {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//         },
+//       }
+//     );
 
-    setLanguages((prevLanguages) =>
-      prevLanguages.map((lang) =>
-        lang.id === languageId ? { ...lang, is_active: newStatus } : lang
-      )
-    );
+//     setLanguages((prevLanguages) =>
+//       prevLanguages.map((lang) =>
+//         lang.id === languageId ? { ...lang, is_active: newStatus } : lang
+//       )
+//     );
 
-    showNotification({
-      message: `Language ${newStatus ? 'activé' : 'désactivé'} avec succès`,
-      variant: 'success',
-    });
-  } catch (error) {
-    console.error('Failed to update status:', error);
+//     showNotification({
+//       message: `Language ${newStatus ? 'activé' : 'désactivé'} avec succès`,
+//       variant: 'success',
+//     });
+//   } catch (error) {
+//     console.error('Failed to update status:', error);
 
-    showNotification({
-      message: 'Échec de la suppression language',
-      variant: 'danger',
-    });
-  }
-};
+//     showNotification({
+//       message: 'Échec de la suppression language',
+//       variant: 'danger',
+//     });
+//   }
+// };
 
 
   return (
