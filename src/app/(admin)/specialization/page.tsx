@@ -209,7 +209,7 @@ const handleToggleStatus = async (specializationId: string, newStatus: boolean) 
                         <th>Spécialisation</th>
                         <th>Description</th>
                         <th>Département</th>
-                        <th>Status</th>
+                        {/* <th>Status</th> */}
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -220,7 +220,7 @@ const handleToggleStatus = async (specializationId: string, newStatus: boolean) 
                           <td>{spec.specialization_type}</td>
                           <td>{spec.description}</td>
                           <td>{spec.department_name}</td>
-                          <td>
+                          {/* <td>
                             <div className="form-check form-switch">
                               <input
                                 className="form-check-input"
@@ -239,7 +239,7 @@ const handleToggleStatus = async (specializationId: string, newStatus: boolean) 
                                 {spec.is_active ? 'Active' : 'Inactive'}
                               </label>
                             </div>
-                          </td>
+                          </td> */}
                           <td>
                             <div className="d-flex gap-2">
                               <Button
