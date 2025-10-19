@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 import LanguageForm, { LanguageFormValues } from '../../languageForm';
+import { useNotificationContext } from '@/context/useNotificationContext';
 
 interface Props {
   params: { id?: string };
@@ -14,7 +15,7 @@ interface Props {
 const EditLanguagePage = ({ params }: Props) => {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
-
+const { showNotification } = useNotificationContext();
   // Default values to prefill the form
   const [defaultValues, setDefaultValues] = useState<
     Partial<LanguageFormValues & { _id?: string }>
@@ -82,12 +83,20 @@ const EditLanguagePage = ({ params }: Props) => {
         },
       );
 
-      // toast.success('Language updated successfully!');
+      showNotification({
+      message: 'Langue modifiée avec succès !',
+      variant: 'success',
+    });
+
+    setTimeout(() => {
       router.push('/languages');
+    }, 500);
     } catch (error) {
-      console.error('Update error:', error);
-      toast.error('Error updating language');
-    }
+    showNotification({
+      message: "Échec de la modification de la langue.",
+      variant: 'danger',
+    });
+  }
   };
 
   if (loading) return <div>Loading language details...</div>;
