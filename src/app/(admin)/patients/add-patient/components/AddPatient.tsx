@@ -138,6 +138,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
             phones: patient.phones?.length ? patient.phones : [''],
 
             languageId: patient.languageId ? String(patient.languageId) : '',
+              mutualityregistrationnumber: patient.rpnumber || '',
           };
 
           setDefaultValues(mappedPatient);
@@ -153,6 +154,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     setErrorMessage('');
     const payload = {
       ...data,
+      rpnumber: data.mutualityregistrationnumber,
       phones: data.phones?.filter((p) => p.trim() !== '') ?? [],
       languageId: data.languageId ? Number(data.languageId) : undefined,
     };
