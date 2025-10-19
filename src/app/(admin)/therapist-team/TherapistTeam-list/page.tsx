@@ -290,7 +290,7 @@ const TherapistTeamsListPage = () => {
                         className="text-danger"
                         onClick={() => setSelectedBranchId(null)}
                       >
-                        Clear Branch Filter
+                        Supprimer le filtre de succursale
                       </DropdownItem>
                     )}
                   </DropdownMenu>

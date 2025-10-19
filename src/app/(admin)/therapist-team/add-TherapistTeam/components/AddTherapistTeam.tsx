@@ -887,7 +887,7 @@ const AddTherapistTeamPage: React.FC<AddTherapistProps> = ({ editId }) => {
           <Row className="justify-content-end g-2 mt-2">
             <Col lg={2}>
               <Button type="submit" variant="primary" className="w-100" disabled={isSubmitting}>
-                {editId ? 'Update' : 'Create'} Therapist
+                {editId ? 'mise à jour' : 'créer'} Thérapeute
               </Button>
             </Col>
             <Col lg={2}>
