@@ -111,7 +111,8 @@ const PatientDetailsPage = () => {
           note: rawPatient.note || '',
           status: rawPatient.status || 'INACTIVE',
           mutualitynumber: rawPatient.mutualitynumber || '',
-          mutualityregistrationnumber: rawPatient.mutualityregistrationnumber || '',
+          mutualityregistrationnumber:
+    rawPatient.mutualityregistrationnumber || rawPatient.rpnumber || '',
           emails: rawPatient.emails || '',
           country: rawPatient.country || '',
           city: rawPatient.city || '',
