@@ -142,14 +142,36 @@ const ChatHistory: React.FC = () => {
   const handleFilter = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (startDate && endDate && startDate > endDate) {
+    // both startDate and endDate are required when attempting a date range filter
+    const startProvided = !!startDate;
+    const endProvided = !!endDate;
+
+    if (startProvided !== endProvided) {
+      // one provided but not the other -> notify and stop
       showNotification({
-        message: 'Start date cannot be after end date',
+        message: 'Please enter both Start date and End date.',
         variant: 'danger',
       });
       return;
     }
 
+    if (startProvided && endProvided && startDate > endDate) {
+      showNotification({
+        message: 'Start date cannot be after end date.',
+        variant: 'danger',
+      });
+      return;
+    }
+
+    // if both dates provided or none provided, proceed.
+    // prefer server-side filtering: call backend with provided params
+    await fetchChats({
+      start_date: startProvided ? startDate : undefined,
+      end_date: endProvided ? endDate : undefined,
+      email: filterEmail || undefined,
+    });
+
+    // keep a local filtered view (by email) for quick UI feedback if needed
     const filtered: GroupedChats = {};
     Object.entries(chats).forEach(([sid, chatData]) => {
       const matchEmail =
@@ -161,13 +183,6 @@ const ChatHistory: React.FC = () => {
 
     setFilteredChats(filtered);
     setCurrentPage(1);
-
-    // call backend API with start_date & end_date & optional email
-    await fetchChats({
-      start_date: startDate || undefined,
-      end_date: endDate || undefined,
-      email: filterEmail || undefined,
-    });
   };
 
   const handleClear = async () => {
@@ -299,9 +314,7 @@ const ChatHistory: React.FC = () => {
                   <Button type="submit" variant="primary" className="flex-grow-1">
                     Recherche
                   </Button>
-                  {/* <Button type="button" variant="secondary" onClick={handleClear}>
-                    Effacer
-                  </Button> */}
+
                 </div>
               </Col>
             </Row>
