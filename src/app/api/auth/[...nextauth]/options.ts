@@ -54,8 +54,8 @@ export const options: NextAuthOptions = {
     },
     session: ({ session, token }) => {
       session.user = {
-        email: 'user@demo.com',
-        name: 'Test User',
+        email: 'info@digimabble.com',
+        name: 'Digimabble',
       };
       return Promise.resolve(session);
     },

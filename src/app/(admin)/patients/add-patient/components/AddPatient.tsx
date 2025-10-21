@@ -167,7 +167,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
             message: 'Patient mis à jour avec succès !',
             variant: 'success',
           });
-          setTimeout(() => router.back(), 2000);
+           setTimeout(() => router.push('/patients/patient-list'), 2000);
         } else {
           showNotification({
             message: 'Échec de la mise à jour du patient',
@@ -181,7 +181,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
             message: 'Patient créé avec succès !',
             variant: 'success',
           });
-          setTimeout(() => router.back(), 2000);
+           setTimeout(() => router.push('/patients/patient-list'), 2000);
         } else {
           showNotification({
             message: 'Échec de la création du patient',
