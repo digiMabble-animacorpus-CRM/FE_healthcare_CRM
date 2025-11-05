@@ -1,7 +1,6 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { API_BASE_PATH, ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
 import type { BranchType } from '@/types/data';
 import axios from 'axios';
@@ -51,26 +50,25 @@ const BranchListPage = () => {
           'Content-Type': 'application/json',
         },
       });
-      
-      console.log("API Response:", response.data);
-      
+
+      console.log('API Response:', response.data);
+
       const data = response.data.elements || [];
       const responseTotalCount = response.data.totalCount || 0;
       const responseTotalPages = response.data.totalPages || 1;
       const responseCurrentPage = response.data.page || 1;
 
-      console.log("Processed data:", {
+      console.log('Processed data:', {
         dataLength: data.length,
         totalCount: responseTotalCount,
         totalPages: responseTotalPages,
-        currentPage: responseCurrentPage
+        currentPage: responseCurrentPage,
       });
 
       setBranches(data);
       setTotalCount(responseTotalCount);
       setTotalPages(responseTotalPages);
       setCurrentPage(responseCurrentPage); // Sync with API response
-
     } catch (error) {
       console.error('Failed to fetch branches:', error);
       setBranches([]);
@@ -154,41 +152,41 @@ const BranchListPage = () => {
       }
 
       const pages: (number | string)[] = [];
-      
+
       // Always show first page
       pages.push(1);
-      
+
       let startPage = Math.max(2, currentPage - 1);
       let endPage = Math.min(totalPages - 1, currentPage + 1);
-      
+
       // Adjust if near beginning
       if (currentPage <= 3) {
         endPage = 4;
       }
-      
+
       // Adjust if near end
       if (currentPage >= totalPages - 2) {
         startPage = totalPages - 3;
       }
-      
+
       // Add first ellipsis if needed
       if (startPage > 2) {
         pages.push('...');
       }
-      
+
       // Add middle pages
       for (let i = startPage; i <= endPage; i++) {
         pages.push(i);
       }
-      
+
       // Add second ellipsis if needed
       if (endPage < totalPages - 1) {
         pages.push('...');
       }
-      
+
       // Always show last page
       pages.push(totalPages);
-      
+
       return pages;
     };
 
@@ -206,16 +204,16 @@ const BranchListPage = () => {
         </li>
 
         {getPageNumbers().map((pageNum, index) => (
-          <li 
-            key={index} 
+          <li
+            key={index}
             className={`page-item ${currentPage === pageNum ? 'active' : ''} ${pageNum === '...' ? 'disabled' : ''}`}
           >
             {pageNum === '...' ? (
               <span className="page-link">...</span>
             ) : (
-              <Button 
-                variant="link" 
-                className="page-link" 
+              <Button
+                variant="link"
+                className="page-link"
                 onClick={() => handlePageChange(pageNum as number)}
               >
                 {pageNum}
@@ -337,9 +335,7 @@ const BranchListPage = () => {
               )}
             </CardBody>
 
-            <CardFooter>
-              {renderPagination()}
-            </CardFooter>
+            <CardFooter>{renderPagination()}</CardFooter>
           </Card>
         </Col>
       </Row>

@@ -200,7 +200,7 @@ const ChatHistory: React.FC = () => {
           <CardBody>
             <div className="d-flex flex-column align-items-center justify-content-center py-4">
               <Spinner animation="border" role="status" className="mb-3" />
-              <div className="mb-3 text-muted">Chargement de l'historique des discussions...</div>
+              <div className="mb-3 text-muted">Chargement de l historique des discussions...</div>
 
               <Row className="w-100">
                 {[0, 1, 2].map((i) => (
@@ -314,7 +314,6 @@ const ChatHistory: React.FC = () => {
                   <Button type="submit" variant="primary" className="flex-grow-1">
                     Recherche
                   </Button>
-
                 </div>
               </Col>
             </Row>
@@ -328,7 +327,7 @@ const ChatHistory: React.FC = () => {
                 <Col md={4} key={sid} className="mb-4">
                   <Card className="h-100 shadow-sm">
                     <CardHeader className="bg-light">
-                      <strong>Identifiant de messagerie de l'utilisateur: {chatData.email}</strong>
+                      <strong>Identifiant de messagerie de l utilisateur: {chatData.email}</strong>
                       <div className="text-muted small">Date: {formatDate(chatData.createdAt)}</div>
                     </CardHeader>
                     <CardBody className="p-3">
