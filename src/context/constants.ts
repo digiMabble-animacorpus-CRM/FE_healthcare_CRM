@@ -16,6 +16,10 @@ export const basePath = '';
 
 export const DEFAULT_PAGE_TITLE = 'Anima Corpus CRM';
 
+export const ROSA_BASE_API_PATH = "https://api-public-integration.rosa.be/api";
+
+export const ROSA_TOKEN = "NjkwOGY0NDAyMmYxYjk0MzRjZjBlNDAzOmM4M2QwNmVlNTcxMTMwNzE5MTljNjZiNWMxNWQwNDBlYzRmODBjZTA2N2NkOGY5YmFhZTYwN2YwMzdlN2VkY2U=";
+
 // Replace the URL's value in env with your backend's URL or if you're using nextjs's API, add the server's origin URL
 export const API_BASE_PATH = 'http://164.92.220.65/api/v1';
 // export const API_BASE_PATH = 'http://localhost:8080/api/v1';

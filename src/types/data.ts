@@ -63,23 +63,83 @@ export type UserType = {
   emailMessage?: string;
 };
 
+// 🔹 Birth date structure
+export type BirthDate = {
+  year: number
+  month: number
+  day: number
+}
+
+// 🔹 Contact info entries (email, phone, etc.)
+export type ContactInfo = {
+  value: string
+  type: 'EMAIL' | 'PHONE' | 'OTHER'
+  description?: string
+  isPrimary?: boolean
+  isEmergency?: boolean
+  isVerified?: boolean
+}
+
+// 🔹 Coordinates for address
+export type Coordinates = {
+  lat: number
+  lng: number
+}
+
+// 🔹 Address structure
+export type AddressNew = {
+  street?: string
+  city?: string
+  country?: string
+  number?: string
+  zipCode?: string
+  coords?: Coordinates
+}
+
+// 🔹 Individual permissions per HP (health professional)
+export type IndividualPermission = {
+  hpId: string
+  permissions: string[]
+}
+
+// 🔹 Permissions section
+export type Permissions = {
+  organizationPermissions?: string[]
+  individualPermissions?: IndividualPermission[]
+}
+
+// 🔹 Main Patient type
 export type PatientType = {
+  id: string
+  externalId?: string
+  firstName: string
+  lastName: string
+  middleName?: string
+  ssin?: string
+  legalGender?: string
+  birthdate?: BirthDate
+  language?: string
+  contactInfos?: ContactInfo[]
+  note?: string
+  address?: AddressNew
+  status?: 'ACTIVE' | 'INACTIVE'
+  permissions?: Permissions
+  mergedFromIds?: string[]
+  mergedToId?: string
+
+
   // Required fields
   firstname: string;
   lastname: string;
-  birthdate: string;
   emails: string;
   number: string;
   legalgender: string;
-  language?: any;
   city: string;
   country: string;
   street: string;
-  note: string;
   tags?: string[];
   languageId?: string;
   // Optional fields
-  id?: string;
   _id?: string;
   visits?: number;
   prescriptions?: number;
@@ -88,8 +148,6 @@ export type PatientType = {
   middlename?: string;
   phones?: string[];
   primarypatientrecordid?: string;
-  ssin?: string;
-  status?: string;
   mutualitynumber?: string;
   mutualityregistrationnumber?: string;
   zipcode?: string;

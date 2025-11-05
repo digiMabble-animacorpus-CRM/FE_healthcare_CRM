@@ -1,6 +1,6 @@
 'use client';
 
-import { API_BASE_PATH } from '@/context/constants';
+import { API_BASE_PATH, ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
 import { decryptAES } from '@/utils/encryption';
 
 export interface PatientUpdatePayload {
@@ -26,30 +26,20 @@ export interface PatientUpdatePayload {
 export const getAllPatient = async (
   page: number = 1,
   limit: number = 10,
-  branch?: string,
-  from?: string,
-  to?: string,
-  search?: string,
-): Promise<{ data: any[]; totalCount: number }> => {
+): Promise<{ data: any[]; totalCount: number; totalPage: number; page: number }> => {
   try {
-    const token = localStorage.getItem('access_token');
+    const token = ROSA_TOKEN;
     if (!token) {
       console.warn('No access token found.');
-      return { data: [], totalCount: 0 };
+      return { data: [], totalCount: 0, totalPage: 0, page: 0 };
     }
 
-    const filters: Record<string, string> = {
+    const queryParams = new URLSearchParams({
       page: page.toString(),
       limit: limit.toString(),
-      ...(branch ? { branch } : {}),
-      ...(from ? { fromDate: from } : {}), // match backend param name
-      ...(to ? { toDate: to } : {}),
-      ...(search ? { searchText: search } : {}),
-    };
+    }).toString();
 
-    const queryParams = new URLSearchParams(filters).toString();
-
-    const response = await fetch(`${API_BASE_PATH}/patients?${queryParams}`, {
+    const response = await fetch(`${ROSA_BASE_API_PATH}/patients?${queryParams}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -60,38 +50,39 @@ export const getAllPatient = async (
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Backend error:', response.status, errorText);
-      return { data: [], totalCount: 0 };
+      return { data: [], totalCount: 0, totalPage: 0, page: 0 };
     }
 
     const jsonData = await response.json();
+    console.log(jsonData)
 
-    const patientData: any[] = Array.isArray(jsonData?.data)
-      ? jsonData.data
-      : jsonData?.data
-        ? [jsonData.data]
-        : [];
+    const patientData = Array.isArray(jsonData?.elements)
+      ? jsonData.elements
+      : [];
 
     return {
       data: patientData,
       totalCount: jsonData?.totalCount || 0,
+      totalPage: jsonData?.totalPages || 0,
+      page: jsonData?.page || 0,
+
     };
   } catch (error) {
     console.error('Error fetching patient:', error);
-    return { data: [], totalCount: 0 };
+    return { data: [], totalCount: 0, totalPage: 0, page: 0 };
   }
 };
 
+
 export const getPatientById = async (patientId: any): Promise<any | null> => {
-  const token = localStorage.getItem('access_token');
+  const token = ROSA_TOKEN;
   if (!token) {
     console.warn('No access token found.');
     return null;
   }
 
-  const url = `${API_BASE_PATH}/patients/${patientId}`;
-
   try {
-    const response = await fetch(url, {
+    const response = await fetch(`${ROSA_BASE_API_PATH}/patients/${patientId}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -100,14 +91,14 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
     });
 
     const result = await response.json();
+    console.log(result, "single patient")
     if (!response.ok) {
-      console.error('Failed to fetch patient:', result?.message || 'Unknown error');
+      console.error('Failed to fetch patient:',  'Unknown error');
       return null;
     }
 
-    // Directly return the patient data
-    if (result?.data) {
-      return result.data as any;
+    if (result) {
+      return result;
     }
 
     console.warn('No data found in response.');
