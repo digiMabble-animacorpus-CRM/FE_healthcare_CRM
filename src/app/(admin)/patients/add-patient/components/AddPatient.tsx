@@ -87,7 +87,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
   const [defaultValues, setDefaultValues] = useState<Partial<PatientType>>({
     createdAt: '',
     _id: '',
-    birthdate: '',
+    // birthdate: '',
     city: '',
     country: '',
     emails: '',
@@ -103,7 +103,7 @@ const AddPatient = ({ params, onSubmitHandler }: Props) => {
     phones: [''],
     primarypatientrecordid: '',
     ssin: '',
-    status: '',
+    // status: '',
     street: '',
     zipcode: '',
   });
