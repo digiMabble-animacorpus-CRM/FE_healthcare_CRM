@@ -402,7 +402,7 @@ const CallerListPage = () => {
       {/* Detail Modal */}
       <Modal show={showDetailModal} onHide={closeDetailModal} centered size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Détails de l'appel</Modal.Title>
+          <Modal.Title>Détails de l appel</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {detailLoading ? (
