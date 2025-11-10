@@ -1,122 +1,86 @@
-// TherapistDetailsPage.tsx
 'use client';
 
 import PageTitle from '@/components/PageTitle';
 import { getTherapistById } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import { Availability } from '../../add-therapist/components/AddTherapist';
-import TherapistDetails from './components/TherapistDetails';
-
-// ✅ Temporary placeholder branches list (replace with real import or API)
-const branchesList = [
-  { branch_id: 1, name: 'Main Branch' },
-  { branch_id: 2, name: 'Secondary Branch' },
-];
+import { Button, Card, Spinner } from 'react-bootstrap';
 
 const TherapistDetailsPage = () => {
-  const params = useParams();
-  const therapistId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const { id } = useParams();
+  const router = useRouter();
 
-  const [data, setData] = useState<TherapistType | null>(null);
+  const [therapist, setTherapist] = useState<TherapistType | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const fetchTherapist = async (): Promise<void> => {
-    setLoading(true);
-    try {
-      if (!therapistId) return;
-
-      const rawTherapist = await getTherapistById(therapistId);
-      if (!rawTherapist) {
-        setData(null);
-        return;
-      }
-
-      const transformedData: TherapistType = {
-        id: rawTherapist.therapistId ?? null,
-        therapistId: rawTherapist.therapistId ?? null,
-        firstName: rawTherapist.firstName || '',
-        lastName: rawTherapist.lastName || '',
-        fullName: `${rawTherapist.firstName || ''} ${rawTherapist.lastName || ''}`.trim(),
-        photo: rawTherapist.photo || null,
-        imageUrl: rawTherapist.imageUrl || rawTherapist.photo || null,
-        contactEmail: rawTherapist.contactEmail || '',
-        contactPhone: rawTherapist.contactPhone || '',
-        inamiNumber: rawTherapist.inamiNumber ? String(rawTherapist.inamiNumber) : '',
-        aboutMe: rawTherapist.aboutMe || null,
-        degreesAndTraining: rawTherapist.degreesAndTraining || rawTherapist.degreesTraining || null,
-        departmentId: rawTherapist.departmentId ?? rawTherapist.department?.id ?? null,
-        departmentName: rawTherapist.department?.name || null,
-
-        // ✅ Required TherapistType props
-        centerAddress: rawTherapist.centerAddress || '',
-        appointmentStart: rawTherapist.appointmentStart || '',
-        jobTitle: rawTherapist.jobTitle || '',
-
-        specializations: Array.isArray(rawTherapist.specializations)
-          ? rawTherapist.specializations.map((s: any) => ({
-              id: s.specialization_id ?? null,
-              name: s.specialization_type ?? '',
-            }))
-          : [],
-
-        branches: Array.isArray(rawTherapist.branches)
-          ? rawTherapist.branches.map((b: any) => {
-              const branchId = b.branch_id ?? b.id ?? b ?? 0;
-              const branchName =
-                b.name || branchesList.find((br) => br.branch_id === branchId)?.name || '';
-
-              const rootAvailability: Availability[] = Array.isArray(rawTherapist.availability)
-                ? rawTherapist.availability.map((av: any) => ({
-                    branchId: av.branchId ?? av.branch_id ?? null,
-                    day: av.day ?? av.d ?? '',
-                    startTime: av.startTime ?? av.start_time ?? av.from ?? '',
-                    endTime: av.endTime ?? av.end_time ?? av.to ?? '',
-                  }))
-                : [{ day: '', startTime: '', endTime: '' }];
-
-              const availabilityForThisBranch =
-                rootAvailability.length > 0
-                  ? rootAvailability.map((a) => ({ ...a }))
-                  : [{ day: '', startTime: '', endTime: '' }];
-
-              return {
-                branch_id: branchId,
-                branch_name: branchName,
-                availability: availabilityForThisBranch,
-              };
-            })
-          : [],
-
-        languages: Array.isArray(rawTherapist.languages) ? rawTherapist.languages : [],
-        faq: rawTherapist.faq || null,
-        paymentMethods: Array.isArray(rawTherapist.paymentMethods)
-          ? rawTherapist.paymentMethods
-          : [],
-      };
-
-      setData(transformedData);
-    } catch (error) {
-      console.error(error, 'Error loading therapist details');
-      alert('Failed to load therapist details');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    if (!therapistId) return;
-    fetchTherapist();
-  }, [therapistId]);
+    if (!id) return;
 
-  if (loading) return <p>Chargement...</p>;
-  if (!data) return <p>Aucun thérapeute trouvé.</p>;
+    const fetchTherapist = async () => {
+      setLoading(true);
+      try {
+        const data = await getTherapistById(id as string);
+        if (!data) throw new Error('Failed to fetch therapist');
+        setTherapist(data);
+      } catch (err) {
+        console.error('❌ Error fetching therapist:', err);
+        router.push('/therapists/therapist-list');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTherapist();
+  }, [id, router]);
+
+  if (loading)
+    return (
+      <div className="text-center py-5">
+        <Spinner animation="border" />
+        <p className="mt-2">Loading therapist details...</p>
+      </div>
+    );
+
+  if (!therapist)
+    return (
+      <div className="text-center py-5 text-muted">
+        <p>No therapist data found.</p>
+      </div>
+    );
 
   return (
     <>
-      <PageTitle subName="Healthcare" title="Présentation du thérapeute" />
-      <TherapistDetails data={data} />
+      <Button
+        className="mb-3"
+        variant="text"
+        size="sm"
+        onClick={() => router.push('/therapists/therapist-list')}
+      >
+        ← Back to List
+      </Button>
+
+      <PageTitle subName="Thérapeute" title="Détails du thérapeute" />
+
+      <Card className="shadow-sm border-0 mt-3">
+        <Card.Body>
+          <h4 className="mb-3">
+            {therapist.firstName} {therapist.lastName}
+          </h4>
+
+          <div className="row">
+            <div className="col-md-6 mb-3">
+              <strong>ID:</strong> <br />
+              <span>{therapist.id || 'N/A'}</span>
+            </div>
+
+            <div className="col-md-6 mb-3">
+              <strong>NIHII:</strong> <br />
+              <span>{therapist.nihii || 'N/A'}</span>
+            </div>
+          </div>
+        </Card.Body>
+      </Card>
     </>
   );
 };

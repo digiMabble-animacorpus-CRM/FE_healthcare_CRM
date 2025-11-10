@@ -17,7 +17,7 @@ export const MENU_ITEMS: MenuItemType[] = [
     key: 'appointments',
     label: 'Rendez-vous',
     icon: 'ri-calendar-line',
-    url: '/appointments/appointment-list',
+    url: '/appointment-calender',
   },
 
   {
@@ -72,7 +72,7 @@ export const MENU_ITEMS: MenuItemType[] = [
       {
         key: 'TherapistTeam-list',
         label: 'Liste des thérapeutes',
-        url: '/therapist-team/TherapistTeam-list',
+        url: '/therapists/therapists-list',
         parentKey: 'therapistsTeam',
       },
       {
