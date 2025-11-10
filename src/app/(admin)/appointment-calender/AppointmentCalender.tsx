@@ -5,6 +5,7 @@ import MiniCalendar from "./components/miniCalender";
 import CalendarFilters from "./components/calenderFilters";
 import MainCalendar from "./components/mainCalender";
 import CalendarHeader from "./components/calenderHeader";
+import EventDetailsModal from "./components/eventDetailModel";
 
 import { getAllEvents } from "./events/api";
 import { getAllSites } from "./sites/api";
@@ -18,41 +19,31 @@ import type { HealthProfessional } from "./hps/types";
 import type { Patient } from "./patients/types";
 import type { Calendar as CalendarType } from "./calendars/types";
 
-/**
- * CalendarDashboard
- * - loads all data (events, calendars, sites, hps, patients)
- * - exposes filters (site/hp/patient)
- * - shows mini calendar + header + main calendar
- *
- * Notes:
- * - Keep fetch sizes reasonable; adjust page/limit to your needs
- * - Toast UI Calendar will be populated from 'events' and 'calendars' props
- */
-
 const CalendarDashboard: React.FC = () => {
-  // data
+  // Data
   const [events, setEvents] = useState<CalendarEventType[]>([]);
   const [calendars, setCalendars] = useState<CalendarType[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [hps, setHps] = useState<HealthProfessional[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
 
-  // ui
+  // UI state
   const [loading, setLoading] = useState(false);
   const [view, setView] = useState<"day" | "week" | "month">("week");
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  const [selectedSite, setSelectedSite] = useState<string>("");
-  const [selectedHp, setSelectedHp] = useState<string>("");
-  const [selectedPatient, setSelectedPatient] = useState<string>("");
+  // Filters (arrays for multi-select)
+  const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
+  const [selectedHpIds, setSelectedHpIds] = useState<string[]>([]);
+  const [selectedPatientIds, setSelectedPatientIds] = useState<string[]>([]);
+  const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const [selectedType, setSelectedType] = useState<string[]>([]);
 
-  // calendar visibility (which calendars are shown)
   const [visibleCalendarIds, setVisibleCalendarIds] = useState<Set<string>>(new Set());
-
-  // label shown in header (range or month)
   const [displayLabel, setDisplayLabel] = useState<string>("");
+  const [selectedEvent, setSelectedEvent] = useState<CalendarEventType | null>(null);
 
-  // load initial data
+  // Load data
   useEffect(() => {
     const loadAll = async () => {
       setLoading(true);
@@ -63,20 +54,29 @@ const CalendarDashboard: React.FC = () => {
           getAllPatients(1, 200),
           getAllCalendars(1, 200),
         ]);
+
         setSites(sitesRes.data);
         setHps(hpsRes.data);
         setPatients(patientsRes.data);
         setCalendars(calendarsRes.data);
 
-        // initialize visible calendars to all calendars by default
-        setVisibleCalendarIds(new Set((calendarsRes.data || []).map((c) => c.id)));
+        // ✅ Select all filters by default
+        setSelectedSiteIds(sitesRes.data.map((s: Site) => s.id));
+        setSelectedHpIds(hpsRes.data.map((hp: HealthProfessional) => hp.id));
+        setSelectedPatientIds(patientsRes.data.map((p: Patient) => p.id));
+        setSelectedStatus(["ACTIVE", "CONFIRMED", "CANCELED", "ARCHIVED", "DELETED"]);
+        setSelectedType(["APPOINTMENT", "LEAVE", "PERSONAL", "EXTERNAL_EVENT"]);
 
-        // fetch events for a range around selectedDate (for initial load use month range)
-        // set from/to as ISO strings
+        // Initialize visible calendars
+        const calendarIds = calendarsRes.data.map((c: CalendarType) => c.id);
+        setVisibleCalendarIds(new Set(calendarIds));
+
+        // Events for month
         const start = new Date(selectedDate);
         start.setDate(1);
         const end = new Date(start);
         end.setMonth(start.getMonth() + 1);
+
         const eventsRes = await getAllEvents(1, 500, start.toISOString(), end.toISOString());
         setEvents(eventsRes.data || []);
       } catch (err) {
@@ -85,40 +85,54 @@ const CalendarDashboard: React.FC = () => {
         setLoading(false);
       }
     };
-
     loadAll();
   }, []);
 
-  // recalc filtered events based on filters + calendars
+  // Filter events
   const filteredEvents = useMemo(() => {
     return events.filter((ev) => {
-      // calendar must be visible
+      const cal = calendars.find((c) => c.id === ev.calendarId);
+      if (!cal) return false;
+
       if (!visibleCalendarIds.has(ev.calendarId)) return false;
 
-      // site filter (find calendar)
-      if (selectedSite) {
-        const cal = calendars.find((c) => c.id === ev.calendarId);
-        if (!cal || cal.siteId !== selectedSite) return false;
+      // Filter by site
+      if (selectedSiteIds.length && !selectedSiteIds.includes(cal.siteId)) return false;
+
+      // Filter by HP
+      if (selectedHpIds.length && !selectedHpIds.includes(cal.hpId)) return false;
+
+      // Filter by patient
+      if (selectedPatientIds.length) {
+        const match = selectedPatientIds.some(
+          (id) =>
+            ev.patientExId === id ||
+            patients.find((p) => p.id === id)?.externalId === ev.patientExId
+        );
+        if (!match) return false;
       }
 
-      // hp filter
-      if (selectedHp) {
-        const cal = calendars.find((c) => c.id === ev.calendarId);
-        if (!cal || cal.hpId !== selectedHp) return false;
-      }
+      // Filter by status
+      if (selectedStatus.length && !selectedStatus.includes(ev.status)) return false;
 
-      // patient filter (patientExId is external ID in events; we compare to patient.id or externalId)
-      if (selectedPatient) {
-        if (ev.patientExId !== selectedPatient && ev.patientExId !== patients.find((p) => p.id === selectedPatient)?.externalId) {
-          return false;
-        }
-      }
+      // Filter by type
+      if (selectedType.length && !selectedType.includes(ev.type)) return false;
 
       return true;
     });
-  }, [events, visibleCalendarIds, selectedSite, selectedHp, selectedPatient, calendars, patients]);
+  }, [
+    events,
+    visibleCalendarIds,
+    selectedSiteIds,
+    selectedHpIds,
+    selectedPatientIds,
+    selectedStatus,
+    selectedType,
+    calendars,
+    patients,
+  ]);
 
-  // toggle visibility per calendar
+  // Calendar visibility
   const toggleCalendarVisibility = (calendarId: string) => {
     setVisibleCalendarIds((prev) => {
       const next = new Set(prev);
@@ -128,7 +142,7 @@ const CalendarDashboard: React.FC = () => {
     });
   };
 
-  // header navigation handlers
+  // Navigation
   const onToday = () => setSelectedDate(new Date());
   const onPrev = () => {
     const d = new Date(selectedDate);
@@ -145,7 +159,7 @@ const CalendarDashboard: React.FC = () => {
     setSelectedDate(d);
   };
 
-  // when the main calendar supplies a visible range, format label for header
+  // Header label
   const handleRangeChange = (r: { start: Date; end: Date }) => {
     const start = r.start;
     const end = r.end;
@@ -153,41 +167,44 @@ const CalendarDashboard: React.FC = () => {
     if (view === "month") {
       setDisplayLabel(start.toLocaleString(undefined, { month: "long", year: "numeric" }));
     } else {
-      setDisplayLabel(`${start.toLocaleString(undefined, options)} — ${end.toLocaleString(undefined, options)}`);
+      setDisplayLabel(
+        `${start.toLocaleString(undefined, options)} — ${end.toLocaleString(undefined, options)}`
+      );
     }
   };
 
-  // event click
+  // Event click
   const handleEventClick = (ev: CalendarEventType) => {
-    // For now, just alert with basic info. Replace with modal as needed.
-    const cal = calendars.find((c) => c.id === ev.calendarId);
-    const hp = hps.find((h) => h.id === cal?.hpId);
-    const patient = patients.find((p) => p.externalId === ev.patientExId || p.id === ev.patientExId);
-    alert(`${ev.title}\n${new Date(ev.startAt).toLocaleString()} → ${new Date(ev.endAt).toLocaleString()}\nTherapist: ${hp ? `${hp.firstName} ${hp.lastName}` : "Unknown"}\nPatient: ${patient ? `${patient.firstName} ${patient.lastName}` : "—"}`);
+    setSelectedEvent(ev);
   };
 
   return (
     <div style={{ display: "flex", gap: 12, padding: 12 }}>
-      {/* Left column: mini calendar + filters */}
+      {/* Left column */}
       <div style={{ width: 340, display: "flex", flexDirection: "column", gap: 12 }}>
         <MiniCalendar selectedDate={selectedDate} onChange={(d) => setSelectedDate(d)} />
+
         <CalendarFilters
           sites={sites}
           hps={hps}
           patients={patients}
           calendars={calendars}
-          selectedSiteId={selectedSite}
-          selectedHpId={selectedHp}
-          selectedPatientId={selectedPatient}
-          onSiteChange={(id) => setSelectedSite(id)}
-          onHpChange={(id) => setSelectedHp(id)}
-          onPatientChange={(id) => setSelectedPatient(id)}
+          selectedSiteIds={selectedSiteIds}
+          selectedHpIds={selectedHpIds}
+          selectedPatientIds={selectedPatientIds}
+          selectedStatus={selectedStatus}
+          selectedType={selectedType}
+          onSiteChange={setSelectedSiteIds}
+          onHpChange={setSelectedHpIds}
+          onPatientChange={setSelectedPatientIds}
+          onStatusChange={setSelectedStatus}
+          onTypeChange={setSelectedType}
           visibleCalendarIds={visibleCalendarIds}
           onToggleCalendarVisibility={toggleCalendarVisibility}
         />
       </div>
 
-      {/* Right column: header + calendar */}
+      {/* Right column */}
       <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
         <CalendarHeader
           displayLabel={displayLabel}
@@ -212,6 +229,18 @@ const CalendarDashboard: React.FC = () => {
           />
         )}
       </div>
+
+      {/* Event Details Modal */}
+      {selectedEvent && (
+        <EventDetailsModal
+          event={selectedEvent}
+          calendars={calendars}
+          hps={hps}
+          patients={patients}
+          sites={sites}
+          onClose={() => setSelectedEvent(null)}
+        />
+      )}
     </div>
   );
 };
