@@ -27,6 +27,12 @@ export const MENU_ITEMS: MenuItemType[] = [
     url: '/chat',
   },
   {
+    key: 'caller',
+    label: 'Caller',
+    icon: 'ri:phone-line',
+    url: '/caller',
+  },
+  {
     key: 'tickets',
     label: 'Billets',
     icon: 'ri:ticket-2-line',
