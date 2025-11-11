@@ -144,28 +144,28 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri-organization-chart',
     url: '/department',
   },
-  {
-    key: 'specialization',
-    label: 'Spécialisation',
-    icon: 'ri-briefcase-4-line',
-    url: '/specialization',
-  },
-  {
-    key: 'languages',
-    label: 'Langages',
-    icon: 'ri-translate',
-    url: '/languages',
-  },
-  {
-    key: 'StaffRoles',
-    label: 'Rôles du personnel',
-    icon: 'ri-user-settings-line',
-    url: '/staff-role',
-  },
-  {
-    key: 'permissions',
-    label: 'Autorisations',
-    icon: 'ri-shield-line',
-    url: '/permissions',
-  },
+  // {
+  //   key: 'specialization',
+  //   label: 'Spécialisation',
+  //   icon: 'ri-briefcase-4-line',
+  //   url: '/specialization',
+  // },
+  // {
+  //   key: 'languages',
+  //   label: 'Langages',
+  //   icon: 'ri-translate',
+  //   url: '/languages',
+  // },
+  // {
+  //   key: 'StaffRoles',
+  //   label: 'Rôles du personnel',
+  //   icon: 'ri-user-settings-line',
+  //   url: '/staff-role',
+  // },
+  // {
+  //   key: 'permissions',
+  //   label: 'Autorisations',
+  //   icon: 'ri-shield-line',
+  //   url: '/permissions',
+  // },
 ];
