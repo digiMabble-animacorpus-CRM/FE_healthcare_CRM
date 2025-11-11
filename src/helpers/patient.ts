@@ -108,6 +108,154 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
     return null;
   }
 };
+
+
+// 🔹 Helper to fetch motives and return as { [id]: label }
+const fetchMotivesMap = async (): Promise<Record<string, string>> => {
+  try {
+    const res = await fetch(
+      `${ROSA_BASE_API_PATH}/motives?limit=100&sortField=label&sortDirection=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${ROSA_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const data = await res.json();
+    if (!res.ok) throw new Error('Failed to fetch motives');
+    const map: Record<string, string> = {};
+    data?.elements?.forEach((m: any) => {
+      map[m.id] = m.label || '—';
+    });
+    return map;
+  } catch (err) {
+    console.error('❌ Error fetching motives:', err);
+    return {};
+  }
+};
+
+// 🔹 Helper to fetch calendars and return as { [id]: label }
+const fetchCalendarsMap = async (): Promise<Record<string, string>> => {
+  try {
+    const res = await fetch(
+      `${ROSA_BASE_API_PATH}/calendars?limit=100&sortField=label&sortDirection=1`,
+      {
+        headers: {
+          Authorization: `Bearer ${ROSA_TOKEN}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+    const data = await res.json();
+    if (!res.ok) throw new Error('Failed to fetch calendars');
+    const map: Record<string, string> = {};
+    data?.elements?.forEach((c: any) => {
+      map[c.id] = c.label || '—';
+    });
+    return map;
+  } catch (err) {
+    console.error('❌ Error fetching calendars:', err);
+    return {};
+  }
+};
+
+export const getPatientEvents = async (
+  patientId: string,
+  page: number = 1,
+  limit: number = 10
+): Promise<any> => {
+  const token = ROSA_TOKEN;
+  if (!token) {
+    console.warn('No access token found.');
+    return { elements: [], totalCount: 0 };
+  }
+
+  try {
+    // 🔹 Build event URL
+    const url = new URL(`${ROSA_BASE_API_PATH}/events`);
+    url.searchParams.append('patientRecordId', patientId);
+    url.searchParams.append('page', page.toString());
+    url.searchParams.append('limit', limit.toString());
+    url.searchParams.append('sortField', 'startAt');
+    url.searchParams.append('sortDirection', '1');
+
+    // 🔹 Fetch events + meta data (calendars & motives) in parallel
+    const [eventsRes, motivesMap, calendarsMap] = await Promise.all([
+      fetch(url.toString(), {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      }),
+      fetchMotivesMap(),
+      fetchCalendarsMap(),
+    ]);
+
+    const result = await eventsRes.json();
+    
+
+    if (!eventsRes.ok) {
+      console.error('Failed to fetch events:', result?.message || 'Unknown error');
+      return { elements: [], totalCount: 0 };
+    }
+
+    if (!Array.isArray(result.elements)) {
+      console.warn('No elements found in event response.');
+      return { elements: [], totalCount: 0 };
+    }
+
+    // 🔹 Enrich events with motive & calendar labels
+    const enriched = result.elements.map((e: any) => ({
+      ...e,
+      motiveLabel: motivesMap[e.motiveId] || '—',
+      calendarLabel: calendarsMap[e.calendarId] || '—',
+    }));
+    return { ...result, elements: enriched };
+  } catch (error) {
+    console.error('Exception during events fetch:', error);
+    return { elements: [], totalCount: 0 };
+  }
+};
+
+
+export const updateEventNote = async (eventId: string, hpNote: string): Promise<boolean> => {
+  const token = ROSA_TOKEN;
+  if (!token) {
+    console.warn('No access token found.');
+    return false;
+  }
+console.log(eventId, "eventId")
+  try {
+    const payload = [
+      {
+        id: eventId,
+        hpNote,
+      },
+    ];
+
+    const response = await fetch(`${ROSA_BASE_API_PATH}/events/bulk`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+console.log(response,"updste")
+    if (!response.ok) {
+      console.error('❌ Failed to update event note');
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('❌ Exception updating note:', error);
+    return false;
+  }
+};
+
+
 export const findPatient = async (value: string): Promise<any | null> => {
   const token = localStorage.getItem('access_token');
   if (!token) {
