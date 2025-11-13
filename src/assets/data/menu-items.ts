@@ -39,19 +39,19 @@ export const MENU_ITEMS: MenuItemType[] = [
     children: [
       {
         key: 'caller',
-        label: 'Caller Ticket',
+        label: 'Ticket d’appel',
         url: '/caller',
         parentKey: 'tickets',
       },
       {
         key: 'new-request',
-        label: 'New Ticket Request',
+        label: 'Nouvelle demande de ticket',
         url: '/tickets',
         parentKey: 'tickets',
       },
       {
         key: 'appointment-management',
-        label: 'Appointment Request',
+        label: 'Demande de rendez-vous”',
         url: '/appointment-management',
         parentKey: 'tickets',
       },

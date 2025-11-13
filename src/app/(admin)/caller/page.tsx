@@ -277,14 +277,14 @@ const CallerListPage = () => {
                     <thead className="bg-light-subtle">
                       <tr>
                         <th style={{ width: 20 }}>S.No</th>
-                        <th>Agent Name</th>
-                        <th>Customer Number</th>
-                        <th>Anima Corpus Number</th>
-                        <th>Call Duration</th>
-                        <th>Call Date & Time</th>
+                        <th>Nom de l’agent</th>
+                        <th>Numéro du client</th>
+                        <th>Numéro Anima Corpus</th>
+                        <th>Durée de l’appel</th>
+                        <th>Date et heure de l’appel</th>
                         
-                        <th>Channel Type</th>
-                        <th>Call Cost</th>
+                        <th>Type de canal</th>
+                        <th>Coût de l’appel</th>
                         {/* <th>End Reason</th> */}
                         {/* <th>Session Status</th> */}
                         {/* <th>User Sentiment</th> */}
