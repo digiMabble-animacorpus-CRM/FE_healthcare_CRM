@@ -20,6 +20,8 @@ import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
 
 const PAGE_LIMIT = 10;
+const RETELL_LIST_ENDPOINT = 'https://api.retellai.com/v2/list-calls';
+const RETELL_GET_ENDPOINT = 'https://api.retellai.com/v2/get-call';
 
 type TicketType = {
   id: number;
@@ -38,6 +40,20 @@ type TicketType = {
   status?: string; // new field
 };
 
+// Provide a fallback API key: prefer localStorage 'retell_api_key' -> env var -> sample key (you provided)
+const getRetellApiKey = () => {
+  if (typeof window !== 'undefined') {
+    const fromStorage = localStorage.getItem('retell_api_key');
+    if (fromStorage) return fromStorage;
+  }
+  // If you prefer to use env var, set NEXT_PUBLIC_RETELL_API_KEY in your environment
+  if (typeof process !== 'undefined' && process.env.NEXT_PUBLIC_RETELL_API_KEY) {
+    return process.env.NEXT_PUBLIC_RETELL_API_KEY;
+  }
+  // fallback to the key you provided (replace/remove if sensitive)
+  return 'key_1d964c4ebd944cdf5f7c9af67b12';
+};
+
 const TicketPage = () => {
   const [tickets, setTickets] = useState<TicketType[]>([]);
   const [totalPages, setTotalPages] = useState(1);
@@ -52,6 +68,65 @@ const TicketPage = () => {
   // Delete modal state
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTicketId, setDeleteTicketId] = useState<number | null>(null);
+
+  // helper: normalize strings for comparison
+  const normalize = (s?: string) => (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
+
+  // helper: does call transcript contain a user message that matches the ticket name?
+  const callMatchesTicket = (call: any, ticket: TicketType) => {
+    if (!call || !call.transcript_object || !Array.isArray(call.transcript_object)) return false;
+
+    const first = normalize(ticket.first_name);
+    const last = normalize(ticket.last_name);
+    if (!first && !last) return false;
+
+    // possible patterns to match
+    const patterns: string[] = [];
+    if (first && last) {
+      patterns.push(`${first} ${last}`); // "sarah mauvio"
+      patterns.push(`${first}, ${last}`); // "sarah, mauvio"
+      patterns.push(`${last} ${first}`); // "mauvio sarah" (less likely but safe)
+      patterns.push(`${last}, ${first}`);
+    }
+    if (last) patterns.push(last); // fallback to last name only (be careful)
+    if (first) patterns.push(first);
+
+    // check each user role message for any pattern
+    return call.transcript_object.some((msg: any) => {
+      if (!msg || msg.role !== 'user') return false;
+      if (!msg.content || typeof msg.content !== 'string') return false;
+
+      const content = normalize(msg.content.replace(/[.]/g, '')); // remove trailing dots
+      // check whole phrase match (avoid partial accidental matches)
+      return patterns.some((p) => {
+        if (!p) return false;
+        return content.includes(p);
+      });
+    });
+  };
+
+  // check if a phone number is invalid or placeholder
+  const isInvalidPhone = (phone: any) => {
+    if (phone === null || phone === undefined) return true;
+
+    const normalized = phone.toString().trim().toLowerCase();
+    const invalidValues = [
+      '',
+      'caller_number',
+      'appelant',
+      'caller',
+      'unknown',
+      'na',
+      'null',
+      'undefined',
+      'caller number'
+    ];
+
+    if (invalidValues.includes(normalized)) return true;
+
+    const hasDigit = /\d/.test(normalized);
+    return !hasDigit;
+  };
 
   const fetchTickets = async (page: number) => {
     setLoading(true);
@@ -69,15 +144,66 @@ const TicketPage = () => {
         },
       });
 
-      const data: TicketType[] = response.data.new_requests || [];
-      // add default status = "New"
-      const enriched = data.map((t) => ({
+      const ticketData: TicketType[] = response.data.new_requests || response.data || [];
+
+      let callList: any[] = [];
+      try {
+        const apiKey = getRetellApiKey();
+        const body: any = {
+          page,
+          limit: PAGE_LIMIT,
+        };
+        if (searchTerm) body.search = searchTerm;
+        if (apiKey) {
+          const retellRes = await axios.post(RETELL_LIST_ENDPOINT, body, {
+            headers: {
+              Authorization: `Bearer ${apiKey}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          // retellRes.data may be an array or {calls: [...]}, adapt to your actual response
+          callList = Array.isArray(retellRes.data)
+            ? retellRes.data
+            : retellRes.data.calls || retellRes.data || [];
+        } else {
+          // no key configured — skip retell matching
+          console.warn('NEXT_PUBLIC_RETELL_KEY not configured; skipping RetellAI enrichment.');
+        }
+      } catch (err) {
+        console.warn('Failed to fetch Retell calls — continuing without enrichment.', err);
+        callList = [];
+      }
+
+      const enrichedTickets = ticketData.map((ticket) => {
+        const updated = { ...ticket };
+
+        if (!isInvalidPhone(updated.phone)) {
+          return updated;
+        }
+
+        const match = callList.find((call: any) => callMatchesTicket(call, ticket));
+
+        if (match?.from_number) {
+          updated.phone = match.from_number;
+        }
+
+        return updated;
+      });
+
+      const finalTickets = enrichedTickets.map((t) => ({
         ...t,
         status: t.status || 'New',
       }));
 
-      setTickets(enriched);
-      setTotalPages(Math.ceil((data.length || 0) / PAGE_LIMIT));
+      setTickets(finalTickets);
+
+      const totalItems =
+        typeof response.data.total === 'number'
+          ? response.data.total
+          : typeof response.data.count === 'number'
+            ? response.data.count
+            : finalTickets.length;
+      setTotalPages(Math.max(1, Math.ceil(totalItems / PAGE_LIMIT)));
     } catch (error) {
       console.error('Failed to fetch tickets:', error);
       setTickets([]);
@@ -92,7 +218,7 @@ const TicketPage = () => {
   }, [currentPage, searchTerm]);
 
   const handlePageChange = (page: number) => {
-    if (page !== currentPage) {
+    if (page !== currentPage && page >= 1 && page <= totalPages) {
       setCurrentPage(page);
     }
   };
