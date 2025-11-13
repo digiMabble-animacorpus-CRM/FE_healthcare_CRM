@@ -277,19 +277,22 @@ const CallerListPage = () => {
                     <thead className="bg-light-subtle">
                       <tr>
                         <th style={{ width: 20 }}>S.No</th>
-                        <th>Time</th>
-                        <th>Duration</th>
-                        <th>Channel Type</th>
-                        <th>Cost</th>
-                        <th>End Reason</th>
-                        <th>Session Status</th>
-                        <th>User Sentiment</th>
-                        <th>From</th>
-                        <th>To</th>
-                        <th>Direction</th>
-                        <th>Session Outcome</th>
-                        <th>End to End Latency (ms)</th>
                         <th>Agent Name</th>
+                        <th>Customer Number</th>
+                        <th>Anima Corpus Number</th>
+                        <th>Call Duration</th>
+                        <th>Call Date & Time</th>
+                        
+                        <th>Channel Type</th>
+                        <th>Call Cost</th>
+                        {/* <th>End Reason</th> */}
+                        {/* <th>Session Status</th> */}
+                        {/* <th>User Sentiment</th> */}
+                        
+                        {/* <th>Direction</th>
+                        <th>Session Outcome</th>
+                        <th>End to End Latency (ms)</th> */}
+                        
                         <th>Action</th>
                       </tr>
                     </thead>
@@ -297,20 +300,23 @@ const CallerListPage = () => {
                       {calls.map((c: CallType, idx: number) => (
                         <tr key={c.call_id || idx}>
                           <td>{idx + 1}</td>
-                          <td>{formatDate(c.start_timestamp)}</td>
+                          <td>{c.agent_name ?? '-'}</td>
+                          <td>{c.from_number ?? '-'}</td>
+                          <td>{c.to_number ?? '-'}</td>
                           <td>{msToHMS(c.duration_ms)}</td>
+                          <td>{formatDate(c.start_timestamp)}</td>
+                          
                           <td>{c.call_type ?? '-'}</td>
                           <td>
                             {c.call_cost?.combined_cost != null
                               ? `${Number(c.call_cost.combined_cost).toFixed(2)}`
                               : '-'}
                           </td>
-                          <td>{c.disconnection_reason ?? '-'}</td>
+                          {/* <td>{c.disconnection_reason ?? '-'}</td>
                           <td>{c.call_status ?? '-'}</td>
-                          <td>{c.call_analysis?.user_sentiment ?? '-'}</td>
-                          <td>{c.from_number ?? '-'}</td>
-                          <td>{c.to_number ?? '-'}</td>
-                          <td>{c.direction ?? '-'}</td>
+                          <td>{c.call_analysis?.user_sentiment ?? '-'}</td> */}
+                          
+                          {/* <td>{c.direction ?? '-'}</td>
                           <td>
                             {c.call_analysis?.call_successful != null
                               ? c.call_analysis.call_successful
@@ -322,8 +328,8 @@ const CallerListPage = () => {
                             {(c.latency?.e2e?.p50 ?? c.latency?.e2e?.p50) !== undefined
                               ? Math.round(c.latency?.e2e?.p50 as number)
                               : '-'}
-                          </td>
-                          <td>{c.agent_name ?? '-'}</td>
+                          </td> */}
+                          
                           <td>
                             <div className="d-flex gap-2">
                               <Button

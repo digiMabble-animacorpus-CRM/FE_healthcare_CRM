@@ -26,26 +26,32 @@ export const MENU_ITEMS: MenuItemType[] = [
     icon: 'ri:message-2-line',
     url: '/chat',
   },
-  {
-    key: 'caller',
-    label: 'Caller',
-    icon: 'ri:phone-line',
-    url: '/caller',
-  },
+  // {
+  //   key: 'caller',
+  //   label: 'Caller',
+  //   icon: 'ri:phone-line',
+  //   url: '/caller',
+  // },
   {
     key: 'tickets',
     label: 'Billets',
     icon: 'ri:ticket-2-line',
     children: [
       {
+        key: 'caller',
+        label: 'Caller Ticket',
+        url: '/caller',
+        parentKey: 'tickets',
+      },
+      {
         key: 'new-request',
-        label: 'Nouvelle demande',
+        label: 'New Ticket Request',
         url: '/tickets',
         parentKey: 'tickets',
       },
       {
         key: 'appointment-management',
-        label: 'Gestion des rendez-vous',
+        label: 'Appointment Request',
         url: '/appointment-management',
         parentKey: 'tickets',
       },
