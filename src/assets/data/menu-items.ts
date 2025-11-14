@@ -139,11 +139,17 @@ export const MENU_ITEMS: MenuItemType[] = [
     url: '/branches',
   },
   {
-    key: 'department',
-    label: 'Département',
+    key: 'motive',
+    label: 'Motif',
     icon: 'ri-organization-chart',
-    url: '/department',
+    url: '/motive',
   },
+  // {
+  //   key: 'department',
+  //   label: 'Département',
+  //   icon: 'ri-organization-chart',
+  //   url: '/department',
+  // },
   // {
   //   key: 'specialization',
   //   label: 'Spécialisation',

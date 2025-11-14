@@ -47,6 +47,23 @@ const normalizeMotivePayload = (m: Partial<MotiveDto>): MotiveDto => ({
 });
 
 /** ===========================
+ * ✅ Motive DTO
+ * =========================== */
+
+export type MotiveCreateRequestDto = {
+  calendarIds: string[];
+  label: string;
+  newPatientDuration?: number;
+  existingPatientDuration?: number;
+  isBookableOnline?: boolean;
+  color: string;
+  status?: 'ACTIVE' | 'INACTIVE' | 'ARCHIVED';
+  isSendingNotificationsDisabled?: boolean;
+  type?: 'CABINET' | 'VISITES' | 'VIDEO';
+};
+
+
+/** ===========================
  * ✅ Get All Motives
  * =========================== */
 export const getAllMotives = async (
@@ -265,3 +282,44 @@ export const getAllHps = async (
     return { elements: [], totalCount: 0, totalPages: 0, page: 0 };
   }
 };
+
+/** ===========================
+ * ✅ Create New Motive
+ * =========================== */
+export const createMotive = async (payload: MotiveCreateRequestDto) => {
+  try {
+    const token = ROSA_TOKEN;
+    if (!token) {
+      console.warn('⚠️ No token found for createMotive()');
+      return { success: false, message: 'No authentication token found.' };
+    }
+
+    // The API expects an array for bulk creation
+    const res = await fetch(`${ROSA_BASE_API_PATH}/motives/bulk`, {
+      method: 'PATCH',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify([payload]),
+    });
+
+    if (!res.ok) {
+      const text = await res.text();
+      console.error('❌ createMotive failed:', res.status, text);
+      return {
+        success: false,
+        message: `Erreur lors de la création du motif (${res.status})`,
+      };
+    }
+
+    return { success: true };
+  } catch (err) {
+    console.error('💥 createMotive exception:', err);
+    return {
+      success: false,
+      message: 'Erreur réseau : impossible de créer le motif.',
+    };
+  }
+};
+

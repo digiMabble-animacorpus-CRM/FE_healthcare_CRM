@@ -24,6 +24,9 @@ import {
 import MotiveCard from './components/motiveCards';
 import EditCalendarsModal from './components/editCalenderDialog';
 import EditPatternModal from './components/editDialog';
+import CreateMotiveForm from './components/createMotiveDialog';
+
+// ✅ Import the Create Motive Form (modal)
 
 const PAGE_SIZE = 20;
 
@@ -46,6 +49,7 @@ export default function MotivesListPage() {
   // Dialogs
   const [editingCalendarsFor, setEditingCalendarsFor] = useState<any | null>(null);
   const [editingPatternFor, setEditingPatternFor] = useState<any | null>(null);
+  const [showCreateMotive, setShowCreateMotive] = useState(false); // ✅ new
 
   const { showNotification } = useNotificationContext();
 
@@ -144,11 +148,16 @@ export default function MotivesListPage() {
       <Row>
         <Col xl={12}>
           <Card className="shadow-sm">
-            {/* 🔹 Filter Header */}
+            {/* 🔹 Header with Add Button */}
             <CardHeader className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 flex-wrap">
-              <CardTitle as="h4" className="mb-0">Motives</CardTitle>
+              <div className="d-flex align-items-center justify-content-between w-100">
+                <CardTitle as="h4" className="mb-0">Motives</CardTitle>
+                <Button variant="primary" size="sm" onClick={() => setShowCreateMotive(true)}>
+                  + Add Motive
+                </Button>
+              </div>
 
-              {/* Filter Section */}
+              {/* 🔹 Filters Section */}
               <div
                 className="d-flex flex-wrap align-items-center gap-2 w-100 w-md-auto"
                 style={{ minHeight: 40 }}
@@ -300,6 +309,18 @@ export default function MotivesListPage() {
           motive={editingPatternFor}
           onClose={() => setEditingPatternFor(null)}
           onSave={handlePatternSaved}
+        />
+      )}
+
+      {/* 🔹 Create Motive Modal */}
+      {showCreateMotive && (
+        <CreateMotiveForm
+          show
+          onClose={() => setShowCreateMotive(false)}
+          onSaved={() => {
+            showNotification({ message: 'Motive created successfully', variant: 'success' });
+            fetchAll(); // ✅ refresh list on success
+          }}
         />
       )}
     </>
