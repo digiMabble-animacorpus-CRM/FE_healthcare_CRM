@@ -207,10 +207,10 @@ const AppointmentManagementPage = () => {
                         <th>Nom du thérapeute</th>
                         <th>Date de rendez-vous</th>
                         <th>Heure de rendez-vous</th>
-                        <th>Nouvelle date préférée</th>
-                        <th>Nouvelle heure préférée</th>
+                        <th>Nouvelle date de rendez-vous</th>
+                        <th>Nouvelle heure de rendez-vous</th>
                         <th>Statut</th>
-                        <th>Créé à</th>
+                        <th>Créé le</th>
                         <th>Action</th>
                       </tr>
                     </thead>
