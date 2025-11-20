@@ -54,25 +54,21 @@ export const getAllPatient = async (
     }
 
     const jsonData = await response.json();
-    console.log(jsonData)
+    console.log(jsonData);
 
-    const patientData = Array.isArray(jsonData?.elements)
-      ? jsonData.elements
-      : [];
+    const patientData = Array.isArray(jsonData?.elements) ? jsonData.elements : [];
 
     return {
       data: patientData,
       totalCount: jsonData?.totalCount || 0,
       totalPage: jsonData?.totalPages || 0,
       page: jsonData?.page || 0,
-
     };
   } catch (error) {
     console.error('Error fetching patient:', error);
     return { data: [], totalCount: 0, totalPage: 0, page: 0 };
   }
 };
-
 
 export const getPatientById = async (patientId: any): Promise<any | null> => {
   const token = ROSA_TOKEN;
@@ -91,9 +87,9 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
     });
 
     const result = await response.json();
-    console.log(result, "single patient")
+    console.log(result, 'single patient');
     if (!response.ok) {
-      console.error('Failed to fetch patient:',  'Unknown error');
+      console.error('Failed to fetch patient:', 'Unknown error');
       return null;
     }
 
@@ -109,7 +105,6 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
   }
 };
 
-
 // 🔹 Helper to fetch motives and return as { [id]: label }
 const fetchMotivesMap = async (): Promise<Record<string, string>> => {
   try {
@@ -120,7 +115,7 @@ const fetchMotivesMap = async (): Promise<Record<string, string>> => {
           Authorization: `Bearer ${ROSA_TOKEN}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
     const data = await res.json();
     if (!res.ok) throw new Error('Failed to fetch motives');
@@ -145,7 +140,7 @@ const fetchCalendarsMap = async (): Promise<Record<string, string>> => {
           Authorization: `Bearer ${ROSA_TOKEN}`,
           'Content-Type': 'application/json',
         },
-      }
+      },
     );
     const data = await res.json();
     if (!res.ok) throw new Error('Failed to fetch calendars');
@@ -163,7 +158,7 @@ const fetchCalendarsMap = async (): Promise<Record<string, string>> => {
 export const getPatientEvents = async (
   patientId: string,
   page: number = 1,
-  limit: number = 10
+  limit: number = 10,
 ): Promise<any> => {
   const token = ROSA_TOKEN;
   if (!token) {
@@ -193,7 +188,6 @@ export const getPatientEvents = async (
     ]);
 
     const result = await eventsRes.json();
-    
 
     if (!eventsRes.ok) {
       console.error('Failed to fetch events:', result?.message || 'Unknown error');
@@ -218,14 +212,13 @@ export const getPatientEvents = async (
   }
 };
 
-
 export const updateEventNote = async (eventId: string, hpNote: string): Promise<boolean> => {
   const token = ROSA_TOKEN;
   if (!token) {
     console.warn('No access token found.');
     return false;
   }
-console.log(eventId, "eventId")
+  console.log(eventId, 'eventId');
   try {
     const payload = [
       {
@@ -242,7 +235,7 @@ console.log(eventId, "eventId")
       },
       body: JSON.stringify(payload),
     });
-console.log(response,"updste")
+    console.log(response, 'updste');
     if (!response.ok) {
       console.error('❌ Failed to update event note');
       return false;
@@ -254,7 +247,6 @@ console.log(response,"updste")
     return false;
   }
 };
-
 
 export const findPatient = async (value: string): Promise<any | null> => {
   const token = localStorage.getItem('access_token');
@@ -403,12 +395,15 @@ export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   };
 };
 
-export const deletePatient = async (id: string | number): Promise<boolean> => {
+export const deletePatient = async (
+  id: string | number,
+  externalId: any,
+): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return false;
 
-    const response = await fetch(`${API_BASE_PATH}/patients/${id}`, {
+    const response = await fetch(`${API_BASE_PATH}/patients?ids=${id}&externalIds=${externalId}`, {
       method: 'DELETE',
       headers: {
         Authorization: `Bearer ${token}`,
