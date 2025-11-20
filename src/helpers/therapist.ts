@@ -1,6 +1,6 @@
 'use client';
 
-import { API_BASE_PATH } from '@/context/constants';
+import { API_BASE_PATH, ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
 import { decryptAES } from '@/utils/encryption';
 // import type { TherapistCreatePayload, TherapistType } from '@/types/data';
 export interface TherapistUpdatePayload {
@@ -26,30 +26,24 @@ export interface TherapistUpdatePayload {
 export const getAllTherapists = async (
   page: number = 1,
   limit: number = 10,
-  branch?: string,
-  from?: string,
-  to?: string,
   search?: string,
-): Promise<{ data: any[]; totalCount: number }> => {
+): Promise<{ data: any[]; totalCount: number; totalPage: number; page:number }> => {
   try {
-    const token = localStorage.getItem('access_token');
+    const token = ROSA_TOKEN
     if (!token) {
       console.warn('No access token found.');
-      return { data: [], totalCount: 0 };
+      return { data: [], totalCount: 0, totalPage:0, page:0 };
     }
 
     const filters: Record<string, string> = {
       page: page.toString(),
       limit: limit.toString(),
-      ...(branch ? { branch } : {}),
-      ...(from ? { fromDate: from } : {}),
-      ...(to ? { toDate: to } : {}),
       ...(search ? { searchText: search } : {}),
     };
 
     const queryParams = new URLSearchParams(filters).toString();
 
-    const response = await fetch(`${API_BASE_PATH}/therapists?${queryParams}`, {
+    const response = await fetch(`${ROSA_BASE_API_PATH}/hps?${queryParams}`, {
       method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -60,25 +54,27 @@ export const getAllTherapists = async (
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Backend error:', response.status, errorText);
-      return { data: [], totalCount: 0 };
+      return { data: [], totalCount: 0, totalPage:0, page:0 };
     }
 
     const jsonData = await response.json();
-
-    const therapistData: any[] = Array.isArray(jsonData) ? jsonData : jsonData ? [jsonData] : [];
+    console.log(jsonData, "therapist")
 
     return {
-      data: therapistData,
+      data: jsonData?.elements,
       totalCount: jsonData?.totalCount || 0,
+      totalPage: jsonData?.totalPages || 0,
+      page: jsonData?.page || 0,
+
     };
   } catch (error) {
     console.error('Error fetching patient:', error);
-    return { data: [], totalCount: 0 };
+    return { data: [], totalCount: 0, totalPage: 0, page:0 };
   }
 };
 
 export const getTherapistById = async (therapistId: any): Promise<any | null> => {
-  const token = localStorage.getItem('access_token');
+  const token = ROSA_TOKEN
   if (!token) {
     console.warn('No access token found.');
     return null;

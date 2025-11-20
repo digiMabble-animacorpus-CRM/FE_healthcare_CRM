@@ -383,14 +383,17 @@ export type BranchDetails = {
 };
 
 export type TherapistType = {
-  id: string | number | null | undefined;
+  id: string;
+  firstName: string;
+  lastName: string;
+  nihii: any;
+
+  // not used
   centerAddress: any;
   appointmentStart: any;
   imageUrl?: string | null;
   jobTitle: string;
   therapistId: string | number | null | undefined;
-  firstName: string;
-  lastName: string;
   fullName: string;
   photo?: string | null;
   contactEmail: string;

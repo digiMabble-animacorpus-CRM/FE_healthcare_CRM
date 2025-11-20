@@ -4,7 +4,6 @@ import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
-import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -15,47 +14,37 @@ import {
   CardHeader,
   CardTitle,
   Col,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownToggle,
   Modal,
   Row,
   Spinner,
-  Toast,
-  ToastContainer,
 } from 'react-bootstrap';
 
-const PAGE_SIZE = 500;
-const BRANCHES = ['Gembloux - Orneau', 'Gembloux - Tout Vent', 'Namur'];
+const PAGE_SIZE = 10;
 
 const TherapistsListPage = () => {
-  const [allTherapists, setAllTherapists] = useState<TherapistType[]>([]);
+  const [therapists, setTherapists] = useState<TherapistType[]>([]);
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedBranch, setSelectedBranch] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [dateFilter, setDateFilter] = useState<string>('all');
   const [loading, setLoading] = useState(false);
+  const [viewingId, setViewingId] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedTherapistId, setSelectedTherapistId] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const router = useRouter();
 
+  // Fetch all therapists
   const fetchTherapists = async () => {
     setLoading(true);
     try {
-      const response = await getAllTherapists(1, 10000); // fetch all
-      setAllTherapists(
-        (response.data || []).map((t: any) => ({
-          ...t,
-          therapistId: t.id, // Map id to therapistId for UI compatibility
-        })),
-      );
-      setAllTherapists(response.data || []);
+      const response = await getAllTherapists(currentPage, PAGE_SIZE);
+      setTherapists(response.data || []);
+      setTotalCount(response.totalCount || response.data?.length || 0);
+      setTotalPages(response.totalPage || 1);
     } catch (err) {
       console.error('Failed to fetch therapists', err);
-      setAllTherapists([]);
+      setTherapists([]);
     } finally {
       setLoading(false);
     }
@@ -63,99 +52,123 @@ const TherapistsListPage = () => {
 
   useEffect(() => {
     fetchTherapists();
-  }, [showDeleteModal]);
+  }, [currentPage]);
 
-  const getDateRange = () => {
-    const now = dayjs();
-    switch (dateFilter) {
-      case 'today':
-        return { from: now.startOf('day'), to: now.endOf('day') };
-      case 'this_week':
-        return { from: now.startOf('week'), to: now.endOf('week') };
-      case '15_days':
-        return { from: now.subtract(15, 'day').startOf('day'), to: now.endOf('day') };
-      case 'this_month':
-        return { from: now.startOf('month'), to: now.endOf('month') };
-      case 'this_year':
-        return { from: now.startOf('year'), to: now.endOf('year') };
-      default:
-        return null;
-    }
-  };
-
+  // Filter by search
   const filteredTherapists = useMemo(() => {
-    let data = [...allTherapists];
+    if (!searchTerm.trim()) return therapists;
+    const term = searchTerm.toLowerCase();
+    return therapists.filter(
+      (t) =>
+        `${t.firstName ?? ''} ${t.lastName ?? ''}`.toLowerCase().includes(term) ||
+        (t.nihii ?? '').toLowerCase().includes(term)
+    );
+  }, [therapists, searchTerm]);
 
-    if (selectedBranch) {
-      data = data.filter((t) => t.centerAddress?.includes(selectedBranch));
+  const currentData = useMemo(() => filteredTherapists, [filteredTherapists]);
+
+  // Handle View
+  const handleView = async (id: string) => {
+    if (viewingId) return;
+    setViewingId(id);
+    try {
+      router.push(`/therapists/details/${id}`);
+    } finally {
+      setTimeout(() => setViewingId(null), 3000);
     }
-
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      data = data.filter(
-        (t) =>
-          (t.firstName?.toLowerCase().includes(term) ?? false) ||
-          (t.lastName?.toLowerCase().includes(term) ?? false) ||
-          (t.fullName?.toLowerCase().includes(term) ?? false) ||
-          (t.contactEmail?.toLowerCase().includes(term) ?? false) ||
-          (t.contactPhone?.toLowerCase().includes(term) ?? false),
-      );
-    }
-
-    const range = getDateRange();
-    if (range) {
-      data = data.filter((t) => {
-        if (!t.appointmentStart) return false;
-        const created = dayjs(t.appointmentStart);
-        return created.isAfter(range.from) && created.isBefore(range.to);
-      });
-    }
-
-    return data;
-  }, [allTherapists, selectedBranch, searchTerm, dateFilter]);
-
-  const totalPages = Math.ceil(filteredTherapists.length / PAGE_SIZE);
-
-  const currentData = useMemo(() => {
-    const start = (currentPage - 1) * PAGE_SIZE;
-    return filteredTherapists.slice(start, start + PAGE_SIZE);
-  }, [filteredTherapists, currentPage]);
-
-  const handleView = (id: any) => router.push(`/therapists/details/${id}`);
-
-  const handleEditClick = (id: any) => {
-    router.push(`/therapists/edit-therapist/${id}`);
   };
 
-  const handleDeleteClick = (id: any) => {
+  // Handle Delete
+  const handleDeleteClick = (id: string) => {
     setSelectedTherapistId(id);
     setShowDeleteModal(true);
   };
 
-  const handleConfirmDelete = async () => {
+  const handleDeleteTherapist = async () => {
     if (!selectedTherapistId) return;
-
     try {
       const success = await deleteTherapist(selectedTherapistId);
       if (success) {
-        setAllTherapists((prev) => prev.filter((t) => t.therapistId !== selectedTherapistId));
-        setShowSuccessMessage(true);
-        await fetchTherapists(); // 🔥 Refetch after delete
-        setToastMessage('Therapist deleted successfully!');
+        setTherapists((prev) => prev.filter((t) => t.id !== selectedTherapistId));
       } else {
-        setToastMessage('Failed to delete therapist');
+        console.warn('Failed to delete therapist');
       }
     } catch (err) {
       console.error('Delete error:', err);
-      // setToastMessage('Error occurred while deleting therapist');
     } finally {
       setShowDeleteModal(false);
       setSelectedTherapistId(null);
     }
   };
+
+  // Pagination
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
+  };
+
+  const renderPagination = () => {
+    if (totalPages <= 1) return null;
+
+    const getPageNumbers = () => {
+      if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+      const pages: (number | string)[] = [];
+      pages.push(1);
+      let startPage = Math.max(2, currentPage - 1);
+      let endPage = Math.min(totalPages - 1, currentPage + 1);
+      if (currentPage <= 3) endPage = 4;
+      if (currentPage >= totalPages - 2) startPage = totalPages - 3;
+      if (startPage > 2) pages.push('...');
+      for (let i = startPage; i <= endPage; i++) pages.push(i);
+      if (endPage < totalPages - 1) pages.push('...');
+      pages.push(totalPages);
+      return pages;
+    };
+
+    return (
+      <ul className="pagination justify-content-end mb-0">
+        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+          <Button
+            variant="link"
+            className="page-link"
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            Précédent
+          </Button>
+        </li>
+
+        {getPageNumbers().map((pageNum, index) => (
+          <li
+            key={index}
+            className={`page-item ${currentPage === pageNum ? 'active' : ''} ${
+              pageNum === '...' ? 'disabled' : ''
+            }`}
+          >
+            {pageNum === '...' ? (
+              <span className="page-link">...</span>
+            ) : (
+              <Button
+                variant="link"
+                className="page-link"
+                onClick={() => handlePageChange(pageNum as number)}
+              >
+                {pageNum}
+              </Button>
+            )}
+          </li>
+        ))}
+
+        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+          <Button
+            variant="link"
+            className="page-link"
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            Suivant
+          </Button>
+        </li>
+      </ul>
+    );
   };
 
   return (
@@ -166,53 +179,20 @@ const TherapistsListPage = () => {
         <Col xl={12}>
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
-              <CardTitle as="h3" className="mb-0">
-                Liste de tous les thérapeutes ({filteredTherapists.length} Total)
+              <CardTitle as="h4" className="mb-0">
+                Liste de tous les thérapeutes{' '}
+                <span className="text-muted">({totalCount} Total)</span>
               </CardTitle>
 
               <div className="d-flex gap-2 align-items-center">
                 <input
                   type="text"
                   className="form-control form-control-sm"
-                  placeholder="Rechercher par nom, email, numéro..."
+                  placeholder="Rechercher par nom ou NIHII..."
                   value={searchTerm}
-                  onChange={(e) => {
-                    setSearchTerm(e.target.value);
-                    setCurrentPage(1);
-                  }}
+                  onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ minWidth: 200 }}
                 />
-
-                <Dropdown>
-                  <DropdownToggle className="btn btn-sm btn-primary dropdown-toggle text-white">
-                    {selectedBranch || 'Filtrer par succursale'}
-                  </DropdownToggle>
-                  <DropdownMenu>
-                    {BRANCHES.map((branch) => (
-                      <DropdownItem
-                        key={branch}
-                        onClick={() => {
-                          setSelectedBranch(branch);
-                          setCurrentPage(1);
-                        }}
-                        active={selectedBranch === branch}
-                      >
-                        {branch}
-                      </DropdownItem>
-                    ))}
-                    {selectedBranch && (
-                      <DropdownItem
-                        className="text-danger"
-                        onClick={() => {
-                          setSelectedBranch(null);
-                          setCurrentPage(1);
-                        }}
-                      >
-                        Clear Branch Filter
-                      </DropdownItem>
-                    )}
-                  </DropdownMenu>
-                </Dropdown>
               </div>
             </CardHeader>
 
@@ -221,145 +201,72 @@ const TherapistsListPage = () => {
                 <div className="text-center py-5">
                   <Spinner animation="border" />
                 </div>
-              ) : filteredTherapists.length === 0 ? (
-                <div className="text-center py-4 text-muted">Aucun thérapeute trouvé</div>
               ) : (
                 <div className="table-responsive">
                   <table
                     className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 1100 }}
+                    style={{ minWidth: 800 }}
                   >
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th style={{ width: 50 }}>Non</th>
-                        <th>Photo de profil</th>
+                        <th>No</th>
                         <th>Nom</th>
-                        <th>E-mail</th>
-                        <th>Téléphone</th>
-                        <th>Succursale</th>
-                        <th>Spécialisation</th>
+                        <th>NIHII</th>
                         <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {currentData.map((item, index) => (
-                        <tr key={item.therapistId}>
-                          <td>{(currentPage - 1) * PAGE_SIZE + index + 1}.</td>
-                          <td>
-                            {item.imageUrl &&
-                            item.imageUrl !== 'null' &&
-                            item.imageUrl.trim() !== '' ? (
-                              <img
-                                src={item.imageUrl}
-                                alt={item.firstName}
-                                className="rounded-circle object-cover"
-                                style={{ width: '40px', height: '40px' }}
-                              />
-                            ) : (
-                              <div
-                                className="rounded-circle d-flex align-items-center justify-content-center"
-                                style={{
-                                  width: '40px',
-                                  height: '40px',
-                                  backgroundColor: '#e7ddff',
-                                  color: '#341539',
-                                  fontSize: '20px',
-                                  fontWeight: 'bold',
-                                }}
-                              >
-                                {item.firstName?.charAt(0).toUpperCase()}
-                              </div>
-                            )}
-                          </td>
-                          <td>
-                            {item.firstName} {item.lastName}
-                          </td>
-                          <td>{item.contactEmail}</td>
-                          <td>{item.contactPhone}</td>
-                          <td>
-                            {item.branches && item.branches.length > 0
-                              ? item.branches.map((b: any) => b.name).join(', ')
-                              : '—'}
-                          </td>
-                          <td>
-                            {item.specializations && item.specializations.length > 0
-                              ? item.specializations
-                                  .map((s: any) => s.specialization_type)
-                                  .join(', ')
-                              : '—'}
-                          </td>
-                          <td>
-                            <div className="d-flex gap-2">
-                              <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => handleView(item.therapistId)}
-                              >
-                                <IconifyIcon icon="solar:eye-broken" />
-                              </Button>
+                      {currentData.length > 0 ? (
+                        currentData.map((item, index) => (
+                          <tr key={item.id}>
+                            <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
+                            <td>{`${item.firstName ?? ''} ${item.lastName ?? ''}`}</td>
+                            <td>{item.nihii ?? '-'}</td>
+                            <td>
+                              <div className="d-flex gap-2">
+                                <Button
+                                  variant="light"
+                                  size="sm"
+                                  onClick={() => handleView(item.id)}
+                                  disabled={!!viewingId}
+                                >
+                                  {viewingId === item.id ? (
+                                    <Spinner animation="border" size="sm" />
+                                  ) : (
+                                    <IconifyIcon icon="solar:eye-broken" />
+                                  )}
+                                </Button>
 
-                              <Button
-                                variant="soft-primary"
-                                size="sm"
-                                onClick={() => handleEditClick(item.therapistId)}
-                              >
-                                <IconifyIcon icon="solar:pen-2-broken" />
-                              </Button>
-                              <Button
-                                variant="soft-danger"
-                                size="sm"
-                                onClick={() => handleDeleteClick(item.therapistId)}
-                              >
-                                <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
-                              </Button>
-                            </div>
+                                <Button
+                                  variant="soft-danger"
+                                  size="sm"
+                                  onClick={() => handleDeleteClick(item.id)}
+                                >
+                                  <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
+                                </Button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan={4} className="text-center py-4 text-muted">
+                            Aucun thérapeute trouvé
                           </td>
                         </tr>
-                      ))}
+                      )}
                     </tbody>
                   </table>
                 </div>
               )}
             </CardBody>
 
-            <CardFooter>
-              <ul className="pagination justify-content-end mb-0">
-                <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                  <Button
-                    variant="link"
-                    className="page-link"
-                    onClick={() => handlePageChange(currentPage - 1)}
-                  >
-                    Précédent
-                  </Button>
-                </li>
-                {Array.from({ length: totalPages }).map((_, idx) => (
-                  <li key={idx} className={`page-item ${currentPage === idx + 1 ? 'active' : ''}`}>
-                    <Button
-                      variant="link"
-                      className="page-link"
-                      onClick={() => handlePageChange(idx + 1)}
-                    >
-                      {idx + 1}
-                    </Button>
-                  </li>
-                ))}
-                <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                  <Button
-                    variant="link"
-                    className="page-link"
-                    onClick={() => handlePageChange(currentPage + 1)}
-                  >
-                    Suivant
-                  </Button>
-                </li>
-              </ul>
-            </CardFooter>
+            <CardFooter>{renderPagination()}</CardFooter>
           </Card>
         </Col>
       </Row>
 
-      {/* Delete Modal */}
+      {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
@@ -369,29 +276,13 @@ const TherapistsListPage = () => {
           <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
             Annuler
           </Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>
+          <Button variant="danger" onClick={handleDeleteTherapist}>
             Supprimer
           </Button>
         </Modal.Footer>
       </Modal>
-
-      {/* Toast Notification */}
-      <ToastContainer position="top-end" className="p-3">
-        <Toast
-          bg="success"
-          show={!!toastMessage}
-          autohide
-          delay={3000}
-          onClose={() => setToastMessage(null)}
-        >
-          <Toast.Body className="text-white">{toastMessage}</Toast.Body>
-        </Toast>
-      </ToastContainer>
     </>
   );
 };
 
 export default TherapistsListPage;
-function setShowSuccessMessage(arg0: boolean) {
-  throw new Error('Function not implemented.');
-}

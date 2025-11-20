@@ -17,7 +17,7 @@ export const MENU_ITEMS: MenuItemType[] = [
     key: 'appointments',
     label: 'Rendez-vous',
     icon: 'ri-calendar-line',
-    url: '/appointments/appointment-list',
+    url: '/appointment-calender',
   },
 
   {
@@ -84,7 +84,7 @@ export const MENU_ITEMS: MenuItemType[] = [
       {
         key: 'TherapistTeam-list',
         label: 'Liste des thérapeutes',
-        url: '/therapist-team/TherapistTeam-list',
+        url: '/therapists/therapists-list',
         parentKey: 'therapistsTeam',
       },
       {
@@ -145,33 +145,39 @@ export const MENU_ITEMS: MenuItemType[] = [
     url: '/branches',
   },
   {
-    key: 'department',
-    label: 'Département',
+    key: 'motive',
+    label: 'Motif',
     icon: 'ri-organization-chart',
-    url: '/department',
+    url: '/motive',
   },
-  {
-    key: 'specialization',
-    label: 'Spécialisation',
-    icon: 'ri-briefcase-4-line',
-    url: '/specialization',
-  },
-  {
-    key: 'languages',
-    label: 'Langages',
-    icon: 'ri-translate',
-    url: '/languages',
-  },
-  {
-    key: 'StaffRoles',
-    label: 'Rôles du personnel',
-    icon: 'ri-user-settings-line',
-    url: '/staff-role',
-  },
-  {
-    key: 'permissions',
-    label: 'Autorisations',
-    icon: 'ri-shield-line',
-    url: '/permissions',
-  },
+  // {
+  //   key: 'department',
+  //   label: 'Département',
+  //   icon: 'ri-organization-chart',
+  //   url: '/department',
+  // },
+  // {
+  //   key: 'specialization',
+  //   label: 'Spécialisation',
+  //   icon: 'ri-briefcase-4-line',
+  //   url: '/specialization',
+  // },
+  // {
+  //   key: 'languages',
+  //   label: 'Langages',
+  //   icon: 'ri-translate',
+  //   url: '/languages',
+  // },
+  // {
+  //   key: 'StaffRoles',
+  //   label: 'Rôles du personnel',
+  //   icon: 'ri-user-settings-line',
+  //   url: '/staff-role',
+  // },
+  // {
+  //   key: 'permissions',
+  //   label: 'Autorisations',
+  //   icon: 'ri-shield-line',
+  //   url: '/permissions',
+  // },
 ];
