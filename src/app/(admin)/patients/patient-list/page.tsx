@@ -4,7 +4,6 @@ import '@/assets/scss/components/_edittogglebtn.scss';
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useNotificationContext } from '@/context/useNotificationContext';
-import { deletePatient, getAllPatient } from '@/helpers/patient';
 import type { BirthDate, PatientType } from '@/types/data';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,8 +17,10 @@ import {
   Col,
   Modal,
   Row,
-  Spinner
+  Spinner,
 } from 'react-bootstrap';
+import PatientFormModal from '../components/PatientFormModal';
+import { deletePatient, getAllPatient } from '../helpers/patientApi';
 
 const PAGE_SIZE = 10;
 
@@ -33,6 +34,12 @@ const PatientsListPage = () => {
   const [viewingId, setViewingId] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
+  const [selectedExternalId, setSelectedExternalId] = useState<string | null>(null);
+
+  // 🔹 NEW — Modal state (create or edit)
+  const [showPatientModal, setShowPatientModal] = useState(false);
+  const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
+  const [editPatientId, setEditPatientId] = useState<string | undefined>(undefined);
 
   const { showNotification } = useNotificationContext();
   const router = useRouter();
@@ -111,10 +118,23 @@ const PatientsListPage = () => {
     }
   };
 
-  const handleEdit = (id: string) => router.push(`/patients/edit-patient/${id}`);
+  // 🔹 Open EDIT modal
+  const handleEdit = (id: string) => {
+    setModalMode('edit');
+    setEditPatientId(id);
+    setShowPatientModal(true);
+  };
 
-  const handleDeleteClick = (id: string) => {
+  // 🔹 Open CREATE modal
+  const openCreateModal = () => {
+    setModalMode('create');
+    setEditPatientId(undefined);
+    setShowPatientModal(true);
+  };
+
+  const handleDeleteClick = (id: string, externalId?: string | null) => {
     setSelectedPatientId(id);
+    setSelectedExternalId(externalId ?? null);
     setShowDeleteModal(true);
   };
 
@@ -122,24 +142,24 @@ const PatientsListPage = () => {
     if (!selectedPatientId) return;
 
     try {
-      const success = await deletePatient(selectedPatientId);
+      const success = await deletePatient(selectedPatientId, selectedExternalId ?? undefined);
       if (success) {
         setPatients((prev) => prev.filter((p) => p.id !== selectedPatientId));
         showNotification({
           message: 'Patient supprimé avec succès !',
-          variant: 'success'
+          variant: 'success',
         });
       } else {
         showNotification({
-          message: "Échec de la suppression du patient",
-          variant: 'danger'
+          message: 'Échec de la suppression du patient',
+          variant: 'danger',
         });
       }
     } catch (err) {
       console.error('Delete error:', err);
       showNotification({
-        message: "Une erreur est survenue lors de la suppression",
-        variant: 'danger'
+        message: 'Une erreur est survenue lors de la suppression',
+        variant: 'danger',
       });
     } finally {
       setShowDeleteModal(false);
@@ -193,8 +213,9 @@ const PatientsListPage = () => {
         {getPageNumbers().map((pageNum, index) => (
           <li
             key={index}
-            className={`page-item ${currentPage === pageNum ? 'active' : ''} ${pageNum === '...' ? 'disabled' : ''
-              }`}
+            className={`page-item ${currentPage === pageNum ? 'active' : ''} ${
+              pageNum === '...' ? 'disabled' : ''
+            }`}
           >
             {pageNum === '...' ? (
               <span className="page-link">...</span>
@@ -233,20 +254,13 @@ const PatientsListPage = () => {
           <Card>
             <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
               <CardTitle as="h4" className="mb-0">
-                Liste de tous les patients{' '}
-                <span className="text-muted">({totalCount} Total)</span>
+                Liste de tous les patients <span className="text-muted">({totalCount} Total)</span>
               </CardTitle>
 
-              <div className="d-flex gap-2 align-items-center">
-                <input
-                  type="text"
-                  className="form-control form-control-sm"
-                  placeholder="Rechercher par nom, email, numéro..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ minWidth: 200 }}
-                />
-              </div>
+              {/* 🔹 CREATE PATIENT BUTTON */}
+              <Button variant="primary" onClick={openCreateModal}>
+                <IconifyIcon icon="solar:add-circle-bold" /> Ajouter un patient
+              </Button>
             </CardHeader>
 
             <CardBody className="p-0">
@@ -287,8 +301,9 @@ const PatientsListPage = () => {
                             </td>
                             <td>
                               <span
-                                className={`badge bg-${item.status === 'ACTIVE' ? 'success' : 'secondary'
-                                  } text-white`}
+                                className={`badge bg-${
+                                  item.status === 'ACTIVE' ? 'success' : 'secondary'
+                                } text-white`}
                               >
                                 {item.status}
                               </span>
@@ -307,6 +322,8 @@ const PatientsListPage = () => {
                                     <IconifyIcon icon="solar:eye-broken" />
                                   )}
                                 </Button>
+
+                                {/* 🔹 EDIT BUTTON */}
                                 <Button
                                   variant="soft-primary"
                                   size="sm"
@@ -314,10 +331,11 @@ const PatientsListPage = () => {
                                 >
                                   <IconifyIcon icon="solar:pen-2-broken" />
                                 </Button>
+
                                 <Button
                                   variant="soft-danger"
                                   size="sm"
-                                  onClick={() => handleDeleteClick(item.id)}
+                                  onClick={() => handleDeleteClick(item.id, item?.externalId)}
                                 >
                                   <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
                                 </Button>
@@ -343,7 +361,7 @@ const PatientsListPage = () => {
         </Col>
       </Row>
 
-      {/* Delete Confirmation Modal */}
+      {/* DELETE CONFIRMATION */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
@@ -358,6 +376,15 @@ const PatientsListPage = () => {
           </Button>
         </Modal.Footer>
       </Modal>
+
+      {/* 🔹 CREATE / EDIT PATIENT MODAL */}
+      <PatientFormModal
+        show={showPatientModal}
+        mode={modalMode}
+        patientId={editPatientId}
+        onClose={() => setShowPatientModal(false)}
+        onSaved={() => fetchPatients()}
+      />
     </>
   );
 };
