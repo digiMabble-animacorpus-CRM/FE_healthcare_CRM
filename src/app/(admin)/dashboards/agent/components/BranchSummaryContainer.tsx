@@ -1,9 +1,11 @@
-// BranchSummaryContainer.tsx
 'use client';
 
 import { getBranchSummary } from '@/helpers/dashboard';
 import React, { useEffect, useState } from 'react';
 import BranchSummary, { BranchSummaryItem, FilterOption } from './BranchSummary';
+import axios from 'axios';
+import { API_BASE_PATH } from '@/context/constants';
+import { useNotificationContext } from '@/context/useNotificationContext';
 
 // Utility function for cumulative summary
 const getCumulativeSummary = (branches: BranchSummaryItem[]): BranchSummaryItem => ({
@@ -12,10 +14,11 @@ const getCumulativeSummary = (branches: BranchSummaryItem[]): BranchSummaryItem 
   doctors: branches.reduce((sum, b) => sum + (b.doctors || 0), 0),
   patients: branches.reduce((sum, b) => sum + (b.patients || 0), 0),
   appointmentsMonth: branches.reduce((sum, b) => sum + (b.appointmentsMonth || 0), 0),
-  revenueMonth: 0, // Placeholder - sum revenue if actual data exists
+  revenueMonth: 0, 
 });
 
 const BranchSummaryContainer: React.FC = () => {
+  const { showNotification } = useNotificationContext();
   const [allSummaries, setAllSummaries] = useState<BranchSummaryItem[]>([]); // raw backend + cumulative
   const [summaries, setSummaries] = useState<BranchSummaryItem[]>([]); // filtered for UI
   const [loading, setLoading] = useState(true);
@@ -35,17 +38,17 @@ const BranchSummaryContainer: React.FC = () => {
             doctors: item.doctors,
             patients: item.patients,
             appointmentsMonth: item.appointmentsMonth,
-            revenueMonth: 0, // Placeholder
+            revenueMonth: 0, 
           }));
 
-          // Cumulative "All Branches" summary
+         
           const cumulativeSummary = getCumulativeSummary(mappedData);
-          // Prepend cumulative summary
+          
           const fullData = [cumulativeSummary, ...mappedData];
 
           setAllSummaries(fullData);
 
-          // Initialize all filters to 'month'
+         
           const initialFilters: Record<string | number, FilterOption> = { all: 'month' };
           fullData.forEach((item) => {
             initialFilters[item.branchId] = 'month';
@@ -66,19 +69,103 @@ const BranchSummaryContainer: React.FC = () => {
     fetchData();
   }, []);
 
-  // Simulated filtering logic on data based on filter type
+  
+  const fetchTotals = async () => {
+    try {
+      const token = localStorage.getItem('access_token');
+      const res = await axios.get(`${API_BASE_PATH}/dashboard/totals`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+      });
+
+      const apiBody = res.data ?? {};
+
+      
+      if (apiBody?.status === false) {
+        showNotification?.({ message: 'Total fetch fail', variant: 'danger' });
+        return;
+      }
+
+    
+      if (apiBody?.status !== true) {
+      
+        showNotification?.({ message: 'Total fetch fail', variant: 'danger' });
+        return;
+      }
+
+      const payload = apiBody.data ?? {};
+      if (
+        payload == null ||
+        (payload.totalTherapists == null &&
+          payload.totalPatients == null &&
+          payload.totalAppointments == null)
+      ) {
+        showNotification?.({ message: 'Total fetch fail', variant: 'danger' });
+        return;
+      }
+
+      const allItem: BranchSummaryItem = {
+        branchId: 'all',
+        branchName: 'Tous',
+        doctors: payload.totalTherapists ?? 0,
+        patients: payload.totalPatients ?? 0,
+        appointmentsMonth: payload.totalAppointments ?? 0,
+        revenueMonth: 0,
+      };
+
+     
+      setAllSummaries((prev) => {
+        const others = prev.filter((p) => String(p.branchId) !== 'all');
+        const updated = [allItem, ...others];
+    
+        const filteredBranchSummaries = updated
+          .filter((branch) => branch.branchId !== 'all')
+          .map((branch) => {
+            const branchFilter = branchFilters[branch.branchId] || 'month';
+            switch (branchFilter) {
+              case 'thisWeek':
+              case 'lastWeek':
+                return { ...branch, appointmentsMonth: Math.floor(branch.appointmentsMonth / 4) };
+              case 'month':
+              default:
+                return branch;
+            }
+          });
+        const cumulative = allItem; 
+        setSummaries([cumulative, ...filteredBranchSummaries]);
+        return updated;
+      });
+
+      setBranchFilters((prev) => ({ ...prev, ['all']: 'overall' }));
+
+   
+      showNotification?.({ message: apiBody.message ?? 'Totals loaded', variant: 'success' });
+    } catch (err: any) {
+      console.error('Failed to fetch totals:', err);
+
+    
+      const serverMessage = err?.response?.data?.message;
+   
+      showNotification?.({ message: 'Total fetch fail', variant: 'danger' });
+
+      if (serverMessage) {
+        console.debug('Totals API message:', serverMessage);
+      }
+    }
+  };
+
+
   const applyFilterToData = (
     branch: BranchSummaryItem,
     filter: FilterOption,
   ): BranchSummaryItem => {
-    let filteredAppointments = branch.appointmentsMonth; // fallback to monthly data
+    let filteredAppointments = branch.appointmentsMonth; 
 
     switch (filter) {
       case 'thisWeek':
-        filteredAppointments = Math.floor(branch.appointmentsMonth / 4); // Approximate for this week
+        filteredAppointments = Math.floor(branch.appointmentsMonth / 4); 
         break;
       case 'lastWeek':
-        filteredAppointments = Math.floor(branch.appointmentsMonth / 4); // Same for demo
+        filteredAppointments = Math.floor(branch.appointmentsMonth / 4);
         break;
       case 'month':
       default:
@@ -88,12 +175,12 @@ const BranchSummaryContainer: React.FC = () => {
     return { ...branch, appointmentsMonth: filteredAppointments };
   };
 
-  // Branch-wise and cumulative filtering handler
+
   const handleFilterChange = (branchId: string | number, filter: FilterOption) => {
     setBranchFilters((prev) => {
       const updatedFilters = { ...prev, [branchId]: filter };
 
-      // Apply filters to each branch except 'all'
+     
       const filteredBranchSummaries = allSummaries
         .filter((branch) => branch.branchId !== 'all')
         .map((branch) => {
@@ -101,10 +188,10 @@ const BranchSummaryContainer: React.FC = () => {
           return applyFilterToData(branch, branchFilter);
         });
 
-      // For 'all' (cumulative) summary, filter is 'all' or defaults to 'month'
+     
       const cumulativeSummary = getCumulativeSummary(filteredBranchSummaries);
 
-      // Add cumulative summary at the top
+    
       const updatedSummaries = [cumulativeSummary, ...filteredBranchSummaries];
 
       setSummaries(updatedSummaries);
@@ -117,11 +204,13 @@ const BranchSummaryContainer: React.FC = () => {
 
   return (
     <BranchSummary
-      summaries={summaries}
+      summaries={allSummaries}
       filters={branchFilters}
       onFilterChange={handleFilterChange}
+      onRequestTotals={fetchTotals}
     />
   );
 };
 
 export default BranchSummaryContainer;
+
