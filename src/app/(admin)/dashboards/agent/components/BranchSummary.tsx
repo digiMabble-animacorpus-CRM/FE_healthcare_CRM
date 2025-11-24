@@ -13,12 +13,14 @@ export type BranchSummaryItem = {
   revenueMonth: number;
 };
 
-export type FilterOption = 'thisWeek' | 'lastWeek' | 'month';
+export type FilterOption = 'thisWeek' | 'lastWeek' | 'month' | 'overall';
 
 type BranchSummaryProps = {
   summaries: BranchSummaryItem[];
   filters: Record<string | number, FilterOption>;
   onFilterChange: (branchId: string | number, filter: FilterOption) => void;
+  // new optional callback: parent will call the /dashboard/totals API and update the "Tous" item
+  onRequestTotals?: () => Promise<void> | void;
 };
 
 const num = (n: number) => new Intl.NumberFormat().format(n);
@@ -30,7 +32,7 @@ function chunk<T>(arr: T[], size = 2): T[][] {
   );
 }
 
-const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFilterChange }) => {
+const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFilterChange, onRequestTotals }) => {
   if (!summaries || summaries.length === 0) {
     return <div>No branch summaries available.</div>;
   }
@@ -40,6 +42,10 @@ const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFil
       case 'thisWeek':
       case 'lastWeek':
         return Math.floor(branch.appointmentsMonth / 4);
+      case 'overall':
+        // for overall we simply return the month value here;
+        // parent may provide aggregated 'Tous' item for branchId 'all'
+        return branch.appointmentsMonth;
       case 'month':
       default:
         return branch.appointmentsMonth;
@@ -70,19 +76,39 @@ const BranchSummary: React.FC<BranchSummaryProps> = ({ summaries, filters, onFil
                       <div className="d-flex justify-content-between align-items-center mb-3">
                         <h5 className="mb-0">{b.branchName}</h5>
                         <div role="group" className="d-flex gap-2">
-                          {(['thisWeek', 'lastWeek', 'month'] as FilterOption[]).map((option) => (
-                            <button
-                              key={option}
-                              type="button"
-                              className={`btn btn-sm ${currentFilter === option ? 'btn-primary' : 'btn-outline-primary'} rounded-pill`}
-                              style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
-                              onClick={() => onFilterChange(b.branchId, option)}
-                            >
-                              {option === 'thisWeek' && 'This Week'}
-                              {option === 'lastWeek' && 'Last Week'}
-                              {option === 'month' && 'Last Month'}
-                            </button>
-                          ))}
+                          {(() => {
+                            const isTous =
+                              String(b.branchId).toLowerCase() === 'all' ||
+                              String(b.branchName).toLowerCase().includes('tous');
+                            const options: FilterOption[] = isTous
+                              ? (['overall', 'thisWeek', 'lastWeek', 'month'] as FilterOption[])
+                              : (['thisWeek', 'lastWeek', 'month'] as FilterOption[]);
+
+                            return options.map((option) => (
+                              <button
+                                key={option}
+                                type="button"
+                                className={`btn btn-sm ${currentFilter === option ? 'btn-primary' : 'btn-outline-primary'} rounded-pill`}
+                                style={{ padding: '0.25rem 0.6rem', fontSize: '0.75rem' }}
+                                onClick={async () => {
+                                  if (option === 'overall' && isTous) {
+                                    if (onRequestTotals) {
+                                      await onRequestTotals();
+                                    } else {
+                                      onFilterChange(b.branchId, option);
+                                    }
+                                  } else {
+                                    onFilterChange(b.branchId, option);
+                                  }
+                                }}
+                              >
+                                {option === 'overall' && 'Overall'}
+                                {option === 'thisWeek' && 'This Week'}
+                                {option === 'lastWeek' && 'Last Week'}
+                                {option === 'month' && 'Last Month'}
+                              </button>
+                            ));
+                          })()}
                         </div>
                       </div>
                       <Row className="text-center g-3">
