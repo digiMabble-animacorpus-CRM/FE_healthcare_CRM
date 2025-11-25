@@ -1,7 +1,7 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
+import { getAllTherapists } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
 import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
@@ -13,7 +13,6 @@ import {
   CardHeader,
   CardTitle,
   Col,
-  Modal,
   Row,
   Spinner,
 } from 'react-bootstrap';
@@ -56,7 +55,7 @@ const TherapistsListPage = () => {
     return therapists.filter(
       (t) =>
         `${t.firstName ?? ''} ${t.lastName ?? ''}`.toLowerCase().includes(term) ||
-        (t.nihii ?? '').toLowerCase().includes(term)
+        (t.nihii ?? '').toLowerCase().includes(term),
     );
   }, [therapists, searchTerm]);
 
@@ -88,9 +87,12 @@ const TherapistsListPage = () => {
 
     return (
       <ul className="pagination flex-wrap justify-content-center justify-content-md-end gap-1 mb-0">
-
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-          <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
+          <Button
+            variant="link"
+            className="page-link"
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
             Précédent
           </Button>
         </li>
@@ -105,7 +107,11 @@ const TherapistsListPage = () => {
             {pageNum === '...' ? (
               <span className="page-link">...</span>
             ) : (
-              <Button variant="link" className="page-link" onClick={() => handlePageChange(pageNum as number)}>
+              <Button
+                variant="link"
+                className="page-link"
+                onClick={() => handlePageChange(pageNum as number)}
+              >
                 {pageNum}
               </Button>
             )}
@@ -113,7 +119,11 @@ const TherapistsListPage = () => {
         ))}
 
         <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-          <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
+          <Button
+            variant="link"
+            className="page-link"
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
             Suivant
           </Button>
         </li>
@@ -128,7 +138,6 @@ const TherapistsListPage = () => {
       <Row>
         <Col xs={12}>
           <Card>
-
             {/* Responsive Card Header */}
             <CardHeader
               className="
