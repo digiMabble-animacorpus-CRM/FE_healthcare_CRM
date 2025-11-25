@@ -1,7 +1,6 @@
 'use client';
 
 import PageTitle from '@/components/PageTitle';
-import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { deleteTherapist, getAllTherapists } from '@/helpers/therapist';
 import type { TherapistType } from '@/types/data';
 import { useRouter } from 'next/navigation';
@@ -28,9 +27,6 @@ const TherapistsListPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
-  const [viewingId, setViewingId] = useState<string | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [selectedTherapistId, setSelectedTherapistId] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -43,7 +39,6 @@ const TherapistsListPage = () => {
       setTotalCount(response.totalCount || response.data?.length || 0);
       setTotalPages(response.totalPage || 1);
     } catch (err) {
-      console.error('Failed to fetch therapists', err);
       setTherapists([]);
     } finally {
       setLoading(false);
@@ -65,43 +60,9 @@ const TherapistsListPage = () => {
     );
   }, [therapists, searchTerm]);
 
-  const currentData = useMemo(() => filteredTherapists, [filteredTherapists]);
+  const currentData = filteredTherapists;
 
-  // Handle View
-  const handleView = async (id: string) => {
-    if (viewingId) return;
-    setViewingId(id);
-    try {
-      router.push(`/therapists/details/${id}`);
-    } finally {
-      setTimeout(() => setViewingId(null), 3000);
-    }
-  };
-
-  // Handle Delete
-  const handleDeleteClick = (id: string) => {
-    setSelectedTherapistId(id);
-    setShowDeleteModal(true);
-  };
-
-  const handleDeleteTherapist = async () => {
-    if (!selectedTherapistId) return;
-    try {
-      const success = await deleteTherapist(selectedTherapistId);
-      if (success) {
-        setTherapists((prev) => prev.filter((t) => t.id !== selectedTherapistId));
-      } else {
-        console.warn('Failed to delete therapist');
-      }
-    } catch (err) {
-      console.error('Delete error:', err);
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedTherapistId(null);
-    }
-  };
-
-  // Pagination
+  // Pagination Logic
   const handlePageChange = (page: number) => {
     if (page < 1 || page > totalPages) return;
     setCurrentPage(page);
@@ -126,13 +87,10 @@ const TherapistsListPage = () => {
     };
 
     return (
-      <ul className="pagination justify-content-end mb-0">
+      <ul className="pagination flex-wrap justify-content-center justify-content-md-end gap-1 mb-0">
+
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-          <Button
-            variant="link"
-            className="page-link"
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
+          <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage - 1)}>
             Précédent
           </Button>
         </li>
@@ -147,11 +105,7 @@ const TherapistsListPage = () => {
             {pageNum === '...' ? (
               <span className="page-link">...</span>
             ) : (
-              <Button
-                variant="link"
-                className="page-link"
-                onClick={() => handlePageChange(pageNum as number)}
-              >
+              <Button variant="link" className="page-link" onClick={() => handlePageChange(pageNum as number)}>
                 {pageNum}
               </Button>
             )}
@@ -159,11 +113,7 @@ const TherapistsListPage = () => {
         ))}
 
         <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-          <Button
-            variant="link"
-            className="page-link"
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
+          <Button variant="link" className="page-link" onClick={() => handlePageChange(currentPage + 1)}>
             Suivant
           </Button>
         </li>
@@ -176,9 +126,20 @@ const TherapistsListPage = () => {
       <PageTitle subName="Thérapeute" title="Liste des thérapeutes" />
 
       <Row>
-        <Col xl={12}>
+        <Col xs={12}>
           <Card>
-            <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
+
+            {/* Responsive Card Header */}
+            <CardHeader
+              className="
+                d-flex 
+                flex-column flex-md-row 
+                justify-content-between 
+                align-items-start align-items-md-center 
+                gap-2 
+                border-bottom
+              "
+            >
               <CardTitle as="h4" className="mb-0">
                 Liste de tous les thérapeutes{' '}
                 <span className="text-muted">({totalCount} Total)</span>
@@ -191,7 +152,6 @@ const TherapistsListPage = () => {
                   placeholder="Rechercher par nom ou NIHII..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  style={{ minWidth: 200 }}
                 />
               </div>
             </CardHeader>
@@ -203,16 +163,12 @@ const TherapistsListPage = () => {
                 </div>
               ) : (
                 <div className="table-responsive">
-                  <table
-                    className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 800 }}
-                  >
+                  <table className="table table-hover table-sm table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
                         <th>No</th>
                         <th>Nom</th>
                         <th>NIHII</th>
-                        <th>Action</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -222,35 +178,11 @@ const TherapistsListPage = () => {
                             <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
                             <td>{`${item.firstName ?? ''} ${item.lastName ?? ''}`}</td>
                             <td>{item.nihii ?? '-'}</td>
-                            <td>
-                              <div className="d-flex gap-2">
-                                <Button
-                                  variant="light"
-                                  size="sm"
-                                  onClick={() => handleView(item.id)}
-                                  disabled={!!viewingId}
-                                >
-                                  {viewingId === item.id ? (
-                                    <Spinner animation="border" size="sm" />
-                                  ) : (
-                                    <IconifyIcon icon="solar:eye-broken" />
-                                  )}
-                                </Button>
-
-                                <Button
-                                  variant="soft-danger"
-                                  size="sm"
-                                  onClick={() => handleDeleteClick(item.id)}
-                                >
-                                  <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
-                                </Button>
-                              </div>
-                            </td>
                           </tr>
                         ))
                       ) : (
                         <tr>
-                          <td colSpan={4} className="text-center py-4 text-muted">
+                          <td colSpan={3} className="text-center py-4 text-muted">
                             Aucun thérapeute trouvé
                           </td>
                         </tr>
@@ -265,22 +197,6 @@ const TherapistsListPage = () => {
           </Card>
         </Col>
       </Row>
-
-      {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-        <Modal.Header closeButton>
-          <Modal.Title>Confirmer la suppression</Modal.Title>
-        </Modal.Header>
-        <Modal.Body>Êtes-vous sûr de vouloir supprimer ce thérapeute ?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
-            Annuler
-          </Button>
-          <Button variant="danger" onClick={handleDeleteTherapist}>
-            Supprimer
-          </Button>
-        </Modal.Footer>
-      </Modal>
     </>
   );
 };

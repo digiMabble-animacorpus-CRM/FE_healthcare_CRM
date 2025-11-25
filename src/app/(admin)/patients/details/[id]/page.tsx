@@ -25,7 +25,8 @@ import {
 } from 'react-bootstrap';
 import dayjs from 'dayjs';
 import PatientFormModal from '../../components/PatientFormModal';
-import { BsThreeDotsVertical } from "react-icons/bs";
+import { BsThreeDotsVertical } from 'react-icons/bs';
+import IconifyIcon from '@/components/wrappers/IconifyIcon';
 
 const calculateAge = (birthdate: { year: number; month: number; day: number }) => {
   if (!birthdate?.year) return null;
@@ -194,8 +195,12 @@ const PatientDetailsPage = () => {
               {patient.firstName} {patient.lastName}
             </h4>
 
+            <Button variant="soft-primary" size="sm" onClick={() => setShowEditModal(true)}>
+              <IconifyIcon icon="solar:pen-2-broken" />
+            </Button>
+
             {/* ACTIONS DROPDOWN */}
-            <Dropdown as={ButtonGroup}>
+            {/* <Dropdown as={ButtonGroup}>
               <Dropdown.Toggle
                 variant="light"
                 className="border-0 p-0"
@@ -208,13 +213,13 @@ const PatientDetailsPage = () => {
               <Dropdown.Menu align="end">
                 <Dropdown.Item onClick={() => setShowEditModal(true)}>Edit Patient</Dropdown.Item>
 
-                <Dropdown.Divider />
+                 <Dropdown.Divider /> 
 
                 <Dropdown.Item className="text-danger" onClick={() => setShowDeleteModal(true)}>
                   Delete Patient
                 </Dropdown.Item>
               </Dropdown.Menu>
-            </Dropdown>
+            </Dropdown> */}
           </div>
 
           {/* PATIENT FIELDS */}

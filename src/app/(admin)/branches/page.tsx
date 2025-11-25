@@ -192,7 +192,7 @@ const BranchListPage = () => {
     };
 
     return (
-      <ul className="pagination justify-content-end mb-0">
+      <ul className="pagination flex-wrap justify-content-center justify-content-md-end gap-1 mb-0">
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <Button
             variant="link"
@@ -247,27 +247,6 @@ const BranchListPage = () => {
               <CardTitle as="h4" className="mb-0">
                 Liste de toutes les succursales ({totalCount} Total)
               </CardTitle>
-
-              <div className="d-flex flex-wrap align-items-center gap-2">
-                <div style={{ minWidth: '200px' }}>
-                  <input
-                    type="text"
-                    className="form-control form-control-sm"
-                    placeholder="Rechercher par nom..."
-                    value={searchTerm}
-                    onChange={(e) => {
-                      setSearchTerm(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                  />
-                </div>
-                <Button
-                  variant="primary"
-                  onClick={() => router.push('/branches/branch-form/create')}
-                >
-                  Ajouter une succursale
-                </Button>
-              </div>
             </CardHeader>
 
             <CardBody className="p-0">
