@@ -77,42 +77,16 @@ export const MENU_ITEMS: MenuItemType[] = [
   //   ],
   // },
   {
-    key: 'therapistsTeam',
+    key: 'therapists',
     label: 'Thérapeute',
     icon: 'ri-stethoscope-line',
-    children: [
-      {
-        key: 'TherapistTeam-list',
-        label: 'Liste des thérapeutes',
-        url: '/therapists/therapists-list',
-        parentKey: 'therapistsTeam',
-      },
-      {
-        key: 'add-TherapistTeam',
-        label: 'Ajouter un thérapeute',
-        url: '/therapist-team/add-TherapistTeam',
-        parentKey: 'therapistsTeam',
-      },
-    ],
+    url: '/therapists/therapists-list',
   },
   {
     key: 'patients',
     label: 'Patient',
     icon: 'ri-hospital-line',
-    children: [
-      {
-        key: 'patient-list',
-        label: 'Liste des patients',
-        url: '/patients/patient-list',
-        parentKey: 'patients',
-      },
-      {
-        key: 'add-patient',
-        label: 'Ajouter un patient',
-        url: '/patients/add-patient',
-        parentKey: 'patients',
-      },
-    ],
+    url: '/patients/patient-list',
   },
   // {
   //   key: 'teams',

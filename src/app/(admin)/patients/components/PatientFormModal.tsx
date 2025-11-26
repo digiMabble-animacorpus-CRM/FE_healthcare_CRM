@@ -32,6 +32,7 @@ type FormValues = {
   addressCity: string | null;
   addressCountry: string | null;
   note: string | null;
+  status: 'ACTIVE' | 'INACTIVE';
 };
 
 const ssinRegex = /^[0-9]{11}$/;
@@ -100,6 +101,7 @@ export default function PatientFormModal({
     addressCity: null,
     addressCountry: null,
     note: null,
+    status: 'ACTIVE',
   };
 
   const {
@@ -161,7 +163,7 @@ export default function PatientFormModal({
         setValue('addressCountry', addr.country ?? null);
 
         setValue('note', result.note ?? null);
-
+        setValue('status', result.status ?? 'ACTIVE');
         setLoadingPatient(false);
       })();
     }
@@ -221,7 +223,8 @@ export default function PatientFormModal({
 
     if (values.note) payload.note = values.note;
 
-    if (mode === 'create') payload.status = 'ACTIVE';
+    // if (mode === 'create') payload.status = 'ACTIVE';
+    payload.status = values.status;
 
     return payload;
   };
@@ -247,6 +250,7 @@ export default function PatientFormModal({
 
         setAlert({ type: 'success', text: 'Patient updated successfully.' });
         onSaved?.();
+        reset();
         setTimeout(onClose, 700);
       } else {
         const payload = buildPayload(values);
@@ -265,9 +269,9 @@ export default function PatientFormModal({
       }
     } catch {
       setAlert({ type: 'danger', text: 'Unexpected error occurred.' });
+    } finally {
+      setSubmitting(false);
     }
-
-    setSubmitting(false);
   };
 
   const isDisabled = submitting || loadingPatient;
@@ -380,6 +384,15 @@ export default function PatientFormModal({
                   <option value="">Select</option>
                   <option value="M">Male</option>
                   <option value="F">Female</option>
+                </Form.Select>
+              </Form.Group>
+            </Col>
+            <Col md={6}>
+              <Form.Group>
+                <Form.Label>Status</Form.Label>
+                <Form.Select disabled={isDisabled} {...register('status')}>
+                  <option value="ACTIVE">Active</option>
+                  <option value="INACTIVE">Inactive</option>
                 </Form.Select>
               </Form.Group>
             </Col>

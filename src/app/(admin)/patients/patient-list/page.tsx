@@ -36,7 +36,6 @@ const PatientsListPage = () => {
   const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
   const [selectedExternalId, setSelectedExternalId] = useState<string | null>(null);
 
-  // 🔹 NEW — Modal state (create or edit)
   const [showPatientModal, setShowPatientModal] = useState(false);
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
   const [editPatientId, setEditPatientId] = useState<string | undefined>(undefined);
@@ -52,9 +51,6 @@ const PatientsListPage = () => {
       setPatients(response.data || []);
       setTotalCount(response.totalCount || 0);
       setTotalPages(response.totalPage || 0);
-    } catch (err) {
-      console.error('Failed to fetch patients', err);
-      setPatients([]);
     } finally {
       setLoading(false);
     }
@@ -81,7 +77,7 @@ const PatientsListPage = () => {
     });
   }, [patients, searchTerm]);
 
-  const currentData = useMemo(() => filteredPatients, [filteredPatients]);
+  const currentData = filteredPatients;
 
   const calculateAge = (birthdate: string | BirthDate | null | undefined): string => {
     if (!birthdate) return '-';
@@ -111,21 +107,17 @@ const PatientsListPage = () => {
   const handleView = async (id: string) => {
     if (viewingId) return;
     setViewingId(id);
-    try {
-      router.push(`/patients/details/${id}`);
-    } finally {
-      setTimeout(() => setViewingId(null), 3000);
-    }
+    router.push(`/patients/details/${id}`);
+
+    setTimeout(() => setViewingId(null), 2000);
   };
 
-  // 🔹 Open EDIT modal
   const handleEdit = (id: string) => {
     setModalMode('edit');
     setEditPatientId(id);
     setShowPatientModal(true);
   };
 
-  // 🔹 Open CREATE modal
   const openCreateModal = () => {
     setModalMode('create');
     setEditPatientId(undefined);
@@ -141,30 +133,20 @@ const PatientsListPage = () => {
   const handleDeletePatient = async () => {
     if (!selectedPatientId) return;
 
-    try {
-      const success = await deletePatient(selectedPatientId, selectedExternalId ?? undefined);
-      if (success) {
-        setPatients((prev) => prev.filter((p) => p.id !== selectedPatientId));
-        showNotification({
-          message: 'Patient supprimé avec succès !',
-          variant: 'success',
-        });
-      } else {
-        showNotification({
-          message: 'Échec de la suppression du patient',
-          variant: 'danger',
-        });
-      }
-    } catch (err) {
-      console.error('Delete error:', err);
+    const success = await deletePatient(selectedPatientId, selectedExternalId ?? undefined);
+
+    if (success) {
+      setPatients((prev) =>
+        prev.map((p) => (p.id === selectedPatientId ? { ...p, status: 'INACTIVE' } : p)),
+      );
+
       showNotification({
-        message: 'Une erreur est survenue lors de la suppression',
-        variant: 'danger',
+        message: 'Patient supprimé avec succès !',
+        variant: 'success',
       });
-    } finally {
-      setShowDeleteModal(false);
-      setSelectedPatientId(null);
     }
+
+    setShowDeleteModal(false);
   };
 
   const handlePageChange = (page: number) => {
@@ -172,17 +154,14 @@ const PatientsListPage = () => {
     setCurrentPage(page);
   };
 
+  // 🔹 RESPONSIVE PAGINATION
   const renderPagination = () => {
     if (totalPages <= 1) return null;
 
     const getPageNumbers = () => {
-      if (totalPages <= 7) {
-        return Array.from({ length: totalPages }, (_, i) => i + 1);
-      }
+      if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
 
-      const pages: (number | string)[] = [];
-      pages.push(1);
-
+      const pages: (number | string)[] = [1];
       let startPage = Math.max(2, currentPage - 1);
       let endPage = Math.min(totalPages - 1, currentPage + 1);
 
@@ -198,7 +177,7 @@ const PatientsListPage = () => {
     };
 
     return (
-      <ul className="pagination justify-content-end mb-0">
+      <ul className="pagination flex-wrap justify-content-center justify-content-md-end gap-1 mb-0">
         <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
           <Button
             variant="link"
@@ -250,17 +229,28 @@ const PatientsListPage = () => {
       <PageTitle subName="Patient" title="Liste des patients" />
 
       <Row>
-        <Col xl={12}>
+        <Col xs={12}>
           <Card>
-            <CardHeader className="d-flex justify-content-between align-items-center border-bottom gap-2">
+            {/* 🔹 RESPONSIVE CARD HEADER */}
+            <CardHeader
+              className="
+                d-flex 
+                flex-column flex-md-row 
+                justify-content-between 
+                align-items-start align-items-md-center 
+                gap-3
+                border-bottom
+              "
+            >
               <CardTitle as="h4" className="mb-0">
                 Liste de tous les patients <span className="text-muted">({totalCount} Total)</span>
               </CardTitle>
 
-              {/* 🔹 CREATE PATIENT BUTTON */}
-              <Button variant="primary" onClick={openCreateModal}>
-                <IconifyIcon icon="solar:add-circle-bold" /> Ajouter un patient
-              </Button>
+              <div className="d-flex flex-column flex-sm-row gap-2">
+                <Button className="w-100 w-sm-auto" variant="primary" onClick={openCreateModal}>
+                  <IconifyIcon icon="solar:add-circle-bold" /> Ajouter un patient
+                </Button>
+              </div>
             </CardHeader>
 
             <CardBody className="p-0">
@@ -270,10 +260,7 @@ const PatientsListPage = () => {
                 </div>
               ) : (
                 <div className="table-responsive">
-                  <table
-                    className="table table-hover table-sm table-centered mb-0"
-                    style={{ minWidth: 1000 }}
-                  >
+                  <table className="table table-hover table-sm table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
                         <th>No</th>
@@ -285,20 +272,25 @@ const PatientsListPage = () => {
                         <th>Action</th>
                       </tr>
                     </thead>
+
                     <tbody>
                       {currentData.length > 0 ? (
                         currentData.map((item, index) => (
                           <tr key={item.id}>
                             <td>{(currentPage - 1) * PAGE_SIZE + index + 1}</td>
+
                             <td>
                               {item.firstName} {item.lastName}
                             </td>
+
                             <td>{getContactValue(item.contactInfos ?? [], 'EMAIL')}</td>
                             <td>{getContactValue(item.contactInfos ?? [], 'PHONE')}</td>
+
                             <td>
                               {calculateAge(item.birthdate)}
                               {item.legalGender && ` | ${formatGender(item.legalGender)}`}
                             </td>
+
                             <td>
                               <span
                                 className={`badge bg-${
@@ -308,6 +300,8 @@ const PatientsListPage = () => {
                                 {item.status}
                               </span>
                             </td>
+
+                            {/* 🔹 RESPONSIVE ACTION BUTTONS */}
                             <td>
                               <div className="d-flex gap-2">
                                 <Button
@@ -332,13 +326,15 @@ const PatientsListPage = () => {
                                   <IconifyIcon icon="solar:pen-2-broken" />
                                 </Button>
 
-                                <Button
-                                  variant="soft-danger"
-                                  size="sm"
-                                  onClick={() => handleDeleteClick(item.id, item?.externalId)}
-                                >
-                                  <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
-                                </Button>
+                                {item.status === 'ACTIVE' && (
+                                  <Button
+                                    variant="soft-danger"
+                                    size="sm"
+                                    onClick={() => handleDeleteClick(item.id, item.externalId)}
+                                  >
+                                    <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
+                                  </Button>
+                                )}
                               </div>
                             </td>
                           </tr>
@@ -361,7 +357,7 @@ const PatientsListPage = () => {
         </Col>
       </Row>
 
-      {/* DELETE CONFIRMATION */}
+      {/* Delete Modal */}
       <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
         <Modal.Header closeButton>
           <Modal.Title>Confirmer la suppression</Modal.Title>
@@ -377,7 +373,7 @@ const PatientsListPage = () => {
         </Modal.Footer>
       </Modal>
 
-      {/* 🔹 CREATE / EDIT PATIENT MODAL */}
+      {/* Patient Modal */}
       <PatientFormModal
         show={showPatientModal}
         mode={modalMode}
