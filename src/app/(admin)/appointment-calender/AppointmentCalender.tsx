@@ -18,9 +18,11 @@ import type { Site } from "./sites/types";
 import type { HealthProfessional } from "./hps/types";
 import type { Patient } from "./patients/types";
 import type { Calendar as CalendarType } from "./calendars/types";
+import { Button } from "react-bootstrap";
+import EventFormModal from "../create-appointment/components/eventFormModel";
 
 const CalendarDashboard: React.FC = () => {
-  // Data
+  // ... your existing state declarations
   const [events, setEvents] = useState<CalendarEventType[]>([]);
   const [calendars, setCalendars] = useState<CalendarType[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
@@ -29,10 +31,10 @@ const CalendarDashboard: React.FC = () => {
 
   // UI state
   const [loading, setLoading] = useState(false);
-  const [view, setView] = useState<"day" | "week" | "month">("week");
+  const [view, setView] = useState<'day' | 'week' | 'month'>('week');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  // Filters (arrays for multi-select)
+  // Filters...
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
   const [selectedHpIds, setSelectedHpIds] = useState<string[]>([]);
   const [selectedPatientIds, setSelectedPatientIds] = useState<string[]>([]);
@@ -40,8 +42,9 @@ const CalendarDashboard: React.FC = () => {
   const [selectedType, setSelectedType] = useState<string[]>([]);
 
   const [visibleCalendarIds, setVisibleCalendarIds] = useState<Set<string>>(new Set());
-  const [displayLabel, setDisplayLabel] = useState<string>("");
+  const [displayLabel, setDisplayLabel] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<CalendarEventType | null>(null);
+  const [showCreateEvent, setShowCreateEvent] = useState<boolean>(false);
 
   // Load data
   useEffect(() => {
@@ -71,13 +74,29 @@ const CalendarDashboard: React.FC = () => {
         const calendarIds = calendarsRes.data.map((c: CalendarType) => c.id);
         setVisibleCalendarIds(new Set(calendarIds));
 
-        // Events for month
+        // ✅ FIXED: Events for current view range
         const start = new Date(selectedDate);
-        start.setDate(1);
-        const end = new Date(start);
-        end.setMonth(start.getMonth() + 1);
+        const end = new Date(selectedDate);
+        
+        // Calculate range based on view
+        if (view === 'week') {
+          const day = start.getDay();
+          start.setDate(start.getDate() - day);
+          start.setHours(0, 0, 0, 0);
+          end.setDate(start.getDate() + 6);
+          end.setHours(23, 59, 59, 999);
+        } else if (view === 'month') {
+          start.setDate(1);
+          start.setHours(0, 0, 0, 0);
+          end.setMonth(start.getMonth() + 1);
+          end.setDate(0);
+          end.setHours(23, 59, 59, 999);
+        } else {
+          start.setHours(0, 0, 0, 0);
+          end.setHours(23, 59, 59, 999);
+        }
 
-        const eventsRes = await getAllEvents(1, 500, start.toISOString(), end.toISOString());
+        const eventsRes = await getAllEvents(1, 1000, start.toISOString(), end.toISOString());
         setEvents(eventsRes.data || []);
       } catch (err) {
         console.error(err);
@@ -86,6 +105,7 @@ const CalendarDashboard: React.FC = () => {
       }
     };
     loadAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Filter events
@@ -176,12 +196,60 @@ const CalendarDashboard: React.FC = () => {
   // Event click
   const handleEventClick = (ev: CalendarEventType) => {
     setSelectedEvent(ev);
+    // Optionally open edit modal instead of details:
+    // setShowCreateEvent(true); pass mode="edit" and eventId=ev.id
+  };
+
+  // Reload events after create/edit
+  const handleSavedEvent = async (result?: any) => {
+    // ✅ FIXED: Reload for current view range
+    const start = new Date(selectedDate);
+    const end = new Date(selectedDate);
+    
+    if (view === 'week') {
+      const day = start.getDay();
+      start.setDate(start.getDate() - day);
+      start.setHours(0, 0, 0, 0);
+      end.setDate(start.getDate() + 6);
+      end.setHours(23, 59, 59, 999);
+    } else if (view === 'month') {
+      start.setDate(1);
+      start.setHours(0, 0, 0, 0);
+      end.setMonth(start.getMonth() + 1);
+      end.setDate(0);
+      end.setHours(23, 59, 59, 999);
+    } else {
+      start.setHours(0, 0, 0, 0);
+      end.setHours(23, 59, 59, 999);
+    }
+
+    setShowCreateEvent(false);
+    setLoading(true);
+    try {
+      const eventsRes = await getAllEvents(1, 1000, start.toISOString(), end.toISOString());
+      setEvents(eventsRes.data || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
-    <div style={{ display: "flex", gap: 12, padding: 12 }}>
-      {/* Left column */}
-      <div style={{ width: 340, display: "flex", flexDirection: "column", gap: 12 }}>
+    <div style={{ display: 'flex', gap: 12, padding: 12 }}>
+      {/* Left column (updated) */}
+      <div style={{ width: 340, display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Create Event button */}
+        <div style={{ display: 'flex', gap: 8 }}>
+          <Button
+            variant="primary"
+            style={{ width: '100%' }}
+            onClick={() => setShowCreateEvent(true)}
+          >
+            + Create Event
+          </Button>
+        </div>
+
         <MiniCalendar selectedDate={selectedDate} onChange={(d) => setSelectedDate(d)} />
 
         <CalendarFilters
@@ -230,7 +298,7 @@ const CalendarDashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Event Details Modal */}
+      {/* Event Details Modal (existing) */}
       {selectedEvent && (
         <EventDetailsModal
           event={selectedEvent}
@@ -241,6 +309,14 @@ const CalendarDashboard: React.FC = () => {
           onClose={() => setSelectedEvent(null)}
         />
       )}
+
+      {/* Create/Edit Event Modal */}
+      <EventFormModal
+        show={showCreateEvent}
+        mode="create"
+        onClose={() => setShowCreateEvent(false)}
+        onSaved={(res) => handleSavedEvent(res)}
+      />
     </div>
   );
 };
