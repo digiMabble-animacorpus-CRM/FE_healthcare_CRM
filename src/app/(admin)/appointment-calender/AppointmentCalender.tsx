@@ -1,25 +1,25 @@
-"use client";
+'use client';
 
-import React, { useEffect, useMemo, useState } from "react";
-import MiniCalendar from "./components/miniCalender";
-import CalendarFilters from "./components/calenderFilters";
-import MainCalendar from "./components/mainCalender";
-import CalendarHeader from "./components/calenderHeader";
-import EventDetailsModal from "./components/eventDetailModel";
+import React, { useEffect, useMemo, useState } from 'react';
+import MiniCalendar from './components/miniCalender';
+import CalendarFilters from './components/calenderFilters';
+import MainCalendar from './components/mainCalender';
+import CalendarHeader from './components/calenderHeader';
+import EventDetailsModal from './components/eventDetailModel';
 
-import { getAllEvents } from "./events/api";
-import { getAllSites } from "./sites/api";
-import { getAllHps } from "./hps/api";
-import { getAllPatients } from "./patients/api";
-import { getAllCalendars } from "./calendars/api";
+import { getAllEvents } from './events/api';
+import { getAllSites } from './sites/api';
+import { getAllHps } from './hps/api';
+import { getAllPatients } from './patients/api';
+import { getAllCalendars } from './calendars/api';
 
-import type { CalendarEvent as CalendarEventType } from "./events/types";
-import type { Site } from "./sites/types";
-import type { HealthProfessional } from "./hps/types";
-import type { Patient } from "./patients/types";
-import type { Calendar as CalendarType } from "./calendars/types";
-import { Button } from "react-bootstrap";
-import EventFormModal from "../create-appointment/components/eventFormModel";
+import type { CalendarEvent as CalendarEventType } from './events/types';
+import type { Site } from './sites/types';
+import type { HealthProfessional } from './hps/types';
+import type { Patient } from './patients/types';
+import type { Calendar as CalendarType } from './calendars/types';
+import { Button } from 'react-bootstrap';
+import EventFormModal from '../create-appointment/components/eventFormModel';
 
 const CalendarDashboard: React.FC = () => {
   // ... your existing state declarations
@@ -45,6 +45,9 @@ const CalendarDashboard: React.FC = () => {
   const [displayLabel, setDisplayLabel] = useState<string>('');
   const [selectedEvent, setSelectedEvent] = useState<CalendarEventType | null>(null);
   const [showCreateEvent, setShowCreateEvent] = useState<boolean>(false);
+  const [showEventModal, setShowEventModal] = useState(false);
+  const [eventMode, setEventMode] = useState<'create' | 'edit'>('create');
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
   // Load data
   useEffect(() => {
@@ -67,8 +70,8 @@ const CalendarDashboard: React.FC = () => {
         setSelectedSiteIds(sitesRes.data.map((s: Site) => s.id));
         setSelectedHpIds(hpsRes.data.map((hp: HealthProfessional) => hp.id));
         setSelectedPatientIds(patientsRes.data.map((p: Patient) => p.id));
-        setSelectedStatus(["ACTIVE", "CONFIRMED", "CANCELED", "ARCHIVED", "DELETED"]);
-        setSelectedType(["APPOINTMENT", "LEAVE", "PERSONAL", "EXTERNAL_EVENT"]);
+        setSelectedStatus(['ACTIVE', 'CONFIRMED', 'CANCELED', 'ARCHIVED', 'DELETED']);
+        setSelectedType(['APPOINTMENT', 'LEAVE', 'PERSONAL', 'EXTERNAL_EVENT']);
 
         // Initialize visible calendars
         const calendarIds = calendarsRes.data.map((c: CalendarType) => c.id);
@@ -77,7 +80,7 @@ const CalendarDashboard: React.FC = () => {
         // ✅ FIXED: Events for current view range
         const start = new Date(selectedDate);
         const end = new Date(selectedDate);
-        
+
         // Calculate range based on view
         if (view === 'week') {
           const day = start.getDay();
@@ -127,7 +130,7 @@ const CalendarDashboard: React.FC = () => {
         const match = selectedPatientIds.some(
           (id) =>
             ev.patientExId === id ||
-            patients.find((p) => p.id === id)?.externalId === ev.patientExId
+            patients.find((p) => p.id === id)?.externalId === ev.patientExId,
         );
         if (!match) return false;
       }
@@ -166,15 +169,15 @@ const CalendarDashboard: React.FC = () => {
   const onToday = () => setSelectedDate(new Date());
   const onPrev = () => {
     const d = new Date(selectedDate);
-    if (view === "month") d.setMonth(d.getMonth() - 1);
-    else if (view === "week") d.setDate(d.getDate() - 7);
+    if (view === 'month') d.setMonth(d.getMonth() - 1);
+    else if (view === 'week') d.setDate(d.getDate() - 7);
     else d.setDate(d.getDate() - 1);
     setSelectedDate(d);
   };
   const onNext = () => {
     const d = new Date(selectedDate);
-    if (view === "month") d.setMonth(d.getMonth() + 1);
-    else if (view === "week") d.setDate(d.getDate() + 7);
+    if (view === 'month') d.setMonth(d.getMonth() + 1);
+    else if (view === 'week') d.setDate(d.getDate() + 7);
     else d.setDate(d.getDate() + 1);
     setSelectedDate(d);
   };
@@ -183,12 +186,12 @@ const CalendarDashboard: React.FC = () => {
   const handleRangeChange = (r: { start: Date; end: Date }) => {
     const start = r.start;
     const end = r.end;
-    const options: Intl.DateTimeFormatOptions = { month: "short", day: "numeric" };
-    if (view === "month") {
-      setDisplayLabel(start.toLocaleString(undefined, { month: "long", year: "numeric" }));
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric' };
+    if (view === 'month') {
+      setDisplayLabel(start.toLocaleString(undefined, { month: 'long', year: 'numeric' }));
     } else {
       setDisplayLabel(
-        `${start.toLocaleString(undefined, options)} — ${end.toLocaleString(undefined, options)}`
+        `${start.toLocaleString(undefined, options)} — ${end.toLocaleString(undefined, options)}`,
       );
     }
   };
@@ -205,7 +208,7 @@ const CalendarDashboard: React.FC = () => {
     // ✅ FIXED: Reload for current view range
     const start = new Date(selectedDate);
     const end = new Date(selectedDate);
-    
+
     if (view === 'week') {
       const day = start.getDay();
       start.setDate(start.getDate() - day);
@@ -244,7 +247,11 @@ const CalendarDashboard: React.FC = () => {
           <Button
             variant="primary"
             style={{ width: '100%' }}
-            onClick={() => setShowCreateEvent(true)}
+            onClick={() => {
+              setEventMode('create');
+              setEditingEventId(null);
+              setShowEventModal(true);
+            }}
           >
             + Create Event
           </Button>
@@ -273,9 +280,9 @@ const CalendarDashboard: React.FC = () => {
       </div>
 
       {/* Right column */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
         <CalendarHeader
-          displayLabel={displayLabel}
+          selectedDate={selectedDate}
           view={view}
           onPrev={onPrev}
           onNext={onNext}
@@ -307,15 +314,28 @@ const CalendarDashboard: React.FC = () => {
           patients={patients}
           sites={sites}
           onClose={() => setSelectedEvent(null)}
+          onEdit={(id) => {
+            setSelectedEvent(null);
+            setEventMode('edit');
+            setEditingEventId(id);
+            setShowEventModal(true);
+          }}
         />
       )}
 
-      {/* Create/Edit Event Modal */}
       <EventFormModal
-        show={showCreateEvent}
-        mode="create"
-        onClose={() => setShowCreateEvent(false)}
-        onSaved={(res) => handleSavedEvent(res)}
+        show={showEventModal}
+        mode={eventMode}
+        eventId={editingEventId || undefined}
+        onClose={() => {
+          setShowEventModal(false);
+          setEditingEventId(null);
+        }}
+        onSaved={() => {
+          setShowEventModal(false);
+          setEditingEventId(null);
+          handleSavedEvent();
+        }}
       />
     </div>
   );

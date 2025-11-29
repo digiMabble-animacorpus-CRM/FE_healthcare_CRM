@@ -1,16 +1,15 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef } from "react";
-import Calendar from "@toast-ui/react-calendar";
-import "@toast-ui/calendar/dist/toastui-calendar.min.css";
-import type { CalendarEvent } from "../events/types";
-import type { Calendar as CalendarType } from "../calendars/types";
-
+import React, { useEffect, useRef } from 'react';
+import Calendar from '@toast-ui/react-calendar';
+import '@toast-ui/calendar/dist/toastui-calendar.min.css';
+import type { CalendarEvent } from '../events/types';
+import type { Calendar as CalendarType } from '../calendars/types';
 
 interface MainCalendarProps {
   events: CalendarEvent[];
   calendars: CalendarType[];
-  view: "day" | "week" | "month";
+  view: 'day' | 'week' | 'month';
   selectedDate: Date;
   visibleCalendarIds: Set<string>;
   onRangeChange?: (range: { start: Date; end: Date }) => void;
@@ -35,12 +34,12 @@ const MainCalendar: React.FC<MainCalendarProps> = ({
       return {
         id: ev.id,
         calendarId: ev.calendarId,
-        title: ev.title || "Untitled",
-        category: "time",
+        title: ev.title || 'Untitled',
+        category: 'time',
         start: ev.startAt,
         end: ev.endAt,
         isReadOnly: true,
-        backgroundColor: cal?.color || "#4a90e2",
+        backgroundColor: cal?.color || '#4a90e2',
       };
     });
 
@@ -70,14 +69,14 @@ const MainCalendar: React.FC<MainCalendarProps> = ({
   };
 
   return (
-    <div style={{ height: "80vh", background: "#fff", borderRadius: 8 }}>
+    <div style={{ height: '80vh', background: '#fff', borderRadius: 8 }}>
       <Calendar
         ref={calendarRef}
         view={view}
         height="100%"
-        useDetailPopup={true}
+        useDetailPopup={false}
         taskView={false}
-        scheduleView={["time"]}
+        scheduleView={['time']}
         calendars={calendars.map((c) => ({
           id: c.id,
           name: c.label,
