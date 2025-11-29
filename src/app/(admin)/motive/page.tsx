@@ -15,6 +15,7 @@ import {
 } from 'react-bootstrap';
 import { useNotificationContext } from '@/context/useNotificationContext';
 import {
+  buildMotiveUpdatePayload,
   getAllCalendars,
   getAllHps,
   getAllMotives,
@@ -37,7 +38,9 @@ export default function MotivesListPage() {
   const [totalPages, setTotalPages] = useState(1);
 
   // Filters
-  const [statusFilter, setStatusFilter] = useState<'ACTIVE' | 'INACTIVE' | 'ARCHIVED' | ''>('ACTIVE');
+  const [statusFilter, setStatusFilter] = useState<'ACTIVE' | 'INACTIVE' | 'ARCHIVED' | ''>(
+    'ACTIVE',
+  );
   const [calendarFilter, setCalendarFilter] = useState<string | undefined>(undefined);
   const [hpFilter, setHpFilter] = useState<string | undefined>(undefined);
   const [searchTerm, setSearchTerm] = useState('');
@@ -99,13 +102,34 @@ export default function MotivesListPage() {
   const openEditPattern = (motive: any) => setEditingPatternFor(motive);
 
   const handleCalendarsSaved = async (id: string, calendarIds: string[]) => {
-    const ok = await updateMotivesBulk([{ id, calendarIds }]);
+    console.log('🚀 handleCalendarsSaved:', id, calendarIds);
+
+    const fresh = motives.find((m) => m.id === id);
+    if (!fresh) return;
+
+    const payload = {
+      id: fresh.id,
+      calendarIds,
+      label: fresh.label,
+      color: fresh.color,
+      newPatientDuration: fresh.newPatientDuration,
+      existingPatientDuration: fresh.existingPatientDuration,
+      isBookableOnline: fresh.isBookableOnline,
+      isSendingNotificationsDisabled: fresh.isSendingNotificationsDisabled,
+      status: fresh.status,
+      type: fresh.type || 'CABINET',
+    };
+
+    console.log('🚀 payload for calendar update:', payload);
+
+    const ok = await updateMotivesBulk([payload]);
     if (ok) {
       showNotification({ message: 'Calendars updated', variant: 'success' });
       fetchAll();
     } else {
       showNotification({ message: 'Failed to update calendars', variant: 'danger' });
     }
+
     setEditingCalendarsFor(null);
   };
 
@@ -151,7 +175,9 @@ export default function MotivesListPage() {
             {/* 🔹 Header with Add Button */}
             <CardHeader className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 flex-wrap">
               <div className="d-flex align-items-center justify-content-between w-100">
-                <CardTitle as="h4" className="mb-0">Motives</CardTitle>
+                <CardTitle as="h4" className="mb-0">
+                  Motives
+                </CardTitle>
                 <Button variant="primary" size="sm" onClick={() => setShowCreateMotive(true)}>
                   + Add Motive
                 </Button>
@@ -275,7 +301,9 @@ export default function MotivesListPage() {
                     </li>
                   ))}
 
-                  <li className={`page-item ${currentPage === (totalPages || 1) ? 'disabled' : ''}`}>
+                  <li
+                    className={`page-item ${currentPage === (totalPages || 1) ? 'disabled' : ''}`}
+                  >
                     <Button
                       variant="link"
                       className="page-link"

@@ -62,6 +62,20 @@ export type MotiveCreateRequestDto = {
   type?: 'CABINET' | 'VISITES' | 'VIDEO';
 };
 
+export const buildMotiveUpdatePayload = (motive: any, calendarIds?: string[]) => {
+  return {
+    id: motive.id,
+    label: motive.label,
+    color: motive.color,
+    newPatientDuration: motive.newPatientDuration,
+    existingPatientDuration: motive.existingPatientDuration,
+    isBookableOnline: motive.isBookableOnline ?? false,
+    isSendingNotificationsDisabled: motive.isSendingNotificationsDisabled ?? false,
+    status: motive.status || 'ACTIVE',
+    type: motive.type,
+    calendarIds,
+  };
+};
 
 /** ===========================
  * ✅ Get All Motives
@@ -70,7 +84,7 @@ export const getAllMotives = async (
   page = 1,
   limit = 20,
   sortField = 'label',
-  sortDirection = 1
+  sortDirection = 1,
 ) => {
   try {
     const token = ROSA_TOKEN;
@@ -118,7 +132,7 @@ export const getAllMotives = async (
 /** ===========================
  * ✅ Bulk Update Motives
  * =========================== */
-export const updateMotivesBulk = async (payload: MotiveDto[]) => {
+export const updateMotivesBulk = async (payload: any[]) => {
   try {
     const token = ROSA_TOKEN;
     if (!token) {
@@ -126,15 +140,13 @@ export const updateMotivesBulk = async (payload: MotiveDto[]) => {
       return false;
     }
 
-    const cleaned = payload.map(normalizeMotivePayload);
-
     const res = await fetch(`${ROSA_BASE_API_PATH}/motives/bulk`, {
       method: 'PATCH',
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(cleaned),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
@@ -193,7 +205,7 @@ export const getAllCalendars = async (
   limit = 50,
   sortField = 'label',
   sortDirection = 1,
-  search?: string
+  search?: string,
 ) => {
   try {
     const token = ROSA_TOKEN;
@@ -242,7 +254,7 @@ export const getAllHps = async (
   limit = 50,
   sortField = 'firstName',
   sortDirection = 1,
-  search?: string
+  search?: string,
 ) => {
   try {
     const token = ROSA_TOKEN;
@@ -322,4 +334,3 @@ export const createMotive = async (payload: MotiveCreateRequestDto) => {
     };
   }
 };
-
