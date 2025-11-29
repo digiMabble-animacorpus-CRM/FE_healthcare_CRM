@@ -239,26 +239,26 @@ const CalendarDashboard: React.FC = () => {
   };
 
   return (
-    <div style={{ display: 'flex', gap: 12, padding: 12 }}>
-      {/* Left column (updated) */}
-      <div style={{ width: 340, display: 'flex', flexDirection: 'column', gap: 12 }}>
-        {/* Create Event button */}
-        <div style={{ display: 'flex', gap: 8 }}>
-          <Button
-            variant="primary"
-            style={{ width: '100%' }}
-            onClick={() => {
-              setEventMode('create');
-              setEditingEventId(null);
-              setShowEventModal(true);
-            }}
-          >
-            + Create Event
-          </Button>
-        </div>
+    <div className="d-flex flex-column flex-lg-row gap-3 p-1 w-100">
+      {/* LEFT COLUMN — Sidebar */}
+      <div className="d-flex flex-column gap-3" style={{ width: '100%', maxWidth: 340 }}>
+        {/* Create Event Button */}
+        <Button
+          variant="primary"
+          className="w-100"
+          onClick={() => {
+            setEventMode('create');
+            setEditingEventId(null);
+            setShowEventModal(true);
+          }}
+        >
+          + Create Event
+        </Button>
 
-        <MiniCalendar selectedDate={selectedDate} onChange={(d) => setSelectedDate(d)} />
+        {/* Mini Calendar */}
+        <MiniCalendar selectedDate={selectedDate} onChange={setSelectedDate} />
 
+        {/* Filters */}
         <CalendarFilters
           sites={sites}
           hps={hps}
@@ -279,8 +279,8 @@ const CalendarDashboard: React.FC = () => {
         />
       </div>
 
-      {/* Right column */}
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+      {/* RIGHT COLUMN — Calendar */}
+      <div className="d-flex flex-column flex-grow-1">
         <CalendarHeader
           selectedDate={selectedDate}
           view={view}
@@ -291,7 +291,7 @@ const CalendarDashboard: React.FC = () => {
         />
 
         {loading ? (
-          <div style={{ padding: 24 }}>Loading data…</div>
+          <div className="p-4">Loading data…</div>
         ) : (
           <MainCalendar
             events={filteredEvents}
@@ -305,7 +305,7 @@ const CalendarDashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Event Details Modal (existing) */}
+      {/* EVENT DETAILS MODAL */}
       {selectedEvent && (
         <EventDetailsModal
           event={selectedEvent}
@@ -323,6 +323,7 @@ const CalendarDashboard: React.FC = () => {
         />
       )}
 
+      {/* CREATE/EDIT EVENT MODAL */}
       <EventFormModal
         show={showEventModal}
         mode={eventMode}

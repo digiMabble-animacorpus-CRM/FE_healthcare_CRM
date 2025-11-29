@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Button, ButtonGroup, Form } from 'react-bootstrap';
+import { Button, ButtonGroup, Form, Row, Col } from 'react-bootstrap';
 
 interface CalendarHeaderProps {
-  selectedDate: Date; // 👈 NEW
+  selectedDate: Date;
   view: 'day' | 'week' | 'month';
   onPrev: () => void;
   onNext: () => void;
@@ -21,12 +21,11 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   onViewChange,
 }) => {
   // ----------------------------------------------------
-  // 📌 FORMAT THE LABEL BASED ON VIEW
+  // 🔥 RESPONSIVE DATE LABEL LOGIC
   // ----------------------------------------------------
   const displayLabel = useMemo(() => {
     const d = new Date(selectedDate);
 
-    // --- DAY VIEW ---
     if (view === 'day') {
       const today = new Date();
       const isToday = d.toDateString() === today.toDateString();
@@ -45,10 +44,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
           });
     }
 
-    // --- WEEK VIEW ---
     if (view === 'week') {
       const start = new Date(d);
-      start.setDate(start.getDate() - start.getDay()); // Sunday
+      start.setDate(start.getDate() - start.getDay());
 
       const end = new Date(start);
       end.setDate(start.getDate() + 6);
@@ -67,7 +65,6 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       return `${startStr} — ${endStr}`;
     }
 
-    // --- MONTH VIEW ---
     if (view === 'month') {
       return d.toLocaleDateString([], {
         month: 'long',
@@ -79,35 +76,42 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
   }, [selectedDate, view]);
 
   return (
-    <div className="d-flex align-items-center justify-content-between mb-3 p-2 bg-light rounded shadow-sm">
-      {/* LEFT BUTTONS */}
-      <ButtonGroup>
-        <Button variant="outline-secondary" onClick={onPrev}>
-          ◀
-        </Button>
-        <Button variant="outline-secondary" onClick={onToday}>
-          Today
-        </Button>
-        <Button variant="outline-secondary" onClick={onNext}>
-          ▶
-        </Button>
-      </ButtonGroup>
+    <div className="mb-3 p-3 bg-white rounded shadow-sm">
+      <Row className="g-3 align-items-center">
+        {/* LEFT — Navigation Buttons */}
+        <Col xs={12} md="auto" className="text-center text-md-start">
+          <ButtonGroup>
+            <Button variant="outline-secondary" onClick={onPrev}>
+              ◀
+            </Button>
+            <Button variant="outline-secondary" onClick={onToday}>
+              Today
+            </Button>
+            <Button variant="outline-secondary" onClick={onNext}>
+              ▶
+            </Button>
+          </ButtonGroup>
+        </Col>
 
-      {/* CENTER LABEL */}
-      <div className="flex-grow-1 text-center fw-bold fs-5" style={{ userSelect: 'none' }}>
-        {displayLabel}
-      </div>
+        {/* CENTER — Label */}
+        <Col xs={12} md className="text-center fw-bold fs-5">
+          {displayLabel}
+        </Col>
 
-      {/* VIEW SELECT */}
-      <Form.Select
-        value={view}
-        onChange={(e) => onViewChange(e.target.value as any)}
-        style={{ width: 150 }}
-      >
-        <option value="day">Day View</option>
-        <option value="week">Week View</option>
-        <option value="month">Month View</option>
-      </Form.Select>
+        {/* RIGHT — View Select */}
+        <Col xs={12} md="auto" className="text-center text-md-end">
+          <Form.Select
+            value={view}
+            onChange={(e) => onViewChange(e.target.value as any)}
+            style={{ maxWidth: 180 }}
+            className="mx-auto mx-md-0"
+          >
+            <option value="day">Day View</option>
+            <option value="week">Week View</option>
+            <option value="month">Month View</option>
+          </Form.Select>
+        </Col>
+      </Row>
     </div>
   );
 };
