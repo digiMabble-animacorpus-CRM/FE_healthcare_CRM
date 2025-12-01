@@ -30,7 +30,7 @@ type Props = {
 };
 
 // -------------------------
-// FIX 3 — Standard OptionType for react-select
+// Standard OptionType for react-select
 // -------------------------
 type OptionType = {
   value: string;
@@ -68,12 +68,11 @@ const DEFAULT_VALUES: FormValues = {
 };
 
 // -------------------------
-// Validation schema FIX 1 — correct yup.when()
+// Validation schema
 // -------------------------
 const validationSchema = yup.object({
   title: yup.string().trim().required('Title is required'),
   calendarId: yup.string().nullable(),
-  //   .required('Calendar is required'),
   type: yup
     .string()
     .oneOf(['APPOINTMENT', 'PERSONAL', 'LEAVE', 'EXTERNAL_EVENT', 'BUSY'])
@@ -92,6 +91,7 @@ const validationSchema = yup.object({
     .test('after-start', 'End must be after start', function (value) {
       const { startAt } = this.parent;
       if (!startAt || !value) return true;
+      // Note: Date comparison relies on both being valid Date objects
       return new Date(value) > new Date(startAt);
     }),
 
@@ -106,6 +106,20 @@ const validationSchema = yup.object({
     }),
 });
 
+/**
+ * 💡 FIX: Helper function to convert the 'datetime-local' string
+ * into a UTC ISO string that represents the exact local time entered.
+ * This prevents the time zone offset (e.g., -5 hours) on submission.
+ */
+const convertLocalToUTCISO = (localTime: string): string => {
+  if (!localTime) return '';
+  // Append ':00.000Z' to force JavaScript to interpret the date string
+  // as an instant in UTC time.
+  const utcDate = new Date(`${localTime}:00.000Z`);
+  return utcDate.toISOString();
+};
+
+
 export default function EventFormModal({ show, mode, eventId, onClose, onSaved }: Props) {
   const isEdit = mode === 'edit';
 
@@ -116,7 +130,8 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
   const [calendars, setCalendars] = useState<CalendarDto[]>([]);
   const [motives, setMotives] = useState<MotiveDto[]>([]);
   const [hps, setHps] = useState<Array<{ id: string; firstName?: string; lastName?: string }>>([]);
-  const [allPatients, setAllPatients] = useState<any[]>([]); // FIX 2: store patients locally
+  const [allPatients, setAllPatients] = useState<any[]>([]);
+  const [referenceDataLoaded, setReferenceDataLoaded] = useState(false); // Track if static data is loaded
 
   const {
     register,
@@ -137,114 +152,105 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
   const watchedStartAt = watch('startAt');
 
   // -------------------------
-  // Load calendars, motives, HPs, patients
+  // 💡 FIX 1: Merge useEffects to prevent double load on edit
+  // Loads all reference data, then loads event data if in edit mode.
   // -------------------------
   useEffect(() => {
-    if (!show) return;
+    if (!show) {
+      // Reset form and state when modal is closed
+      reset(DEFAULT_VALUES);
+      setReferenceDataLoaded(false); 
+      return;
+    }
 
     let mounted = true;
     setLoadingInitial(true);
     setAlert(null);
 
-    (async () => {
+    const loadAllData = async () => {
       try {
+        // 1. Load Reference Data
         const [calResp, motiveResp, hpResp, patientResp] = await Promise.all([
           getAllCalendars(1, 500),
           getAllMotives(1, 500),
           getAllHps(1, 500),
           getAllPatients(1, 500),
         ]);
-        console.log('PatientResp:', patientResp);
-        console.log('HPResp:', hpResp);
-        console.log('MotiveResp:', motiveResp);
-        console.log('CalResp:', calResp);
 
         if (!mounted) return;
+
+        const patients = patientResp.data || [];
+        const healthProfessionals = hpResp.elements || [];
 
         setCalendars(calResp.elements || []);
         setMotives(motiveResp.data || []);
-        setHps(hpResp.elements || []);
-        setAllPatients(patientResp.data || []);
-      } catch (err) {
-        console.error(err);
-        setAlert({ type: 'danger', text: 'Failed to load reference data' });
-      } finally {
-        if (mounted) setLoadingInitial(false);
-      }
-    })();
+        setHps(healthProfessionals);
+        setAllPatients(patients);
+        setReferenceDataLoaded(true);
 
-    return () => {
-      mounted = false;
-    };
-  }, [show]);
+        // 2. Load Event Data (Only if in edit mode)
+        if (isEdit && eventId) {
+          const ev = await getEventById(eventId);
+          if (!mounted) return;
+          
+          // Map attendees to OptionType
+          const patientAttendee = (ev.attendees || [])
+            .filter((a: any) => a.entityType === 'PatientRecord')
+            .map((a: any) => {
+              const p = patients.find((pp: any) => pp.id === a.entityId);
+              return p
+                ? { value: p.id, label: `${p.firstName} ${p.lastName}` }
+                : { value: a.entityId, label: 'Patient' };
+            })[0] || null;
 
-  // -------------------------
-  // Load event on edit
-  // -------------------------
-  useEffect(() => {
-    if (!show) return;
-
-    if (!isEdit) {
-      reset(DEFAULT_VALUES);
-      return;
-    }
-
-    if (!eventId) {
-      setAlert({ type: 'danger', text: 'Missing eventId' });
-      return;
-    }
-
-    let mounted = true;
-    setLoadingInitial(true);
-
-    (async () => {
-      try {
-        const ev = await getEventById(eventId);
-        if (!mounted) return;
-
-        reset({
-          title: ev.title ?? '',
-          status: ev.status ?? 'ACTIVE',
-          calendarId: ev.calendarId ?? null,
-          type: ev.type ?? 'APPOINTMENT',
-          motiveId: ev.motiveId ?? null,
-          startAt: ev.startAt?.slice(0, 16) || '',
-          endAt: ev.endAt?.slice(0, 16) || '',
-          description: ev.description ?? null,
-          hpNote: ev.hpNote ?? null,
-          patientNote: ev.patientNote ?? null,
-
-          attendeePatient:
-            (ev.attendees || [])
-              .filter((a: any) => a.entityType === 'PatientRecord')
-              .map((a: any) => {
-                const p = allPatients.find((pp) => pp.id === a.entityId);
-                return p
-                  ? { value: p.id, label: `${p.firstName} ${p.lastName}` }
-                  : { value: a.entityId, label: 'Patient' };
-              })[0] || null,
-
-          attendeesHp: (ev.attendees || [])
+          const hpAttendees = (ev.attendees || [])
             .filter((a: any) => a.entityType === 'Hp')
             .map((a: any) => {
-              const hp = hps.find((hp) => hp.id === a.entityId);
+              const hp = healthProfessionals.find((h: any) => h.id === a.entityId);
               return {
                 value: a.entityId,
                 label: hp ? `${hp.firstName} ${hp.lastName}` : a.entityId,
               };
-            }),
-        });
+            });
+
+          // 💡 FIX 2: Correct Date Conversion on Load (to remove 'Z' and display in local time field)
+          // The API sends an ISO string (e.g., '2025-12-01T15:00:00.000Z').
+          // The datetime-local input expects 'YYYY-MM-DDThh:mm' in LOCAL time.
+          // By creating a Date object, it automatically converts the UTC time to your local time.
+          // Slicing it to the correct format removes the seconds and the 'Z' which is necessary.
+          const localStartAt = ev.startAt ? new Date(ev.startAt).toISOString().slice(0, 16) : '';
+          const localEndAt = ev.endAt ? new Date(ev.endAt).toISOString().slice(0, 16) : '';
+
+
+          reset({
+            title: ev.title ?? '',
+            status: ev.status ?? 'ACTIVE',
+            calendarId: ev.calendarId ?? null,
+            type: ev.type ?? 'APPOINTMENT',
+            motiveId: ev.motiveId ?? null,
+            startAt: localStartAt, // <-- FIX applied here
+            endAt: localEndAt,     // <-- FIX applied here
+            description: ev.description ?? null,
+            hpNote: ev.hpNote ?? null,
+            patientNote: ev.patientNote ?? null,
+            attendeePatient: patientAttendee,
+            attendeesHp: hpAttendees,
+          });
+        }
       } catch (err) {
-        setAlert({ type: 'danger', text: 'Unable to load event' });
+        console.error(err);
+        setAlert({ type: 'danger', text: 'Failed to load data or event' });
       } finally {
         if (mounted) setLoadingInitial(false);
       }
-    })();
+    };
+
+    loadAllData();
 
     return () => {
       mounted = false;
     };
-  }, [show, isEdit, eventId, allPatients, hps, reset]);
+  }, [show, isEdit, eventId, reset]); // Dependencies cleaned up
 
   // -------------------------
   // Motives filtered by calendar
@@ -268,7 +274,8 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
   // Auto-set end time
   // -------------------------
   useEffect(() => {
-    if (!show || isEdit) return;
+    // Only run if the reference data is loaded, and it's a create
+    if (!referenceDataLoaded || isEdit) return;
     if (!selectedMotive || !watchedStartAt) return;
 
     const minutes =
@@ -279,10 +286,10 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
 
     const end = addMinutes(start, minutes);
     setValue('endAt', end.toISOString().slice(0, 16));
-  }, [selectedMotive, watchedStartAt, show, isEdit, setValue]);
+  }, [selectedMotive, watchedStartAt, isEdit, setValue, referenceDataLoaded]);
 
   // -------------------------
-  // FIX 2 — Patient search (local filtering)
+  // Patient search (local filtering)
   // -------------------------
   const loadPatientOptions = useCallback(
     async (input: string) => {
@@ -327,7 +334,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
   );
 
   // -------------------------
-  // Submit
+  // Submit - FIX DATE CONVERSION
   // -------------------------
   const onSubmit: SubmitHandler<FormValues> = async (values) => {
     setAlert(null);
@@ -361,8 +368,9 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
       calendarId: values.calendarId,
       motiveId: values.type === 'APPOINTMENT' ? values.motiveId : undefined,
       attendees,
-      startAt: new Date(values.startAt).toISOString(),
-      endAt: new Date(values.endAt).toISOString(),
+      // 💡 FIX 3: Use the helper to convert 'datetime-local' string correctly to UTC ISO string
+      startAt: convertLocalToUTCISO(values.startAt),
+      endAt: convertLocalToUTCISO(values.endAt),
       type: values.type,
       description: values.description || undefined,
       hpNote: values.hpNote || undefined,

@@ -1,6 +1,5 @@
-import { ROSA_BASE_API_PATH, ROSA_TOKEN } from "@/context/constants";
-import { CalendarEvent } from "./types";
-
+import { ROSA_BASE_API_PATH } from '@/context/constants';
+import { CalendarEvent } from './types';
 
 export const getAllEvents = async (
   page: number = 1,
@@ -8,12 +7,12 @@ export const getAllEvents = async (
   from?: string,
   to?: string,
   calendarId?: string,
-  patientRecordId?: string
+  patientRecordId?: string,
 ): Promise<{ data: CalendarEvent[]; totalCount: number; totalPage: number; page: number }> => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
     if (!token) {
-      console.warn("No access token found.");
+      console.warn('No access token found.');
       return { data: [], totalCount: 0, totalPage: 0, page: 0 };
     }
 
@@ -29,16 +28,16 @@ export const getAllEvents = async (
     const queryParams = new URLSearchParams(filters).toString();
 
     const response = await fetch(`${ROSA_BASE_API_PATH}/events?${queryParams}`, {
-      method: "GET",
+      method: 'GET',
       headers: {
         Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error("Backend error:", response.status, errorText);
+      console.error('Backend error:', response.status, errorText);
       return { data: [], totalCount: 0, totalPage: 0, page: 0 };
     }
 
@@ -50,7 +49,7 @@ export const getAllEvents = async (
       page: jsonData?.page || 1,
     };
   } catch (error) {
-    console.error("Error fetching events:", error);
+    console.error('Error fetching events:', error);
     return { data: [], totalCount: 0, totalPage: 0, page: 0 };
   }
 };

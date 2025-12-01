@@ -1,5 +1,4 @@
-import { ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
-
+import { ROSA_BASE_API_PATH } from '@/context/constants';
 /** ===========================
  * ✅ Types
  * =========================== */
@@ -62,21 +61,6 @@ export type MotiveCreateRequestDto = {
   type?: 'CABINET' | 'VISITES' | 'VIDEO';
 };
 
-export const buildMotiveUpdatePayload = (motive: any, calendarIds?: string[]) => {
-  return {
-    id: motive.id,
-    label: motive.label,
-    color: motive.color,
-    newPatientDuration: motive.newPatientDuration,
-    existingPatientDuration: motive.existingPatientDuration,
-    isBookableOnline: motive.isBookableOnline ?? false,
-    isSendingNotificationsDisabled: motive.isSendingNotificationsDisabled ?? false,
-    status: motive.status || 'ACTIVE',
-    type: motive.type,
-    calendarIds,
-  };
-};
-
 /** ===========================
  * ✅ Get All Motives
  * =========================== */
@@ -87,7 +71,8 @@ export const getAllMotives = async (
   sortDirection = 1,
 ) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for getAllMotives()');
       return { data: [], totalCount: 0, totalPages: 0, page: 0 };
@@ -134,7 +119,8 @@ export const getAllMotives = async (
  * =========================== */
 export const updateMotivesBulk = async (payload: any[]) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for updateMotivesBulk');
       return false;
@@ -167,7 +153,8 @@ export const updateMotivesBulk = async (payload: any[]) => {
  * =========================== */
 export const updateSingleMotive = async (id: string, body: Partial<MotiveDto>) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for updateSingleMotive');
       return false;
@@ -208,7 +195,8 @@ export const getAllCalendars = async (
   search?: string,
 ) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for getAllCalendars()');
       return { elements: [], totalCount: 0, totalPages: 0, page };
@@ -257,7 +245,8 @@ export const getAllHps = async (
   search?: string,
 ) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for getAllHps()');
       return { elements: [], totalCount: 0, totalPages: 0, page };
@@ -300,7 +289,8 @@ export const getAllHps = async (
  * =========================== */
 export const createMotive = async (payload: MotiveCreateRequestDto) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for createMotive()');
       return { success: false, message: 'No authentication token found.' };

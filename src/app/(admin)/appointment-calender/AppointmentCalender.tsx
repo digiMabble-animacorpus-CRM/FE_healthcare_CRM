@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState, useCallback } from 'react';
 import MiniCalendar from './components/miniCalender';
 import CalendarFilters from './components/calenderFilters';
 import MainCalendar from './components/mainCalender';
@@ -18,8 +18,39 @@ import type { Site } from './sites/types';
 import type { HealthProfessional } from './hps/types';
 import type { Patient } from './patients/types';
 import type { Calendar as CalendarType } from './calendars/types';
-import { Button } from 'react-bootstrap';
+import { Button, Spinner } from 'react-bootstrap';
 import EventFormModal from '../create-appointment/components/eventFormModel';
+
+// Utility function to calculate the date range for fetching events
+// Based on the current view and selected date.
+const calculateRange = (date: Date, view: 'day' | 'week' | 'month') => {
+  const start = new Date(date);
+  const end = new Date(date);
+
+  if (view === 'week') {
+    const day = start.getDay();
+    // Start of the week (Sunday)
+    start.setDate(start.getDate() - day);
+    start.setHours(0, 0, 0, 0);
+    // End of the week (Saturday)
+    end.setDate(start.getDate() + 6);
+    end.setHours(23, 59, 59, 999);
+  } else if (view === 'month') {
+    // Start of the month
+    start.setDate(1);
+    start.setHours(0, 0, 0, 0);
+    // End of the month
+    end.setMonth(start.getMonth() + 1);
+    end.setDate(0);
+    end.setHours(23, 59, 59, 999);
+  } else {
+    // Day view
+    start.setHours(0, 0, 0, 0);
+    end.setHours(23, 59, 59, 999);
+  }
+
+  return { start, end };
+};
 
 const CalendarDashboard: React.FC = () => {
   // ... your existing state declarations
@@ -30,7 +61,8 @@ const CalendarDashboard: React.FC = () => {
   const [patients, setPatients] = useState<Patient[]>([]);
 
   // UI state
-  const [loading, setLoading] = useState(false);
+  const [isLoadingStaticData, setIsLoadingStaticData] = useState(false); // 👈 NEW: Tracks initial static data load
+  const [isEventsRefreshing, setIsEventsRefreshing] = useState(false); // 👈 NEW: Tracks only event data refresh
   const [view, setView] = useState<'day' | 'week' | 'month'>('week');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
@@ -49,10 +81,28 @@ const CalendarDashboard: React.FC = () => {
   const [eventMode, setEventMode] = useState<'create' | 'edit'>('create');
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
-  // Load data
+  // 1. Refactored function to fetch events based on current range
+  const fetchEventsForCurrentView = useCallback(async () => {
+    // Start refreshing state, but DO NOT set events to []
+    setIsEventsRefreshing(true); 
+    
+    try {
+      const { start, end } = calculateRange(selectedDate, view);
+      
+      // Fetch events for the calculated range
+      const eventsRes = await getAllEvents(1, 2000, start.toISOString(), end.toISOString());
+      setEvents(eventsRes.data || []); // Events state updated with fresh data
+    } catch (err) {
+      console.error('Failed to fetch events:', err);
+    } finally {
+      setIsEventsRefreshing(false); // Refreshing finished
+    }
+  }, [selectedDate, view]); // Dependencies for the event fetcher
+
+  // Initial Data Load (Runs once)
   useEffect(() => {
-    const loadAll = async () => {
-      setLoading(true);
+    const loadStaticData = async () => {
+      setIsLoadingStaticData(true); // Start initial data loading
       try {
         const [sitesRes, hpsRes, patientsRes, calendarsRes] = await Promise.all([
           getAllSites(1, 200),
@@ -66,7 +116,7 @@ const CalendarDashboard: React.FC = () => {
         setPatients(patientsRes.data);
         setCalendars(calendarsRes.data);
 
-        // ✅ Select all filters by default
+        // Select all filters by default
         setSelectedSiteIds(sitesRes.data.map((s: Site) => s.id));
         setSelectedHpIds(hpsRes.data.map((hp: HealthProfessional) => hp.id));
         setSelectedPatientIds(patientsRes.data.map((p: Patient) => p.id));
@@ -77,41 +127,24 @@ const CalendarDashboard: React.FC = () => {
         const calendarIds = calendarsRes.data.map((c: CalendarType) => c.id);
         setVisibleCalendarIds(new Set(calendarIds));
 
-        // ✅ FIXED: Events for current view range
-        const start = new Date(selectedDate);
-        const end = new Date(selectedDate);
-
-        // Calculate range based on view
-        if (view === 'week') {
-          const day = start.getDay();
-          start.setDate(start.getDate() - day);
-          start.setHours(0, 0, 0, 0);
-          end.setDate(start.getDate() + 6);
-          end.setHours(23, 59, 59, 999);
-        } else if (view === 'month') {
-          start.setDate(1);
-          start.setHours(0, 0, 0, 0);
-          end.setMonth(start.getMonth() + 1);
-          end.setDate(0);
-          end.setHours(23, 59, 59, 999);
-        } else {
-          start.setHours(0, 0, 0, 0);
-          end.setHours(23, 59, 59, 999);
-        }
-
-        const eventsRes = await getAllEvents(1, 1000, start.toISOString(), end.toISOString());
-        setEvents(eventsRes.data || []);
       } catch (err) {
-        console.error(err);
+        console.error('Failed to load static data:', err);
       } finally {
-        setLoading(false);
+        setIsLoadingStaticData(false); // Finish initial data loading
       }
     };
-    loadAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    loadStaticData();
+  }, []); // Runs only on mount for static data
 
-  // Filter events
+  // 2. Event Data Load (Runs on mount AND when selectedDate/view changes)
+  useEffect(() => {
+    // Only fetch events after static data (calendars) is loaded
+    if (calendars.length > 0) {
+        fetchEventsForCurrentView();
+    }
+  }, [selectedDate, view, calendars.length, fetchEventsForCurrentView]);
+
+  // Filter events (logic remains the same)
   const filteredEvents = useMemo(() => {
     return events.filter((ev) => {
       const cal = calendars.find((c) => c.id === ev.calendarId);
@@ -155,7 +188,7 @@ const CalendarDashboard: React.FC = () => {
     patients,
   ]);
 
-  // Calendar visibility
+  // Calendar visibility, Navigation, Header label, Event click functions (unchanged)
   const toggleCalendarVisibility = (calendarId: string) => {
     setVisibleCalendarIds((prev) => {
       const next = new Set(prev);
@@ -165,7 +198,6 @@ const CalendarDashboard: React.FC = () => {
     });
   };
 
-  // Navigation
   const onToday = () => setSelectedDate(new Date());
   const onPrev = () => {
     const d = new Date(selectedDate);
@@ -182,7 +214,6 @@ const CalendarDashboard: React.FC = () => {
     setSelectedDate(d);
   };
 
-  // Header label
   const handleRangeChange = (r: { start: Date; end: Date }) => {
     const start = r.start;
     const end = r.end;
@@ -196,46 +227,15 @@ const CalendarDashboard: React.FC = () => {
     }
   };
 
-  // Event click
   const handleEventClick = (ev: CalendarEventType) => {
     setSelectedEvent(ev);
-    // Optionally open edit modal instead of details:
-    // setShowCreateEvent(true); pass mode="edit" and eventId=ev.id
   };
 
-  // Reload events after create/edit
+  // 3. Simplified event reload after create/edit to use the new function
   const handleSavedEvent = async (result?: any) => {
-    // ✅ FIXED: Reload for current view range
-    const start = new Date(selectedDate);
-    const end = new Date(selectedDate);
-
-    if (view === 'week') {
-      const day = start.getDay();
-      start.setDate(start.getDate() - day);
-      start.setHours(0, 0, 0, 0);
-      end.setDate(start.getDate() + 6);
-      end.setHours(23, 59, 59, 999);
-    } else if (view === 'month') {
-      start.setDate(1);
-      start.setHours(0, 0, 0, 0);
-      end.setMonth(start.getMonth() + 1);
-      end.setDate(0);
-      end.setHours(23, 59, 59, 999);
-    } else {
-      start.setHours(0, 0, 0, 0);
-      end.setHours(23, 59, 59, 999);
-    }
-
-    setShowCreateEvent(false);
-    setLoading(true);
-    try {
-      const eventsRes = await getAllEvents(1, 1000, start.toISOString(), end.toISOString());
-      setEvents(eventsRes.data || []);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    setShowEventModal(false);
+    setEditingEventId(null);
+    await fetchEventsForCurrentView(); // Simply call the shared function
   };
 
   return (
@@ -290,22 +290,42 @@ const CalendarDashboard: React.FC = () => {
           onViewChange={(v) => setView(v)}
         />
 
-        {loading ? (
-          <div className="p-4">Loading data…</div>
+        {/* LOADING LOGIC: Show spinner only if initial data is still loading */}
+        {isLoadingStaticData && calendars.length === 0 ? (
+          // Case 1: Initial load (Block view with a large loader)
+          <div className="d-flex flex-column justify-content-center align-items-center p-5 text-muted h-100">
+            <Spinner animation="border" variant="primary" role="status" style={{ width: '3rem', height: '3rem' }} />
+            <div className="mt-3">Loading initial data...</div>
+          </div>
         ) : (
-          <MainCalendar
-            events={filteredEvents}
-            calendars={calendars}
-            view={view}
-            selectedDate={selectedDate}
-            visibleCalendarIds={visibleCalendarIds}
-            onRangeChange={(range) => handleRangeChange(range as any)}
-            onEventClick={handleEventClick}
-          />
+          /* Case 2 & 3: Static data loaded, now render the calendar */
+          <div className="position-relative flex-grow-1">
+            {/* Overlay for refreshing events (shows stale data underneath) */}
+            {isEventsRefreshing && (
+              <div 
+                className="position-absolute w-100 h-100 d-flex justify-content-center align-items-center" 
+                style={{ backgroundColor: 'rgba(255, 255, 255, 0.7)', zIndex: 10, top: 0, left: 0 }}
+              >
+                <Spinner animation="grow" variant="secondary" role="status" className="me-2" size="sm" />
+                Refreshing events...
+              </div>
+            )}
+            
+            {/* Main Calendar is always rendered if static data is available */}
+            <MainCalendar
+              events={filteredEvents}
+              calendars={calendars}
+              view={view}
+              selectedDate={selectedDate}
+              visibleCalendarIds={visibleCalendarIds}
+              onRangeChange={(range) => handleRangeChange(range as any)}
+              onEventClick={handleEventClick}
+            />
+          </div>
         )}
       </div>
 
-      {/* EVENT DETAILS MODAL */}
+      {/* EVENT DETAILS MODAL (unchanged) */}
       {selectedEvent && (
         <EventDetailsModal
           event={selectedEvent}
@@ -323,7 +343,7 @@ const CalendarDashboard: React.FC = () => {
         />
       )}
 
-      {/* CREATE/EDIT EVENT MODAL */}
+      {/* CREATE/EDIT EVENT MODAL (unchanged) */}
       <EventFormModal
         show={showEventModal}
         mode={eventMode}
@@ -332,11 +352,7 @@ const CalendarDashboard: React.FC = () => {
           setShowEventModal(false);
           setEditingEventId(null);
         }}
-        onSaved={() => {
-          setShowEventModal(false);
-          setEditingEventId(null);
-          handleSavedEvent();
-        }}
+        onSaved={handleSavedEvent}
       />
     </div>
   );
