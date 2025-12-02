@@ -72,7 +72,7 @@ const useSignIn = () => {
         });
         const rosaData = await rosaToken.json();
         localStorage.setItem('access_token', data.data.accessToken);
-        localStorage.setItem('rosa_token', rosaData.rosaToken);
+        localStorage.setItem('rosa_token', rosaData.token);
         localStorage.setItem('user', JSON.stringify(data.data.user));
 
         const rememberMe = document.getElementById('checkbox-signin') as HTMLInputElement;
