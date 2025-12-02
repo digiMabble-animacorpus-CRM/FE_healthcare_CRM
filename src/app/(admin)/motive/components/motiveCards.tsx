@@ -51,20 +51,15 @@ export default function MotiveCard({
         />
 
         <div style={{ minWidth: 180 }}>
-          <div
-            className="fw-semibold text-truncate"
-            style={{ maxWidth: 250 }}
-          >
+          <div className="fw-semibold text-truncate" style={{ maxWidth: 250 }}>
             {motive.label || '—'}
           </div>
 
           <div
-            className="text-muted text-truncate"
-            style={{ fontSize: 13, maxWidth: 300 }}
+            className="text-muted text-truncate max-w-[250px] sm:max-w-none"
+            style={{ fontSize: 13 }}
           >
-            {calendarLabels.length > 0
-              ? calendarLabels.join(', ')
-              : '—'}
+            {calendarLabels.length > 0 ? calendarLabels.join(', ') : '—'}
           </div>
         </div>
       </div>
@@ -82,10 +77,7 @@ export default function MotiveCard({
 
         {/* Calendar count */}
         <div className="text-muted d-flex align-items-center me-1">
-          <IconifyIcon
-            icon="ic:twotone-calendar-month"
-            className="me-1"
-          />
+          <IconifyIcon icon="ic:twotone-calendar-month" className="me-1" />
           <span style={{ fontSize: 13 }}>{count}</span>
         </div>
 
@@ -116,9 +108,7 @@ export default function MotiveCard({
             size="sm"
             className="d-flex align-items-center"
             onClick={onToggleArchive}
-            title={
-              motive.status === 'ARCHIVED' ? 'Restore' : 'Push to Archive'
-            }
+            title={motive.status === 'ARCHIVED' ? 'Restore' : 'Push to Archive'}
           >
             <IconifyIcon
               icon={

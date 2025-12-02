@@ -2,7 +2,7 @@
 
 import PageTitle from '@/components/PageTitle';
 // import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { API_BASE_PATH, ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
+import { API_BASE_PATH, ROSA_BASE_API_PATH } from '@/context/constants';
 import type { BranchType } from '@/types/data';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
@@ -43,7 +43,7 @@ const BranchListPage = () => {
     }).toString();
 
     try {
-      const token = ROSA_TOKEN;
+      const token = localStorage.getItem('rosa_token');
       const response = await axios.get(`${ROSA_BASE_API_PATH}/sites?${queryParams}`, {
         method: 'GET',
         headers: {

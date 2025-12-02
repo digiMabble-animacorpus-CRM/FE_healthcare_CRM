@@ -1,7 +1,8 @@
 'use client';
 
-import { API_BASE_PATH, ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
+import { API_BASE_PATH, ROSA_BASE_API_PATH } from '@/context/constants';
 import { decryptAES } from '@/utils/encryption';
+
 // import type { TherapistCreatePayload, TherapistType } from '@/types/data';
 export interface TherapistUpdatePayload {
   name?: string;
@@ -27,12 +28,13 @@ export const getAllTherapists = async (
   page: number = 1,
   limit: number = 10,
   search?: string,
-): Promise<{ data: any[]; totalCount: number; totalPage: number; page:number }> => {
+): Promise<{ data: any[]; totalCount: number; totalPage: number; page: number }> => {
   try {
-    const token = ROSA_TOKEN
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('No access token found.');
-      return { data: [], totalCount: 0, totalPage:0, page:0 };
+      return { data: [], totalCount: 0, totalPage: 0, page: 0 };
     }
 
     const filters: Record<string, string> = {
@@ -54,27 +56,27 @@ export const getAllTherapists = async (
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Backend error:', response.status, errorText);
-      return { data: [], totalCount: 0, totalPage:0, page:0 };
+      return { data: [], totalCount: 0, totalPage: 0, page: 0 };
     }
 
     const jsonData = await response.json();
-    console.log(jsonData, "therapist")
+    console.log(jsonData, 'therapist');
 
     return {
       data: jsonData?.elements,
       totalCount: jsonData?.totalCount || 0,
       totalPage: jsonData?.totalPages || 0,
       page: jsonData?.page || 0,
-
     };
   } catch (error) {
     console.error('Error fetching patient:', error);
-    return { data: [], totalCount: 0, totalPage: 0, page:0 };
+    return { data: [], totalCount: 0, totalPage: 0, page: 0 };
   }
 };
 
 export const getTherapistById = async (therapistId: any): Promise<any | null> => {
-  const token = ROSA_TOKEN
+  const token = localStorage.getItem('rosa_token');
+
   if (!token) {
     console.warn('No access token found.');
     return null;

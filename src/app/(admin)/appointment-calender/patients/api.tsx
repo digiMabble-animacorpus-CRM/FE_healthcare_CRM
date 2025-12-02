@@ -1,12 +1,12 @@
 import { Patient } from "./types";
-import { ROSA_BASE_API_PATH, ROSA_TOKEN } from "@/context/constants";
+import { ROSA_BASE_API_PATH } from "@/context/constants";
 
 export const getAllPatients = async (
   page: number = 1,
   limit: number = 10
 ): Promise<{ data: Patient[]; totalCount: number; totalPage: number; page: number }> => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem("rosa_token");
     if (!token) {
       console.warn("No access token found.");
       return { data: [], totalCount: 0, totalPage: 0, page: 0 };

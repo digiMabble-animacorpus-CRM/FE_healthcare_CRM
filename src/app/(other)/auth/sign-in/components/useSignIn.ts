@@ -64,7 +64,15 @@ const useSignIn = () => {
       const data = await res.json();
 
       if (res.ok && data.status && data.data?.accessToken) {
+        const rosaToken = await fetch(`${API_BASE_PATH}/rosa-token`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        const rosaData = await rosaToken.json();
         localStorage.setItem('access_token', data.data.accessToken);
+        localStorage.setItem('rosa_token', rosaData.token);
         localStorage.setItem('user', JSON.stringify(data.data.user));
 
         const rememberMe = document.getElementById('checkbox-signin') as HTMLInputElement;

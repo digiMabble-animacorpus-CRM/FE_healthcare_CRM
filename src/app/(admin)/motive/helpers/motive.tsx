@@ -1,5 +1,4 @@
-import { ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
-
+import { ROSA_BASE_API_PATH } from '@/context/constants';
 /** ===========================
  * ✅ Types
  * =========================== */
@@ -62,7 +61,6 @@ export type MotiveCreateRequestDto = {
   type?: 'CABINET' | 'VISITES' | 'VIDEO';
 };
 
-
 /** ===========================
  * ✅ Get All Motives
  * =========================== */
@@ -70,10 +68,11 @@ export const getAllMotives = async (
   page = 1,
   limit = 20,
   sortField = 'label',
-  sortDirection = 1
+  sortDirection = 1,
 ) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for getAllMotives()');
       return { data: [], totalCount: 0, totalPages: 0, page: 0 };
@@ -118,15 +117,14 @@ export const getAllMotives = async (
 /** ===========================
  * ✅ Bulk Update Motives
  * =========================== */
-export const updateMotivesBulk = async (payload: MotiveDto[]) => {
+export const updateMotivesBulk = async (payload: any[]) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for updateMotivesBulk');
       return false;
     }
-
-    const cleaned = payload.map(normalizeMotivePayload);
 
     const res = await fetch(`${ROSA_BASE_API_PATH}/motives/bulk`, {
       method: 'PATCH',
@@ -134,7 +132,7 @@ export const updateMotivesBulk = async (payload: MotiveDto[]) => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(cleaned),
+      body: JSON.stringify(payload),
     });
 
     if (!res.ok) {
@@ -155,7 +153,8 @@ export const updateMotivesBulk = async (payload: MotiveDto[]) => {
  * =========================== */
 export const updateSingleMotive = async (id: string, body: Partial<MotiveDto>) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for updateSingleMotive');
       return false;
@@ -193,10 +192,11 @@ export const getAllCalendars = async (
   limit = 50,
   sortField = 'label',
   sortDirection = 1,
-  search?: string
+  search?: string,
 ) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for getAllCalendars()');
       return { elements: [], totalCount: 0, totalPages: 0, page };
@@ -242,10 +242,11 @@ export const getAllHps = async (
   limit = 50,
   sortField = 'firstName',
   sortDirection = 1,
-  search?: string
+  search?: string,
 ) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for getAllHps()');
       return { elements: [], totalCount: 0, totalPages: 0, page };
@@ -288,7 +289,8 @@ export const getAllHps = async (
  * =========================== */
 export const createMotive = async (payload: MotiveCreateRequestDto) => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('⚠️ No token found for createMotive()');
       return { success: false, message: 'No authentication token found.' };
@@ -322,4 +324,3 @@ export const createMotive = async (payload: MotiveCreateRequestDto) => {
     };
   }
 };
-

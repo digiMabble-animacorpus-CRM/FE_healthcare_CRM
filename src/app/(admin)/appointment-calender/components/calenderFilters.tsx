@@ -1,6 +1,14 @@
 "use client";
 
-import React, { useMemo, useState, useRef, useEffect } from "react";
+import React, {
+  useMemo,
+  useState,
+  useRef,
+  useEffect,
+} from "react";
+
+import { Card, Button } from "react-bootstrap";
+
 import type { Calendar as CalendarType } from "../calendars/types";
 import type { Site } from "../sites/types";
 import type { HealthProfessional } from "../hps/types";
@@ -16,16 +24,18 @@ interface CalendarFiltersProps {
   selectedPatientIds: string[];
   selectedStatus: string[];
   selectedType: string[];
-  onSiteChange: (siteIds: string[]) => void;
-  onHpChange: (hpIds: string[]) => void;
-  onPatientChange: (patientIds: string[]) => void;
-  onStatusChange: (statuses: string[]) => void;
-  onTypeChange: (types: string[]) => void;
+  onSiteChange: (ids: string[]) => void;
+  onHpChange: (ids: string[]) => void;
+  onPatientChange: (ids: string[]) => void;
+  onStatusChange: (ids: string[]) => void;
+  onTypeChange: (ids: string[]) => void;
   visibleCalendarIds: Set<string>;
-  onToggleCalendarVisibility: (calendarId: string) => void;
+  onToggleCalendarVisibility: (id: string) => void;
 }
 
-/* 🔹 Reusable Multi-Select with Search */
+/* -----------------------------------------
+   MULTI SELECT DROPDOWN
+------------------------------------------ */
 const MultiSelectDropdown: React.FC<{
   label: string;
   options: { value: string; label: string }[];
@@ -37,122 +47,103 @@ const MultiSelectDropdown: React.FC<{
   const ref = useRef<HTMLDivElement>(null);
 
   const allSelected = selected.length === options.length;
-  const filtered = options.filter((opt) =>
-    opt.label.toLowerCase().includes(search.toLowerCase())
+
+  const filtered = useMemo(
+    () =>
+      options.filter((o) =>
+        o.label.toLowerCase().includes(search.toLowerCase())
+      ),
+    [options, search]
   );
 
   // Close on outside click
   useEffect(() => {
     const close = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setIsOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
     };
     document.addEventListener("mousedown", close);
     return () => document.removeEventListener("mousedown", close);
   }, []);
 
-  const toggleAll = () => {
-    if (allSelected) onChange([]);
-    else onChange(options.map((opt) => opt.value));
+  const toggleOption = (val: string) => {
+    if (selected.includes(val)) {
+      onChange(selected.filter((v) => v !== val));
+    } else {
+      onChange([...selected, val]);
+    }
   };
 
-  const toggleOption = (value: string) => {
-    if (selected.includes(value))
-      onChange(selected.filter((v) => v !== value));
-    else onChange([...selected, value]);
+  const toggleAll = () => {
+    if (allSelected) onChange([]);
+    else onChange(options.map((o) => o.value));
   };
 
   return (
-    <div ref={ref} style={{ position: "relative", marginBottom: 12 }}>
-      <label style={{ display: "block", fontWeight: 600, marginBottom: 6 }}>
-        {label}
-      </label>
+    <div className="position-relative mb-3" ref={ref}>
+      <label className="fw-semibold mb-1 d-block">{label}</label>
 
+      {/* Trigger */}
       <div
-        onClick={() => setIsOpen(!isOpen)}
-        style={{
-          border: "1px solid #ccc",
-          padding: 8,
-          borderRadius: 6,
-          background: "#fff",
-          cursor: "pointer",
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          flexWrap: "wrap",
-        }}
+        role="button"
+        tabIndex={0}
+        aria-expanded={isOpen}
+        className="border rounded px-3 py-2 bg-white d-flex justify-content-between align-items-center"
+        onClick={() => setIsOpen((x) => !x)}
       >
-        <span style={{ color: selected.length ? "#000" : "#888" }}>
+        <span className={selected.length ? "text-dark" : "text-muted"}>
           {selected.length === 0
             ? "Select..."
             : selected.length === options.length
             ? "All selected"
             : `${selected.length} selected`}
         </span>
-        <span style={{ transform: isOpen ? "rotate(180deg)" : "rotate(0deg)" }}>▼</span>
+        <span style={{ fontSize: 12 }}>{isOpen ? "▲" : "▼"}</span>
       </div>
 
+      {/* Dropdown */}
       {isOpen && (
-        <div
+        <Card
+          className="shadow-sm mt-1 position-absolute w-100"
           style={{
-            position: "absolute",
-            top: "100%",
-            left: 0,
-            right: 0,
-            background: "#fff",
-            border: "1px solid #ccc",
-            borderRadius: 6,
-            marginTop: 4,
-            maxHeight: 240,
+            zIndex: 2000,
+            maxHeight: 250,
             overflowY: "auto",
-            zIndex: 100,
           }}
         >
-          <input
-            placeholder="Search..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            style={{
-              width: "100%",
-              padding: 8,
-              borderBottom: "1px solid #eee",
-              outline: "none",
-              boxSizing: "border-box",
-            }}
-          />
+          {/* Search */}
+          <div className="p-2 border-bottom">
+            <input
+              className="form-control"
+              placeholder="Search..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+          </div>
 
           {/* Select All */}
           <div
-            style={{
-              padding: "8px 10px",
-              borderBottom: "1px solid #eee",
-              background: allSelected ? "rgba(0, 128, 255, 0.1)" : "transparent",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              cursor: "pointer",
-            }}
+            className="px-3 py-2 border-bottom d-flex gap-2"
+            style={{ cursor: "pointer" }}
             onClick={toggleAll}
           >
             <input type="checkbox" checked={allSelected} readOnly />
             <span>Select All</span>
           </div>
 
-          {/* Options */}
           {filtered.length ? (
             filtered.map((opt) => (
               <div
                 key={opt.value}
-                onClick={() => toggleOption(opt.value)}
+                className="px-3 py-2 d-flex gap-2"
                 style={{
-                  padding: "8px 10px",
                   cursor: "pointer",
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
                   background: selected.includes(opt.value)
-                    ? "rgba(0, 128, 255, 0.08)"
+                    ? "rgba(0,123,255,0.08)"
                     : "transparent",
                 }}
+                onClick={() => toggleOption(opt.value)}
               >
                 <input
                   type="checkbox"
@@ -163,139 +154,147 @@ const MultiSelectDropdown: React.FC<{
               </div>
             ))
           ) : (
-            <div style={{ padding: 10, color: "#777" }}>No results</div>
+            <div className="p-3 text-center text-muted">No results</div>
           )}
-        </div>
+        </Card>
       )}
     </div>
   );
 };
 
-const CalendarFilters: React.FC<CalendarFiltersProps> = ({
-  sites,
-  hps,
-  patients,
-  calendars,
-  selectedSiteIds,
-  selectedHpIds,
-  selectedPatientIds,
-  selectedStatus,
-  selectedType,
-  onSiteChange,
-  onHpChange,
-  onPatientChange,
-  onStatusChange,
-  onTypeChange,
-  visibleCalendarIds,
-  onToggleCalendarVisibility,
-}) => {
-  const calendarsBySite = useMemo(() => {
-    const map = new Map<string, CalendarType[]>();
-    calendars.forEach((c) => {
-      const arr = map.get(c.siteId) || [];
-      arr.push(c);
-      map.set(c.siteId, arr);
-    });
-    return map;
-  }, [calendars]);
+/* -----------------------------------------
+   MAIN FILTERS COMPONENT
+------------------------------------------ */
+const CalendarFilters: React.FC<CalendarFiltersProps> = (props) => {
+  const {
+    sites,
+    hps,
+    patients,
+    calendars,
+    selectedSiteIds,
+    selectedHpIds,
+    selectedPatientIds,
+    selectedStatus,
+    selectedType,
+    onSiteChange,
+    onHpChange,
+    onPatientChange,
+    onStatusChange,
+    onTypeChange,
+    visibleCalendarIds,
+    onToggleCalendarVisibility,
+  } = props;
+
+  const [openMobile, setOpenMobile] = useState(false);
 
   return (
-    <aside style={{ width: 300, padding: 12 }}>
-      <MultiSelectDropdown
-        label="Site"
-        options={sites.map((s) => ({ value: s.id, label: s.name }))}
-        selected={selectedSiteIds}
-        onChange={onSiteChange}
-      />
+    <Card className="p-3 shadow-sm rounded-3 w-100">
+      {/* MOBILE BUTTON */}
+      <div className="d-lg-none mb-2">
+        <Button
+          variant="primary"
+          className="w-100"
+          onClick={() => setOpenMobile((x) => !x)}
+        >
+          {openMobile ? "Hide Filters ▲" : "Show Filters ▼"}
+        </Button>
+      </div>
 
-      <MultiSelectDropdown
-        label="Therapist"
-        options={hps.map((hp) => ({
-          value: hp.id,
-          label: `${hp.firstName} ${hp.lastName}`,
-        }))}
-        selected={selectedHpIds}
-        onChange={onHpChange}
-      />
+      {/* MOBILE COLLAPSE */}
+      <div className={`d-lg-block ${openMobile ? "" : "d-none"}`}>
+        {/* SITE */}
+        <MultiSelectDropdown
+          label="Site"
+          options={sites.map((s) => ({
+            value: s.id,
+            label: s.name,
+          }))}
+          selected={selectedSiteIds}
+          onChange={onSiteChange}
+        />
 
-      <MultiSelectDropdown
-        label="Patient"
-        options={patients.map((p) => ({
-          value: p.id,
-          label: `${p.firstName} ${p.lastName}`,
-        }))}
-        selected={selectedPatientIds}
-        onChange={onPatientChange}
-      />
+        {/* THERAPIST */}
+        <MultiSelectDropdown
+          label="Therapist"
+          options={hps.map((hp) => ({
+            value: hp.id,
+            label: `${hp.firstName} ${hp.lastName}`,
+          }))}
+          selected={selectedHpIds}
+          onChange={onHpChange}
+        />
 
-      <MultiSelectDropdown
-        label="Status"
-        options={[
-          { value: "ACTIVE", label: "Active" },
-          { value: "CONFIRMED", label: "Confirmed" },
-          { value: "CANCELED", label: "Canceled" },
-          { value: "ARCHIVED", label: "Archived" },
-          { value: "DELETED", label: "Deleted" },
-        ]}
-        selected={selectedStatus}
-        onChange={onStatusChange}
-      />
+        {/* PATIENT */}
+        <MultiSelectDropdown
+          label="Patient"
+          options={patients.map((p) => ({
+            value: p.id,
+            label: `${p.firstName} ${p.lastName}`,
+          }))}
+          selected={selectedPatientIds}
+          onChange={onPatientChange}
+        />
 
-      <MultiSelectDropdown
-        label="Type"
-        options={[
-          { value: "APPOINTMENT", label: "Appointment" },
-          { value: "LEAVE", label: "Leave" },
-          { value: "PERSONAL", label: "Personal" },
-          { value: "EXTERNAL_EVENT", label: "External Event" },
-        ]}
-        selected={selectedType}
-        onChange={onTypeChange}
-      />
+        {/* STATUS */}
+        <MultiSelectDropdown
+          label="Status"
+          options={[
+            { value: "ACTIVE", label: "Active" },
+            { value: "CONFIRMED", label: "Confirmed" },
+            { value: "CANCELED", label: "Canceled" },
+            { value: "ARCHIVED", label: "Archived" },
+            { value: "DELETED", label: "Deleted" },
+          ]}
+          selected={selectedStatus}
+          onChange={onStatusChange}
+        />
 
-      {/* Calendars */}
-      <div style={{ marginTop: 12 }}>
-        <label style={{ display: "block", fontWeight: 700, marginBottom: 8 }}>
-          My calendars
-        </label>
-        <div style={{ maxHeight: 240, overflowY: "auto", paddingRight: 6 }}>
-          {calendars.map((cal) => {
-            const hp = hps.find((h) => h.id === cal.hpId);
-            return (
+        {/* TYPE */}
+        <MultiSelectDropdown
+          label="Type"
+          options={[
+            { value: "APPOINTMENT", label: "Appointment" },
+            { value: "LEAVE", label: "Leave" },
+            { value: "PERSONAL", label: "Personal" },
+            { value: "EXTERNAL_EVENT", label: "External Event" },
+          ]}
+          selected={selectedType}
+          onChange={onTypeChange}
+        />
+
+        {/* CALENDARS */}
+        <div className="mt-3">
+          <div className="fw-bold mb-2">My Calendars</div>
+
+          <div style={{ maxHeight: 240, overflowY: "auto" }}>
+            {calendars.map((cal) => (
               <div
                 key={cal.id}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 8,
-                  marginBottom: 8,
-                }}
+                className="d-flex align-items-center gap-2 mb-2"
+                style={{ cursor: "pointer" }}
               >
                 <input
                   type="checkbox"
                   checked={visibleCalendarIds.has(cal.id)}
                   onChange={() => onToggleCalendarVisibility(cal.id)}
                 />
+
                 <div
                   style={{
-                    width: 10,
-                    height: 10,
-                    background: cal.color || "#999",
+                    width: 14,
+                    height: 14,
+                    background: cal.color || "#ccc",
                     borderRadius: 3,
                   }}
                 />
-                <div style={{ fontSize: 14 }}>
-                  <div style={{ fontWeight: 600 }}>{cal.label}</div>
-                  <div style={{ fontSize: 12, color: "#666" }}>
-                    {hp ? `${hp.firstName} ${hp.lastName}` : ""}
-                  </div>
-                </div>
+
+                <div className="fw-semibold">{cal.label}</div>
               </div>
-            );
-          })}
+            ))}
+          </div>
         </div>
       </div>
-    </aside>
+    </Card>
   );
 };
 

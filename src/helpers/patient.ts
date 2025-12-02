@@ -1,8 +1,7 @@
 'use client';
 
-import { API_BASE_PATH, ROSA_BASE_API_PATH, ROSA_TOKEN } from '@/context/constants';
+import { API_BASE_PATH, ROSA_BASE_API_PATH } from '@/context/constants';
 import { decryptAES } from '@/utils/encryption';
-
 export interface PatientUpdatePayload {
   name?: string;
   email?: string;
@@ -28,7 +27,8 @@ export const getAllPatient = async (
   limit: number = 10,
 ): Promise<{ data: any[]; totalCount: number; totalPage: number; page: number }> => {
   try {
-    const token = ROSA_TOKEN;
+    const token = localStorage.getItem('rosa_token');
+
     if (!token) {
       console.warn('No access token found.');
       return { data: [], totalCount: 0, totalPage: 0, page: 0 };
@@ -71,7 +71,8 @@ export const getAllPatient = async (
 };
 
 export const getPatientById = async (patientId: any): Promise<any | null> => {
-  const token = ROSA_TOKEN;
+  const token = localStorage.getItem('rosa_token');
+
   if (!token) {
     console.warn('No access token found.');
     return null;
@@ -107,6 +108,8 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
 
 // 🔹 Helper to fetch motives and return as { [id]: label }
 const fetchMotivesMap = async (): Promise<Record<string, string>> => {
+  const ROSA_TOKEN = localStorage.getItem('rosa_token');
+
   try {
     const res = await fetch(
       `${ROSA_BASE_API_PATH}/motives?limit=100&sortField=label&sortDirection=1`,
@@ -132,6 +135,8 @@ const fetchMotivesMap = async (): Promise<Record<string, string>> => {
 
 // 🔹 Helper to fetch calendars and return as { [id]: label }
 const fetchCalendarsMap = async (): Promise<Record<string, string>> => {
+  const ROSA_TOKEN = localStorage.getItem('rosa_token');
+
   try {
     const res = await fetch(
       `${ROSA_BASE_API_PATH}/calendars?limit=100&sortField=label&sortDirection=1`,
@@ -160,7 +165,8 @@ export const getPatientEvents = async (
   page: number = 1,
   limit: number = 10,
 ): Promise<any> => {
-  const token = ROSA_TOKEN;
+  const token = localStorage.getItem('rosa_token');
+
   if (!token) {
     console.warn('No access token found.');
     return { elements: [], totalCount: 0 };
@@ -213,7 +219,8 @@ export const getPatientEvents = async (
 };
 
 export const updateEventNote = async (eventId: string, hpNote: string): Promise<boolean> => {
-  const token = ROSA_TOKEN;
+  const token = localStorage.getItem('rosa_token');
+
   if (!token) {
     console.warn('No access token found.');
     return false;
@@ -395,10 +402,7 @@ export const transformToBackendDto = (formData: any): PatientUpdatePayload => {
   };
 };
 
-export const deletePatient = async (
-  id: string | number,
-  externalId: any,
-): Promise<boolean> => {
+export const deletePatient = async (id: string | number, externalId: any): Promise<boolean> => {
   try {
     const token = localStorage.getItem('access_token');
     if (!token) return false;

@@ -1,43 +1,117 @@
-"use client";
+'use client';
 
-import React from "react";
+import React, { useMemo } from 'react';
+import { Button, ButtonGroup, Form, Row, Col } from 'react-bootstrap';
 
 interface CalendarHeaderProps {
-  displayLabel: string;
-  view: "day" | "week" | "month";
+  selectedDate: Date;
+  view: 'day' | 'week' | 'month';
   onPrev: () => void;
   onNext: () => void;
   onToday: () => void;
-  onViewChange: (v: "day" | "week" | "month") => void;
+  onViewChange: (v: 'day' | 'week' | 'month') => void;
 }
 
 const CalendarHeader: React.FC<CalendarHeaderProps> = ({
-  displayLabel,
+  selectedDate,
   view,
   onPrev,
   onNext,
   onToday,
   onViewChange,
 }) => {
+  // ----------------------------------------------------
+  // 🔥 RESPONSIVE DATE LABEL LOGIC
+  // ----------------------------------------------------
+  const displayLabel = useMemo(() => {
+    const d = new Date(selectedDate);
+
+    if (view === 'day') {
+      const today = new Date();
+      const isToday = d.toDateString() === today.toDateString();
+
+      return isToday
+        ? `Today — ${d.toLocaleDateString([], {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          })}`
+        : d.toLocaleDateString([], {
+            weekday: 'short',
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric',
+          });
+    }
+
+    if (view === 'week') {
+      const start = new Date(d);
+      start.setDate(start.getDate() - start.getDay());
+
+      const end = new Date(start);
+      end.setDate(start.getDate() + 6);
+
+      const startStr = start.toLocaleDateString([], {
+        day: 'numeric',
+        month: 'short',
+      });
+
+      const endStr = end.toLocaleDateString([], {
+        day: 'numeric',
+        month: 'short',
+        year: start.getFullYear() !== end.getFullYear() ? 'numeric' : undefined,
+      });
+
+      return `${startStr} — ${endStr}`;
+    }
+
+    if (view === 'month') {
+      return d.toLocaleDateString([], {
+        month: 'long',
+        year: 'numeric',
+      });
+    }
+
+    return '';
+  }, [selectedDate, view]);
+
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
-      <div style={{ display: "flex", gap: 8 }}>
-        <button onClick={onToday} style={{ padding: "8px 10px", borderRadius: 6 }}>Today</button>
-        <button onClick={onPrev} style={{ padding: "8px 10px", borderRadius: 6 }}>◀</button>
-        <button onClick={onNext} style={{ padding: "8px 10px", borderRadius: 6 }}>▶</button>
-      </div>
+    <div className="mb-3 p-3 bg-white rounded shadow-sm">
+      <Row className="g-3 align-items-center">
+        {/* LEFT — Navigation Buttons */}
+        <Col xs={12} md="auto" className="text-center text-md-start">
+          <ButtonGroup>
+            <Button variant="outline-secondary" onClick={onPrev}>
+              ◀
+            </Button>
+            <Button variant="outline-secondary" onClick={onToday}>
+              Today
+            </Button>
+            <Button variant="outline-secondary" onClick={onNext}>
+              ▶
+            </Button>
+          </ButtonGroup>
+        </Col>
 
-      <div style={{ flex: 1, textAlign: "center", fontWeight: 700 }}>
-        {displayLabel}
-      </div>
+        {/* CENTER — Label */}
+        <Col xs={12} md className="text-center fw-bold fs-5">
+          {displayLabel}
+        </Col>
 
-      <div style={{ display: "flex", gap: 8 }}>
-        <select value={view} onChange={(e) => onViewChange(e.target.value as any)} style={{ padding: 8, borderRadius: 6 }}>
-          <option value="day">Day</option>
-          <option value="week">Week</option>
-          <option value="month">Month</option>
-        </select>
-      </div>
+        {/* RIGHT — View Select */}
+        <Col xs={12} md="auto" className="text-center text-md-end">
+          <Form.Select
+            value={view}
+            onChange={(e) => onViewChange(e.target.value as any)}
+            style={{ maxWidth: 180 }}
+            className="mx-auto mx-md-0"
+          >
+            <option value="day">Day View</option>
+            <option value="week">Week View</option>
+            <option value="month">Month View</option>
+          </Form.Select>
+        </Col>
+      </Row>
     </div>
   );
 };
