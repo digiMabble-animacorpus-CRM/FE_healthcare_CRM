@@ -37,8 +37,7 @@ export default function BranchFilter({
   if (loading) return <BranchFilterSkeleton />;
 
   return (
-    <Row className="mb-4">
-      <Col md={4}>
+    <div>
         <Form.Group>
           <Form.Label className="fw-semibold">Branch</Form.Label>
           <Form.Select
@@ -55,7 +54,6 @@ export default function BranchFilter({
             ))}
           </Form.Select>
         </Form.Group>
-      </Col>
-    </Row>
+    </div>
   );
 }

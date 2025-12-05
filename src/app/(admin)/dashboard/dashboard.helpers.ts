@@ -192,40 +192,33 @@ export function getTherapistPerformance(
   hps: Hp[],
   calendars: Calendar[],
 ): TherapistPerformance {
-  // Map therapist → their calendarIds
   const hpCalendarMap: Record<string, string[]> = {};
   calendars.forEach((c) => {
     if (!hpCalendarMap[c.hpId]) hpCalendarMap[c.hpId] = [];
     hpCalendarMap[c.hpId].push(c.id);
   });
 
-  // Prepare counters
   const demandMap: Record<string, number> = {};
   const cancelMap: Record<string, number> = {};
   const profitMap: Record<string, number> = {};
 
-  // Calculate per event
   events.forEach((ev) => {
     const hpId = Object.keys(hpCalendarMap).find((id) => hpCalendarMap[id].includes(ev.calendarId));
     if (!hpId) return;
 
-    // MOST IN-DEMAND (count all APPOINTMENTS except leave)
     if (ev.type === 'APPOINTMENT') {
       demandMap[hpId] = (demandMap[hpId] || 0) + 1;
     }
 
-    // MOST CANCELLATIONS
     if (ev.status === 'CANCELED') {
       cancelMap[hpId] = (cancelMap[hpId] || 0) + 1;
     }
 
-    // MOST PROFITABLE (fallback: completed appointments)
     if (['SEEN', 'ACTIVE', 'IN_CONSULTATION'].includes(ev.status)) {
       profitMap[hpId] = (profitMap[hpId] || 0) + 1;
     }
   });
 
-  // Pick top therapists
   const getTop = (map: Record<string, number>) => {
     const id = Object.keys(map).sort((a, b) => map[b] - map[a])[0];
     if (!id) return undefined;
@@ -233,9 +226,18 @@ export function getTherapistPerformance(
     return hp ? { ...hp, count: map[id], value: map[id] } : undefined;
   };
 
+  // NEW — totals
+  const totalInDemand = Object.values(demandMap).reduce((a, b) => a + b, 0);
+  const totalCancellations = Object.values(cancelMap).reduce((a, b) => a + b, 0);
+  const totalProfit = Object.values(profitMap).reduce((a, b) => a + b, 0);
+
   return {
     mostInDemand: getTop(demandMap),
     mostCancellations: getTop(cancelMap),
     mostProfitable: getTop(profitMap),
+
+    totalInDemand,
+    totalCancellations,
+    totalProfit,
   };
 }

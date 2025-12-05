@@ -133,5 +133,9 @@ export interface TherapistPerformance {
   mostInDemand?: Hp & { count: number };
   mostCancellations?: Hp & { count: number };
   mostProfitable?: Hp & { value: number };
+
+  totalInDemand: number;
+  totalCancellations: number;
+  totalProfit: number;
 }
 

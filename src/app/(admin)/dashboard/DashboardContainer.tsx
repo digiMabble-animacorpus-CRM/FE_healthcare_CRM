@@ -1,7 +1,6 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { Container } from "react-bootstrap";
+'use client';
+import { useEffect, useState } from 'react';
+import { Container } from 'react-bootstrap';
 
 import {
   getAllSites,
@@ -9,7 +8,7 @@ import {
   getAllEvents,
   getAllPatients,
   getAllHps,
-} from "./dashboard.api";
+} from './dashboard.api';
 
 import {
   getDateRange,
@@ -17,12 +16,20 @@ import {
   getAppointmentBreakdown,
   getPatientInsights,
   getTherapistPerformance,
-} from "./dashboard.helpers";
+} from './dashboard.helpers';
 
-import { Site, Event, Patient, Hp, Calendar, TimeFilterType } from "./dashboard.types";
-import { AppointmentsSection, AppointmentsSectionSkeleton, BranchFilter, PatientsSection, PatientsSectionSkeleton, SummaryCards, SummaryCardsSkeleton, TherapistsSection, TherapistsSectionSkeleton } from "./components";
-
-
+import { Site, Event, Patient, Hp, Calendar, TimeFilterType } from './dashboard.types';
+import {
+  AppointmentsSection,
+  AppointmentsSectionSkeleton,
+  BranchFilter,
+  PatientsSection,
+  PatientsSectionSkeleton,
+  SummaryCards,
+  SummaryCardsSkeleton,
+  TherapistsSection,
+  TherapistsSectionSkeleton,
+} from './components';
 
 // ======================================================
 // DASHBOARD CONTAINER (CORE DATA LOADER)
@@ -31,6 +38,7 @@ export default function DashboardContainer() {
   // ---------------------------
   // STATE
   // ---------------------------
+
   const [loading, setLoading] = useState(true);
 
   const [sites, setSites] = useState<Site[]>([]);
@@ -39,26 +47,30 @@ export default function DashboardContainer() {
   const [patients, setPatients] = useState<Patient[]>([]);
   const [hps, setHps] = useState<Hp[]>([]);
 
-  const [selectedBranch, setSelectedBranch] = useState<string>("all");
-  const [appointmentsFilter, setAppointmentsFilter] = useState<TimeFilterType>("all");
-  const [patientsFilter, setPatientsFilter] = useState<TimeFilterType>("all");
-  const [therapistsFilter, setTherapistsFilter] = useState<TimeFilterType>("all");
+  const [selectedBranch, setSelectedBranch] = useState<string>('all');
+  const [appointmentsFilter, setAppointmentsFilter] = useState<TimeFilterType>('all');
+  const [patientsFilter, setPatientsFilter] = useState<TimeFilterType>('all');
+  const [therapistsFilter, setTherapistsFilter] = useState<TimeFilterType>('all');
 
   // ======================================================
-  // INITIAL LOAD
+  // INITIAL LOAD (UPDATED FOR CONCURRENCY)
   // ======================================================
   useEffect(() => {
     async function loadAll() {
       try {
         setLoading(true);
 
-        const sitesData = await getAllSites();
-        const calendarsData = await getAllCalendars();
-        const hpsData = await getAllHps();
-        const patientsData = await getAllPatients();
-
-        // Load events WITHOUT date filter initially
-        const eventsData = await getAllEvents();
+        // ⭐ IMPROVEMENT: Use Promise.all() to run all API calls concurrently.
+        // This ensures the total load time is governed by the single slowest
+        // aggregated call, drastically reducing the 90+ second wait.
+        const [sitesData, calendarsData, hpsData, patientsData, eventsData] = await Promise.all([
+          getAllSites(),
+          getAllCalendars(),
+          getAllHps(),
+          getAllPatients(),
+          // Load events WITHOUT date filter initially, as full data is needed for analytics
+          getAllEvents(),
+        ]);
 
         setSites(sitesData);
         setCalendars(calendarsData);
@@ -68,7 +80,7 @@ export default function DashboardContainer() {
 
         setLoading(false);
       } catch (error) {
-        console.error("Dashboard Load Error:", error);
+        console.error('Dashboard Load Error:', error);
         setLoading(false);
       }
     }
@@ -78,6 +90,7 @@ export default function DashboardContainer() {
 
   // ======================================================
   // FILTERED VALUES (FOR EACH SECTION)
+  // (No change needed here as the filtering logic is sound)
   // ======================================================
 
   // ---------- APPOINTMENTS ----------
@@ -86,9 +99,7 @@ export default function DashboardContainer() {
 
     const { from, to } = getDateRange(appointmentsFilter);
     if (from && to) {
-      filtered = filtered.filter(
-        (ev) => ev.startAt >= from && ev.startAt <= to
-      );
+      filtered = filtered.filter((ev) => ev.startAt >= from && ev.startAt <= to);
     }
 
     return filterEventsByBranch(filtered, calendars, selectedBranch);
@@ -98,7 +109,7 @@ export default function DashboardContainer() {
 
   // ---------- PATIENTS ----------
   const patientFiltered = (() => {
-    if (patientsFilter === "all") return patients;
+    if (patientsFilter === 'all') return patients;
 
     const { from, to } = getDateRange(patientsFilter);
 
@@ -116,19 +127,13 @@ export default function DashboardContainer() {
 
     const { from, to } = getDateRange(therapistsFilter);
     if (from && to) {
-      filtered = filtered.filter(
-        (ev) => ev.startAt >= from && ev.startAt <= to
-      );
+      filtered = filtered.filter((ev) => ev.startAt >= from && ev.startAt <= to);
     }
 
     return filterEventsByBranch(filtered, calendars, selectedBranch);
   })();
 
-  const therapistPerformance = getTherapistPerformance(
-    therapistFilteredEvents,
-    hps,
-    calendars
-  );
+  const therapistPerformance = getTherapistPerformance(therapistFilteredEvents, hps, calendars);
 
   // ======================================================
   // LOADING STATE HANDLING
@@ -150,14 +155,14 @@ export default function DashboardContainer() {
   // ======================================================
   return (
     <Container className="py-4">
-
-      {/* BRANCH FILTER */}
-      <BranchFilter
-        branches={sites}
-        value={selectedBranch}
-        onChange={setSelectedBranch}
-      />
-
+     <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
+        {/* PAGE HEADER */}
+        <div>
+          <h2 className="fw-bold">Dashboard</h2>
+        </div>
+        {/* BRANCH FILTER */}
+        <BranchFilter branches={sites} value={selectedBranch} onChange={setSelectedBranch} />
+      </div>
       {/* SUMMARY CARDS */}
       <SummaryCards
         totalAppointments={appointmentFilteredEvents.length}
@@ -185,7 +190,6 @@ export default function DashboardContainer() {
         timeFilter={therapistsFilter}
         onTimeFilterChange={setTherapistsFilter}
       />
-
     </Container>
   );
 }

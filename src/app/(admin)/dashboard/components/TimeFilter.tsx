@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { ButtonGroup, Button } from "react-bootstrap";
-import { TimeFilterType } from "../dashboard.types";
+import { Button } from 'react-bootstrap';
+import { TimeFilterType } from '../dashboard.types';
 
 interface TimeFilterProps {
   value: TimeFilterType;
@@ -9,35 +9,45 @@ interface TimeFilterProps {
 }
 
 export default function TimeFilter({ value, onChange }: TimeFilterProps) {
+  const filters: TimeFilterType[] = ['today', 'week', 'month', 'all'];
+
   return (
-    <ButtonGroup className="mb-3">
-      <Button
-        variant={value === "today" ? "primary" : "outline-primary"}
-        onClick={() => onChange("today")}
-      >
-        Today
-      </Button>
+    <div
+      className="d-inline-flex p-1 rounded-pill gap-1"
+      style={{
+        background: '#fcfdfdff',
+        border: '1px solid #e0e0e0',
+      }}
+    >
+      {filters.map((f) => {
+        const isActive = value === f;
 
-      <Button
-        variant={value === "week" ? "primary" : "outline-primary"}
-        onClick={() => onChange("week")}
-      >
-        This Week
-      </Button>
-
-      <Button
-        variant={value === "month" ? "primary" : "outline-primary"}
-        onClick={() => onChange("month")}
-      >
-        This Month
-      </Button>
-
-      <Button
-        variant={value === "all" ? "primary" : "outline-primary"}
-        onClick={() => onChange("all")}
-      >
-        All
-      </Button>
-    </ButtonGroup>
+        return (
+          <Button
+            key={f}
+            onClick={() => onChange(f)}
+            size="sm"
+            className="rounded-pill px-2 fs-6 fs-md-6 fs-lg-5 px-md-3 px-lg-4" 
+            variant="light"
+            style={{
+              background: isActive ? 'var(--bs-primary)' : 'transparent',
+              color: isActive ? '#fff' : '#333',
+              transition: 'all 0.25s ease',
+              transform: isActive ? 'scale(1.05)' : 'scale(1)',
+              border: 'none',
+              boxShadow: 'none',
+            }}
+          >
+            {f === 'today'
+              ? 'Today'
+              : f === 'week'
+                ? 'This Week'
+                : f === 'month'
+                  ? 'This Month'
+                  : 'All'}
+          </Button>
+        );
+      })}
+    </div>
   );
 }
