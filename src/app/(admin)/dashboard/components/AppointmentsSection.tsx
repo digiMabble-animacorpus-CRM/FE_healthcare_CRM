@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Row, Col, ProgressBar, Placeholder } from 'react-bootstrap';
+import { Card, Row, Col, ProgressBar } from 'react-bootstrap';
 import TimeFilter from './TimeFilter';
 import { AppointmentBreakdown, TimeFilterType } from '../dashboard.types';
 
