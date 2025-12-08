@@ -1,65 +1,53 @@
 "use client";
 
 import { Card, Col, Row } from "react-bootstrap";
-import { FaCalendarCheck, FaUsers, FaUserMd } from "react-icons/fa"; 
+import { FaCalendarCheck, FaUsers, FaUserMd } from "react-icons/fa";
 
 // =====================================================
-// SKELETON (unchanged)
+// SINGLE COMPONENT WITH INDIVIDUAL SKELETON LOADING
 // =====================================================
-export function SummaryCardsSkeleton() {
-    return (
-        <Row className="g-3 mb-4">
-            {Array.from({ length: 3 }).map((_, i) => (
-                <Col md={4} key={i}>
-                    <Card className="p-3 shadow-sm">
-                        <div className="placeholder-wave">
-                            <div className="placeholder col-6 mb-3" style={{ height: 20 }}></div>
-                            <div className="placeholder col-8 mb-2" style={{ height: 28 }}></div>
-                            <div className="placeholder col-4" style={{ height: 18 }}></div>
-                        </div>
-                    </Card>
-                </Col>
-            ))}
-        </Row>
-    );
-}
-
-// =====================================================
-// COMPONENT
-// =====================================================
-interface SummaryCardProps {
-    totalAppointments: number;
-    totalPatients: number;
-    totalTherapists: number;
+interface SummaryCardsProps {
+    totalAppointments?: number;
+    totalPatients?: number;
+    totalTherapists?: number;
+    loadingAppointments?: boolean;
+    loadingPatients?: boolean;
+    loadingTherapists?: boolean;
 }
 
 export default function SummaryCards({
     totalAppointments,
     totalPatients,
     totalTherapists,
-}: SummaryCardProps) {
+    loadingAppointments = false,
+    loadingPatients = false,
+    loadingTherapists = false,
+}: SummaryCardsProps) {
     
     const cards = [
         {
             label: "Appointments",
-            value: totalAppointments.toLocaleString(),
+            value: totalAppointments,
             icon: <FaCalendarCheck />,
             themeColor: "#4169E1",
             bgColor: "rgba(65, 105, 225, 0.1)",
+            isLoading: loadingAppointments,
         },
         {
             label: "Total Patients",
-            value: totalPatients.toLocaleString(),
+            value: totalPatients,
             icon: <FaUsers />,
             themeColor: "#20B2AA",
             bgColor: "rgba(32, 178, 170, 0.1)",
+            isLoading: loadingPatients,
         },
         {
             label: "Therapists",
-            value: totalTherapists.toLocaleString(),
+            value: totalTherapists,
             icon: <FaUserMd />,
             themeColor: "#FF7F50",
             bgColor: "rgba(255, 127, 80, 0.1)",
+            isLoading: loadingTherapists,
         },
     ];
 
@@ -78,11 +66,33 @@ export default function SummaryCards({
                                 <div className="text-uppercase mb-1 fw-medium" style={{ fontSize: 13 }}>
                                     {card.label}
                                 </div>
-                                <div 
-                                    className="fw-bolder" 
-                                    style={{ fontSize: 40, color: card.themeColor }}
-                                >
-                                    {card.value}
+                                
+                                {/* Value with conditional skeleton */}
+                                <div style={{ minHeight: 48 }}>
+                                    {card.isLoading || card.value === undefined ? (
+                                        <div className="placeholder-glow">
+                                            <span 
+                                                className="placeholder placeholder-lg"
+                                                style={{ 
+                                                    width: 80,
+                                                    height: 40,
+                                                    backgroundColor: `${card.themeColor}40`,
+                                                    borderRadius: 6,
+                                                }}
+                                            ></span>
+                                        </div>
+                                    ) : (
+                                        <div 
+                                            className="fw-bolder" 
+                                            style={{ 
+                                                fontSize: 40, 
+                                                color: card.themeColor,
+                                                lineHeight: 1
+                                            }}
+                                        >
+                                            {card.value.toLocaleString()}
+                                        </div>
+                                    )}
                                 </div>
                             </div>
 

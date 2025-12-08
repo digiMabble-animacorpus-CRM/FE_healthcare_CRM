@@ -9,35 +9,195 @@ import { Doughnut } from 'react-chartjs-2';
 ChartJS.register(ArcElement, Tooltip, Legend);
 
 // =====================================================
-// SKELETON
+// SKELETON - Similar layout to actual component
 // =====================================================
 export function PatientsSectionSkeleton() {
   return (
-    <Card className="p-3 mb-4 shadow-sm">
-      <div className="placeholder-wave mb-3">
-        <div className="placeholder col-4" style={{ height: 30 }}></div>
+    <Card className="p-4 mb-4 shadow-sm border-0 rounded-4" style={{ background: '#EEF3FB' }}>
+      <div className="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
+        <h4 className="fw-bold m-0">Patient Insights</h4>
       </div>
 
-      <Row className="g-3">
-        {[1, 2, 3].map((i) => (
-          <Col md={4} key={i}>
-            <Card className="p-3 shadow-sm h-100">
-              <div className="placeholder-wave">
-                <div className="placeholder col-6 mb-2" style={{ height: 20 }}></div>
-                <div className="placeholder col-8 mb-2" style={{ height: 16 }}></div>
-                <div className="placeholder col-5 mb-2" style={{ height: 16 }}></div>
-                <div className="placeholder col-3" style={{ height: 16 }}></div>
+      <Row className="g-4">
+        {/* GENDER DISTRIBUTION SKELETON */}
+        <Col md={4}>
+          <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
+            <h6 className="fw-semibold mb-3">Gender Distribution</h6>
+
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+              {/* Chart placeholder */}
+              <div className="placeholder-glow">
+                <div
+                  className="placeholder rounded-circle"
+                  style={{
+                    width: 120,
+                    height: 120,
+                    backgroundColor: '#e3e0e0ff',
+                  }}
+                ></div>
               </div>
-            </Card>
-          </Col>
-        ))}
+
+              {/* Legend placeholders */}
+              <div>
+                <div className="d-flex align-items-center mb-2">
+                  <div className="placeholder-glow">
+                    <div
+                      className="placeholder rounded-circle"
+                      style={{
+                        height: 12,
+                        width: 12,
+                        marginRight: 8,
+                        backgroundColor: '#e3e0e0ff',
+                      }}
+                    ></div>
+                  </div>
+                  <div className="placeholder-glow">
+                    <div
+                      className="placeholder"
+                      style={{
+                        height: 16,
+                        width: 80,
+                        borderRadius: 4,
+                        backgroundColor: '#e3e0e0ff',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="d-flex align-items-center">
+                  <div className="placeholder-glow">
+                    <div
+                      className="placeholder rounded-circle"
+                      style={{
+                        height: 12,
+                        width: 12,
+                        marginRight: 8,
+                        backgroundColor: '#e3e0e0ff',
+                      }}
+                    ></div>
+                  </div>
+                  <div className="placeholder-glow">
+                    <div
+                      className="placeholder"
+                      style={{
+                        height: 16,
+                        width: 90,
+                        borderRadius: 4,
+                        backgroundColor: '#e3e0e0ff',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* AGE GROUPS SKELETON */}
+        <Col md={4}>
+          <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
+            <h6 className="fw-semibold mb-3">Age Groups</h6>
+
+            <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
+              {/* Chart placeholder */}
+              <div className="placeholder-glow">
+                <div
+                  className="placeholder rounded-circle"
+                  style={{
+                    width: 120,
+                    height: 120,
+                    backgroundColor: '#e3e0e0ff',
+                  }}
+                ></div>
+              </div>
+
+              {/* Legend placeholders */}
+              <div>
+                {[1, 2, 3, 4, 5].map((item) => (
+                  <div key={item} className="mb-2 d-flex align-items-center">
+                    <div className="placeholder-glow">
+                      <div
+                        className="placeholder rounded-circle"
+                        style={{
+                          height: 12,
+                          width: 12,
+                          marginRight: 8,
+                          backgroundColor: '#e3e0e0ff',
+                        }}
+                      ></div>
+                    </div>
+                    <div className="placeholder-glow">
+                      <div
+                        className="placeholder"
+                        style={{
+                          height: 16,
+                          width: 60 + item * 5,
+                          borderRadius: 4,
+                          backgroundColor: '#e3e0e0ff',
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </Card>
+        </Col>
+
+        {/* PATIENT STATUS SKELETON */}
+        <Col md={4}>
+          <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
+            <h6 className="fw-semibold mb-3">Patient Status</h6>
+
+            {[1, 2, 3].map((item) => (
+              <div key={item} className="mb-3">
+                <div className="d-flex justify-content-between mb-1">
+                  <div className="placeholder-glow">
+                    <div
+                      className="placeholder"
+                      style={{
+                        height: 16,
+                        width: 30,
+                        borderRadius: 4,
+                        backgroundColor: '#e3e0e0ff',
+                      }}
+                    ></div>
+                  </div>
+                  <div className="placeholder-glow">
+                    <div
+                      className="placeholder"
+                      style={{
+                        height: 16,
+                        width: 30,
+                        borderRadius: 4,
+                        backgroundColor: '#e3e0e0ff',
+                      }}
+                    ></div>
+                  </div>
+                </div>
+
+                <div className="placeholder-glow">
+                  <div
+                    className="placeholder"
+                    style={{
+                      height: 7,
+                      width: '100%',
+                      borderRadius: 4,
+                      backgroundColor: '#e3e0e0ff',
+                    }}
+                  ></div>
+                </div>
+              </div>
+            ))}
+          </Card>
+        </Col>
       </Row>
     </Card>
   );
 }
 
 // =====================================================
-// COMPONENT
+// COMPONENT (unchanged)
 // =====================================================
 interface PatientsSectionProps {
   data: PatientInsights;
@@ -90,18 +250,13 @@ export default function PatientsSection({
   const statusBars = makeBars(data.statusCounts);
 
   return (
-    <Card
-      className="p-4 mb-4 shadow-sm border-0 rounded-4"
-      style={{ background: '#EEF3FB' }}
-    >
+    <Card className="p-4 mb-4 shadow-sm border-0 rounded-4" style={{ background: '#EEF3FB' }}>
       <div className="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
         <h4 className="fw-bold m-0">Patient Insights</h4>
       </div>
 
       <Row className="g-4">
-        {/* ==================================================
-              1. GENDER DISTRIBUTION
-        ================================================== */}
+        {/* GENDER DISTRIBUTION */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
             <h6 className="fw-semibold mb-3">Gender Distribution</h6>
@@ -142,9 +297,7 @@ export default function PatientsSection({
           </Card>
         </Col>
 
-        {/* ==================================================
-              2. AGE GROUPS
-        ================================================== */}
+        {/* AGE GROUPS */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
             <h6 className="fw-semibold mb-3">Age Groups</h6>
@@ -174,9 +327,7 @@ export default function PatientsSection({
           </Card>
         </Col>
 
-        {/* ==================================================
-              3. PATIENT STATUS
-        ================================================== */}
+        {/* PATIENT STATUS */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
             <h6 className="fw-semibold mb-3">Patient Status</h6>

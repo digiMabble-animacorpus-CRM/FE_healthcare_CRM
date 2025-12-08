@@ -26,26 +26,29 @@ import {
   PatientsSection,
   PatientsSectionSkeleton,
   SummaryCards,
-  SummaryCardsSkeleton,
   TherapistsSection,
   TherapistsSectionSkeleton,
 } from './components';
 
 // ======================================================
-// DASHBOARD CONTAINER (CORE DATA LOADER)
+// DASHBOARD CONTAINER (Optimized Parallel Loading)
 // ======================================================
 export default function DashboardContainer() {
   // ---------------------------
   // STATE
   // ---------------------------
-
-  const [loading, setLoading] = useState(true);
-
   const [sites, setSites] = useState<Site[]>([]);
   const [calendars, setCalendars] = useState<Calendar[]>([]);
   const [events, setEvents] = useState<Event[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
   const [hps, setHps] = useState<Hp[]>([]);
+
+  // Loading states
+  const [sitesLoaded, setSitesLoaded] = useState(false);
+  const [calendarsLoaded, setCalendarsLoaded] = useState(false);
+  const [eventsLoaded, setEventsLoaded] = useState(false);
+  const [patientsLoaded, setPatientsLoaded] = useState(false);
+  const [hpsLoaded, setHpsLoaded] = useState(false);
 
   const [selectedBranch, setSelectedBranch] = useState<string>('all');
   const [appointmentsFilter, setAppointmentsFilter] = useState<TimeFilterType>('all');
@@ -53,48 +56,85 @@ export default function DashboardContainer() {
   const [therapistsFilter, setTherapistsFilter] = useState<TimeFilterType>('all');
 
   // ======================================================
-  // INITIAL LOAD (UPDATED FOR CONCURRENCY)
+  // LOAD ALL DATA IN PARALLEL
   // ======================================================
   useEffect(() => {
-    async function loadAll() {
+    async function loadAllData() {
       try {
-        setLoading(true);
-
-        // ⭐ IMPROVEMENT: Use Promise.all() to run all API calls concurrently.
-        // This ensures the total load time is governed by the single slowest
-        // aggregated call, drastically reducing the 90+ second wait.
-        const [sitesData, calendarsData, hpsData, patientsData, eventsData] = await Promise.all([
+        // Load all independent APIs in parallel
+        const [sitesData, calendarsData, patientsData, hpsData] = await Promise.allSettled([
           getAllSites(),
           getAllCalendars(),
-          getAllHps(),
           getAllPatients(),
-          // Load events WITHOUT date filter initially, as full data is needed for analytics
-          getAllEvents(),
+          getAllHps(),
         ]);
 
-        setSites(sitesData);
-        setCalendars(calendarsData);
-        setHps(hpsData);
-        setPatients(patientsData);
-        setEvents(eventsData);
+        // Handle sites
+        if (sitesData.status === 'fulfilled') {
+          setSites(sitesData.value);
+        }
+        setSitesLoaded(true);
 
-        setLoading(false);
+        // Handle calendars
+        if (calendarsData.status === 'fulfilled') {
+          setCalendars(calendarsData.value);
+        }
+        setCalendarsLoaded(true);
+
+        // Handle patients
+        if (patientsData.status === 'fulfilled') {
+          setPatients(patientsData.value);
+        }
+        setPatientsLoaded(true);
+
+        // Handle HPs
+        if (hpsData.status === 'fulfilled') {
+          setHps(hpsData.value);
+        }
+        setHpsLoaded(true);
       } catch (error) {
-        console.error('Dashboard Load Error:', error);
-        setLoading(false);
+        console.error('Dashboard initial load error:', error);
+        // Set all as loaded even if failed
+        setSitesLoaded(true);
+        setCalendarsLoaded(true);
+        setPatientsLoaded(true);
+        setHpsLoaded(true);
       }
     }
 
-    loadAll();
+    loadAllData();
   }, []);
 
   // ======================================================
-  // FILTERED VALUES (FOR EACH SECTION)
-  // (No change needed here as the filtering logic is sound)
+  // LOAD EVENTS AFTER CALENDARS ARE LOADED
+  // ======================================================
+  useEffect(() => {
+    async function loadEvents() {
+      if (!calendarsLoaded) return; // Wait for calendars
+
+      try {
+        const eventsData = await getAllEvents();
+        setEvents(eventsData);
+      } catch (error) {
+        console.error('Events Load Error:', error);
+      } finally {
+        setEventsLoaded(true);
+      }
+    }
+
+    if (calendarsLoaded && !eventsLoaded) {
+      loadEvents();
+    }
+  }, [calendarsLoaded, eventsLoaded]);
+
+  // ======================================================
+  // CALCULATED VALUES WITH LOADING CHECKS
   // ======================================================
 
   // ---------- APPOINTMENTS ----------
   const appointmentFilteredEvents = (() => {
+    if (!eventsLoaded || !calendarsLoaded) return [];
+
     let filtered = events;
 
     const { from, to } = getDateRange(appointmentsFilter);
@@ -109,13 +149,12 @@ export default function DashboardContainer() {
 
   // ---------- PATIENTS ----------
   const patientFiltered = (() => {
+    if (!patientsLoaded) return [];
+
     if (patientsFilter === 'all') return patients;
 
     const { from, to } = getDateRange(patientsFilter);
-
-    // NOTE:
     // Patients API does not provide createdAt
-    // So we simply use ALL patients for now
     return patients;
   })();
 
@@ -123,6 +162,8 @@ export default function DashboardContainer() {
 
   // ---------- THERAPISTS ----------
   const therapistFilteredEvents = (() => {
+    if (!eventsLoaded || !calendarsLoaded) return [];
+
     let filtered = events;
 
     const { from, to } = getDateRange(therapistsFilter);
@@ -133,63 +174,77 @@ export default function DashboardContainer() {
     return filterEventsByBranch(filtered, calendars, selectedBranch);
   })();
 
-  const therapistPerformance = getTherapistPerformance(therapistFilteredEvents, hps, calendars);
-
-  // ======================================================
-  // LOADING STATE HANDLING
-  // ======================================================
-  if (loading) {
-    return (
-      <Container className="py-4">
-        <BranchFilter branches={sites} loading />
-        <SummaryCardsSkeleton />
-        <AppointmentsSectionSkeleton />
-        <PatientsSectionSkeleton />
-        <TherapistsSectionSkeleton />
-      </Container>
-    );
-  }
+  const therapistPerformance = (() => {
+    if (!eventsLoaded || !calendarsLoaded || !hpsLoaded) {
+      return { totalInDemand: 0, totalCancellations: 0, totalProfit: 0 };
+    }
+    return getTherapistPerformance(therapistFilteredEvents, hps, calendars);
+  })();
 
   // ======================================================
   // RENDER UI
   // ======================================================
   return (
     <Container className="py-4">
-     <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
+      <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
         {/* PAGE HEADER */}
         <div>
           <h2 className="fw-bold">Dashboard</h2>
         </div>
         {/* BRANCH FILTER */}
-        <BranchFilter branches={sites} value={selectedBranch} onChange={setSelectedBranch} />
+        {!sitesLoaded || !eventsLoaded ? (
+          <BranchFilter branches={[]} loading />
+        ) : (
+          <BranchFilter branches={sites} value={selectedBranch} onChange={setSelectedBranch} />
+        )}
       </div>
       {/* SUMMARY CARDS */}
-      <SummaryCards
-        totalAppointments={appointmentFilteredEvents.length}
-        totalPatients={patients.length}
-        totalTherapists={hps.length}
-      />
-
+      <div className="mb-4">
+        <SummaryCards
+          totalAppointments={eventsLoaded ? appointmentFilteredEvents.length : undefined}
+          totalPatients={patientsLoaded ? patients.length : undefined}
+          totalTherapists={hpsLoaded ? hps.length : undefined}
+          loadingAppointments={!eventsLoaded || !calendarsLoaded}
+          loadingPatients={!patientsLoaded}
+          loadingTherapists={!hpsLoaded}
+        />
+      </div>
       {/* APPOINTMENTS SECTION */}
-      <AppointmentsSection
-        data={appointmentBreakdown}
-        timeFilter={appointmentsFilter}
-        onTimeFilterChange={setAppointmentsFilter}
-      />
-
+      {!eventsLoaded || !calendarsLoaded ? (
+        <AppointmentsSectionSkeleton />
+      ) : (
+        <div className="mb-4">
+          <AppointmentsSection
+            data={appointmentBreakdown}
+            timeFilter={appointmentsFilter}
+            onTimeFilterChange={setAppointmentsFilter}
+          />
+        </div>
+      )}
       {/* PATIENTS SECTION */}
-      <PatientsSection
-        data={patientInsights}
-        timeFilter={patientsFilter}
-        onTimeFilterChange={setPatientsFilter}
-      />
-
+      {!patientsLoaded ? (
+        <PatientsSectionSkeleton />
+      ) : (
+        <div className="mb-4">
+          <PatientsSection
+            data={patientInsights}
+            timeFilter={patientsFilter}
+            onTimeFilterChange={setPatientsFilter}
+          />
+        </div>
+      )}
       {/* THERAPISTS SECTION */}
-      <TherapistsSection
-        data={therapistPerformance}
-        timeFilter={therapistsFilter}
-        onTimeFilterChange={setTherapistsFilter}
-      />
+      {!eventsLoaded || !calendarsLoaded || !hpsLoaded ? (
+        <TherapistsSectionSkeleton />
+      ) : (
+        <div className="mb-4">
+          <TherapistsSection
+            data={therapistPerformance}
+            timeFilter={therapistsFilter}
+            onTimeFilterChange={setTherapistsFilter}
+          />
+        </div>
+      )}
     </Container>
   );
 }
