@@ -1,4 +1,5 @@
 import { ROSA_BASE_API_PATH } from '@/context/constants';
+import { getSignal } from '@/lib/apiAbort';
 /** ===========================
  * ✅ Types
  * =========================== */
@@ -93,6 +94,7 @@ export const getAllMotives = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!res.ok) {
@@ -133,6 +135,7 @@ export const updateMotivesBulk = async (payload: any[]) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      signal: getSignal()
     });
 
     if (!res.ok) {
@@ -169,6 +172,7 @@ export const updateSingleMotive = async (id: string, body: Partial<MotiveDto>) =
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(normalized),
+      signal: getSignal()
     });
 
     if (!res.ok) {
@@ -218,6 +222,7 @@ export const getAllCalendars = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!res.ok) {
@@ -268,6 +273,7 @@ export const getAllHps = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!res.ok) {
@@ -304,6 +310,7 @@ export const createMotive = async (payload: MotiveCreateRequestDto) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify([payload]),
+      signal: getSignal()
     });
 
     if (!res.ok) {

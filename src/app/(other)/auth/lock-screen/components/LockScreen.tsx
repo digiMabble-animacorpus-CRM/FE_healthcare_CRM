@@ -36,10 +36,10 @@ const LockScreen = () => {
             <Card className="auth-card">
               <CardBody className="px-3 py-5">
                 <div className="mx-auto mb-4 text-center auth-logo">
-                  <Link href="/dashboards/agent" className="logo-dark">
+                  <Link href="/appointment-calender" className="logo-dark">
                     <Image src={logoDark} height={32} alt="logo dark" />
                   </Link>
-                  <Link href="/dashboards/agent" className="logo-light">
+                  <Link href="/appointment-calender" className="logo-light">
                     <Image src={LogoLight} height={28} alt="logo light" />
                   </Link>
                 </div>

@@ -1,3 +1,4 @@
+import { getSignal } from '@/lib/apiAbort';
 import { HealthProfessional } from './types';
 import { ROSA_BASE_API_PATH } from '@/context/constants';
 
@@ -29,6 +30,7 @@ export const getAllHps = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!response.ok) {

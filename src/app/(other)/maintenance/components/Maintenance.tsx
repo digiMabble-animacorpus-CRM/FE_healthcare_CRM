@@ -30,10 +30,10 @@ const Maintenance = () => {
                   <Col lg={8}>
                     <div className="p-4">
                       <div className="mx-auto mb-5 text-center auth-logo">
-                        <Link href="/dashboards/agent" className="logo-dark">
+                        <Link href="/appointment-calender" className="logo-dark">
                           <Image src={logoDark} height={150} alt="logo dark" />
                         </Link>
-                        <Link href="/dashboards/agent" className="logo-light">
+                        <Link href="/appointment-calender" className="logo-light">
                           <Image src={LogoLight} height={150} alt="logo light" />
                         </Link>
                       </div>
@@ -44,7 +44,7 @@ const Maintenance = () => {
                         Nous améliorons le système. À bientôt !
                       </p>
                       <div className="text-center">
-                        <Link href="/dashboards/agent" passHref legacyBehavior>
+                        <Link href="/appointment-calender" passHref legacyBehavior>
                           <Button variant="danger" as="a">
                             aller au tableau de bord
                           </Button>

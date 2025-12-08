@@ -21,7 +21,7 @@ const ComingSoon = () => {
             <Card className="auth-card text-center">
               <CardBody>
                 <div className="mx-auto my-5 text-center">
-                  <Link href="/dashboards/agent">
+                  <Link href="/appointment-calender">
                     <Image src={logoDark} alt="logo-dark" height={32} />
                   </Link>
                 </div>

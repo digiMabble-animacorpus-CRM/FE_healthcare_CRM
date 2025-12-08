@@ -1,5 +1,6 @@
 import { ROSA_BASE_API_PATH } from '@/context/constants';
 import { Calendar } from './types';
+import { getSignal } from '@/lib/apiAbort';
 
 export const getAllCalendars = async (
   page: number = 1,
@@ -29,6 +30,7 @@ export const getAllCalendars = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!response.ok) {

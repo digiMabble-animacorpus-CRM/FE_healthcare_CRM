@@ -1,20 +1,39 @@
 'use client';
 
 import { SessionProvider } from 'next-auth/react';
-import { useEffect } from 'react';
+import { useEffect, useRef, useLayoutEffect } from 'react';
 import { ToastContainer } from 'react-toastify';
 import { DEFAULT_PAGE_TITLE } from '@/context/constants';
 import dynamic from 'next/dynamic';
+import { NotificationProvider } from '@/context/useNotificationContext';
+import { ChildrenType } from '@/types/component-props';
+import { usePathname } from 'next/navigation';
+import { abortAll } from '@/lib/apiAbort';
 
 const LayoutProvider = dynamic(
   () => import('@/context/useLayoutContext').then((mod) => mod.LayoutProvider),
-  { ssr: false },
+  { ssr: false }
 );
 
-import { NotificationProvider } from '@/context/useNotificationContext';
-import { ChildrenType } from '@/types/component-props';
-
 const AppProvidersWrapper = ({ children }: ChildrenType) => {
+  const pathname = usePathname();
+
+  // 🔥 Make sure abortAll() runs ONLY once per REAL pathname change
+  const lastPathnameRef = useRef<string | null>(null);
+
+  useLayoutEffect(() => {
+    if (lastPathnameRef.current === pathname) {
+      // Prevent double abort on same pathname
+      return;
+    }
+
+    lastPathnameRef.current = pathname;
+
+    console.log("🛑 Route changed → Aborting all previous API requests");
+    abortAll(); // aborts only old-page requests, not new ones
+
+  }, [pathname]);
+
   const handleChangeTitle = () => {
     document.title = DEFAULT_PAGE_TITLE;
   };
@@ -27,7 +46,6 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
       screen?.classList.add('remove');
     }
 
-    // ✅ Use MutationObserver instead of deprecated DOMNodeInserted
     const observer = new MutationObserver(() => {
       screen?.classList.add('remove');
     });
@@ -40,7 +58,7 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
 
     return () => {
       document.removeEventListener('visibilitychange', handleChangeTitle);
-      observer.disconnect(); // cleanup
+      observer.disconnect();
     };
   }, []);
 
@@ -48,7 +66,9 @@ const AppProvidersWrapper = ({ children }: ChildrenType) => {
     <SessionProvider>
       <LayoutProvider>
         <NotificationProvider>
-          <div style={{ backgroundColor: '#FAF5FF', minHeight: '100vh' }}>{children}</div>
+          <div style={{ backgroundColor: '#FAF5FF', minHeight: '100vh' }}>
+            {children}
+          </div>
           <ToastContainer theme="colored" />
         </NotificationProvider>
       </LayoutProvider>

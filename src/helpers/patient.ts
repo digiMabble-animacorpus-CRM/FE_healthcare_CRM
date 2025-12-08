@@ -1,6 +1,7 @@
 'use client';
 
 import { API_BASE_PATH, ROSA_BASE_API_PATH } from '@/context/constants';
+import { getSignal } from '@/lib/apiAbort';
 import { decryptAES } from '@/utils/encryption';
 export interface PatientUpdatePayload {
   name?: string;
@@ -45,6 +46,7 @@ export const getAllPatient = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!response.ok) {
@@ -85,6 +87,7 @@ export const getPatientById = async (patientId: any): Promise<any | null> => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     const result = await response.json();
@@ -118,6 +121,7 @@ const fetchMotivesMap = async (): Promise<Record<string, string>> => {
           Authorization: `Bearer ${ROSA_TOKEN}`,
           'Content-Type': 'application/json',
         },
+        signal: getSignal()
       },
     );
     const data = await res.json();
@@ -145,6 +149,7 @@ const fetchCalendarsMap = async (): Promise<Record<string, string>> => {
           Authorization: `Bearer ${ROSA_TOKEN}`,
           'Content-Type': 'application/json',
         },
+        signal: getSignal()
       },
     );
     const data = await res.json();
@@ -188,6 +193,7 @@ export const getPatientEvents = async (
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        signal: getSignal()
       }),
       fetchMotivesMap(),
       fetchCalendarsMap(),
@@ -241,6 +247,7 @@ export const updateEventNote = async (eventId: string, hpNote: string): Promise<
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      signal: getSignal()
     });
     console.log(response, 'updste');
     if (!response.ok) {

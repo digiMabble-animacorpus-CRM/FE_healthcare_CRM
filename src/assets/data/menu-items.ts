@@ -6,18 +6,19 @@ export const MENU_ITEMS: MenuItemType[] = [
     label: 'MENU',
     isTitle: true,
   },
-  {
-    key: 'dashboards',
-    label: 'Tableau de bord',
-    icon: 'ri:dashboard-2-line',
-    url: '/dashboards/agent',
-  },
 
   {
     key: 'appointments',
     label: 'Rendez-vous',
     icon: 'ri-calendar-line',
     url: '/appointment-calender',
+  },
+
+  {
+    key: 'dashboard',
+    label: 'Tableau de bord',
+    icon: 'ri:dashboard-2-line',
+    url: '/dashboard',
   },
 
   {
