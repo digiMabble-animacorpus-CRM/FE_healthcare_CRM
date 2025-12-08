@@ -20,6 +20,7 @@ import {
   Row,
   Spinner,
 } from 'react-bootstrap';
+import { getSignal } from '@/lib/apiAbort';
 
 const PAGE_LIMIT = 5; // Changed to 5 as requested
 
@@ -50,6 +51,7 @@ const BranchListPage = () => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
+        signal: getSignal()
       });
 
       console.log('API Response:', response.data);

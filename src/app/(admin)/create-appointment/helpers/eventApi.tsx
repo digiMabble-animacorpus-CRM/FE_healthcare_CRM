@@ -1,5 +1,6 @@
 // helpers/eventApi.ts
 import { ROSA_BASE_API_PATH } from '@/context/constants';
+import { getSignal } from '@/lib/apiAbort';
 
 /** Safe JSON fallback */
 async function safeJson(res: Response) {
@@ -25,6 +26,7 @@ export const getEventById = async (id: string) => {
       headers: {
         Authorization: `Bearer ${ROSA_TOKEN}`,
       },
+      signal: getSignal()
     });
 
     if (!res.ok) return null;
@@ -50,6 +52,7 @@ export const createEventBulk = async (payload: any[]) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      signal: getSignal()
     });
 
     const json = await safeJson(res);
@@ -79,6 +82,7 @@ export const updateEventBulk = async (payload: any[]) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      signal: getSignal()
     });
 
     const json = await safeJson(res);
@@ -123,6 +127,7 @@ export const getAllEvents = async (
       headers: {
         Authorization: `Bearer ${ROSA_TOKEN}`,
       },
+      signal: getSignal()
     });
 
     if (!res.ok) {
@@ -164,6 +169,7 @@ export const deleteEvent = async (id: string) => {
         Authorization: `Bearer ${ROSA_TOKEN}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     const json = await safeJson(res);

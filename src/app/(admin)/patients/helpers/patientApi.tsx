@@ -1,6 +1,7 @@
 // helpers/patientApi.ts
 
 import { ROSA_BASE_API_PATH } from '@/context/constants';
+import { getSignal } from '@/lib/apiAbort';
 
 type PatientRecordDto = any; // you can replace with your strict Rosa schema
 
@@ -22,6 +23,7 @@ export const getPatientById = async (id: string) => {
     const res = await fetch(`${ROSA_BASE_API_PATH}/patients/${id}`, {
       method: 'GET',
       headers: { Authorization: `Bearer ${ROSA_TOKEN}` },
+      signal: getSignal()
     });
 
     if (!res.ok) return null;
@@ -44,6 +46,7 @@ export const createPatientBulk = async (payload: PatientRecordDto[]) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      signal: getSignal()
     });
 
     const json = await safeJson(res);
@@ -69,6 +72,7 @@ export const updatePatientBulk = async (payload: PatientRecordDto[]) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(payload),
+      signal: getSignal()
     });
 
     const json = await safeJson(res);
@@ -102,6 +106,7 @@ export const deletePatient = async (id?: string, externalId?: string) => {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     const json = await safeJson(res);
@@ -139,6 +144,7 @@ export const getAllPatient = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!response.ok) {

@@ -1,3 +1,4 @@
+import { getSignal } from "@/lib/apiAbort";
 import { Patient } from "./types";
 import { ROSA_BASE_API_PATH } from "@/context/constants";
 
@@ -25,6 +26,7 @@ export const getAllPatients = async (
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
+      signal: getSignal()
     });
 
     if (!response.ok) {

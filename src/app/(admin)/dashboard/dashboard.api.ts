@@ -2,6 +2,7 @@
 
 import { ROSA_BASE_API_PATH } from '@/context/constants';
 import { Site, Event, Patient, Hp, Calendar } from './dashboard.types';
+import { getSignal } from '@/lib/apiAbort';
 
 const API_BASE = ROSA_BASE_API_PATH;
 const TOKEN_KEY = 'rosa_token';
@@ -26,6 +27,7 @@ async function apiGet<T>(endpoint: string): Promise<T> {
       Authorization: `Bearer ${token}`,
       Accept: 'application/json',
     },
+    signal: getSignal()
   });
 
   if (!res.ok) {

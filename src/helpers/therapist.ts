@@ -1,6 +1,7 @@
 'use client';
 
 import { API_BASE_PATH, ROSA_BASE_API_PATH } from '@/context/constants';
+import { getSignal } from '@/lib/apiAbort';
 import { decryptAES } from '@/utils/encryption';
 
 // import type { TherapistCreatePayload, TherapistType } from '@/types/data';
@@ -51,6 +52,7 @@ export const getAllTherapists = async (
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      signal: getSignal()
     });
 
     if (!response.ok) {
