@@ -86,7 +86,7 @@ const useSignIn = () => {
         }
 
         //  Unified dashboard redirection
-        push('/dashboards/agent');
+        push('/appointment-calender');
 
         showNotification({ message: 'Bienvenue chez Anima Corpus CRM', variant: 'success' });
       } else {
