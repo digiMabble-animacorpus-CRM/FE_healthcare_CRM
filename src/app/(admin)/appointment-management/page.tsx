@@ -10,7 +10,6 @@ import {
   Spinner,
   Badge,
   Dropdown,
-  CardFooter,
 } from 'react-bootstrap';
 import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
@@ -60,7 +59,7 @@ const AppointmentManagementPage = () => {
 
       const data = response.data.appointment_management || [];
       setAppointments(Array.isArray(data) ? data : []);
-
+      console.log(data, "data")
       const totalCount = response.data.total_count || data.length;
       setTotalPages(Math.ceil(totalCount / PAGE_LIMIT) || 1);
     } catch (error) {
