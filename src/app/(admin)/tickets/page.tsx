@@ -1,6 +1,5 @@
 'use client';
 
-import PageTitle from '@/components/PageTitle';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import { useEffect, useState } from 'react';
 import {
