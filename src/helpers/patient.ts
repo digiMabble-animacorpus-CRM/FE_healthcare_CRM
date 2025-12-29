@@ -26,13 +26,13 @@ export interface PatientUpdatePayload {
 export const getAllPatient = async (
   page: number = 1,
   limit: number = 10,
-): Promise<{ data: any[]; totalCount: number; totalPage: number; page: number }> => {
+): Promise<{ data: any[]; totalCount: number; totalPage: number; page: number; hasNextPage: boolean }> => {
   try {
     const token = localStorage.getItem('rosa_token');
 
     if (!token) {
       console.warn('No access token found.');
-      return { data: [], totalCount: 0, totalPage: 0, page: 0 };
+      return { data: [], totalCount: 0, totalPage: 0, page: 0, hasNextPage: false };
     }
 
     const queryParams = new URLSearchParams({
@@ -52,7 +52,7 @@ export const getAllPatient = async (
     if (!response.ok) {
       const errorText = await response.text();
       console.error('Backend error:', response.status, errorText);
-      return { data: [], totalCount: 0, totalPage: 0, page: 0 };
+      return { data: [], totalCount: 0, totalPage: 0, page: 0, hasNextPage: false };
     }
 
     const jsonData = await response.json();
@@ -62,13 +62,14 @@ export const getAllPatient = async (
 
     return {
       data: patientData,
+      hasNextPage: jsonData?.hasNextPage || false,
       totalCount: jsonData?.totalCount || 0,
       totalPage: jsonData?.totalPages || 0,
       page: jsonData?.page || 0,
     };
   } catch (error) {
     console.error('Error fetching patient:', error);
-    return { data: [], totalCount: 0, totalPage: 0, page: 0 };
+    return { data: [], totalCount: 0, totalPage: 0, page: 0, hasNextPage: false };
   }
 };
 

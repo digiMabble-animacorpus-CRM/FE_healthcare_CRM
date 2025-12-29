@@ -48,6 +48,7 @@ const PatientsListPage = () => {
     setLoading(true);
     try {
       const response = await getAllPatient(currentPage, PAGE_SIZE);
+      console.log(response)
       setPatients(response.data || []);
       setTotalCount(response.totalCount || 0);
       setTotalPages(response.totalPage || 0);

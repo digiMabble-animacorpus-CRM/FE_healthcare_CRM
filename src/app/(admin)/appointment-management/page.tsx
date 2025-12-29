@@ -58,6 +58,7 @@ const AppointmentManagementPage = () => {
       });
 
       const data = response.data.appointment_management || [];
+      console.log(data, "data")
       setAppointments(Array.isArray(data) ? data : []);
       console.log(data, "data")
       const totalCount = response.data.total_count || data.length;
