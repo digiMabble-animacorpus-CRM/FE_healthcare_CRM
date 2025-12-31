@@ -12,6 +12,7 @@ import {
   Modal,
   Form,
   Badge,
+  Container,
 } from 'react-bootstrap';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
@@ -34,31 +35,51 @@ type TicketType = {
   first_name: string;
   last_name: string;
   status?: string;
-  urgency?: 'Urgent' | 'Medium' | 'Normal'; // New based on doc [cite: 77]
+  urgency?: 'Urgent' | 'Moyen' | 'Normal';
 };
 
-const getRetellApiKey = () => {
-  if (typeof window !== 'undefined') {
-    const fromStorage = localStorage.getItem('retell_api_key');
-    if (fromStorage) return fromStorage;
-  }
-  return 'key_1d964c4ebd944cdf5f7c9af67b12';
+type StatsType = {
+  adult: number;
+  child: number;
+  couple: number;
+  internship: number;
+  job: number;
+  partnership: number;
+  supplier: number;
+  information: number;
 };
 
 const TicketPage = () => {
   const [tickets, setTickets] = useState<TicketType[]>([]);
+  const [stats, setStats] = useState<StatsType>({
+    adult: 0,
+    child: 0,
+    couple: 0,
+    internship: 0,
+    job: 0,
+    partnership: 0,
+    supplier: 0,
+    information: 0,
+  });
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(false);
-  const [activeFilter, setActiveFilter] = useState('All'); // For high-level filters [cite: 62]
+  const [activeFilter, setActiveFilter] = useState('Tous');
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [editTicket, setEditTicket] = useState<TicketType | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteTicketId, setDeleteTicketId] = useState<number | null>(null);
 
-  // --- Functions (Logic preserved from original) ---
+  const getRetellApiKey = () => {
+    if (typeof window !== 'undefined') {
+      const fromStorage = localStorage.getItem('retell_api_key');
+      if (fromStorage) return fromStorage;
+    }
+    return 'key_1d964c4ebd944cdf5f7c9af67b12';
+  };
+
   const normalize = (s?: string) => (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
 
   const callMatchesTicket = (call: any, ticket: TicketType) => {
@@ -81,6 +102,39 @@ const TicketPage = () => {
     return invalid.includes(normalized) || !/\d/.test(normalized);
   };
 
+  const calculateStats = (ticketList: TicketType[]) => {
+    const newStats: StatsType = {
+      adult: 0,
+      child: 0,
+      couple: 0,
+      internship: 0,
+      job: 0,
+      partnership: 0,
+      supplier: 0,
+      information: 0,
+    };
+
+    ticketList.forEach((ticket) => {
+      if (ticket.is_for_child) {
+        newStats.child++;
+      } else {
+        newStats.adult++;
+      }
+
+      const spec = ticket.specialty?.toLowerCase() || '';
+      const desc = ticket.description?.toLowerCase() || '';
+
+      if (spec.includes('couple') || desc.includes('couple')) newStats.couple++;
+      if (spec.includes('internship') || spec.includes('stage')) newStats.internship++;
+      if (spec.includes('job') || spec.includes('emploi')) newStats.job++;
+      if (spec.includes('partnership') || spec.includes('partenariat')) newStats.partnership++;
+      if (spec.includes('supplier') || spec.includes('fournisseur')) newStats.supplier++;
+      if (spec.includes('information') || spec.includes('info')) newStats.information++;
+    });
+
+    setStats(newStats);
+  };
+
   const fetchTickets = async (page: number) => {
     setLoading(true);
     try {
@@ -89,7 +143,6 @@ const TicketPage = () => {
         params: { page, limit: PAGE_LIMIT, search: searchTerm },
         headers: { Authorization: `Bearer ${token}` },
       });
-
       const ticketData: TicketType[] = response.data.new_requests || response.data || [];
       let callList: any[] = [];
 
@@ -104,7 +157,7 @@ const TicketPage = () => {
       } catch (err) { console.warn('Retell skip', err); }
 
       const finalTickets = ticketData.map((t) => {
-        const updated = { ...t, status: t.status || 'New', urgency: 'Urgent' as const }; // Mock urgency per design
+        const updated = { ...t, status: t.status || 'Nouveau', urgency: 'Urgent' as const };
         if (isInvalidPhone(updated.phone)) {
           const match = callList.find((call: any) => callMatchesTicket(call, t));
           if (match?.from_number) updated.phone = match.from_number;
@@ -113,6 +166,7 @@ const TicketPage = () => {
       });
 
       setTickets(finalTickets);
+      calculateStats(finalTickets);
       setTotalPages(Math.max(1, Math.ceil((response.data.total || finalTickets.length) / PAGE_LIMIT)));
     } catch (error) {
       console.error(error);
@@ -130,7 +184,7 @@ const TicketPage = () => {
       const response = await axios.get(`${API_BASE_PATH}/new-requests/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setEditTicket({ ...response.data, status: response.data.status || 'New' });
+      setEditTicket({ ...response.data, status: response.data.status || 'Nouveau' });
       setShowEditModal(true);
     } catch (error) { console.error(error); }
   };
@@ -143,6 +197,7 @@ const TicketPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTickets((prev) => prev.map((t) => (t.id === editTicket.id ? editTicket : t)));
+      calculateStats(tickets.map((t) => (t.id === editTicket.id ? editTicket : t)));
       setShowEditModal(false);
     } catch (error) { console.error(error); }
   };
@@ -156,185 +211,382 @@ const TicketPage = () => {
       await axios.delete(`${API_BASE_PATH}/new-requests/${deleteTicketId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTickets((prev) => prev.filter((t) => t.id !== deleteTicketId));
+      const newTickets = tickets.filter((t) => t.id !== deleteTicketId);
+      setTickets(newTickets);
+      calculateStats(newTickets);
     } finally { setShowDeleteModal(false); }
   };
 
-  // Indicator Mock data [cite: 47-54]
+  const getTimeAgo = (dateString: string) => {
+    const minutes = Math.floor((Date.now() - new Date(dateString).getTime()) / 60000);
+    if (minutes < 60) return `Il y a ${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    return `Il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+  };
+
   const indicators = [
-    { label: 'Adult', count: 2, icon: 'solar:user-broken', color: 'primary' },
-    { label: 'Child', count: 2, icon: 'solar:baby-carriage-broken', color: 'info' },
-    { label: 'Couple', count: 1, icon: 'solar:heart-broken', color: 'danger' },
-    { label: 'Internship', count: 1, icon: 'solar:medal-ribbon-broken', color: 'secondary' },
-    { label: 'Job Application', count: 1, icon: 'solar:case-minimalistic-broken', color: 'primary' },
-    { label: 'Partnership', count: 1, icon: 'solar:handshake-outline-broken', color: 'success' },
-    { label: 'Supplier', count: 1, icon: 'solar:delivery-broken', color: 'warning' },
-    { label: 'Information', count: 1, icon: 'solar:info-circle-broken', color: 'dark' },
+    { label: 'Adulte', count: stats.adult, icon: 'solar:user-broken', color: 'primary' },
+    { label: 'Enfant', count: stats.child, icon: 'solar:shield-user-broken', color: 'info' },
+    { label: 'Couple', count: stats.couple, icon: 'solar:heart-broken', color: 'danger' },
+    { label: 'Stage', count: stats.internship, icon: 'solar:medal-ribbon-broken', color: 'secondary' },
+    { label: 'Candidature', count: stats.job, icon: 'solar:case-minimalistic-broken', color: 'primary' },
+    { label: 'Partenariat', count: stats.partnership, icon: 'solar:users-group-rounded-broken', color: 'success' },
+    { label: 'Fournisseur', count: stats.supplier, icon: 'solar:delivery-broken', color: 'warning' },
+    { label: 'Information', count: stats.information, icon: 'solar:info-circle-broken', color: 'dark' },
   ];
 
+  const filteredTickets = tickets.filter((ticket) => {
+    if (activeFilter === 'Patients') return ticket.is_for_child || !ticket.specialty?.toLowerCase().includes('job');
+    if (activeFilter === 'Professionnel') return ticket.specialty?.toLowerCase().includes('job') || ticket.specialty?.toLowerCase().includes('partnership');
+    return true;
+  });
+
+  const filterCounts = {
+    Tous: tickets.length,
+    Patients: tickets.filter(t => t.is_for_child || !t.specialty?.toLowerCase().includes('job')).length,
+    Professionnel: tickets.filter(t => t.specialty?.toLowerCase().includes('job') || t.specialty?.toLowerCase().includes('partnership')).length,
+  };
+
   return (
-    <>
-      <div className="mb-4">
-        <h2 className="fw-bold mb-1">Requests & Inquiries</h2>
-        <p className="text-muted">Incoming requests categorized by type</p>
+    <Container fluid className="p-4 " style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+      {/* Header */}
+      <div className="d-flex align-items-center mb-4"> 
+        <div>
+          <h2 className="fw-bold mb-0" style={{ fontSize: '24px' }}>Demandes & Requêtes</h2>
+          <p className="text-muted mb-0" style={{ fontSize: '14px' }}>Demandes entrantes classées par type</p>
+        </div>
       </div>
 
-      {/* 2.B Breakdown by Request Type [cite: 45] */}
-      <Row className="mb-4 g-2 flex-nowrap overflow-auto pb-2">
+      {/* Stats Cards */}
+      <Row className="mb-4 g-3 flex-nowrap overflow-auto pb-2 custom-scrollbar">
         {indicators.map((ind, i) => (
-          <Col key={i} xs="auto" style={{ minWidth: '125px' }}>
-            <Card className="border-0 shadow-sm text-center cursor-pointer">
-              <CardBody className="p-3">
-                <div className={`bg-soft-${ind.color} text-${ind.color} rounded-circle p-2 d-inline-block mb-2`}>
-                  <IconifyIcon icon={ind.icon} className="fs-20" />
+          <Col
+            key={i}
+            className="flex-fill"
+            style={{ minWidth: '120px' }}
+          >
+            <Card
+              className="border-0 shadow-sm h-100 stat-card"
+              style={{ borderRadius: '12px', transition: 'transform 0.2s' }}
+            >
+              <CardBody className="p-3 text-center d-flex flex-column align-items-center justify-content-center">
+                <div
+                  className="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
+                  style={{
+                    width: '48px',
+                    height: '48px',
+                    backgroundColor: `rgba(var(--bs-${ind.color}-rgb), 0.1)`,
+                    flexShrink: 0
+                  }}
+                >
+                  <IconifyIcon icon={ind.icon} className={`text-${ind.color} fs-4`} />
                 </div>
-                <h4 className="fw-bold mb-0">{ind.count}</h4>
-                <small className="text-muted fw-medium">{ind.label}</small>
+
+                <h4 className="fw-bold mb-0" style={{ fontSize: '1.5rem' }}>
+                  {ind.count}
+                </h4>
+
+                <small
+                  className="text-muted text-uppercase fw-semibold mt-1"
+                  style={{
+                    fontSize: '10px',
+                    letterSpacing: '0.5px',
+                    display: 'block',
+                    lineHeight: '1.2'
+                  }}
+                >
+                  {ind.label}
+                </small>
               </CardBody>
             </Card>
           </Col>
         ))}
       </Row>
 
-      {/* 2.C Profile Filters [cite: 60] */}
-      <div className="d-flex justify-content-between align-items-center mb-4 gap-3">
-        <div className="d-flex gap-2">
-          {['All', 'Patients', 'Professional'].map((f) => (
-            <Button
-              key={f}
-              variant={activeFilter === f ? 'primary' : 'white'}
-              className={`rounded-pill px-3 shadow-sm border-0 ${activeFilter !== f && 'text-muted'}`}
-              onClick={() => setActiveFilter(f)}
-            >
-              {f} <Badge bg={activeFilter === f ? 'white' : 'soft-secondary'} className={activeFilter === f ? 'text-primary' : 'text-dark'}>
-                {f === 'All' ? '10' : f === 'Patients' ? '5' : '4'}
-              </Badge>
-            </Button>
-          ))}
-        </div>
-        <div className="flex-grow-1" style={{ maxWidth: '300px' }}>
-          <Form.Control
-            type="text"
-            placeholder="Rechercher..."
-            className="rounded-pill border-0 shadow-sm"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-      </div>
+      {/* Filter Tabs */}
+      <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: '12px' }}>
+        <CardBody className="p-3">
+          <Row className="align-items-center">
+            <Col md={6}>
+              <div className="d-flex flex-wrap gap-2">
+                {['Tous', 'Patients', 'Professionnel'].map((f) => (
+                  <Button
+                    key={f}
+                    variant={activeFilter === f ? 'primary' : 'light'}
+                    className="rounded-pill border-0 fw-semibold"
+                    style={{ padding: '8px 20px', fontSize: '14px' }}
+                    onClick={() => setActiveFilter(f)}
+                  >
+                    {f}
+                    <Badge
+                      bg={activeFilter === f ? 'white' : 'secondary'}
+                      text={activeFilter === f ? 'primary' : 'white'}
+                      className="ms-2"
+                      style={{ fontSize: '12px' }}
+                    >
+                      {filterCounts[f as keyof typeof filterCounts]}
+                    </Badge>
+                  </Button>
+                ))}
+              </div>
+            </Col>
+            <Col md={6} className="mt-3 mt-md-0">
+              <div className="position-relative">
+                <IconifyIcon icon="solar:magnifer-broken"
+                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
+                <Form.Control
+                  type="text"
+                  placeholder="Rechercher par nom, email ou spécialité..."
+                  className="rounded-pill border-light bg-light ps-5 py-2 shadow-none"
+                  value={searchTerm}
+                  onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1); }}
+                />
+              </div>
+            </Col>
+          </Row>
+        </CardBody>
+      </Card>
 
-      {/* 3. Request Cards [cite: 67] */}
+      {/* Tickets List */}
       {loading ? (
-        <div className="text-center py-5"><Spinner animation="border" /></div>
+        <div className="d-flex flex-column align-items-center justify-content-center py-5">
+          <Spinner animation="border" variant="primary" className="mb-2" />
+          <span className="text-muted fw-medium">Chargement des demandes...</span>
+        </div>
       ) : (
         <div className="d-flex flex-column gap-3 mb-4">
-          {tickets.map((ticket) => (
-            <Card key={ticket.id} className="border-0 shadow-sm overflow-hidden">
+          {filteredTickets.map((ticket) => (
+            <Card key={ticket.id} className="border-0 shadow-sm ticket-card" style={{ borderRadius: '16px' }}>
               <CardBody className="p-4">
-                <div className="d-flex gap-3">
-                  <div className={`bg-soft-${ticket.is_for_child ? 'info' : 'primary'} rounded-circle p-3 d-flex align-items-center justify-content-center`} style={{ width: '56px', height: '56px' }}>
-                    <IconifyIcon icon={ticket.is_for_child ? "solar:baby-carriage-broken" : "solar:user-broken"} className={`text-${ticket.is_for_child ? 'info' : 'primary'} fs-24`} />
-                  </div>
-                  <div className="flex-grow-1">
-                    <div className="d-flex align-items-center gap-2 mb-1">
-                      <h5 className="mb-0 fw-bold">{ticket.first_name} {ticket.last_name}</h5>
-                      <Badge bg="soft-primary" className="text-primary px-2">{ticket.is_for_child ? 'Child' : 'Adult'}</Badge>
-                      <Badge bg="soft-danger" className="text-danger px-2">{ticket.urgency}</Badge>
+                <Row>
+                  <Col xs="auto">
+                    <div className={`rounded-circle d-flex align-items-center justify-content-center ${ticket.is_for_child ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary'}`}
+                      style={{ width: '56px', height: '56px' }}>
+                      <IconifyIcon
+                        icon={ticket.is_for_child ? "solar:baby-carriage-bold-duotone" : "solar:user-bold-duotone"}
+                        className="fs-3"
+                      />
+                    </div>
+                  </Col>
+
+                  <Col>
+                    <div className="d-flex justify-content-between align-items-start mb-2 flex-wrap">
+                      <div className="d-flex align-items-center gap-2 flex-wrap">
+                        <h5 className="mb-0 fw-bold">{ticket.first_name} {ticket.last_name}</h5>
+                        <Badge bg={ticket.is_for_child ? 'info' : 'secondary'} className="rounded-pill" style={{ fontSize: '12px', fontWeight: '500' }}>
+                          {ticket.is_for_child ? 'Enfant' : 'Adulte'}
+                        </Badge>
+                        <Badge bg="danger" className="rounded-pill" style={{ fontSize: '12px', fontWeight: '500' }}>
+                          {ticket.urgency}
+                        </Badge>
+                      </div>
+                      <small className="text-muted">{getTimeAgo(ticket.created_at)}</small>
                     </div>
 
-                    <p className="text-dark mb-3">{ticket.description}</p>
+                    <p className="text-secondary mb-3" style={{ fontSize: '14px', lineHeight: '1.6' }}>
+                      {ticket.description}
+                    </p>
 
-                    {/* Contact Block  */}
-                    <div className="d-flex flex-wrap gap-4 text-muted fs-14 mb-3">
-                      <span><IconifyIcon icon="solar:phone-broken" className="me-1 align-middle" /> {ticket.phone}</span>
-                      <span><IconifyIcon icon="solar:letter-broken" className="me-1 align-middle" /> {ticket.email}</span>
-                      <span><IconifyIcon icon="solar:map-point-broken" className="me-1 align-middle" /> {ticket.location}</span>
-                      <span className="ms-md-auto">{new Date(ticket.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} ago</span>
+                    <div className="d-flex flex-wrap gap-3 mb-3" style={{ fontSize: '13px' }}>
+                      <div className="d-flex align-items-center text-muted">
+                        <IconifyIcon icon="solar:phone-broken" className="me-2" />
+                        {ticket.phone}
+                      </div>
+                      <div className="d-flex align-items-center text-muted">
+                        <IconifyIcon icon="solar:letter-broken" className="me-2" />
+                        {ticket.email}
+                      </div>
+                      <div className="d-flex align-items-center text-muted">
+                        <IconifyIcon icon="solar:map-point-broken" className="me-2" />
+                        {ticket.location}
+                      </div>
                     </div>
 
-                    {/* Dynamic Fields [cite: 97] */}
+                    <div className="mb-3">
+                      <span className="text-muted" style={{ fontSize: '13px' }}>Spécialité demandée : </span>
+                      <span className="fw-bold text-dark" style={{ fontSize: '13px' }}>{ticket.specialty}</span>
+                    </div>
+
                     {ticket.is_for_child && (
-                      <div className="fs-14 mb-2">
-                        <span className="text-primary fw-medium">Child name:</span> <span className="text-muted">{ticket.child_name} ({ticket.child_age} ans)</span>
+                      <div className="bg-light rounded-3 p-2 px-3 mb-3 d-inline-flex align-items-center gap-2">
+                        <small className="text-primary fw-semibold">
+                          Nom de l'enfant : <span className="text-dark">{ticket.child_name} ({ticket.child_age} ans)</span>
+                        </small>
                       </div>
                     )}
-                    <div className="fs-14 mb-3">
-                      <span className="fw-bold">Specialty requested:</span> <span className="text-muted">{ticket.specialty}</span>
-                    </div>
 
-                    {/* AI Recommendation [cite: 119] */}
-                    <div className="bg-light-subtle rounded p-2 border d-flex align-items-center gap-2 mb-3">
-                      <div className="bg-primary rounded-circle p-1 d-flex">
-                        <IconifyIcon icon="solar:magic-stick-3-broken" className="text-white fs-12" />
+                    <div className="rounded-3 p-3 mb-3 border-0"
+                      style={{ backgroundColor: '#F3F4F6', border: '1px solid #E5E7EB' }}>
+                      <div className="d-flex align-items-start gap-2">
+                        <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center flex-shrink-0"
+                          style={{ width: '24px', height: '24px' }}>
+                          <IconifyIcon icon="solar:magic-stick-3-bold-duotone" className="text-white" style={{ fontSize: '12px' }} />
+                        </div>
+                        <small className="text-dark">
+                          Animus suggère de créer un dossier patient et de proposer un premier rendez-vous.
+                        </small>
                       </div>
-                      <small className="text-secondary fw-medium">Animus suggests creating a patient file and offering a first appointment.</small>
                     </div>
 
-                    <div className="d-flex justify-content-end gap-2">
-                      <Button variant="outline-dark" size="sm" className="border d-flex align-items-center gap-1 px-3" onClick={() => handleEditClick(ticket.id)}>
-                        <IconifyIcon icon="solar:user-plus-broken" /> Create patient file
+                    <div className="d-flex flex-wrap gap-2 justify-content-end">
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        className="rounded-pill px-3 fw-medium border-2"
+                        onClick={() => handleEditClick(ticket.id)}
+                      >
+                        <IconifyIcon icon="solar:user-plus-broken" className="me-1" />
+                        Créer dossier patient
                       </Button>
-                      <Button variant="primary" size="sm" className="px-4 d-flex align-items-center gap-1">
-                        Process <IconifyIcon icon="solar:alt-arrow-right-broken" />
-                      </Button>
-                      <Button variant="soft-danger" size="sm" onClick={() => handleDeleteClick(ticket.id)}>
-                        <IconifyIcon icon="solar:trash-bin-minimalistic-2-broken" />
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        className="rounded-pill px-4 border-0 shadow-sm"
+                      >
+                        Traiter <IconifyIcon icon="solar:alt-arrow-right-broken" className="ms-1" />
                       </Button>
                     </div>
-                  </div>
-                </div>
+                  </Col>
+                </Row>
               </CardBody>
             </Card>
           ))}
         </div>
       )}
 
-      {/* Pagination Footer */}
-      <div className="d-flex justify-content-center">
-        <ul className="pagination pagination-rounded mb-0">
-          <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
-            <Button variant="link" className="page-link shadow-none" onClick={() => handlePageChange(currentPage - 1)}>
-              <IconifyIcon icon="solar:alt-arrow-left-broken" />
-            </Button>
-          </li>
+      {/* Pagination */}
+      <div className="d-flex justify-content-center mt-4">
+        <div className="bg-white p-2 rounded-pill shadow-sm d-flex align-items-center gap-1">
+          <Button
+            variant="light"
+            className="rounded-circle p-2 shadow-none border-0"
+            style={{ width: '40px', height: '40px' }}
+            disabled={currentPage === 1}
+            onClick={() => handlePageChange(currentPage - 1)}
+          >
+            <IconifyIcon icon="solar:alt-arrow-left-broken" />
+          </Button>
           {[...Array(totalPages)].map((_, i) => (
-            <li key={i} className={`page-item ${currentPage === i + 1 && 'active'}`}>
-              <Button variant="link" className="page-link shadow-none" onClick={() => handlePageChange(i + 1)}>{i + 1}</Button>
-            </li>
-          ))}
-          <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
-            <Button variant="link" className="page-link shadow-none" onClick={() => handlePageChange(currentPage + 1)}>
-              <IconifyIcon icon="solar:alt-arrow-right-broken" />
+            <Button
+              key={i}
+              variant={currentPage === i + 1 ? 'primary' : 'light'}
+              className="rounded-circle border-0 shadow-none"
+              style={{ width: '40px', height: '40px' }}
+              onClick={() => handlePageChange(i + 1)}
+            >
+              {i + 1}
             </Button>
-          </li>
-        </ul>
+          ))}
+          <Button
+            variant="light"
+            className="rounded-circle p-2 shadow-none border-0"
+            style={{ width: '40px', height: '40px' }}
+            disabled={currentPage === totalPages}
+            onClick={() => handlePageChange(currentPage + 1)}
+          >
+            <IconifyIcon icon="solar:alt-arrow-right-broken" />
+          </Button>
+        </div>
       </div>
 
-      {/* Modals preserved from original */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg">
-        <Modal.Header closeButton><Modal.Title>Modifier Ticket</Modal.Title></Modal.Header>
-        <Modal.Body>{editTicket && <Form>
-            <Row className="mb-3">
-                <Col md={6}><Form.Label>Prénom</Form.Label><Form.Control type="text" value={editTicket.first_name} onChange={(e) => setEditTicket({...editTicket, first_name: e.target.value})}/></Col>
-                <Col md={6}><Form.Label>Nom</Form.Label><Form.Control type="text" value={editTicket.last_name} onChange={(e) => setEditTicket({...editTicket, last_name: e.target.value})}/></Col>
-            </Row>
-            {/* ... Other fields same as original logic ... */}
-        </Form>}</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowEditModal(false)}>Annuler</Button>
-          <Button variant="primary" onClick={handleSaveEdit}>Sauvegarder</Button>
+      {/* Edit Modal */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg" contentClassName="border-0 rounded-4 shadow">
+        <Modal.Header closeButton className="border-0 pb-0 pt-4 px-4">
+          <Modal.Title className="fw-bold">Mettre à jour les infos</Modal.Title>
+        </Modal.Header>
+        <Modal.Body className="p-4">
+          {editTicket && (
+            <Form>
+              <Row className="g-3">
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label className="small fw-bold text-muted">Prénom</Form.Label>
+                    <Form.Control className="bg-light border-0 py-2" type="text" value={editTicket.first_name}
+                      onChange={(e) => setEditTicket({ ...editTicket, first_name: e.target.value })} />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label className="small fw-bold text-muted">Nom</Form.Label>
+                    <Form.Control className="bg-light border-0 py-2" type="text" value={editTicket.last_name}
+                      onChange={(e) => setEditTicket({ ...editTicket, last_name: e.target.value })} />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label className="small fw-bold text-muted">Email</Form.Label>
+                    <Form.Control className="bg-light border-0 py-2" type="email" value={editTicket.email}
+                      onChange={(e) => setEditTicket({ ...editTicket, email: e.target.value })} />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label className="small fw-bold text-muted">Téléphone</Form.Label>
+                    <Form.Control className="bg-light border-0 py-2" type="text" value={editTicket.phone}
+                      onChange={(e) => setEditTicket({ ...editTicket, phone: e.target.value })} />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label className="small fw-bold text-muted">Spécialité</Form.Label>
+                    <Form.Control className="bg-light border-0 py-2" type="text" value={editTicket.specialty}
+                      onChange={(e) => setEditTicket({ ...editTicket, specialty: e.target.value })} />
+                  </Form.Group>
+                </Col>
+                <Col md={6}>
+                  <Form.Group>
+                    <Form.Label className="small fw-bold text-muted">Emplacement</Form.Label>
+                    <Form.Control className="bg-light border-0 py-2" type="text" value={editTicket.location}
+                      onChange={(e) => setEditTicket({ ...editTicket, location: e.target.value })} />
+                  </Form.Group>
+                </Col>
+                <Col md={12}>
+                  <Form.Group>
+                    <Form.Label className="small fw-bold text-muted">Description</Form.Label>
+                    <Form.Control className="bg-light border-0 py-2" as="textarea" rows={3} value={editTicket.description}
+                      onChange={(e) => setEditTicket({ ...editTicket, description: e.target.value })} />
+                  </Form.Group>
+                </Col>
+              </Row>
+            </Form>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="border-0 pt-0 p-4">
+          <Button variant="light" className="rounded-3 px-4" onClick={() => setShowEditModal(false)}>Annuler</Button>
+          <Button variant="primary" className="rounded-3 px-4" onClick={handleSaveEdit}>Enregistrer</Button>
         </Modal.Footer>
       </Modal>
 
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered>
-        <Modal.Header closeButton><Modal.Title>Confirmer</Modal.Title></Modal.Header>
-        <Modal.Body>Supprimer ce ticket ?</Modal.Body>
-        <Modal.Footer>
-          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>Non</Button>
-          <Button variant="danger" onClick={handleConfirmDelete}>Supprimer</Button>
-        </Modal.Footer>
+      {/* Delete Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)} centered contentClassName="border-0 rounded-4 shadow">
+        <Modal.Body className="p-5 text-center">
+          <div className="rounded-circle p-3 d-inline-block mb-3" style={{ backgroundColor: '#fee2e2' }}>
+            <IconifyIcon icon="solar:trash-bin-minimalistic-2-bold" className="fs-1 text-danger" />
+          </div>
+          <h4 className="fw-bold">Supprimer la demande ?</h4>
+          <p className="text-muted">Cette action est irréversible. Êtes-vous sûr de vouloir supprimer cette requête ?</p>
+          <div className="d-flex gap-2 justify-content-center mt-4">
+            <Button variant="light" className="px-4 rounded-3" onClick={() => setShowDeleteModal(false)}>Non, garder</Button>
+            <Button variant="danger" className="px-4 rounded-3" onClick={handleConfirmDelete}>Oui, supprimer</Button>
+          </div>
+        </Modal.Body>
       </Modal>
-    </>
+
+      <style jsx>{`
+  .custom-scrollbar::-webkit-scrollbar {
+    height: 4px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: #e2e8f0;
+    border-radius: 10px;
+  }
+  @media (min-width: 1200px) {
+    .custom-scrollbar {
+      overflow: hidden !important;
+    }
+  }
+`}</style>
+    </Container>
   );
 };
 
