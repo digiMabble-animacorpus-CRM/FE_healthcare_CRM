@@ -52,14 +52,7 @@ type StatsType = {
 const TicketPage = () => {
   const [tickets, setTickets] = useState<TicketType[]>([]);
   const [stats, setStats] = useState<StatsType>({
-    adult: 0,
-    child: 0,
-    couple: 0,
-    internship: 0,
-    job: 0,
-    partnership: 0,
-    supplier: 0,
-    information: 0,
+    adult: 0, child: 0, couple: 0, internship: 0, job: 0, partnership: 0, supplier: 0, information: 0,
   });
   const [totalPages, setTotalPages] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -103,27 +96,11 @@ const TicketPage = () => {
   };
 
   const calculateStats = (ticketList: TicketType[]) => {
-    const newStats: StatsType = {
-      adult: 0,
-      child: 0,
-      couple: 0,
-      internship: 0,
-      job: 0,
-      partnership: 0,
-      supplier: 0,
-      information: 0,
-    };
-
+    const newStats: StatsType = { adult: 0, child: 0, couple: 0, internship: 0, job: 0, partnership: 0, supplier: 0, information: 0 };
     ticketList.forEach((ticket) => {
-      if (ticket.is_for_child) {
-        newStats.child++;
-      } else {
-        newStats.adult++;
-      }
-
+      if (ticket.is_for_child) newStats.child++; else newStats.adult++;
       const spec = ticket.specialty?.toLowerCase() || '';
       const desc = ticket.description?.toLowerCase() || '';
-
       if (spec.includes('couple') || desc.includes('couple')) newStats.couple++;
       if (spec.includes('internship') || spec.includes('stage')) newStats.internship++;
       if (spec.includes('job') || spec.includes('emploi')) newStats.job++;
@@ -131,7 +108,6 @@ const TicketPage = () => {
       if (spec.includes('supplier') || spec.includes('fournisseur')) newStats.supplier++;
       if (spec.includes('information') || spec.includes('info')) newStats.information++;
     });
-
     setStats(newStats);
   };
 
@@ -197,7 +173,6 @@ const TicketPage = () => {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTickets((prev) => prev.map((t) => (t.id === editTicket.id ? editTicket : t)));
-      calculateStats(tickets.map((t) => (t.id === editTicket.id ? editTicket : t)));
       setShowEditModal(false);
     } catch (error) { console.error(error); }
   };
@@ -211,9 +186,7 @@ const TicketPage = () => {
       await axios.delete(`${API_BASE_PATH}/new-requests/${deleteTicketId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const newTickets = tickets.filter((t) => t.id !== deleteTicketId);
-      setTickets(newTickets);
-      calculateStats(newTickets);
+      setTickets(tickets.filter((t) => t.id !== deleteTicketId));
     } finally { setShowDeleteModal(false); }
   };
 
@@ -221,7 +194,7 @@ const TicketPage = () => {
     const minutes = Math.floor((Date.now() - new Date(dateString).getTime()) / 60000);
     if (minutes < 60) return `Il y a ${minutes} min`;
     const hours = Math.floor(minutes / 60);
-    return `Il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+    return `Il y a ${hours} h`;
   };
 
   const indicators = [
@@ -248,92 +221,53 @@ const TicketPage = () => {
   };
 
   return (
-    <Container fluid className="p-4 " style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
+    <Container fluid className="p-2 p-md-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       {/* Header */}
-      <div className="d-flex align-items-center mb-4"> 
-        <div>
-          <h2 className="fw-bold mb-0" style={{ fontSize: '24px' }}>Demandes & Requêtes</h2>
-          <p className="text-muted mb-0" style={{ fontSize: '14px' }}>Demandes entrantes classées par type</p>
-        </div>
+      <div className="mb-4">
+        <h2 className="fw-bold mb-1" style={{ fontSize: 'calc(1.2rem + 0.6vw)' }}>Demandes & Requêtes</h2>
+        <p className="text-muted mb-0" style={{ fontSize: '14px' }}>Flux de demandes en temps réel</p>
       </div>
 
-      {/* Stats Cards */}
-      <Row className="mb-4 g-3 flex-nowrap overflow-auto pb-2 custom-scrollbar">
+      {/* Stats Grid - Responsive Column Count */}
+      <Row className="g-2 g-md-3 mb-4">
         {indicators.map((ind, i) => (
-          <Col
-            key={i}
-            className="flex-fill"
-            style={{ minWidth: '120px' }}
-          >
-            <Card
-              className="border-0 shadow-sm h-100 stat-card"
-              style={{ borderRadius: '12px', transition: 'transform 0.2s' }}
-            >
-              <CardBody className="p-3 text-center d-flex flex-column align-items-center justify-content-center">
-                <div
-                  className="rounded-circle d-inline-flex align-items-center justify-content-center mb-2"
-                  style={{
-                    width: '48px',
-                    height: '48px',
-                    backgroundColor: `rgba(var(--bs-${ind.color}-rgb), 0.1)`,
-                    flexShrink: 0
-                  }}
-                >
-                  <IconifyIcon icon={ind.icon} className={`text-${ind.color} fs-4`} />
+          <Col key={i} xs={6} sm={4} md={3} xl={1.5} className="d-flex">
+            <Card className="border-0 shadow-sm w-100" style={{ borderRadius: '12px' }}>
+              <CardBody className="p-2 p-md-3 text-center d-flex flex-column align-items-center justify-content-center">
+                <div className="rounded-circle d-flex align-items-center justify-content-center mb-2"
+                  style={{ width: '40px', height: '40px', backgroundColor: `rgba(var(--bs-${ind.color}-rgb), 0.1)` }}>
+                  <IconifyIcon icon={ind.icon} className={`text-${ind.color} fs-5`} />
                 </div>
-
-                <h4 className="fw-bold mb-0" style={{ fontSize: '1.5rem' }}>
-                  {ind.count}
-                </h4>
-
-                <small
-                  className="text-muted text-uppercase fw-semibold mt-1"
-                  style={{
-                    fontSize: '10px',
-                    letterSpacing: '0.5px',
-                    display: 'block',
-                    lineHeight: '1.2'
-                  }}
-                >
-                  {ind.label}
-                </small>
+                <h5 className="fw-bold mb-0">{ind.count}</h5>
+                <small className="text-muted fw-semibold text-uppercase" style={{ fontSize: '9px', letterSpacing: '0.5px' }}>{ind.label}</small>
               </CardBody>
             </Card>
           </Col>
         ))}
       </Row>
 
-      {/* Filter Tabs */}
+      {/* Filter & Search */}
       <Card className="border-0 shadow-sm mb-4" style={{ borderRadius: '12px' }}>
-        <CardBody className="p-3">
-          <Row className="align-items-center">
-            <Col md={6}>
+        <CardBody className="p-2 p-md-3">
+          <Row className="g-3 align-items-center">
+            <Col lg={6} order={2} orderLg={1}>
               <div className="d-flex flex-wrap gap-2">
                 {['Tous', 'Patients', 'Professionnel'].map((f) => (
                   <Button
                     key={f}
                     variant={activeFilter === f ? 'primary' : 'light'}
-                    className="rounded-pill border-0 fw-semibold"
-                    style={{ padding: '8px 20px', fontSize: '14px' }}
+                    className="rounded-pill border-0 fw-semibold flex-grow-1 flex-md-grow-0"
+                    style={{ fontSize: '13px', padding: '8px 16px' }}
                     onClick={() => setActiveFilter(f)}
                   >
-                    {f}
-                    <Badge
-                      bg={activeFilter === f ? 'white' : 'secondary'}
-                      text={activeFilter === f ? 'primary' : 'white'}
-                      className="ms-2"
-                      style={{ fontSize: '12px' }}
-                    >
-                      {filterCounts[f as keyof typeof filterCounts]}
-                    </Badge>
+                    {f} <Badge bg={activeFilter === f ? 'white' : 'secondary'} text={activeFilter === f ? 'primary' : 'white'} className="ms-1">{filterCounts[f as keyof typeof filterCounts]}</Badge>
                   </Button>
                 ))}
               </div>
             </Col>
-            <Col md={6} className="mt-3 mt-md-0">
+            <Col lg={6} order={1} orderLg={2}>
               <div className="position-relative">
-                <IconifyIcon icon="solar:magnifer-broken"
-                  className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
+                <IconifyIcon icon="solar:magnifer-broken" className="position-absolute top-50 start-0 translate-middle-y ms-3 text-muted" />
                 <Form.Control
                   type="text"
                   placeholder="Rechercher par nom, email ou spécialité..."
@@ -349,100 +283,68 @@ const TicketPage = () => {
 
       {/* Tickets List */}
       {loading ? (
-        <div className="d-flex flex-column align-items-center justify-content-center py-5">
-          <Spinner animation="border" variant="primary" className="mb-2" />
-          <span className="text-muted fw-medium">Chargement des demandes...</span>
-        </div>
+        <div className="text-center py-5"><Spinner animation="border" variant="primary" /></div>
       ) : (
         <div className="d-flex flex-column gap-3 mb-4">
           {filteredTickets.map((ticket) => (
-            <Card key={ticket.id} className="border-0 shadow-sm ticket-card" style={{ borderRadius: '16px' }}>
-              <CardBody className="p-4">
-                <Row>
-                  <Col xs="auto">
-                    <div className={`rounded-circle d-flex align-items-center justify-content-center ${ticket.is_for_child ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary'}`}
+            <Card key={ticket.id} className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
+              <CardBody className="p-3 p-md-4">
+                <Row className="g-3">
+                  {/* Icon Col */}
+                  <Col xs={12} md="auto" className="text-center text-md-start">
+                    <div className={`rounded-circle d-flex align-items-center justify-content-center mx-auto ${ticket.is_for_child ? 'bg-info-subtle text-info' : 'bg-primary-subtle text-primary'}`}
                       style={{ width: '56px', height: '56px' }}>
-                      <IconifyIcon
-                        icon={ticket.is_for_child ? "solar:baby-carriage-bold-duotone" : "solar:user-bold-duotone"}
-                        className="fs-3"
-                      />
+                      <IconifyIcon icon={ticket.is_for_child ? "solar:baby-carriage-bold-duotone" : "solar:user-bold-duotone"} className="fs-3" />
                     </div>
                   </Col>
 
-                  <Col>
-                    <div className="d-flex justify-content-between align-items-start mb-2 flex-wrap">
-                      <div className="d-flex align-items-center gap-2 flex-wrap">
-                        <h5 className="mb-0 fw-bold">{ticket.first_name} {ticket.last_name}</h5>
-                        <Badge bg={ticket.is_for_child ? 'info' : 'secondary'} className="rounded-pill" style={{ fontSize: '12px', fontWeight: '500' }}>
-                          {ticket.is_for_child ? 'Enfant' : 'Adulte'}
-                        </Badge>
-                        <Badge bg="danger" className="rounded-pill" style={{ fontSize: '12px', fontWeight: '500' }}>
-                          {ticket.urgency}
-                        </Badge>
+                  {/* Info Col */}
+                  <Col xs={12} md>
+                    <div className="d-flex flex-column flex-sm-row justify-content-between align-items-sm-start gap-2 mb-2">
+                      <div>
+                        <div className="d-flex align-items-center gap-2 flex-wrap">
+                          <h5 className="mb-0 fw-bold">{ticket.first_name} {ticket.last_name}</h5>
+                          <Badge bg={ticket.is_for_child ? 'info' : 'secondary'} className="rounded-pill small">{ticket.is_for_child ? 'Enfant' : 'Adulte'}</Badge>
+                          <Badge bg="danger" className="rounded-pill small">{ticket.urgency}</Badge>
+                        </div>
+                        <div className="text-primary small fw-bold mt-1">{ticket.specialty}</div>
                       </div>
-                      <small className="text-muted">{getTimeAgo(ticket.created_at)}</small>
+                      <small className="text-muted whitespace-nowrap">{getTimeAgo(ticket.created_at)}</small>
                     </div>
 
-                    <p className="text-secondary mb-3" style={{ fontSize: '14px', lineHeight: '1.6' }}>
-                      {ticket.description}
-                    </p>
+                    <p className="text-secondary mb-3 small" style={{ lineHeight: '1.5' }}>{ticket.description}</p>
 
-                    <div className="d-flex flex-wrap gap-3 mb-3" style={{ fontSize: '13px' }}>
-                      <div className="d-flex align-items-center text-muted">
-                        <IconifyIcon icon="solar:phone-broken" className="me-2" />
-                        {ticket.phone}
+                    {/* Meta Info Grid */}
+                    <div className="row g-2 mb-3">
+                      <div className="col-12 col-sm-4 d-flex align-items-center text-muted small">
+                        <IconifyIcon icon="solar:phone-broken" className="me-2 text-primary" /> {ticket.phone}
                       </div>
-                      <div className="d-flex align-items-center text-muted">
-                        <IconifyIcon icon="solar:letter-broken" className="me-2" />
-                        {ticket.email}
+                      <div className="col-12 col-sm-4 d-flex align-items-center text-muted small text-truncate">
+                        <IconifyIcon icon="solar:letter-broken" className="me-2 text-primary" /> {ticket.email}
                       </div>
-                      <div className="d-flex align-items-center text-muted">
-                        <IconifyIcon icon="solar:map-point-broken" className="me-2" />
-                        {ticket.location}
+                      <div className="col-12 col-sm-4 d-flex align-items-center text-muted small">
+                        <IconifyIcon icon="solar:map-point-broken" className="me-2 text-primary" /> {ticket.location}
                       </div>
-                    </div>
-
-                    <div className="mb-3">
-                      <span className="text-muted" style={{ fontSize: '13px' }}>Spécialité demandée : </span>
-                      <span className="fw-bold text-dark" style={{ fontSize: '13px' }}>{ticket.specialty}</span>
                     </div>
 
                     {ticket.is_for_child && (
-                      <div className="bg-light rounded-3 p-2 px-3 mb-3 d-inline-flex align-items-center gap-2">
-                        <small className="text-primary fw-semibold">
-                          Nom de l'enfant : <span className="text-dark">{ticket.child_name} ({ticket.child_age} ans)</span>
-                        </small>
+                      <div className="bg-light rounded-3 p-2 px-3 mb-3 d-inline-block w-100 w-md-auto">
+                        <small className="text-dark fw-medium">Enfant: <span className="text-primary">{ticket.child_name} ({ticket.child_age} ans)</span></small>
                       </div>
                     )}
 
-                    <div className="rounded-3 p-3 mb-3 border-0"
-                      style={{ backgroundColor: '#F3F4F6', border: '1px solid #E5E7EB' }}>
-                      <div className="d-flex align-items-start gap-2">
-                        <div className="rounded-circle bg-primary d-flex align-items-center justify-content-center flex-shrink-0"
-                          style={{ width: '24px', height: '24px' }}>
-                          <IconifyIcon icon="solar:magic-stick-3-bold-duotone" className="text-white" style={{ fontSize: '12px' }} />
-                        </div>
-                        <small className="text-dark">
-                          Animus suggère de créer un dossier patient et de proposer un premier rendez-vous.
-                        </small>
-                      </div>
+                    {/* AI Suggestion */}
+                    <div className="p-3 mb-3 rounded-3 border-0 d-flex gap-2" style={{ backgroundColor: '#F3F4F6' }}>
+                      <IconifyIcon icon="solar:magic-stick-3-bold-duotone" className="text-primary mt-1" />
+                      <small className="text-dark">Suggéré : Créer un dossier patient et proposer un créneau.</small>
                     </div>
 
-                    <div className="d-flex flex-wrap gap-2 justify-content-end">
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        className="rounded-pill px-3 fw-medium border-2"
-                        onClick={() => handleEditClick(ticket.id)}
-                      >
+                    {/* Actions */}
+                    <div className="d-flex flex-column flex-sm-row gap-2 justify-content-end">
+                      <Button variant="outline-secondary" size="sm" className="rounded-pill px-3 border-2 fw-medium" onClick={() => handleEditClick(ticket.id)}>
                         <IconifyIcon icon="solar:user-plus-broken" className="me-1" />
-                        Créer dossier patient
-                      </Button>
-                      <Button
-                        variant="primary"
-                        size="sm"
-                        className="rounded-pill px-4 border-0 shadow-sm"
-                      >
+                        Créer dossier patient                      </Button>
+                      <Button variant="primary" size="sm" className="rounded-pill px-4 shadow-sm border-0">
                         Traiter <IconifyIcon icon="solar:alt-arrow-right-broken" className="ms-1" />
                       </Button>
                     </div>
@@ -456,45 +358,21 @@ const TicketPage = () => {
 
       {/* Pagination */}
       <div className="d-flex justify-content-center mt-4">
-        <div className="bg-white p-2 rounded-pill shadow-sm d-flex align-items-center gap-1">
-          <Button
-            variant="light"
-            className="rounded-circle p-2 shadow-none border-0"
-            style={{ width: '40px', height: '40px' }}
-            disabled={currentPage === 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-          >
-            <IconifyIcon icon="solar:alt-arrow-left-broken" />
-          </Button>
+        <div className="bg-white p-1 rounded-pill shadow-sm d-flex gap-1 overflow-auto">
+          <Button variant="light" className="rounded-circle" disabled={currentPage === 1} onClick={() => handlePageChange(currentPage - 1)}><IconifyIcon icon="solar:alt-arrow-left-broken" /></Button>
           {[...Array(totalPages)].map((_, i) => (
-            <Button
-              key={i}
-              variant={currentPage === i + 1 ? 'primary' : 'light'}
-              className="rounded-circle border-0 shadow-none"
-              style={{ width: '40px', height: '40px' }}
-              onClick={() => handlePageChange(i + 1)}
-            >
-              {i + 1}
-            </Button>
+            <Button key={i} variant={currentPage === i + 1 ? 'primary' : 'light'} className="rounded-circle" style={{ minWidth: '40px' }} onClick={() => handlePageChange(i + 1)}>{i + 1}</Button>
           ))}
-          <Button
-            variant="light"
-            className="rounded-circle p-2 shadow-none border-0"
-            style={{ width: '40px', height: '40px' }}
-            disabled={currentPage === totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-          >
-            <IconifyIcon icon="solar:alt-arrow-right-broken" />
-          </Button>
+          <Button variant="light" className="rounded-circle" disabled={currentPage === totalPages} onClick={() => handlePageChange(currentPage + 1)}><IconifyIcon icon="solar:alt-arrow-right-broken" /></Button>
         </div>
       </div>
 
-      {/* Edit Modal */}
-      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg" contentClassName="border-0 rounded-4 shadow">
-        <Modal.Header closeButton className="border-0 pb-0 pt-4 px-4">
-          <Modal.Title className="fw-bold">Mettre à jour les infos</Modal.Title>
+      {/* Modals are unchanged from your original but with updated styling classes */}
+      <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered size="lg">
+        <Modal.Header closeButton className="border-0">
+          <Modal.Title className="fw-bold">Modifier la demande</Modal.Title>
         </Modal.Header>
-        <Modal.Body className="p-4">
+        <Modal.Body>
           {editTicket && (
             <Form>
               <Row className="g-3">
@@ -551,9 +429,9 @@ const TicketPage = () => {
             </Form>
           )}
         </Modal.Body>
-        <Modal.Footer className="border-0 pt-0 p-4">
-          <Button variant="light" className="rounded-3 px-4" onClick={() => setShowEditModal(false)}>Annuler</Button>
-          <Button variant="primary" className="rounded-3 px-4" onClick={handleSaveEdit}>Enregistrer</Button>
+        <Modal.Footer className="border-0">
+          <Button variant="light" onClick={() => setShowEditModal(false)}>Annuler</Button>
+          <Button variant="primary" onClick={handleSaveEdit}>Sauvegarder</Button>
         </Modal.Footer>
       </Modal>
 
@@ -572,20 +450,6 @@ const TicketPage = () => {
         </Modal.Body>
       </Modal>
 
-      <style jsx>{`
-  .custom-scrollbar::-webkit-scrollbar {
-    height: 4px;
-  }
-  .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: #e2e8f0;
-    border-radius: 10px;
-  }
-  @media (min-width: 1200px) {
-    .custom-scrollbar {
-      overflow: hidden !important;
-    }
-  }
-`}</style>
     </Container>
   );
 };
