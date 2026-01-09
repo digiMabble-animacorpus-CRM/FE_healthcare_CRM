@@ -1,7 +1,7 @@
 'use client';
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   Button,
   Card,
@@ -72,6 +72,8 @@ const TicketPage = () => {
     }
     return 'key_1d964c4ebd944cdf5f7c9af67b12';
   };
+
+
 
   const normalize = (s?: string) => (s || '').toString().trim().toLowerCase().replace(/\s+/g, ' ');
 
@@ -190,12 +192,39 @@ const TicketPage = () => {
     } finally { setShowDeleteModal(false); }
   };
 
-  const getTimeAgo = (dateString: string) => {
-    const minutes = Math.floor((Date.now() - new Date(dateString).getTime()) / 60000);
-    if (minutes < 60) return `Il y a ${minutes} min`;
-    const hours = Math.floor(minutes / 60);
-    return `Il y a ${hours} h`;
+  const formatGitHubDateTimeWithAgo = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+
+    // Absolute format: YYYY-MM-DD HH:mm
+    const absolute =
+      `${date.getFullYear()}-` +
+      `${String(date.getMonth() + 1).padStart(2, '0')}-` +
+      `${String(date.getDate()).padStart(2, '0')} ` +
+      `${String(date.getHours()).padStart(2, '0')}:` +
+      `${String(date.getMinutes()).padStart(2, '0')}`;
+
+    // Relative time
+    const diffMs = now.getTime() - date.getTime();
+    const diffMinutes = Math.floor(diffMs / 60000);
+
+    let ago = '';
+
+    if (diffMinutes < 1) {
+      ago = "à l’instant";
+    } else if (diffMinutes < 60) {
+      ago = `il y a ${diffMinutes} minute${diffMinutes > 1 ? 's' : ''}`;
+    } else if (diffMinutes < 1440) {
+      const hours = Math.floor(diffMinutes / 60);
+      ago = `il y a ${hours} heure${hours > 1 ? 's' : ''}`;
+    } else {
+      const days = Math.floor(diffMinutes / 1440);
+      ago = `il y a ${days} jour${days > 1 ? 's' : ''}`;
+    }
+
+    return `${absolute} (${ago})`;
   };
+
 
   const indicators = [
     { label: 'Adulte', count: stats.adult, icon: 'solar:user-broken', color: 'primary' },
@@ -213,6 +242,13 @@ const TicketPage = () => {
     if (activeFilter === 'Professionnel') return ticket.specialty?.toLowerCase().includes('job') || ticket.specialty?.toLowerCase().includes('partnership');
     return true;
   });
+
+  const sortedTickets = useMemo(() => {
+    return [...filteredTickets].sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+  }, [filteredTickets]);
 
   const filterCounts = {
     Tous: tickets.length,
@@ -286,7 +322,7 @@ const TicketPage = () => {
         <div className="text-center py-5"><Spinner animation="border" variant="primary" /></div>
       ) : (
         <div className="d-flex flex-column gap-3 mb-4">
-          {filteredTickets.map((ticket) => (
+          {sortedTickets.map((ticket) => (
             <Card key={ticket.id} className="border-0 shadow-sm" style={{ borderRadius: '16px' }}>
               <CardBody className="p-3 p-md-4">
                 <Row className="g-3">
@@ -309,7 +345,7 @@ const TicketPage = () => {
                         </div>
                         <div className="text-primary small fw-bold mt-1">{ticket.specialty}</div>
                       </div>
-                      <small className="text-muted whitespace-nowrap">{getTimeAgo(ticket.created_at)}</small>
+                      <small className="text-muted whitespace-nowrap">{formatGitHubDateTimeWithAgo(ticket.created_at)}</small>
                     </div>
 
                     <p className="text-secondary mb-3 small" style={{ lineHeight: '1.5' }}>{ticket.description}</p>
@@ -317,10 +353,10 @@ const TicketPage = () => {
                     {/* Meta Info Grid */}
                     <div className="row g-2 mb-3">
                       <div className="col-12 col-sm-4 d-flex align-items-center text-muted small">
-                        <IconifyIcon icon="solar:phone-broken" className="me-2 text-primary" /> {ticket.phone}
+                        <IconifyIcon icon="solar:phone-broken" className="me-2 text-primary" /> {ticket?.phone || "Aucun numéro de téléphone"}
                       </div>
                       <div className="col-12 col-sm-4 d-flex align-items-center text-muted small text-truncate">
-                        <IconifyIcon icon="solar:letter-broken" className="me-2 text-primary" /> {ticket.email}
+                        <IconifyIcon icon="solar:letter-broken" className="me-2 text-primary" /> {ticket?.email || "Aucun e-mail disponible"}
                       </div>
                       <div className="col-12 col-sm-4 d-flex align-items-center text-muted small">
                         <IconifyIcon icon="solar:map-point-broken" className="me-2 text-primary" /> {ticket.location}

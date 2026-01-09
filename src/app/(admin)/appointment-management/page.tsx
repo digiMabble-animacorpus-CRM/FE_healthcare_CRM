@@ -95,6 +95,7 @@ const AppointmentManagementPage = () => {
     }
     return list;
   }, [appointments, filter]);
+  console.log(filteredList)
 
   return (
     <Container fluid className="p-3 p-md-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>

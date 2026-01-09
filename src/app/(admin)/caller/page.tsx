@@ -12,7 +12,8 @@ import {
   Badge,
   Form,
   Dropdown,
-  Container
+  Container,
+  Modal
 } from 'react-bootstrap';
 
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
@@ -39,6 +40,8 @@ type CallType = {
   transcript?: string;
   call_analysis?: {
     call_summary?: string;
+    call_successful?: boolean;
+    user_sentiment?: string;
   };
   urgency: 'Urgent' | 'Medium' | 'Normal';
   callTypeLabel: 'Nouveau RDV' | 'Annulation' | 'Information' | 'Autre';
@@ -49,6 +52,7 @@ type CallType = {
 
 const PATIENT_LIMIT = 2000;
 const RETELL_LIST_ENDPOINT = 'https://api.retellai.com/v2/list-calls';
+const RETELL_GET_ENDPOINT = 'https://api.retellai.com/v2/get-call';
 
 const normalizePhone = (phone: string) => phone?.replace(/\s+/g, '').replace('+', '') || '';
 
@@ -66,6 +70,16 @@ const formatDate = (ms?: number) => {
   return `${date.toLocaleDateString('fr-FR', { weekday: 'short', day: 'numeric', month: 'short' })}, ${date.toLocaleTimeString('fr-FR', { hour: 'numeric', minute: '2-digit' })}`;
 };
 
+const msToHMS = (ms?: number) => {
+  if (!ms && ms !== 0) return '-';
+  const totalSeconds = Math.round((ms || 0) / 1000);
+  const h = Math.floor(totalSeconds / 3600);
+  const m = Math.floor((totalSeconds % 3600) / 60);
+  const s = totalSeconds % 60;
+  return `${h ? h + 'h ' : ''}${m ? m + 'm ' : ''}${s}s`.trim() || '0s';
+};
+
+
 const CallerListPage = () => {
   const [calls, setCalls] = useState<CallType[]>([]);
   const [loading, setLoading] = useState(false);
@@ -74,6 +88,13 @@ const CallerListPage = () => {
   const [urgencyFilter, setUrgencyFilter] = useState('Tous');
   const [categoryFilter, setCategoryFilter] = useState('Tous');
   const [timeFilter, setTimeFilter] = useState('Tous');
+
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedCallId, setSelectedCallId] = useState<string | null>(null);
+  const [callDetail, setCallDetail] = useState<CallType | null>(null);
+  const [detailLoading, setDetailLoading] = useState(false);
+
+  console.log(callDetail)
 
   const [showPatientModal, setShowPatientModal] = useState(false);
   const { showNotification } = useNotificationContext();
@@ -109,6 +130,39 @@ const CallerListPage = () => {
     } catch (error) { console.error("Échec sync patients", error); }
     return allPatients;
   };
+
+  const openDetailModal = async (callId: string) => {
+    setSelectedCallId(callId);
+    setShowDetailModal(true);
+    setDetailLoading(true);
+    try {
+      const apiKey = getRetellApiKey();
+      const response = await axios.get(`${RETELL_GET_ENDPOINT}/${callId}`, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      setCallDetail(response.data);
+    } catch (err) {
+      console.error('Failed to fetch call detail', err);
+      showNotification?.({
+        message: "Échec de la récupération du détail de l'appel.",
+        variant: 'danger',
+      });
+      setCallDetail(null);
+    } finally {
+      setDetailLoading(false);
+    }
+  };
+
+  const closeDetailModal = () => {
+    setShowDetailModal(false);
+    setSelectedCallId(null);
+    setCallDetail(null);
+  };
+
 
   const enrichCall = (c: any, patients: Patient[]): CallType => {
     const text = (c.transcript || '').toLowerCase();
@@ -273,9 +327,8 @@ const CallerListPage = () => {
                   <Dropdown.Item
                     key={option}
                     eventKey={option}
-                    className={`d-flex align-items-center justify-content-between py-2 ${
-                      timeFilter === option ? 'bg-light fw-bold text-primary' : ''
-                    }`}
+                    className={`d-flex align-items-center justify-content-between py-2 ${timeFilter === option ? 'bg-light fw-bold text-primary' : ''
+                      }`}
                   >
                     {option === 'Tous' ? 'Tout le temps' : option}
                     {timeFilter === option && <IconifyIcon icon="mdi:check" className="text-primary ms-2" />}
@@ -288,7 +341,7 @@ const CallerListPage = () => {
 
         <Col xs={12} lg={8}>
           <div className="d-flex justify-content-start justify-content-lg">
-            <div 
+            <div
               className="category-scroll d-flex gap-2 pb-1 overflow-auto justify-content-start"
               style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
             >
@@ -297,11 +350,10 @@ const CallerListPage = () => {
                   key={cat}
                   variant="link"
                   onClick={() => setCategoryFilter(cat)}
-                  className={`rounded-pill px-3 py-1 text-decoration-none border shadow-sm flex-shrink-0 transition-all ${
-                    categoryFilter === cat
-                      ? 'bg-primary-subtle border-primary-subtle text-primary fw-bold'
-                      : 'bg-white border-light text-dark fw-medium'
-                  }`}
+                  className={`rounded-pill px-3 py-1 text-decoration-none border shadow-sm flex-shrink-0 transition-all ${categoryFilter === cat
+                    ? 'bg-primary-subtle border-primary-subtle text-primary fw-bold'
+                    : 'bg-white border-light text-dark fw-medium'
+                    }`}
                   style={{ fontSize: '13px', whiteSpace: 'nowrap' }}
                 >
                   {cat} <span className="ms-1 opacity-75">({(categoryCounts as any)[cat] || 0})</span>
@@ -369,6 +421,19 @@ const CallerListPage = () => {
                         Créer Patient
                       </Button>
                     )}
+                    <Button variant="outline-primary" className="rounded-2 px-4 fw-semibold d-flex align-items-center justify-content-center gap-2 btn-sm flex-fill"
+                      onClick={() => {
+                        if (c.call_id) openDetailModal(c.call_id);
+                        else
+                          showNotification?.({
+                            message: 'Aucun call_id disponible pour ce record.',
+                            variant: 'warning',
+                          });
+                      }}
+                    >
+                      <IconifyIcon icon="mdi:eye-outline" className="me-1" />
+                      Détail
+                    </Button>
                     <Button variant="primary" className="rounded-2 px-4 fw-semibold d-flex align-items-center justify-content-center gap-2 btn-sm flex-fill" style={{ backgroundColor: '#6f42c1', border: 'none' }}>
                       Traiter <IconifyIcon icon="mdi:arrow-right" />
                     </Button>
@@ -389,6 +454,164 @@ const CallerListPage = () => {
       )}
 
       <PatientFormModal show={showPatientModal} mode="create" onClose={() => setShowPatientModal(false)} onSaved={fetchCalls} />
+      <Modal show={showDetailModal} onHide={closeDetailModal} centered size="lg">
+        <Modal.Header closeButton>
+          <Modal.Title>Détails de l appel</Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+          {detailLoading ? (
+            <div className="text-center py-4">
+              <Spinner animation="border" />
+            </div>
+          ) : callDetail ? (
+            <>
+              <Row className="mb-3">
+                <Col md={6}>
+                  <strong>Agent:</strong> {callDetail.agent_name ?? '-'}
+                </Col>
+                <Col md={6}>
+                  <strong>Call ID:</strong> {callDetail.call_id ?? '-'}
+                </Col>
+              </Row>
+
+              <Row className="mb-3">
+                <Col md={4}>
+                  <strong>Phone (From):</strong> {callDetail.from_number ?? '-'}
+                </Col>
+                <Col md={4}>
+                  <strong>To:</strong> {callDetail.to_number ?? '-'}
+                </Col>
+                <Col md={4}>
+                  <strong>Duration:</strong> {msToHMS(callDetail.duration_ms)}
+                </Col>
+              </Row>
+
+              <Row className="mb-2">
+                <Col md={4}>
+                  <strong>Cost:</strong>{' '}
+                  {callDetail.call_cost?.combined_cost != null
+                    ? `${Number(callDetail.call_cost.combined_cost).toFixed(2)}`
+                    : '-'}
+                </Col>
+                <Col md={4}>
+                  <strong>Call Status:</strong> {callDetail.call_status ?? '-'}
+                </Col>
+                <Col md={4}>
+                  <strong>Disconnection Reason:</strong> {callDetail.disconnection_reason ?? '-'}
+                </Col>
+              </Row>
+
+              <hr />
+
+              <h6>Conversation Analysis</h6>
+              <Row>
+                <Col md={6}>
+                  <div>
+                    <strong>Call Successful:</strong>{' '}
+                    {callDetail.call_analysis?.call_successful != null
+                      ? callDetail.call_analysis.call_successful.toString()
+                      : '-'}
+                  </div>
+                  <div>
+                    <strong>Call Status:</strong> {callDetail.call_status ?? '-'}
+                  </div>
+                  <div>
+                    <strong>User Sentiment:</strong>{' '}
+                    {callDetail.call_analysis?.user_sentiment ?? '-'}
+                  </div>
+                  <div>
+                    <strong>Disconnection Reason:</strong> {callDetail.disconnection_reason ?? '-'}
+                  </div>
+                  <div>
+                    <strong>End to End Latency:</strong>{' '}
+                    {callDetail.latency?.e2e?.p50
+                      ? `${Math.round(callDetail.latency.e2e.p50)} ms`
+                      : '-'}
+                  </div>
+                </Col>
+
+                <Col md={6}>
+                  <div className="recording-section">
+                    <div className="d-flex justify-content-between align-items-center mb-2">
+                      <strong className="mb-0">Recording</strong>
+                      {callDetail.recording_duration_ms ? (
+                        <small className="text-muted">{msToHMS(callDetail.recording_duration_ms)}</small>
+                      ) : null}
+                    </div>
+
+                    {callDetail.recording_url ? (
+                      <div className="recording-box shadow-sm rounded p-3 bg-white">
+                        <div className="audio-wrap d-flex align-items-center gap-3">
+                          <div className="audio-player flex-grow-1">
+                            <audio controls className="recording-player" preload="metadata">
+                              <source src={callDetail.recording_url} />
+                              Your browser does not support the audio element.
+                            </audio>
+                          </div>
+                          {/* <div className="d-none d-sm-flex align-items-center audio-meta">
+                            <div className="text-muted small me-2">{msToHMS(callDetail.recording_duration_ms)}</div>
+                            <a
+                              href={callDetail.recording_url}
+                              download={`recording_${callDetail.call_id || 'audio'}.wav`}
+                              className="btn btn-sm btn-outline-primary"
+                              title="Download recording"
+                            >
+                              <IconifyIcon icon="mdi:download" className="me-1" /> Download
+                            </a>
+                          </div> */}
+                        </div>
+
+                        <div className="d-flex justify-content-between align-items-center mt-2">
+                          <div className="text-muted small">Source: {callDetail.recording_source ?? '—'}</div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-muted">-</div>
+                    )}
+                  </div>
+                </Col>
+              </Row>
+
+              <hr />
+
+              <h6>Summary & Transcription</h6>
+              <div style={{ whiteSpace: 'pre-wrap', maxHeight: '220px', overflow: 'auto' }}>
+                <strong>Summary:</strong>
+                <div>{callDetail.call_analysis?.call_summary ?? '—'}</div>
+                <hr />
+                <strong>Transcript / Conversation (agent vs user):</strong>
+                <div style={{ marginTop: 8 }}>
+                  {/* If transcript available as string */}
+                  {callDetail.transcript ? (
+                    <pre style={{ whiteSpace: 'pre-wrap' }}>{callDetail.transcript}</pre>
+                  ) : callDetail.transcript_object ? (
+                    // render an aggregated transcript from transcript_object
+                    <div>
+                      {Array.isArray(callDetail.transcript_object) &&
+                        callDetail.transcript_object.map((t: any, i: number) => (
+                          <div key={i} style={{ marginBottom: 8 }}>
+                            <strong>{t.role ?? 'utterance'}:</strong> {t.content}
+                          </div>
+                        ))}
+                    </div>
+                  ) : (
+                    <div>-</div>
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div>Aucun détail disponible.</div>
+          )}
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={closeDetailModal}>
+            Fermer
+          </Button>
+        </Modal.Footer>
+      </Modal>
+
     </Container>
   );
 };
