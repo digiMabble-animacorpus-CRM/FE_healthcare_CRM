@@ -26,7 +26,7 @@ const page = () => {
 
               {/* <Notifications /> */}
 
-              <ThemeCustomizerToggle />
+              {/* <ThemeCustomizerToggle /> */}
 
               <ProfileDropdown />
             </div>

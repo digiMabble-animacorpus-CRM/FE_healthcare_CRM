@@ -1,182 +1,126 @@
 'use client';
+
+import { useEffect } from 'react';
 import { Button, Col, Offcanvas, OffcanvasBody, OffcanvasHeader, Row } from 'react-bootstrap';
 
-import type { MenuType, OffcanvasControlType, ThemeType } from '@/types/context';
+import type { OffcanvasControlType } from '@/types/context';
 import { useLayoutContext } from '@/context/useLayoutContext';
-import { toSentenceCase } from '@/utils/change-casing';
 import SimplebarReactClient from './wrappers/SimplebarReactClient';
 
-const ColorScheme = () => {
-  const { theme, changeTheme } = useLayoutContext();
-  const modes: ThemeType[] = ['light', 'dark'];
-  return (
-    <div>
-      <h5 className="mb-3 font-16 fw-semibold">Color Scheme</h5>
-      {modes.map((mode, idx) => (
-        <div key={mode + idx} className="form-check mb-2">
-          <input
-            className="form-check-input"
-            type="radio"
-            name="data-bs-theme"
-            id={`layout-color-${mode}`}
-            onChange={() => changeTheme(mode)}
-            checked={theme === mode}
-          />
-          <label className="form-check-label" htmlFor={`layout-color-${mode}`}>
-            {toSentenceCase(mode)}
-          </label>
-        </div>
-      ))}
-    </div>
-  );
-};
+/* ------------------------------------------------------------------
+   DEFAULT ENFORCED SETTINGS (NO USER CHOICE)
+   ------------------------------------------------------------------ */
 
-const TopbarTheme = () => {
-  const { topbarTheme, changeTopbarTheme } = useLayoutContext();
-  const modes: ThemeType[] = ['light', 'dark'];
-  return (
-    <div>
-      <h5 className="my-3 font-16 fw-semibold">Topbar Color</h5>
-      {modes.map((mode, idx) => (
-        <div key={idx + mode} className="form-check mb-2">
-          <input
-            className="form-check-input"
-            type="radio"
-            name="data-topbar-color"
-            id={`topbar-color-${mode}`}
-            onChange={() => changeTopbarTheme(mode)}
-            checked={topbarTheme === mode}
-          />
-          <label className="form-check-label" htmlFor={`topbar-color-${mode}`}>
-            {toSentenceCase(mode)}
-          </label>
-        </div>
-      ))}
-    </div>
-  );
-};
-
-const MenuTheme = () => {
+const EnforcedDefaults = () => {
   const {
-    menu: { theme },
-    changeMenu: { theme: changeMenuTheme },
+    changeTheme,
+    changeTopbarTheme,
+    changeMenu,
   } = useLayoutContext();
-  const modes: ThemeType[] = ['light', 'dark'];
-  return (
-    <div>
-      <h5 className="my-3 font-16 fw-semibold">Menu Color</h5>
-      {modes.map((mode, idx) => (
-        <div key={idx + mode + idx} className="form-check mb-2">
-          <input
-            className="form-check-input"
-            type="radio"
-            name="data-menu-color"
-            id={`leftbar-color-${mode}`}
-            onChange={() => changeMenuTheme(mode)}
-            checked={theme === mode}
-          />
-          <label className="form-check-label" htmlFor={`leftbar-color-${mode}`}>
-            {toSentenceCase(mode)}
-          </label>
-        </div>
-      ))}
-    </div>
-  );
+
+  useEffect(() => {
+    // Force defaults
+    changeTheme('light');
+    changeTopbarTheme('light');
+    changeMenu.theme('light');
+    changeMenu.size('hidden');
+  }, []);
+
+  return null;
 };
 
-const SidebarSize = () => {
-  const {
-    menu: { size: menuSize },
-    changeMenu: { size: changeMenuSize },
-  } = useLayoutContext();
-  const sizes: { size: MenuType['size']; name: string }[] = [
-    {
-      name: 'Default',
-      size: 'default',
-    },
-    {
-      name: 'Condensed',
-      size: 'condensed',
-    },
-    {
-      name: 'Hidden',
-      size: 'hidden',
-    },
-    {
-      name: 'Small Hover Active',
-      size: 'sm-hover-active',
-    },
-    {
-      name: 'Small Hover',
-      size: 'sm-hover',
-    },
-  ];
-
-  return (
-    <div>
-      <h5 className="my-3 font-16 fw-semibold">Sidebar Size</h5>
-      {sizes.map((size, idx) => (
-        <div key={size.size + idx} className="form-check mb-2">
-          <input
-            className="form-check-input"
-            type="radio"
-            name="data-menu-size"
-            id={`leftbar-size-${size.size}`}
-            onChange={() => changeMenuSize(size.size)}
-            checked={menuSize === size.size}
-          />
-          <label className="form-check-label" htmlFor={`leftbar-size-${size.size}`}>
-            {size.name}
-          </label>
-        </div>
-      ))}
-    </div>
-  );
-};
+/* ------------------------------------------------------------------
+   UI (OPTIONS COMMENTED OUT)
+   ------------------------------------------------------------------ */
 
 const ThemeCustomizer = ({ open, toggle }: OffcanvasControlType) => {
-  const { resetSettings, theme } = useLayoutContext();
+  const { resetSettings } = useLayoutContext();
 
   return (
-    <div>
-      <Offcanvas
-        placement="end"
-        show={open}
-        onHide={toggle}
-        className="border-0 rounded-start-4 overflow-hidden"
-        tabIndex={-1}
+    <Offcanvas
+      placement="end"
+      show={open}
+      onHide={toggle}
+      className="border-0 rounded-start-4 overflow-hidden"
+      tabIndex={-1}
+    >
+      {/* Enforce defaults once */}
+      <EnforcedDefaults />
+
+      <OffcanvasHeader
+        closeVariant="white"
+        closeButton
+        className="d-flex align-items-center bg-primary p-3"
       >
-        <OffcanvasHeader
-          closeVariant="white"
-          closeButton
-          className="d-flex align-items-center bg-primary p-3"
-        >
-          <h5 className="text-white m-0">Theme Settings</h5>
-        </OffcanvasHeader>
-        <OffcanvasBody className="p-0">
-          <SimplebarReactClient className="h-100">
-            <div className="p-3 settings-bar">
-              <ColorScheme />
+        <h5 className="text-white m-0">Theme Settings</h5>
+      </OffcanvasHeader>
 
-              {theme === 'light' && <TopbarTheme />}
+      <OffcanvasBody className="p-0">
+        <SimplebarReactClient className="h-100">
+          <div className="p-3 settings-bar">
 
-              {theme === 'light' && <MenuTheme />}
+            {/* ============================= */}
+            {/* Color Scheme (LOCKED) */}
+            {/* ============================= */}
+            <h5 className="mb-3 font-16 fw-semibold">Color Scheme</h5>
+            <p className="text-muted small mb-3">Light (default)</p>
 
-              <SidebarSize />
-            </div>
-          </SimplebarReactClient>
-        </OffcanvasBody>
-        <div className="offcanvas-footer border-top p-3 text-center">
-          <Row>
-            <Col>
-              <Button variant="danger" onClick={resetSettings} className="w-100">
-                Reset
-              </Button>
-            </Col>
-          </Row>
-        </div>
-      </Offcanvas>
-    </div>
+            {/* Dark option disabled */}
+            {/*
+            <input type="radio" />
+            */}
+
+            {/* ============================= */}
+            {/* Topbar Color (LOCKED) */}
+            {/* ============================= */}
+            <h5 className="mb-3 font-16 fw-semibold">Topbar Color</h5>
+            <p className="text-muted small mb-3">Light (default)</p>
+
+            {/* Dark option disabled */}
+            {/*
+            <input type="radio" />
+            */}
+
+            {/* ============================= */}
+            {/* Menu Color (LOCKED) */}
+            {/* ============================= */}
+            <h5 className="mb-3 font-16 fw-semibold">Menu Color</h5>
+            <p className="text-muted small mb-3">Light (default)</p>
+
+            {/* Dark option disabled */}
+            {/*
+            <input type="radio" />
+            */}
+
+            {/* ============================= */}
+            {/* Sidebar Size (LOCKED) */}
+            {/* ============================= */}
+            <h5 className="mb-3 font-16 fw-semibold">Sidebar Size</h5>
+            <p className="text-muted small mb-3">Hidden (default)</p>
+
+            {/* Other sizes disabled */}
+            {/*
+            Default
+            Condensed
+            Small Hover
+            Small Hover Active
+            */}
+
+          </div>
+        </SimplebarReactClient>
+      </OffcanvasBody>
+
+      <div className="offcanvas-footer border-top p-3 text-center">
+        <Row>
+          <Col>
+            {/* Reset kept intentionally in case admin wants later */}
+            <Button variant="danger" onClick={resetSettings} className="w-100">
+              Reset
+            </Button>
+          </Col>
+        </Row>
+      </div>
+    </Offcanvas>
   );
 };
 
