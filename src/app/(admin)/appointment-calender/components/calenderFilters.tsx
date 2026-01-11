@@ -56,7 +56,6 @@ const MultiSelectDropdown: React.FC<{
     [options, search]
   );
 
-  // Close on outside click
   useEffect(() => {
     const close = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -84,7 +83,6 @@ const MultiSelectDropdown: React.FC<{
     <div className="position-relative mb-3" ref={ref}>
       <label className="fw-semibold mb-1 d-block">{label}</label>
 
-      {/* Trigger */}
       <div
         role="button"
         tabIndex={0}
@@ -94,15 +92,14 @@ const MultiSelectDropdown: React.FC<{
       >
         <span className={selected.length ? "text-dark" : "text-muted"}>
           {selected.length === 0
-            ? "Select..."
+            ? "Sélectionner…"
             : selected.length === options.length
-            ? "All selected"
-            : `${selected.length} selected`}
+            ? "Tout sélectionné"
+            : `${selected.length} sélectionné(s)`}
         </span>
         <span style={{ fontSize: 12 }}>{isOpen ? "▲" : "▼"}</span>
       </div>
 
-      {/* Dropdown */}
       {isOpen && (
         <Card
           className="shadow-sm mt-1 position-absolute w-100"
@@ -112,24 +109,22 @@ const MultiSelectDropdown: React.FC<{
             overflowY: "auto",
           }}
         >
-          {/* Search */}
           <div className="p-2 border-bottom">
             <input
               className="form-control"
-              placeholder="Search..."
+              placeholder="Rechercher…"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
           </div>
 
-          {/* Select All */}
           <div
             className="px-3 py-2 border-bottom d-flex gap-2"
             style={{ cursor: "pointer" }}
             onClick={toggleAll}
           >
             <input type="checkbox" checked={allSelected} readOnly />
-            <span>Select All</span>
+            <span>Tout sélectionner</span>
           </div>
 
           {filtered.length ? (
@@ -154,7 +149,9 @@ const MultiSelectDropdown: React.FC<{
               </div>
             ))
           ) : (
-            <div className="p-3 text-center text-muted">No results</div>
+            <div className="p-3 text-center text-muted">
+              Aucun résultat
+            </div>
           )}
         </Card>
       )}
@@ -189,20 +186,17 @@ const CalendarFilters: React.FC<CalendarFiltersProps> = (props) => {
 
   return (
     <Card className="p-3 shadow-sm rounded-3 w-100">
-      {/* MOBILE BUTTON */}
       <div className="d-lg-none mb-2">
         <Button
           variant="primary"
           className="w-100"
           onClick={() => setOpenMobile((x) => !x)}
         >
-          {openMobile ? "Hide Filters ▲" : "Show Filters ▼"}
+          {openMobile ? "Masquer les filtres ▲" : "Afficher les filtres ▼"}
         </Button>
       </div>
 
-      {/* MOBILE COLLAPSE */}
       <div className={`d-lg-block ${openMobile ? "" : "d-none"}`}>
-        {/* SITE */}
         <MultiSelectDropdown
           label="Site"
           options={sites.map((s) => ({
@@ -213,9 +207,8 @@ const CalendarFilters: React.FC<CalendarFiltersProps> = (props) => {
           onChange={onSiteChange}
         />
 
-        {/* THERAPIST */}
         <MultiSelectDropdown
-          label="Therapist"
+          label="Thérapeute"
           options={hps.map((hp) => ({
             value: hp.id,
             label: `${hp.firstName} ${hp.lastName}`,
@@ -224,7 +217,6 @@ const CalendarFilters: React.FC<CalendarFiltersProps> = (props) => {
           onChange={onHpChange}
         />
 
-        {/* PATIENT */}
         <MultiSelectDropdown
           label="Patient"
           options={patients.map((p) => ({
@@ -235,36 +227,33 @@ const CalendarFilters: React.FC<CalendarFiltersProps> = (props) => {
           onChange={onPatientChange}
         />
 
-        {/* STATUS */}
         <MultiSelectDropdown
-          label="Status"
+          label="Statut"
           options={[
-            { value: "ACTIVE", label: "Active" },
-            { value: "CONFIRMED", label: "Confirmed" },
-            { value: "CANCELED", label: "Canceled" },
-            { value: "ARCHIVED", label: "Archived" },
-            { value: "DELETED", label: "Deleted" },
+            { value: "ACTIVE", label: "Actif" },
+            { value: "CONFIRMED", label: "Confirmé" },
+            { value: "CANCELED", label: "Annulé" },
+            { value: "ARCHIVED", label: "Archivé" },
+            { value: "DELETED", label: "Supprimé" },
           ]}
           selected={selectedStatus}
           onChange={onStatusChange}
         />
 
-        {/* TYPE */}
         <MultiSelectDropdown
           label="Type"
           options={[
-            { value: "APPOINTMENT", label: "Appointment" },
-            { value: "LEAVE", label: "Leave" },
-            { value: "PERSONAL", label: "Personal" },
-            { value: "EXTERNAL_EVENT", label: "External Event" },
+            { value: "APPOINTMENT", label: "Rendez-vous" },
+            { value: "LEAVE", label: "Congé" },
+            { value: "PERSONAL", label: "Personnel" },
+            { value: "EXTERNAL_EVENT", label: "Événement externe" },
           ]}
           selected={selectedType}
           onChange={onTypeChange}
         />
 
-        {/* CALENDARS */}
         <div className="mt-3">
-          <div className="fw-bold mb-2">My Calendars</div>
+          <div className="fw-bold mb-2">Mes calendriers</div>
 
           <div style={{ maxHeight: 240, overflowY: "auto" }}>
             {calendars.map((cal) => (

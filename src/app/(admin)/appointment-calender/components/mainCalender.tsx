@@ -34,7 +34,7 @@ const MainCalendar: React.FC<MainCalendarProps> = ({
       return {
         id: ev.id,
         calendarId: ev.calendarId,
-        title: ev.title || 'Untitled',
+        title: ev.title || 'Sans titre',
         category: 'time',
         start: ev.startAt,
         end: ev.endAt,

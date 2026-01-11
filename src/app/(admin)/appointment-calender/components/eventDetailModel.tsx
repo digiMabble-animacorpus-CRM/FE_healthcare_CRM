@@ -39,54 +39,55 @@ const EventDetailsModal: React.FC<Props> = ({
   return (
     <Modal show={true} onHide={onClose} centered backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title>{event.title || "Event Details"}</Modal.Title>
+        <Modal.Title>{event.title || "Détails de l’événement"}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         <p>
-          <strong>Time:</strong> {new Date(event.startAt).toLocaleString()} —{" "}
+          <strong>Heure :</strong>{" "}
+          {new Date(event.startAt).toLocaleString()} —{" "}
           {new Date(event.endAt).toLocaleString()}
         </p>
 
         <p>
-          <strong>Therapist:</strong>{" "}
+          <strong>Thérapeute :</strong>{" "}
           {hp ? `${hp.firstName} ${hp.lastName}` : "—"}
         </p>
 
         <p>
-          <strong>Site:</strong> {site?.name || "—"}
+          <strong>Site :</strong> {site?.name || "—"}
         </p>
 
         <p>
-          <strong>Patient:</strong>{" "}
+          <strong>Patient :</strong>{" "}
           {patient
             ? `${patient.firstName} ${patient.lastName}`
-            : "No linked patient"}
+            : "Aucun patient associé"}
         </p>
 
         <p>
-          <strong>Type:</strong> {event.type}
+          <strong>Type :</strong> {event.type}
         </p>
 
         <p>
-          <strong>Status:</strong> {event.status}
+          <strong>Statut :</strong> {event.status}
         </p>
 
         {event.description && (
           <p>
-            <strong>Description:</strong> {event.description}
+            <strong>Description :</strong> {event.description}
           </p>
         )}
 
         {event.patientNote && (
           <p>
-            <strong>Patient Note:</strong> {event.patientNote}
+            <strong>Note du patient :</strong> {event.patientNote}
           </p>
         )}
 
         {event.hpNote && (
           <p>
-            <strong>HP Note:</strong> {event.hpNote}
+            <strong>Note du professionnel de santé :</strong> {event.hpNote}
           </p>
         )}
       </Modal.Body>
@@ -96,14 +97,14 @@ const EventDetailsModal: React.FC<Props> = ({
           variant="primary"
           onClick={() => {
             onClose();
-            onEdit(event.id); // 👈 Pass event ID to parent
+            onEdit(event.id);
           }}
         >
-          Edit
+          Modifier
         </Button>
 
         <Button variant="secondary" onClick={onClose}>
-          Close
+          Fermer
         </Button>
       </Modal.Footer>
     </Modal>

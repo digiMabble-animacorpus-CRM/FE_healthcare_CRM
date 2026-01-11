@@ -45,7 +45,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ selectedDate, onChange }) =
           className="w-100 py-2"
           onClick={() => setShowModal(true)}
         >
-          Calender 📅
+          Calendrier 📅
         </Button>
       </div>
 
@@ -57,7 +57,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ selectedDate, onChange }) =
         backdrop={true}
       >
         <Modal.Header closeButton>
-          <Modal.Title>Select Date</Modal.Title>
+          <Modal.Title>Sélectionner une date</Modal.Title>
         </Modal.Header>
 
         <Modal.Body className="p-3 d-flex justify-content-center">

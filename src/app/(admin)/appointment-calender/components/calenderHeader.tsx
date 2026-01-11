@@ -31,7 +31,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
       const isToday = d.toDateString() === today.toDateString();
 
       return isToday
-        ? `Today — ${d.toLocaleDateString([], {
+        ? `Aujourd’hui — ${d.toLocaleDateString([], {
             day: 'numeric',
             month: 'short',
             year: 'numeric',
@@ -85,7 +85,7 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
               ◀
             </Button>
             <Button variant="outline-secondary" onClick={onToday}>
-              Today
+              Aujourd’hui
             </Button>
             <Button variant="outline-secondary" onClick={onNext}>
               ▶
@@ -106,9 +106,9 @@ const CalendarHeader: React.FC<CalendarHeaderProps> = ({
             style={{ maxWidth: 180 }}
             className="mx-auto mx-md-0"
           >
-            <option value="day">Day View</option>
-            <option value="week">Week View</option>
-            <option value="month">Month View</option>
+            <option value="day">Vue jour</option>
+            <option value="week">Vue semaine</option>
+            <option value="month">Vue mois</option>
           </Form.Select>
         </Col>
       </Row>
