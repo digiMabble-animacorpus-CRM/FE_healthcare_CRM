@@ -6,27 +6,24 @@ import { TherapistPerformance, TimeFilterType } from '../dashboard.types';
 
 export function TherapistsSectionSkeleton() {
   const cards = [
-    { title: 'Most In-Demand', icon: '🔥', color: '#9035e3', iconBg: 'rgba(144,53,227,0.15)' },
-    { title: 'Most Cancellations', icon: '⚠️', color: '#ff5f5f', iconBg: 'rgba(255,95,95,0.15)' },
-    { title: 'Most Profitable', icon: '💰', color: '#28c76f', iconBg: 'rgba(40,199,111,0.15)' },
+    { title: 'Les plus demandés', icon: '🔥', color: '#9035e3', iconBg: 'rgba(144,53,227,0.15)' },
+    { title: 'Le plus d’annulations', icon: '⚠️', color: '#ff5f5f', iconBg: 'rgba(255,95,95,0.15)' },
+    { title: 'Les plus rentables', icon: '💰', color: '#28c76f', iconBg: 'rgba(40,199,111,0.15)' },
   ];
 
   return (
     <Card
       className="p-4 mb-4 shadow-sm border-0 rounded-4"
-      style={{
-        background: '#EEF3FB',
-      }}
+      style={{ background: '#EEF3FB' }}
     >
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
-        <h4 className="fw-bold m-0">Therapist Performance</h4>
+        <h4 className="fw-bold m-0">Performance des thérapeutes</h4>
       </div>
 
       <Row className="g-4">
         {cards.map((card, index) => (
           <Col md={4} key={index}>
             <Card className="p-4 shadow-sm border-0 rounded-4 h-100">
-              {/* Icon */}
               <div
                 style={{
                   width: 55,
@@ -44,7 +41,6 @@ export function TherapistsSectionSkeleton() {
 
               <h6 className="fw-semibold mt-3">{card.title}</h6>
 
-              {/* Therapist name skeleton - Lighter */}
               <div className="placeholder-glow mb-2">
                 <div
                   className="placeholder"
@@ -52,13 +48,12 @@ export function TherapistsSectionSkeleton() {
                     height: 20,
                     width: 120,
                     borderRadius: 4,
-                    backgroundColor: '#e3e0e0ff', // Lighter gray
+                    backgroundColor: '#e3e0e0ff',
                   }}
                 ></div>
               </div>
 
-              {/* Label */}
-             <div className="placeholder-glow mb-2">
+              <div className="placeholder-glow mb-2">
                 <div
                   className="placeholder"
                   style={{
@@ -70,7 +65,6 @@ export function TherapistsSectionSkeleton() {
                 ></div>
               </div>
 
-              {/* Value skeleton - Lighter */}
               <div className="placeholder-glow mb-2">
                 <div
                   className="placeholder"
@@ -83,7 +77,6 @@ export function TherapistsSectionSkeleton() {
                 ></div>
               </div>
 
-              {/* Progress bar skeleton - Lighter */}
               <div className="placeholder-glow">
                 <div
                   className="placeholder"
@@ -91,12 +84,11 @@ export function TherapistsSectionSkeleton() {
                     height: 8,
                     width: '100%',
                     borderRadius: 4,
-                    backgroundColor: '#e3e0e0ff', // Lightest
+                    backgroundColor: '#e3e0e0ff',
                   }}
                 ></div>
               </div>
 
-              {/* Total skeleton - Lighter */}
               <div className="placeholder-glow mt-1">
                 <div
                   className="placeholder"
@@ -104,7 +96,7 @@ export function TherapistsSectionSkeleton() {
                     height: 14,
                     width: 80,
                     borderRadius: 4,
-                    backgroundColor: '#e3e0e0ff', // Lighter gray
+                    backgroundColor: '#e3e0e0ff',
                   }}
                 ></div>
               </div>
@@ -133,11 +125,11 @@ export default function TherapistsSection({
 
   const cards = [
     {
-      title: 'Most In-Demand',
-      label: 'Appointments',
+      title: 'Les plus demandés',
+      label: 'Rendez-vous',
       therapist: data.mostInDemand
         ? `${data.mostInDemand.firstName} ${data.mostInDemand.lastName}`
-        : 'No data',
+        : 'Aucune donnée',
       value: data.mostInDemand?.count ?? 0,
       percent: ((data.mostInDemand?.count ?? 0) / totalAppointments) * 100,
       total: totalAppointments,
@@ -146,11 +138,11 @@ export default function TherapistsSection({
       icon: '🔥',
     },
     {
-      title: 'Most Cancellations',
-      label: 'Cancellations',
+      title: 'Le plus d’annulations',
+      label: 'Annulations',
       therapist: data.mostCancellations
         ? `${data.mostCancellations.firstName} ${data.mostCancellations.lastName}`
-        : 'No data',
+        : 'Aucune donnée',
       value: data.mostCancellations?.count ?? 0,
       percent: ((data.mostCancellations?.count ?? 0) / totalCancellations) * 100,
       total: totalCancellations,
@@ -159,11 +151,11 @@ export default function TherapistsSection({
       icon: '⚠️',
     },
     {
-      title: 'Most Profitable',
-      label: 'Revenue',
+      title: 'Les plus rentables',
+      label: 'Revenus',
       therapist: data.mostProfitable
         ? `${data.mostProfitable.firstName} ${data.mostProfitable.lastName}`
-        : 'No data',
+        : 'Aucune donnée',
       value: data.mostProfitable?.value ?? 0,
       percent: ((data.mostProfitable?.value ?? 0) / totalProfit) * 100,
       total: totalProfit,
@@ -176,12 +168,10 @@ export default function TherapistsSection({
   return (
     <Card
       className="p-4 mb-4 shadow-sm border-0 rounded-4"
-      style={{
-        background: '#EEF3FB',
-      }}
+      style={{ background: '#EEF3FB' }}
     >
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
-        <h4 className="fw-bold m-0">Therapist Performance</h4>
+        <h4 className="fw-bold m-0">Performance des thérapeutes</h4>
         <TimeFilter value={timeFilter} onChange={onTimeFilterChange} />
       </div>
 
@@ -223,12 +213,12 @@ export default function TherapistsSection({
                   card.color === '#9035e3'
                     ? 'primary'
                     : card.color === '#ff5f5f'
-                      ? 'danger'
-                      : 'success'
+                    ? 'danger'
+                    : 'success'
                 }
               />
 
-              <small className="text-muted mt-1 d-block">Total: {card.total}</small>
+              <small className="text-muted mt-1 d-block">Total : {card.total}</small>
             </Card>
           </Col>
         ))}
