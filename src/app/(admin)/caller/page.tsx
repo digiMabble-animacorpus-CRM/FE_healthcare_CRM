@@ -79,9 +79,7 @@ const msToHMS = (ms?: number) => {
   return `${h ? h + 'h ' : ''}${m ? m + 'm ' : ''}${s}s`.trim() || '0s';
 };
 
-
 const CallerListPage = () => {
-  const [calls, setCalls] = useState<CallType[]>([]);
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -94,10 +92,17 @@ const CallerListPage = () => {
   const [callDetail, setCallDetail] = useState<CallType | null>(null);
   const [detailLoading, setDetailLoading] = useState(false);
 
-  console.log(callDetail)
-
   const [showPatientModal, setShowPatientModal] = useState(false);
   const { showNotification } = useNotificationContext();
+
+  const PAGE_SIZE = 2000;
+
+  // Pagination state
+  const [currentOffset, setCurrentOffset] = useState(0);
+  const [allCalls, setAllCalls] = useState<CallType[]>([]);
+  const [hasMoreCalls, setHasMoreCalls] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [totalCallsLoaded, setTotalCallsLoaded] = useState(0);
 
   const isWithinTimeRange = (timestamp?: number, range: string = 'Tous') => {
     if (!timestamp || range === 'Tous') return true;
@@ -127,7 +132,9 @@ const CallerListPage = () => {
         hasNextPage = response?.hasNextPage;
         page++;
       }
-    } catch (error) { console.error("Échec sync patients", error); }
+    } catch (error) {
+      console.error("Échec sync patients", error);
+    }
     return allPatients;
   };
 
@@ -162,7 +169,6 @@ const CallerListPage = () => {
     setSelectedCallId(null);
     setCallDetail(null);
   };
-
 
   const enrichCall = (c: any, patients: Patient[]): CallType => {
     const text = (c.transcript || '').toLowerCase();
@@ -211,25 +217,82 @@ const CallerListPage = () => {
     };
   };
 
-  const fetchCalls = async () => {
-    setLoading(true);
+  const fetchCalls = async (reset = false) => {
+    if (isLoadingMore) return;
+
+    if (reset) {
+      setLoading(true);
+      setCurrentOffset(0);
+    } else {
+      setIsLoadingMore(true);
+    }
+
     try {
       const patientList = await fetchAllPatientsInternal();
       const apiKey = getRetellApiKey();
-      const response = await axios.post(RETELL_LIST_ENDPOINT, { limit: 50 }, {
-        headers: { Authorization: `Bearer ${apiKey}`, 'Content-Type': 'application/json' }
+
+      const body: any = {
+        limit: PAGE_SIZE,
+        offset: reset ? 0 : currentOffset,
+        sort_order: 'descending',
+      };
+
+      const response = await axios.post(RETELL_LIST_ENDPOINT, body, {
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
       });
-      const items = Array.isArray(response.data) ? response.data : (response.data.calls || []);
-      setCalls(items.map((c: any) => enrichCall(c, patientList)));
-    } catch (err) {
-      showNotification?.({ message: 'Erreur lors du chargement des données.', variant: 'danger' });
-    } finally { setLoading(false); }
+
+      const items = Array.isArray(response.data) ? response.data : [];
+      const enriched = items.map((c: any) => enrichCall(c, patientList));
+
+      if (reset) {
+        // Reset all calls
+        setAllCalls(enriched);
+        setTotalCallsLoaded(enriched.length);
+      } else {
+        // Append new calls
+        setAllCalls(prev => [...prev, ...enriched]);
+        setTotalCallsLoaded(prev => prev + enriched.length);
+      }
+
+      // Update offset for next fetch
+      const newOffset = reset ? enriched.length : currentOffset + enriched.length;
+      setCurrentOffset(newOffset);
+
+      // If we got fewer items than requested, no more calls
+      setHasMoreCalls(enriched.length === PAGE_SIZE);
+
+    } catch (err: any) {
+      console.error('Error fetching calls:', err);
+      showNotification?.({
+        message: 'Erreur lors du chargement des appels.',
+        variant: 'danger',
+      });
+    } finally {
+      setLoading(false);
+      setIsLoadingMore(false);
+    }
   };
 
-  useEffect(() => { fetchCalls(); }, []);
+  useEffect(() => {
+    fetchCalls(true);
+  }, []);
+
+  // Calculate paginated calls
+  const currentPageCalls = useMemo(() => {
+    // If we want to show all calls at once (infinite scroll style)
+    return allCalls;
+
+    // OR if you want traditional pagination with fixed page size:
+    // const start = currentPage * PAGE_SIZE;
+    // const end = start + PAGE_SIZE;
+    // return allCalls.slice(start, end);
+  }, [allCalls]);
 
   const filteredCalls = useMemo(() => {
-    return calls.filter(c => {
+    return currentPageCalls.filter(c => {
       const matchesSearch = c.agent_name?.toLowerCase().includes(searchTerm.toLowerCase()) || c.from_number?.includes(searchTerm);
       const translatedUrgency = c.urgency === 'Medium' ? 'Moyen' : c.urgency;
       const matchesUrgency = urgencyFilter === 'Tous' || translatedUrgency === urgencyFilter;
@@ -237,17 +300,17 @@ const CallerListPage = () => {
       const matchesTime = isWithinTimeRange(c.start_timestamp, timeFilter);
       return matchesSearch && matchesUrgency && matchesCategory && matchesTime;
     });
-  }, [calls, searchTerm, urgencyFilter, categoryFilter, timeFilter]);
+  }, [currentPageCalls, searchTerm, urgencyFilter, categoryFilter, timeFilter]);
 
   const stats = useMemo(() => ({
-    Tous: calls.length,
-    Urgent: calls.filter(c => c.urgency === 'Urgent').length,
-    Moyen: calls.filter(c => c.urgency === 'Medium').length,
-    Normal: calls.filter(c => c.urgency === 'Normal').length,
-  }), [calls]);
+    Tous: currentPageCalls.length,
+    Urgent: currentPageCalls.filter(c => c.urgency === 'Urgent').length,
+    Moyen: currentPageCalls.filter(c => c.urgency === 'Medium').length,
+    Normal: currentPageCalls.filter(c => c.urgency === 'Normal').length,
+  }), [currentPageCalls]);
 
   const categoryCounts = useMemo(() => {
-    const base = calls.filter(c =>
+    const base = currentPageCalls.filter(c =>
       (urgencyFilter === 'Tous' || (c.urgency === 'Medium' ? 'Moyen' : c.urgency) === urgencyFilter) &&
       isWithinTimeRange(c.start_timestamp, timeFilter)
     );
@@ -258,14 +321,35 @@ const CallerListPage = () => {
       'Information': base.filter(c => c.callTypeLabel === 'Information').length,
       'Autre': base.filter(c => c.callTypeLabel === 'Autre').length,
     };
-  }, [calls, urgencyFilter, timeFilter]);
+  }, [currentPageCalls, urgencyFilter, timeFilter]);
+
+  // Load more calls (infinite scroll style)
+  const loadMoreCalls = async () => {
+    if (!hasMoreCalls || isLoadingMore) return;
+    await fetchCalls(false);
+  };
+
+  // Traditional pagination controls (if you want page-by-page)
+  const goToPreviousPage = () => {
+    // Implement if using traditional pagination
+  };
+
+  const goToNextPage = async () => {
+    // For infinite scroll style, just load more
+    await loadMoreCalls();
+  };
 
   return (
     <Container fluid className="p-3 p-md-4" style={{ backgroundColor: '#f8f9fa', minHeight: '100vh' }}>
       {/* HEADER */}
       <div className="mb-4">
         <h4 className="mb-0 fw-bold">Appels — Animus Voice</h4>
-        <p className="text-muted mb-0 small">Historique des appels classé intelligemment</p>
+        <p className="text-muted mb-0 small">
+          Historique des appels classé intelligemment
+          <span className="ms-2 badge bg-light text-dark">
+            {totalCallsLoaded} appels chargés
+          </span>
+        </p>
       </div>
 
       {/* TOP SUMMARY CARDS */}
@@ -450,13 +534,71 @@ const CallerListPage = () => {
               <Button variant="link" className="small" onClick={() => { setTimeFilter('Tous'); setUrgencyFilter('Tous'); setCategoryFilter('Tous'); }}>Réinitialiser les filtres</Button>
             </div>
           )}
+
+          {/* LOAD MORE BUTTON */}
+          {hasMoreCalls && !loading && (
+            <div className="text-center mt-4">
+              <Button
+                variant="outline-primary"
+                onClick={loadMoreCalls}
+                disabled={isLoadingMore}
+                className="px-5"
+              >
+                {isLoadingMore ? (
+                  <>
+                    <Spinner size="sm" className="me-2" />
+                    Chargement...
+                  </>
+                ) : (
+                  'Charger plus d\'appels'
+                )}
+              </Button>
+              <p className="text-muted small mt-2">
+                {totalCallsLoaded} appels chargés • {PAGE_SIZE} par requête
+              </p>
+            </div>
+          )}
+
+          {!hasMoreCalls && totalCallsLoaded > 0 && (
+            <div className="text-center mt-4">
+              <p className="text-muted">✓ Tous les appels ont été chargés ({totalCallsLoaded} au total)</p>
+            </div>
+          )}
         </div>
       )}
 
-      <PatientFormModal show={showPatientModal} mode="create" onClose={() => setShowPatientModal(false)} onSaved={fetchCalls} />
+      {/* PAGINATION CONTROLS (Traditional pagination - optional) */}
+      {false && ( // Set to true if you want traditional pagination
+        <div className="d-flex justify-content-between align-items-center mt-4">
+          <Button
+            variant="outline-secondary"
+            onClick={goToPreviousPage}
+            disabled={currentOffset === 0}
+            className="px-4"
+          >
+            ← Précédent
+          </Button>
+
+          <span className="text-muted small">
+            {totalCallsLoaded} appels chargés
+          </span>
+
+          <Button
+            variant="outline-primary"
+            onClick={goToNextPage}
+            disabled={!hasMoreCalls || isLoadingMore}
+            className="px-4"
+          >
+            {isLoadingMore ? <Spinner size="sm" className="me-2" /> : null}
+            Suivant →
+          </Button>
+        </div>
+      )}
+
+      <PatientFormModal show={showPatientModal} mode="create" onClose={() => setShowPatientModal(false)} onSaved={() => fetchCalls(true)} />
       <Modal show={showDetailModal} onHide={closeDetailModal} centered size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Détails de l appel</Modal.Title>
+          <Modal.Title>Détails de l’appel</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -468,63 +610,65 @@ const CallerListPage = () => {
             <>
               <Row className="mb-3">
                 <Col md={6}>
-                  <strong>Agent:</strong> {callDetail.agent_name ?? '-'}
+                  <strong>Agent :</strong> {callDetail.agent_name ?? '-'}
                 </Col>
                 <Col md={6}>
-                  <strong>Call ID:</strong> {callDetail.call_id ?? '-'}
+                  <strong>ID de l’appel :</strong> {callDetail.call_id ?? '-'}
                 </Col>
               </Row>
 
               <Row className="mb-3">
                 <Col md={4}>
-                  <strong>Phone (From):</strong> {callDetail.from_number ?? '-'}
+                  <strong>Téléphone (depuis) :</strong> {callDetail.from_number ?? '-'}
                 </Col>
                 <Col md={4}>
-                  <strong>To:</strong> {callDetail.to_number ?? '-'}
+                  <strong>Vers :</strong> {callDetail.to_number ?? '-'}
                 </Col>
                 <Col md={4}>
-                  <strong>Duration:</strong> {msToHMS(callDetail.duration_ms)}
+                  <strong>Durée :</strong> {msToHMS(callDetail.duration_ms)}
                 </Col>
               </Row>
 
               <Row className="mb-2">
                 <Col md={4}>
-                  <strong>Cost:</strong>{' '}
+                  <strong>Coût :</strong>{' '}
                   {callDetail.call_cost?.combined_cost != null
                     ? `${Number(callDetail.call_cost.combined_cost).toFixed(2)}`
                     : '-'}
                 </Col>
                 <Col md={4}>
-                  <strong>Call Status:</strong> {callDetail.call_status ?? '-'}
+                  <strong>Statut de l’appel :</strong> {callDetail.call_status ?? '-'}
                 </Col>
                 <Col md={4}>
-                  <strong>Disconnection Reason:</strong> {callDetail.disconnection_reason ?? '-'}
+                  <strong>Raison de la déconnexion :</strong>{' '}
+                  {callDetail.disconnection_reason ?? '-'}
                 </Col>
               </Row>
 
               <hr />
 
-              <h6>Conversation Analysis</h6>
+              <h6>Analyse de la conversation</h6>
               <Row>
                 <Col md={6}>
                   <div>
-                    <strong>Call Successful:</strong>{' '}
+                    <strong>Appel réussi :</strong>{' '}
                     {callDetail.call_analysis?.call_successful != null
                       ? callDetail.call_analysis.call_successful.toString()
                       : '-'}
                   </div>
                   <div>
-                    <strong>Call Status:</strong> {callDetail.call_status ?? '-'}
+                    <strong>Statut de l’appel :</strong> {callDetail.call_status ?? '-'}
                   </div>
                   <div>
-                    <strong>User Sentiment:</strong>{' '}
+                    <strong>Sentiment de l’utilisateur :</strong>{' '}
                     {callDetail.call_analysis?.user_sentiment ?? '-'}
                   </div>
                   <div>
-                    <strong>Disconnection Reason:</strong> {callDetail.disconnection_reason ?? '-'}
+                    <strong>Raison de la déconnexion :</strong>{' '}
+                    {callDetail.disconnection_reason ?? '-'}
                   </div>
                   <div>
-                    <strong>End to End Latency:</strong>{' '}
+                    <strong>Latence de bout en bout :</strong>{' '}
                     {callDetail.latency?.e2e?.p50
                       ? `${Math.round(callDetail.latency.e2e.p50)} ms`
                       : '-'}
@@ -534,9 +678,11 @@ const CallerListPage = () => {
                 <Col md={6}>
                   <div className="recording-section">
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                      <strong className="mb-0">Recording</strong>
+                      <strong className="mb-0">Enregistrement</strong>
                       {callDetail.recording_duration_ms ? (
-                        <small className="text-muted">{msToHMS(callDetail.recording_duration_ms)}</small>
+                        <small className="text-muted">
+                          {msToHMS(callDetail.recording_duration_ms)}
+                        </small>
                       ) : null}
                     </div>
 
@@ -546,24 +692,15 @@ const CallerListPage = () => {
                           <div className="audio-player flex-grow-1">
                             <audio controls className="recording-player" preload="metadata">
                               <source src={callDetail.recording_url} />
-                              Your browser does not support the audio element.
+                              Votre navigateur ne prend pas en charge la lecture audio.
                             </audio>
                           </div>
-                          {/* <div className="d-none d-sm-flex align-items-center audio-meta">
-                            <div className="text-muted small me-2">{msToHMS(callDetail.recording_duration_ms)}</div>
-                            <a
-                              href={callDetail.recording_url}
-                              download={`recording_${callDetail.call_id || 'audio'}.wav`}
-                              className="btn btn-sm btn-outline-primary"
-                              title="Download recording"
-                            >
-                              <IconifyIcon icon="mdi:download" className="me-1" /> Download
-                            </a>
-                          </div> */}
                         </div>
 
                         <div className="d-flex justify-content-between align-items-center mt-2">
-                          <div className="text-muted small">Source: {callDetail.recording_source ?? '—'}</div>
+                          <div className="text-muted small">
+                            Source : {callDetail.recording_source ?? '—'}
+                          </div>
                         </div>
                       </div>
                     ) : (
@@ -575,23 +712,21 @@ const CallerListPage = () => {
 
               <hr />
 
-              <h6>Summary & Transcription</h6>
+              <h6>Résumé et transcription</h6>
               <div style={{ whiteSpace: 'pre-wrap', maxHeight: '220px', overflow: 'auto' }}>
-                <strong>Summary:</strong>
+                <strong>Résumé :</strong>
                 <div>{callDetail.call_analysis?.call_summary ?? '—'}</div>
                 <hr />
-                <strong>Transcript / Conversation (agent vs user):</strong>
+                <strong>Transcription / Conversation (agent vs utilisateur) :</strong>
                 <div style={{ marginTop: 8 }}>
-                  {/* If transcript available as string */}
                   {callDetail.transcript ? (
                     <pre style={{ whiteSpace: 'pre-wrap' }}>{callDetail.transcript}</pre>
                   ) : callDetail.transcript_object ? (
-                    // render an aggregated transcript from transcript_object
                     <div>
                       {Array.isArray(callDetail.transcript_object) &&
-                        callDetail.transcript_object.map((t: any, i: number) => (
+                        callDetail.transcript_object.map((t, i) => (
                           <div key={i} style={{ marginBottom: 8 }}>
-                            <strong>{t.role ?? 'utterance'}:</strong> {t.content}
+                            <strong>{t.role ?? 'intervention'} :</strong> {t.content}
                           </div>
                         ))}
                     </div>
@@ -605,6 +740,7 @@ const CallerListPage = () => {
             <div>Aucun détail disponible.</div>
           )}
         </Modal.Body>
+
         <Modal.Footer>
           <Button variant="secondary" onClick={closeDetailModal}>
             Fermer
