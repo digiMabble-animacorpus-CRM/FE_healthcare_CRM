@@ -16,7 +16,7 @@ import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import axios from 'axios';
 import { API_BASE_PATH } from '@/context/constants';
 
-const PAGE_LIMIT = 5;
+const PAGE_LIMIT = 2000;
 
 type AppointmentManagementType = {
   id: number;
@@ -89,12 +89,74 @@ const AppointmentManagementPage = () => {
 
   const filteredList = useMemo(() => {
     let list = [...appointments];
+
+    // 🔹 Search filter (name + phone)
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase();
+
+      list = list.filter((a) =>
+        `${a.first_name} ${a.last_name}`.toLowerCase().includes(q) ||
+        (a.phone?.toLowerCase().includes(q) ?? false)
+      );
+    }
+
+    // 🔹 Action filter
     if (filter !== 'all') {
-      const targetAction = filter === 'new_request' ? ['new_request', 'new'] : [filter];
+      const targetAction =
+        filter === 'new_request' ? ['new_request', 'new'] : [filter];
+
       list = list.filter((a) => targetAction.includes(a.action));
     }
-    return list;
-  }, [appointments, filter]);
+
+    // 🔹 Date filter
+    if (dateFilter !== 'Tout') {
+      const now = new Date();
+
+      list = list.filter((a) => {
+        const createdAt = new Date(a.created_at);
+
+        switch (dateFilter) {
+          case "Aujourd'hui":
+            return createdAt.toDateString() === now.toDateString();
+
+          case "Cette semaine": {
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            startOfWeek.setHours(0, 0, 0, 0);
+            return createdAt >= startOfWeek;
+          }
+
+          case "Ce mois-ci":
+            return (
+              createdAt.getMonth() === now.getMonth() &&
+              createdAt.getFullYear() === now.getFullYear()
+            );
+
+          case "Cette année":
+            return createdAt.getFullYear() === now.getFullYear();
+
+          default:
+            return true;
+        }
+      });
+    }
+
+    // 🔹 Latest first
+    return list.sort(
+      (a, b) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    );
+  }, [appointments, filter, dateFilter, searchTerm]);
+
+  const filteredStats = useMemo(() => {
+    return {
+      total: filteredList.length,
+      new: filteredList.filter((a) => a.action === 'new_request' || a.action === 'new').length,
+      cancel: filteredList.filter((a) => a.action === 'cancel').length,
+      reschedule: filteredList.filter((a) => a.action === 'reschedule').length,
+    };
+  }, [filteredList]);
+
   console.log(filteredList)
 
   return (
@@ -150,49 +212,93 @@ const AppointmentManagementPage = () => {
                 <Button
                   variant={filter === 'all' ? 'primary' : 'light'}
                   className="rounded-pill btn-sm px-3 text-nowrap"
-                  onClick={() => setFilter('all')}
+                  onClick={() => {
+                    setFilter('all');
+                    setCurrentPage(1);
+                  }}
                 >
-                  Tout <Badge bg="secondary" className="ms-1">{stats.total}</Badge>
+                  Tout <Badge bg="secondary" className="ms-1">{filteredStats.total}</Badge>
                 </Button>
+
                 <Button
                   variant={filter === 'new_request' ? 'success' : 'light'}
                   className="rounded-pill btn-sm px-3 text-nowrap"
-                  onClick={() => setFilter('new_request')}
+                  onClick={() => {
+                    setFilter('new_request');
+                    setCurrentPage(1);
+                  }}
                 >
-                  Nouveau <Badge bg="success-subtle" className="text-success ms-1">{stats.new}</Badge>
+                  Nouveau <Badge bg="success-subtle" className="text-success ms-1">{filteredStats.new}</Badge>
                 </Button>
+
                 <Button
                   variant={filter === 'cancel' ? 'danger' : 'light'}
                   className="rounded-pill btn-sm px-3 text-nowrap"
-                  onClick={() => setFilter('cancel')}
+                  onClick={() => {
+                    setFilter('cancel');
+                    setCurrentPage(1);
+                  }}
                 >
-                  Annulation <Badge bg="danger-subtle" className="text-danger ms-1">{stats.cancel}</Badge>
+                  Annulation <Badge bg="danger-subtle" className="text-danger ms-1">{filteredStats.cancel}</Badge>
                 </Button>
+
                 <Button
                   variant={filter === 'reschedule' ? 'warning' : 'light'}
                   className="rounded-pill btn-sm px-3 text-nowrap"
-                  onClick={() => setFilter('reschedule')}
+                  onClick={() => {
+                    setFilter('reschedule');
+                    setCurrentPage(1);
+                  }}
                 >
-                  Report <Badge bg="warning-subtle" className="text-warning ms-1">{stats.reschedule}</Badge>
+                  Report <Badge bg="warning-subtle" className="text-warning ms-1">{filteredStats.reschedule}</Badge>
                 </Button>
+
               </div>
             </div>
           </Col>
           <Col md={4}>
             <div className="d-flex justify-content-between align-items-center gap-2">
               <div className="w-auto">
-                <Dropdown onSelect={(val) => setDateFilter(val || 'Tout')}>
-                  <Dropdown.Toggle variant="white" className="btn-sm border shadow-sm px-3 bg-white d-flex align-items-center gap-2">
+                <Dropdown
+                  onSelect={(val) => {
+                    setDateFilter(val || 'Tout');
+                    setCurrentPage(1);
+                  }}
+                >
+                  <Dropdown.Toggle
+                    variant="white"
+                    className="btn-sm border shadow-sm px-3 bg-white d-flex align-items-center gap-2"
+                  >
                     <IconifyIcon icon="solar:calendar-broken" className="text-primary fs-18" />
                     {dateFilter}
                   </Dropdown.Toggle>
+
                   <Dropdown.Menu align="end">
-                    <Dropdown.Item eventKey="Aujourd'hui">Aujourd'hui</Dropdown.Item>
-                    <Dropdown.Item eventKey="Cette semaine">Cette semaine</Dropdown.Item>
-                    <Dropdown.Item eventKey="Ce mois-ci">Ce mois-ci</Dropdown.Item>
-                    <Dropdown.Item eventKey="Cette année">Cette année</Dropdown.Item>
-                    <Dropdown.Divider />
-                    <Dropdown.Item eventKey="Tout">Tout le temps</Dropdown.Item>
+                    {[
+                      "Aujourd'hui",
+                      "Cette semaine",
+                      "Ce mois-ci",
+                      "Cette année",
+                      "Tout",
+                    ].map((label) => (
+                      <Dropdown.Item
+                        key={label}
+                        eventKey={label}
+                        className="d-flex align-items-center justify-content-between"
+                        active={false} // ❌ disable Bootstrap highlight
+                      >
+                        <span>
+                          {label === "Tout" ? "Tout le temps" : label}
+                        </span>
+
+                        {dateFilter === label && (
+                          <IconifyIcon
+                            icon="solar:check-circle-bold"
+                            className="text-primary"
+                          />
+                        )}
+                      </Dropdown.Item>
+                    ))}
                   </Dropdown.Menu>
                 </Dropdown>
               </div>
@@ -231,7 +337,7 @@ const AppointmentManagementPage = () => {
                   <Col>
                     <div className="d-flex flex-wrap align-items-center gap-2 mb-2">
                       <h5 className="mb-0 fw-bold">{item.first_name} {item.last_name || ''}</h5>
-                      <Badge 
+                      <Badge
                         bg={item.action === 'cancel' ? 'danger-subtle' : item.action === 'reschedule' ? 'warning-subtle' : 'success-subtle'}
                         className={item.action === 'cancel' ? 'text-danger' : item.action === 'reschedule' ? 'text-warning' : 'text-success'}
                       >

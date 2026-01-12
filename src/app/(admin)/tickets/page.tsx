@@ -121,6 +121,7 @@ const TicketPage = () => {
         params: { page, limit: PAGE_LIMIT, search: searchTerm },
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log(response)
       const ticketData: TicketType[] = response.data.new_requests || response.data || [];
       let callList: any[] = [];
 
