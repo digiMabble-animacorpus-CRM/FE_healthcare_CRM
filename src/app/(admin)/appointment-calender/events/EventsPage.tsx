@@ -16,7 +16,7 @@ const EventsPage = () => {
         const res = await getAllEvents(1, 10);
         setEvents(res.data);
       } catch (err: any) {
-        setError(err.message || "Failed to load events");
+        setError(err.message || "Échec du chargement des événements");
       } finally {
         setLoading(false);
       }
@@ -24,14 +24,14 @@ const EventsPage = () => {
     loadEvents();
   }, []);
 
-  if (loading) return <p>Loading events...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p>Chargement des événements…</p>;
+  if (error) return <p>Erreur : {error}</p>;
 
   return (
     <div style={{ padding: "1rem" }}>
-      <h2>📅 Events List</h2>
+      <h2>📅 Liste des événements</h2>
       {events.length === 0 ? (
-        <p>No events found.</p>
+        <p>Aucun événement trouvé.</p>
       ) : (
         <ul>
           {events.map((event) => (

@@ -27,7 +27,7 @@ export default function TimeFilter({ value, onChange }: TimeFilterProps) {
             key={f}
             onClick={() => onChange(f)}
             size="sm"
-            className="rounded-pill px-2 fs-6 fs-md-6 fs-lg-5 px-md-3 px-lg-4" 
+            className="rounded-pill px-2 fs-6 fs-md-6 fs-lg-5 px-md-3 px-lg-4"
             variant="light"
             style={{
               background: isActive ? 'var(--bs-primary)' : 'transparent',
@@ -39,12 +39,12 @@ export default function TimeFilter({ value, onChange }: TimeFilterProps) {
             }}
           >
             {f === 'today'
-              ? 'Today'
+              ? 'Aujourd’hui'
               : f === 'week'
-                ? 'This Week'
+                ? 'Cette semaine'
                 : f === 'month'
-                  ? 'This Month'
-                  : 'All'}
+                  ? 'Ce mois-ci'
+                  : 'Tout'}
           </Button>
         );
       })}

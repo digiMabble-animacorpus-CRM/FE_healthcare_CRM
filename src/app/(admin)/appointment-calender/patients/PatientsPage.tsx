@@ -16,7 +16,7 @@ const PatientsPage = () => {
         const res = await getAllPatients(1, 10);
         setPatients(res.data);
       } catch (err: any) {
-        setError(err.message || "Failed to load patients");
+        setError(err.message || "Échec du chargement des patients");
       } finally {
         setLoading(false);
       }
@@ -24,14 +24,14 @@ const PatientsPage = () => {
     loadPatients();
   }, []);
 
-  if (loading) return <p>Loading patients...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p>Chargement des patients…</p>;
+  if (error) return <p>Erreur : {error}</p>;
 
   return (
     <div style={{ padding: "1rem" }}>
-      <h2>🧍 All Patients</h2>
+      <h2>🧍 Tous les patients</h2>
       {patients.length === 0 ? (
-        <p>No patients found.</p>
+        <p>Aucun patient trouvé.</p>
       ) : (
         <ul>
           {patients.map((p) => (
@@ -43,7 +43,7 @@ const PatientsPage = () => {
               <br />
               {p.address
                 ? `${p.address.street || ""} ${p.address.number || ""}, ${p.address.city}`
-                : "No address provided"}
+                : "Aucune adresse fournie"}
               <br />
               {p.contactInfos && p.contactInfos.length > 0 && (
                 <>📧 {p.contactInfos[0].value}</>
@@ -51,7 +51,7 @@ const PatientsPage = () => {
               {p.note && (
                 <>
                   <br />
-                  📝 Note: {p.note}
+                  📝 Note : {p.note}
                 </>
               )}
             </li>

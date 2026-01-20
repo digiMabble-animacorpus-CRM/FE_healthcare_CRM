@@ -3,7 +3,6 @@
 import { Form } from "react-bootstrap";
 import { Site } from "../dashboard.types";
 
-
 // =====================================================
 // COMPONENT
 // =====================================================
@@ -25,13 +24,13 @@ export default function BranchFilter({
   return (
     <div>
       <Form.Group>
-        <Form.Label className="fw-semibold">Branch</Form.Label>
+        <Form.Label className="fw-semibold">Succursale</Form.Label>
         <Form.Select
           value={value}
           onChange={(e) => onChange?.(e.target.value)}
           className="shadow-sm"
         >
-          <option value="all">All Branches</option>
+          <option value="all">Toutes les succursales</option>
           {branches.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name}

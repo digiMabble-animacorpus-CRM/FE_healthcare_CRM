@@ -26,7 +26,7 @@ export default function SummaryCards({
     
     const cards = [
         {
-            label: "Appointments",
+            label: "Rendez-vous",
             value: totalAppointments,
             icon: <FaCalendarCheck />,
             themeColor: "#4169E1",
@@ -34,7 +34,7 @@ export default function SummaryCards({
             isLoading: loadingAppointments,
         },
         {
-            label: "Total Patients",
+            label: "Total des patients",
             value: totalPatients,
             icon: <FaUsers />,
             themeColor: "#20B2AA",
@@ -42,7 +42,7 @@ export default function SummaryCards({
             isLoading: loadingPatients,
         },
         {
-            label: "Therapists",
+            label: "Thérapeutes",
             value: totalTherapists,
             icon: <FaUserMd />,
             themeColor: "#FF7F50",

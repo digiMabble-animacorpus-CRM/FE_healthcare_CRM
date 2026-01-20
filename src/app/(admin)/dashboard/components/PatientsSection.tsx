@@ -15,17 +15,16 @@ export function PatientsSectionSkeleton() {
   return (
     <Card className="p-4 mb-4 shadow-sm border-0 rounded-4" style={{ background: '#EEF3FB' }}>
       <div className="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
-        <h4 className="fw-bold m-0">Patient Insights</h4>
+        <h4 className="fw-bold m-0">Aperçu des patients</h4>
       </div>
 
       <Row className="g-4">
         {/* GENDER DISTRIBUTION SKELETON */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Gender Distribution</h6>
+            <h6 className="fw-semibold mb-3">Répartition par genre</h6>
 
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-              {/* Chart placeholder */}
               <div className="placeholder-glow">
                 <div
                   className="placeholder rounded-circle"
@@ -37,7 +36,6 @@ export function PatientsSectionSkeleton() {
                 ></div>
               </div>
 
-              {/* Legend placeholders */}
               <div>
                 <div className="d-flex align-items-center mb-2">
                   <div className="placeholder-glow">
@@ -96,10 +94,9 @@ export function PatientsSectionSkeleton() {
         {/* AGE GROUPS SKELETON */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Age Groups</h6>
+            <h6 className="fw-semibold mb-3">Groupes d’âge</h6>
 
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-              {/* Chart placeholder */}
               <div className="placeholder-glow">
                 <div
                   className="placeholder rounded-circle"
@@ -111,7 +108,6 @@ export function PatientsSectionSkeleton() {
                 ></div>
               </div>
 
-              {/* Legend placeholders */}
               <div>
                 {[1, 2, 3, 4, 5].map((item) => (
                   <div key={item} className="mb-2 d-flex align-items-center">
@@ -147,7 +143,7 @@ export function PatientsSectionSkeleton() {
         {/* PATIENT STATUS SKELETON */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Patient Status</h6>
+            <h6 className="fw-semibold mb-3">Statut des patients</h6>
 
             {[1, 2, 3].map((item) => (
               <div key={item} className="mb-3">
@@ -230,11 +226,9 @@ export default function PatientsSection({
     maintainAspectRatio: false,
   };
 
-  // Colors
   const genderColors = ['#0066ff', '#ff2fa0'];
   const ageColors = ['#ff7f50', '#7f6bff', '#00bcd4', '#ffca28', '#6fcf97'];
 
-  // Donut data
   const genderDonut = makeDonut(data.genderCounts, genderColors);
   const ageDonut = makeDonut(data.ageBuckets, ageColors);
 
@@ -252,14 +246,14 @@ export default function PatientsSection({
   return (
     <Card className="p-4 mb-4 shadow-sm border-0 rounded-4" style={{ background: '#EEF3FB' }}>
       <div className="d-flex justify-content-between align-items-center mb-4 flex-column flex-md-row gap-3">
-        <h4 className="fw-bold m-0">Patient Insights</h4>
+        <h4 className="fw-bold m-0">Aperçu des patients</h4>
       </div>
 
       <Row className="g-4">
         {/* GENDER DISTRIBUTION */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Gender Distribution</h6>
+            <h6 className="fw-semibold mb-3">Répartition par genre</h6>
 
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
               <div style={{ width: 120, height: 120 }}>
@@ -277,7 +271,7 @@ export default function PatientsSection({
                       marginRight: 8,
                     }}
                   />
-                  <strong>Male:</strong>&nbsp;{data.genderCounts.male}
+                  <strong>Homme :</strong>&nbsp;{data.genderCounts.male}
                 </div>
 
                 <div className="d-flex align-items-center">
@@ -290,7 +284,7 @@ export default function PatientsSection({
                       marginRight: 8,
                     }}
                   />
-                  <strong>Female:</strong>&nbsp;{data.genderCounts.female}
+                  <strong>Femme :</strong>&nbsp;{data.genderCounts.female}
                 </div>
               </div>
             </div>
@@ -300,7 +294,7 @@ export default function PatientsSection({
         {/* AGE GROUPS */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Age Groups</h6>
+            <h6 className="fw-semibold mb-3">Groupes d’âge</h6>
 
             <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
               <div style={{ width: 120, height: 120 }}>
@@ -319,7 +313,7 @@ export default function PatientsSection({
                         marginRight: 8,
                       }}
                     />
-                    <strong>{label}:</strong>&nbsp;{count}
+                    <strong>{label} :</strong>&nbsp;{count}
                   </div>
                 ))}
               </div>
@@ -330,7 +324,7 @@ export default function PatientsSection({
         {/* PATIENT STATUS */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Patient Status</h6>
+            <h6 className="fw-semibold mb-3">Statut des patients</h6>
 
             {statusBars.map((item) => (
               <div key={item.label} className="mb-3">

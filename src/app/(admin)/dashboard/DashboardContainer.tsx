@@ -189,7 +189,7 @@ export default function DashboardContainer() {
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
         {/* PAGE HEADER */}
         <div>
-          <h2 className="fw-bold">Dashboard</h2>
+          <h2 className="fw-bold">Tableau de bord</h2>
         </div>
         {/* BRANCH FILTER */}
         {!sitesLoaded || !eventsLoaded ? (

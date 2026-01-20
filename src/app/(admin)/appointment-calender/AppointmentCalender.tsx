@@ -21,30 +21,23 @@ import type { Calendar as CalendarType } from './calendars/types';
 import { Button, Spinner } from 'react-bootstrap';
 import EventFormModal from '../create-appointment/components/eventFormModel';
 
-// Utility function to calculate the date range for fetching events
-// Based on the current view and selected date.
 const calculateRange = (date: Date, view: 'day' | 'week' | 'month') => {
   const start = new Date(date);
   const end = new Date(date);
 
   if (view === 'week') {
     const day = start.getDay();
-    // Start of the week (Sunday)
     start.setDate(start.getDate() - day);
     start.setHours(0, 0, 0, 0);
-    // End of the week (Saturday)
     end.setDate(start.getDate() + 6);
     end.setHours(23, 59, 59, 999);
   } else if (view === 'month') {
-    // Start of the month
     start.setDate(1);
     start.setHours(0, 0, 0, 0);
-    // End of the month
     end.setMonth(start.getMonth() + 1);
     end.setDate(0);
     end.setHours(23, 59, 59, 999);
   } else {
-    // Day view
     start.setHours(0, 0, 0, 0);
     end.setHours(23, 59, 59, 999);
   }
@@ -53,20 +46,17 @@ const calculateRange = (date: Date, view: 'day' | 'week' | 'month') => {
 };
 
 const CalendarDashboard: React.FC = () => {
-  // ... your existing state declarations
   const [events, setEvents] = useState<CalendarEventType[]>([]);
   const [calendars, setCalendars] = useState<CalendarType[]>([]);
   const [sites, setSites] = useState<Site[]>([]);
   const [hps, setHps] = useState<HealthProfessional[]>([]);
   const [patients, setPatients] = useState<Patient[]>([]);
 
-  // UI state
-  const [isLoadingStaticData, setIsLoadingStaticData] = useState(false); // 👈 NEW: Tracks initial static data load
-  const [isEventsRefreshing, setIsEventsRefreshing] = useState(false); // 👈 NEW: Tracks only event data refresh
+  const [isLoadingStaticData, setIsLoadingStaticData] = useState(false);
+  const [isEventsRefreshing, setIsEventsRefreshing] = useState(false);
   const [view, setView] = useState<'day' | 'week' | 'month'>('week');
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
 
-  // Filters...
   const [selectedSiteIds, setSelectedSiteIds] = useState<string[]>([]);
   const [selectedHpIds, setSelectedHpIds] = useState<string[]>([]);
   const [selectedPatientIds, setSelectedPatientIds] = useState<string[]>([]);
@@ -81,28 +71,22 @@ const CalendarDashboard: React.FC = () => {
   const [eventMode, setEventMode] = useState<'create' | 'edit'>('create');
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
 
-  // 1. Refactored function to fetch events based on current range
   const fetchEventsForCurrentView = useCallback(async () => {
-    // Start refreshing state, but DO NOT set events to []
-    setIsEventsRefreshing(true); 
-    
+    setIsEventsRefreshing(true);
     try {
       const { start, end } = calculateRange(selectedDate, view);
-      
-      // Fetch events for the calculated range
       const eventsRes = await getAllEvents(1, 2000, start.toISOString(), end.toISOString());
-      setEvents(eventsRes.data || []); // Events state updated with fresh data
+      setEvents(eventsRes.data || []);
     } catch (err) {
       console.error('Failed to fetch events:', err);
     } finally {
-      setIsEventsRefreshing(false); // Refreshing finished
+      setIsEventsRefreshing(false);
     }
-  }, [selectedDate, view]); // Dependencies for the event fetcher
+  }, [selectedDate, view]);
 
-  // Initial Data Load (Runs once)
   useEffect(() => {
     const loadStaticData = async () => {
-      setIsLoadingStaticData(true); // Start initial data loading
+      setIsLoadingStaticData(true);
       try {
         const [sitesRes, hpsRes, patientsRes, calendarsRes] = await Promise.all([
           getAllSites(1, 200),
@@ -116,49 +100,37 @@ const CalendarDashboard: React.FC = () => {
         setPatients(patientsRes.data);
         setCalendars(calendarsRes.data);
 
-        // Select all filters by default
         setSelectedSiteIds(sitesRes.data.map((s: Site) => s.id));
         setSelectedHpIds(hpsRes.data.map((hp: HealthProfessional) => hp.id));
         setSelectedPatientIds(patientsRes.data.map((p: Patient) => p.id));
         setSelectedStatus(['ACTIVE', 'CONFIRMED', 'CANCELED', 'ARCHIVED', 'DELETED']);
         setSelectedType(['APPOINTMENT', 'LEAVE', 'PERSONAL', 'EXTERNAL_EVENT']);
 
-        // Initialize visible calendars
         const calendarIds = calendarsRes.data.map((c: CalendarType) => c.id);
         setVisibleCalendarIds(new Set(calendarIds));
-
       } catch (err) {
         console.error('Failed to load static data:', err);
       } finally {
-        setIsLoadingStaticData(false); // Finish initial data loading
+        setIsLoadingStaticData(false);
       }
     };
     loadStaticData();
-  }, []); // Runs only on mount for static data
+  }, []);
 
-  // 2. Event Data Load (Runs on mount AND when selectedDate/view changes)
   useEffect(() => {
-    // Only fetch events after static data (calendars) is loaded
     if (calendars.length > 0) {
-        fetchEventsForCurrentView();
+      fetchEventsForCurrentView();
     }
   }, [selectedDate, view, calendars.length, fetchEventsForCurrentView]);
 
-  // Filter events (logic remains the same)
   const filteredEvents = useMemo(() => {
     return events.filter((ev) => {
       const cal = calendars.find((c) => c.id === ev.calendarId);
       if (!cal) return false;
-
       if (!visibleCalendarIds.has(ev.calendarId)) return false;
-
-      // Filter by site
       if (selectedSiteIds.length && !selectedSiteIds.includes(cal.siteId)) return false;
-
-      // Filter by HP
       if (selectedHpIds.length && !selectedHpIds.includes(cal.hpId)) return false;
 
-      // Filter by patient
       if (selectedPatientIds.length) {
         const match = selectedPatientIds.some(
           (id) =>
@@ -168,10 +140,7 @@ const CalendarDashboard: React.FC = () => {
         if (!match) return false;
       }
 
-      // Filter by status
       if (selectedStatus.length && !selectedStatus.includes(ev.status)) return false;
-
-      // Filter by type
       if (selectedType.length && !selectedType.includes(ev.type)) return false;
 
       return true;
@@ -188,7 +157,6 @@ const CalendarDashboard: React.FC = () => {
     patients,
   ]);
 
-  // Calendar visibility, Navigation, Header label, Event click functions (unchanged)
   const toggleCalendarVisibility = (calendarId: string) => {
     setVisibleCalendarIds((prev) => {
       const next = new Set(prev);
@@ -231,18 +199,15 @@ const CalendarDashboard: React.FC = () => {
     setSelectedEvent(ev);
   };
 
-  // 3. Simplified event reload after create/edit to use the new function
-  const handleSavedEvent = async (result?: any) => {
+  const handleSavedEvent = async () => {
     setShowEventModal(false);
     setEditingEventId(null);
-    await fetchEventsForCurrentView(); // Simply call the shared function
+    await fetchEventsForCurrentView();
   };
 
   return (
     <div className="d-flex flex-column flex-lg-row gap-3 p-1 w-100">
-      {/* LEFT COLUMN — Sidebar */}
       <div className="d-flex flex-column gap-3" style={{ width: '100%', maxWidth: 340 }}>
-        {/* Create Event Button */}
         <Button
           variant="primary"
           className="w-100"
@@ -252,13 +217,11 @@ const CalendarDashboard: React.FC = () => {
             setShowEventModal(true);
           }}
         >
-          + Create Event
+          + Créer un événement
         </Button>
 
-        {/* Mini Calendar */}
         <MiniCalendar selectedDate={selectedDate} onChange={setSelectedDate} />
 
-        {/* Filters */}
         <CalendarFilters
           sites={sites}
           hps={hps}
@@ -279,7 +242,6 @@ const CalendarDashboard: React.FC = () => {
         />
       </div>
 
-      {/* RIGHT COLUMN — Calendar */}
       <div className="d-flex flex-column flex-grow-1">
         <CalendarHeader
           selectedDate={selectedDate}
@@ -290,28 +252,23 @@ const CalendarDashboard: React.FC = () => {
           onViewChange={(v) => setView(v)}
         />
 
-        {/* LOADING LOGIC: Show spinner only if initial data is still loading */}
         {isLoadingStaticData && calendars.length === 0 ? (
-          // Case 1: Initial load (Block view with a large loader)
           <div className="d-flex flex-column justify-content-center align-items-center p-5 text-muted h-100">
             <Spinner animation="border" variant="primary" role="status" style={{ width: '3rem', height: '3rem' }} />
-            <div className="mt-3">Loading initial data...</div>
+            <div className="mt-3">Chargement des données initiales…</div>
           </div>
         ) : (
-          /* Case 2 & 3: Static data loaded, now render the calendar */
           <div className="position-relative flex-grow-1">
-            {/* Overlay for refreshing events (shows stale data underneath) */}
             {isEventsRefreshing && (
-              <div 
-                className="position-absolute w-100 h-100 d-flex justify-content-center align-items-center" 
+              <div
+                className="position-absolute w-100 h-100 d-flex justify-content-center align-items-center"
                 style={{ backgroundColor: 'rgba(255, 255, 255, 0.7)', zIndex: 10, top: 0, left: 0 }}
               >
                 <Spinner animation="grow" variant="secondary" role="status" className="me-2" size="sm" />
-                Refreshing events...
+                Actualisation des événements…
               </div>
             )}
-            
-            {/* Main Calendar is always rendered if static data is available */}
+
             <MainCalendar
               events={filteredEvents}
               calendars={calendars}
@@ -325,7 +282,6 @@ const CalendarDashboard: React.FC = () => {
         )}
       </div>
 
-      {/* EVENT DETAILS MODAL (unchanged) */}
       {selectedEvent && (
         <EventDetailsModal
           event={selectedEvent}
@@ -343,7 +299,6 @@ const CalendarDashboard: React.FC = () => {
         />
       )}
 
-      {/* CREATE/EDIT EVENT MODAL (unchanged) */}
       <EventFormModal
         show={showEventModal}
         mode={eventMode}

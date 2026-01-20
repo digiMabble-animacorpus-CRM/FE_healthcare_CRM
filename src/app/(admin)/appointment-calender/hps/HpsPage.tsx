@@ -16,7 +16,7 @@ const HpsPage = () => {
         const res = await getAllHps(1, 10);
         setHps(res.data);
       } catch (err: any) {
-        setError(err.message || "Failed to load health professionals");
+        setError(err.message || "Échec du chargement des professionnels de santé");
       } finally {
         setLoading(false);
       }
@@ -24,14 +24,14 @@ const HpsPage = () => {
     loadHps();
   }, []);
 
-  if (loading) return <p>Loading health professionals...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p>Chargement des professionnels de santé…</p>;
+  if (error) return <p>Erreur : {error}</p>;
 
   return (
     <div style={{ padding: "1rem" }}>
-      <h2>👩‍⚕️ All Health Professionals</h2>
+      <h2>👩‍⚕️ Tous les professionnels de santé</h2>
       {hps.length === 0 ? (
-        <p>No health professionals found.</p>
+        <p>Aucun professionnel de santé trouvé.</p>
       ) : (
         <ul>
           {hps.map((hp) => (
@@ -40,7 +40,7 @@ const HpsPage = () => {
                 {hp.firstName} {hp.lastName}
               </strong>
               <br />
-              NIHI: {hp.nihii}
+              NIHI : {hp.nihii}
             </li>
           ))}
         </ul>

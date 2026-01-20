@@ -16,7 +16,7 @@ const CalendarsPage = () => {
         const res = await getAllCalendars(1, 10);
         setCalendars(res.data);
       } catch (err: any) {
-        setError(err.message || "Failed to load calendars");
+        setError(err.message || "Échec du chargement des calendriers");
       } finally {
         setLoading(false);
       }
@@ -24,24 +24,26 @@ const CalendarsPage = () => {
     loadCalendars();
   }, []);
 
-  if (loading) return <p>Loading calendars...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading) return <p>Chargement des calendriers…</p>;
+  if (error) return <p>Erreur : {error}</p>;
 
   return (
     <div style={{ padding: "1rem" }}>
-      <h2>🗓 All Calendars</h2>
+      <h2>🗓 Tous les calendriers</h2>
       {calendars.length === 0 ? (
-        <p>No calendars found.</p>
+        <p>Aucun calendrier trouvé.</p>
       ) : (
         <ul>
           {calendars.map((calendar) => (
             <li key={calendar.id} style={{ marginBottom: "8px" }}>
               <strong>{calendar.label}</strong>
               <br />
-              Site ID: {calendar.siteId} <br />
-              HP ID: {calendar.hpId} <br />
-              Color: <span style={{ color: calendar.color }}>{calendar.color}</span> <br />
-              Timezone: {calendar.timezone}
+              ID du site : {calendar.siteId} <br />
+              ID du professionnel de santé : {calendar.hpId} <br />
+              Couleur :{" "}
+              <span style={{ color: calendar.color }}>{calendar.color}</span>{" "}
+              <br />
+              Fuseau horaire : {calendar.timezone}
             </li>
           ))}
         </ul>

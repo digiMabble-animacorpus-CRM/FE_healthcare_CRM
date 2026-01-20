@@ -8,12 +8,12 @@ import { AppointmentBreakdown, TimeFilterType } from '../dashboard.types';
 // SKELETON
 // =====================================================
 export function AppointmentsSectionSkeleton() {
-  const cardTitles = ['Status Breakdown', 'Type Breakdown', 'Time of Day'];
+  const cardTitles = ['Répartition par statut', 'Répartition par type', 'Moment de la journée'];
 
   return (
     <Card className="p-4 mb-4 shadow-sm border-0 rounded-4" style={{ background: '#EEF3FB' }}>
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
-        <h4 className="fw-bold m-0">Appointment Insights</h4>
+        <h4 className="fw-bold m-0">Aperçu des rendez-vous</h4>
       </div>
 
       <Row className="g-4">
@@ -69,6 +69,7 @@ export function AppointmentsSectionSkeleton() {
     </Card>
   );
 }
+
 // =====================================================
 // COMPONENT (unchanged)
 // =====================================================
@@ -101,7 +102,7 @@ export default function AppointmentsSection({
     <Card className="p-4 mb-4 shadow-sm border-0 rounded-4" style={{ background: '#EEF3FB' }}>
       {/* HEADER */}
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-4">
-        <h4 className="fw-bold m-0">Appointment Insights</h4>
+        <h4 className="fw-bold m-0">Aperçu des rendez-vous</h4>
         <TimeFilter value={timeFilter} onChange={onTimeFilterChange} />
       </div>
 
@@ -109,7 +110,7 @@ export default function AppointmentsSection({
         {/* STATUS BREAKDOWN */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Status Breakdown</h6>
+            <h6 className="fw-semibold mb-3">Répartition par statut</h6>
 
             {statusBars.map((item, i) => (
               <div key={i} className="mb-3">
@@ -130,7 +131,7 @@ export default function AppointmentsSection({
         {/* TYPE BREAKDOWN */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Type Breakdown</h6>
+            <h6 className="fw-semibold mb-3">Répartition par type</h6>
 
             {typeBars.map((item, i) => (
               <div key={i} className="mb-3">
@@ -151,7 +152,7 @@ export default function AppointmentsSection({
         {/* TIME OF DAY BREAKDOWN */}
         <Col md={4}>
           <Card className="p-4 shadow-sm h-100 rounded-4 border-0">
-            <h6 className="fw-semibold mb-3">Time of Day</h6>
+            <h6 className="fw-semibold mb-3">Moment de la journée</h6>
 
             {timeBars.map((item, i) => (
               <div key={i} className="mb-3">
