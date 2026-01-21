@@ -13,10 +13,8 @@ import type { ChildrenType } from '@/types/component-props';
 import type {
   LayoutState,
   LayoutType,
-  MenuType,
   OffcanvasControlType,
   LayoutOffcanvasStatesType,
-  ThemeType,
 } from '@/types/context';
 
 import { toggleDocumentAttribute } from '@/utils/layout';
