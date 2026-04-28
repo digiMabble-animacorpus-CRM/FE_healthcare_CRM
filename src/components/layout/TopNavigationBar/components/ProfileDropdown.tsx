@@ -16,7 +16,7 @@ import {
 import { API_BASE_PATH } from '@/context/constants';
 
 const ProfileDropdown = () => {
-  const [fullName, setFullName] = useState<string>('User');
+  const [fullName, setFullName] = useState<string>('Utilisateur');
   const [avatarUrl, setAvatarUrl] = useState<string>(avatar1.src); // Default to local image
 
   useEffect(() => {

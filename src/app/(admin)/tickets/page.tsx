@@ -70,7 +70,7 @@ const TicketPage = () => {
       const fromStorage = localStorage.getItem('retell_api_key');
       if (fromStorage) return fromStorage;
     }
-    return 'key_1d964c4ebd944cdf5f7c9af67b12';
+    return 'key_7ed85633b142dd0c62d822ab631b';
   };
 
 

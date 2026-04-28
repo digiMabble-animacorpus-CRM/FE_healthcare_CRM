@@ -71,7 +71,7 @@ const DEFAULT_VALUES: FormValues = {
 // Validation schema
 // -------------------------
 const validationSchema = yup.object({
-  title: yup.string().trim().required('Title is required'),
+  title: yup.string().trim().required('Le titre est requis'),
   calendarId: yup.string().nullable(),
   type: yup
     .string()
@@ -79,16 +79,16 @@ const validationSchema = yup.object({
     .required(),
   startAt: yup
     .string()
-    .required('Start date/time is required')
-    .test('valid-date', 'Start date is invalid', (v) =>
+    .required('La date/heure de début est requise')
+    .test('valid-date', 'La date de début est invalide', (v) =>
       v ? !isNaN(new Date(v).getTime()) : false,
     ),
 
   endAt: yup
     .string()
-    .required('End date/time is required')
-    .test('valid-date', 'End date is invalid', (v) => (v ? !isNaN(new Date(v).getTime()) : false))
-    .test('after-start', 'End must be after start', function (value) {
+    .required('La date/heure de fin est requise')
+    .test('valid-date', 'La date de fin est invalide', (v) => (v ? !isNaN(new Date(v).getTime()) : false))
+    .test('after-start', 'La fin doit être après le début', function (value) {
       const { startAt } = this.parent;
       if (!startAt || !value) return true;
       // Note: Date comparison relies on both being valid Date objects
@@ -100,7 +100,7 @@ const validationSchema = yup.object({
     .nullable()
     .when('type', (type: any, schema: any) => {
       if (type === 'APPOINTMENT') {
-        return schema.required('Motive is required for appointments');
+        return schema.required('Le motif est requis pour les rendez-vous');
       }
       return schema.nullable();
     }),
@@ -239,7 +239,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
         }
       } catch (err) {
         console.error(err);
-        setAlert({ type: 'danger', text: 'Failed to load data or event' });
+        setAlert({ type: 'danger', text: 'Échec du chargement des données ou de l’événement' });
       } finally {
         if (mounted) setLoadingInitial(false);
       }
@@ -340,7 +340,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
     setAlert(null);
 
     if (values.type === 'APPOINTMENT' && !values.attendeePatient) {
-      setAlert({ type: 'danger', text: 'Please select a patient.' });
+      setAlert({ type: 'danger', text: 'Veuillez sélectionner un patient.' });
       return;
     }
 
@@ -386,9 +386,9 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
       : await createEventBulk([eventPayload]);
 
     if (!res?.success) {
-      setAlert({ type: 'danger', text: res?.message || 'Save failed' });
+      setAlert({ type: 'danger', text: res?.message || 'Échec de l’enregistrement' });
     } else {
-      setAlert({ type: 'success', text: 'Saved successfully!' });
+      setAlert({ type: 'success', text: 'Enregistré avec succès !' });
       onSaved?.(res);
       setTimeout(() => onClose(), 500);
     }
@@ -399,7 +399,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
   return (
     <Modal show={show} onHide={onClose} centered size="lg" backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title>{isEdit ? 'Edit Event' : 'Create Event'}</Modal.Title>
+        <Modal.Title>{isEdit ? 'Modifier l’événement' : 'Créer un événement'}</Modal.Title>
       </Modal.Header>
 
       <Form onSubmit={handleSubmit(onSubmit)}>
@@ -416,7 +416,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
               <Row className="g-3">
                 <Col md={8}>
                   <Form.Group>
-                    <Form.Label>Title *</Form.Label>
+                    <Form.Label>Titre *</Form.Label>
                     <Form.Control {...register('title')} isInvalid={!!errors.title} />
                   </Form.Group>
                 </Col>
@@ -429,11 +429,11 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
                       name="type"
                       render={({ field }) => (
                         <Form.Select {...field}>
-                          <option value="APPOINTMENT">Appointment</option>
-                          <option value="PERSONAL">Personal</option>
-                          <option value="LEAVE">Leave</option>
-                          <option value="EXTERNAL_EVENT">External Event</option>
-                          <option value="BUSY">Busy</option>
+                          <option value="APPOINTMENT">Rendez-vous</option>
+                          <option value="PERSONAL">Personnel</option>
+                          <option value="LEAVE">Congé</option>
+                          <option value="EXTERNAL_EVENT">Événement externe</option>
+                          <option value="BUSY">Occupé</option>
                         </Form.Select>
                       )}
                     />
@@ -445,7 +445,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
               <Row className="g-3 mt-2">
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Calendar *</Form.Label>
+                    <Form.Label>Calendrier *</Form.Label>
                     <Controller
                       control={control}
                       name="calendarId"
@@ -455,7 +455,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
                           value={calendarOptions.find((o) => o.value === field.value) || null}
                           onChange={(opt) => field.onChange(opt ? opt.value : null)}
                           isClearable
-                          placeholder="Select calendar..."
+                          placeholder="Sélectionner un calendrier..."
                         />
                       )}
                     />
@@ -465,7 +465,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
                 <Col md={6}>
                   <Form.Group>
                     <Form.Label>
-                      Motive {watchedType === 'APPOINTMENT' ? '(required)' : '(optional)'}
+                      Motif {watchedType === 'APPOINTMENT' ? '(requis)' : '(optionnel)'}
                     </Form.Label>
 
                     <Controller
@@ -478,7 +478,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
                           onChange={(opt) => field.onChange(opt ? opt.value : null)}
                           isClearable
                           isDisabled={watchedType !== 'APPOINTMENT'}
-                          placeholder={watchedType === 'APPOINTMENT' ? 'Select motive...' : 'N/A'}
+                          placeholder={watchedType === 'APPOINTMENT' ? 'Sélectionner un motif...' : 'N/A'}
                         />
                       )}
                     />
@@ -490,7 +490,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
               <Row className="g-3 mt-2">
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Start *</Form.Label>
+                    <Form.Label>Début *</Form.Label>
                     <Form.Control
                       type="datetime-local"
                       {...register('startAt')}
@@ -501,7 +501,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
 
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>End *</Form.Label>
+                    <Form.Label>Fin *</Form.Label>
                     <Form.Control
                       type="datetime-local"
                       {...register('endAt')}
@@ -516,7 +516,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
                 <Col md={6}>
                   <Form.Group>
                     <Form.Label>
-                      Patient {watchedType === 'APPOINTMENT' ? '(required)' : '(optional)'}
+                      Patient {watchedType === 'APPOINTMENT' ? '(requis)' : '(optionnel)'}
                     </Form.Label>
 
                     <Controller
@@ -529,7 +529,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
                           loadOptions={loadPatientOptions}
                           value={field.value}
                           onChange={(opt) => field.onChange(opt)}
-                          placeholder="Search patient..."
+                          placeholder="Rechercher un patient..."
                           isDisabled={watchedType !== 'APPOINTMENT'}
                         />
                       )}
@@ -539,7 +539,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
 
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Health Professionals</Form.Label>
+                    <Form.Label>Professionnels de santé</Form.Label>
                     <Controller
                       control={control}
                       name="attendeesHp"
@@ -549,7 +549,7 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
                           options={hpOptions}
                           value={field.value}
                           onChange={(opts) => field.onChange(opts as OptionType[])}
-                          placeholder="Select HPs..."
+                          placeholder="Sélectionner les PS..."
                         />
                       )}
                     />
@@ -570,14 +570,14 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
               <Row className="g-3 mt-2">
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>HP Note</Form.Label>
+                    <Form.Label>Note PS</Form.Label>
                     <Form.Control as="textarea" rows={2} {...register('hpNote')} />
                   </Form.Group>
                 </Col>
 
                 <Col md={6}>
                   <Form.Group>
-                    <Form.Label>Patient Note</Form.Label>
+                    <Form.Label>Note patient</Form.Label>
                     <Form.Control as="textarea" rows={2} {...register('patientNote')} />
                   </Form.Group>
                 </Col>
@@ -588,19 +588,19 @@ export default function EventFormModal({ show, mode, eventId, onClose, onSaved }
 
         <Modal.Footer>
           <Button variant="link" onClick={onClose}>
-            Cancel
+            Annuler
           </Button>
 
           <Button type="submit" variant="primary" disabled={submitting}>
             {submitting ? (
               <>
                 <Spinner as="span" animation="border" size="sm" />{' '}
-                {isEdit ? 'Saving...' : 'Creating...'}
+                {isEdit ? 'Enregistrement...' : 'Création...'}
               </>
             ) : isEdit ? (
-              'Save changes'
+              'Enregistrer les modifications'
             ) : (
-              'Create event'
+              'Créer l’événement'
             )}
           </Button>
         </Modal.Footer>

@@ -100,7 +100,7 @@ const PatientsListPage = () => {
       age--;
     }
 
-    return `${age} yrs`;
+    return `${age} ans`;
   };
 
   const formatGender = (gender: string) => (gender ? gender.charAt(0).toUpperCase() : '');
@@ -227,7 +227,7 @@ const PatientsListPage = () => {
 
   return (
     <>
-      <PageTitle subName="Patient" title="Liste des patients" />
+      <PageTitle subName="Patients" title="Liste des patients" />
 
       <Row>
         <Col xs={12}>
@@ -264,13 +264,13 @@ const PatientsListPage = () => {
                   <table className="table table-hover table-sm table-centered mb-0">
                     <thead className="bg-light-subtle">
                       <tr>
-                        <th>No</th>
+                        <th>N°</th>
                         <th>Nom</th>
                         <th>E-mail</th>
                         <th>Téléphone</th>
                         <th>Âge | Genre</th>
                         <th>Statut</th>
-                        <th>Action</th>
+                        <th>Actions</th>
                       </tr>
                     </thead>
 
@@ -298,7 +298,7 @@ const PatientsListPage = () => {
                                   item.status === 'ACTIVE' ? 'success' : 'secondary'
                                 } text-white`}
                               >
-                                {item.status}
+                                {item.status === 'ACTIVE' ? 'Actif' : item.status === 'INACTIVE' ? 'Inactif' : item.status}
                               </span>
                             </td>
 
