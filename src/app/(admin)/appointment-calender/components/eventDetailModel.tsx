@@ -36,41 +36,61 @@ const EventDetailsModal: React.FC<Props> = ({
     (p) => p.externalId === event.patientExId || p.id === event.patientExId
   );
 
+  const translate = (val: string) => {
+    const map: Record<string, string> = {
+      // Statuses
+      ACTIVE: 'Actif',
+      PENDING: 'En attente',
+      CANCELED: 'Annulé',
+      DELETED: 'Supprimé',
+      NO_SHOW: 'Non présenté',
+      IN_WAITING_ROOM: 'En salle d attente',
+      IN_CONSULTATION: 'En consultation',
+      OVERDUE: 'En retard',
+      SEEN: 'Terminé',
+      CONFIRMED: 'Confirmé',
+
+      // Types
+      APPOINTMENT: 'Rendez-vous',
+      LEAVE: 'Congé',
+      PERSONAL: 'Personnel',
+      EXTERNAL_EVENT: 'Événement externe',
+      BUSY: 'Occupé',
+    };
+    return map[val] || val;
+  };
+
   return (
     <Modal show={true} onHide={onClose} centered backdrop="static">
       <Modal.Header closeButton>
-        <Modal.Title>{event.title || "Détails de l’événement"}</Modal.Title>
+        <Modal.Title>{event.title || 'Détails de l’événement'}</Modal.Title>
       </Modal.Header>
 
       <Modal.Body>
         <p>
-          <strong>Heure :</strong>{" "}
-          {new Date(event.startAt).toLocaleString()} —{" "}
+          <strong>Heure :</strong> {new Date(event.startAt).toLocaleString()} —{' '}
           {new Date(event.endAt).toLocaleString()}
         </p>
 
         <p>
-          <strong>Thérapeute :</strong>{" "}
-          {hp ? `${hp.firstName} ${hp.lastName}` : "—"}
+          <strong>Thérapeute :</strong> {hp ? `${hp.firstName} ${hp.lastName}` : '—'}
         </p>
 
         <p>
-          <strong>Site :</strong> {site?.name || "—"}
+          <strong>Site :</strong> {site?.name || '—'}
         </p>
 
         <p>
-          <strong>Patient :</strong>{" "}
-          {patient
-            ? `${patient.firstName} ${patient.lastName}`
-            : "Aucun patient associé"}
+          <strong>Patient :</strong>{' '}
+          {patient ? `${patient.firstName} ${patient.lastName}` : 'Aucun patient associé'}
         </p>
 
         <p>
-          <strong>Type :</strong> {event.type}
+          <strong>Type :</strong> {translate(event.type)}
         </p>
 
         <p>
-          <strong>Statut :</strong> {event.status}
+          <strong>Statut :</strong> {translate(event.status)}
         </p>
 
         {event.description && (

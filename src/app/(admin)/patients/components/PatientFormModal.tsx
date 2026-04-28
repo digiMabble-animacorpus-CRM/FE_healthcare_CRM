@@ -40,17 +40,17 @@ const phoneRegex = /^[0-9+\s-]{6,20}$/;
 const zipRegex = /^[0-9A-Za-z\s-]{3,10}$/;
 
 const schema = yup.object().shape({
-  firstName: yup.string().trim().required('First name is required'),
-  lastName: yup.string().trim().required('Last name is required'),
+  firstName: yup.string().trim().required('Le prénom est requis'),
+  lastName: yup.string().trim().required('Le nom est requis'),
 
   birthdate: yup
     .string()
     .nullable()
-    .test('valid-date', 'Invalid date', (v) => {
+    .test('valid-date', 'Date invalide', (v) => {
       if (!v) return true;
       return !isNaN(new Date(v).getTime());
     })
-    .test('not-in-future', 'Birthdate cannot be in the future', (v) => {
+    .test('not-in-future', 'La date de naissance ne peut pas être dans le futur', (v) => {
       if (!v) return true;
       return new Date(v) <= new Date();
     }),
@@ -58,21 +58,21 @@ const schema = yup.object().shape({
   ssin: yup
     .string()
     .nullable()
-    .test('valid-ssin', 'SSIN must be 11 digits', (v) => (v ? ssinRegex.test(v) : true)),
+    .test('valid-ssin', 'Le SSIN doit comporter 11 chiffres', (v) => (v ? ssinRegex.test(v) : true)),
 
   legalGender: yup.string().nullable().oneOf(['', 'M', 'F', null]),
   language: yup.string().nullable().oneOf(['', 'fr', 'nl', 'en', 'de', null]),
 
-  email: yup.string().nullable().email('Invalid email'),
+  email: yup.string().nullable().email('E-mail invalide'),
   phone: yup
     .string()
     .nullable()
-    .test('valid-phone', 'Invalid phone number', (v) => (v ? phoneRegex.test(v) : true)),
+    .test('valid-phone', 'Numéro de téléphone invalide', (v) => (v ? phoneRegex.test(v) : true)),
 
   addressZip: yup
     .string()
     .nullable()
-    .test('zip', 'Invalid postal code', (v) => (v ? zipRegex.test(v) : true)),
+    .test('zip', 'Code postal invalide', (v) => (v ? zipRegex.test(v) : true)),
 });
 
 export default function PatientFormModal({
@@ -133,7 +133,7 @@ export default function PatientFormModal({
         const result = await getPatientById(patientId);
 
         if (!result) {
-          setAlert({ type: 'danger', text: 'Unable to load patient data.' });
+          setAlert({ type: 'danger', text: 'Impossible de charger les données du patient.' });
           setLoadingPatient(false);
           return;
         }
@@ -248,7 +248,7 @@ export default function PatientFormModal({
           return;
         }
 
-        setAlert({ type: 'success', text: 'Patient updated successfully.' });
+        setAlert({ type: 'success', text: 'Patient mis à jour avec succès.' });
         onSaved?.();
         reset();
         setTimeout(onClose, 700);
@@ -263,12 +263,12 @@ export default function PatientFormModal({
           return;
         }
 
-        setAlert({ type: 'success', text: 'Patient created successfully.' });
+        setAlert({ type: 'success', text: 'Patient créé avec succès.' });
         onSaved?.();
         setTimeout(onClose, 700);
       }
     } catch {
-      setAlert({ type: 'danger', text: 'Unexpected error occurred.' });
+      setAlert({ type: 'danger', text: "Une erreur inattendue s'est produite." });
     } finally {
       setSubmitting(false);
     }
@@ -278,12 +278,12 @@ export default function PatientFormModal({
 
   const countryOptions = [
     '',
-    'Belgium',
+    'Belgique',
     'France',
-    'Netherlands',
-    'Germany',
-    'United Kingdom',
-    'Other',
+    'Pays-Bas',
+    'Allemagne',
+    'Royaume-Uni',
+    'Autre',
   ];
   if (loadingPatient) {
     return (
@@ -306,7 +306,7 @@ export default function PatientFormModal({
   return (
     <Modal show={show} onHide={onClose} centered size="lg" backdrop="static" keyboard={!submitting}>
       <Modal.Header closeButton>
-        <Modal.Title>{mode === 'create' ? 'Create patient' : 'Edit patient'}</Modal.Title>
+        <Modal.Title>{mode === 'create' ? 'Créer un patient' : 'Modifier le patient'}</Modal.Title>
       </Modal.Header>
 
       <Form onSubmit={handleSubmit(onSubmit)}>
@@ -317,7 +317,7 @@ export default function PatientFormModal({
           <Row className="g-3">
             <Col md={6}>
               <Form.Group>
-                <Form.Label>First name *</Form.Label>
+                <Form.Label>Prénom *</Form.Label>
                 <Form.Control
                   disabled={isDisabled}
                   {...register('firstName')}
@@ -331,7 +331,7 @@ export default function PatientFormModal({
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Last name *</Form.Label>
+                <Form.Label>Nom *</Form.Label>
                 <Form.Control
                   disabled={isDisabled}
                   {...register('lastName')}
@@ -345,7 +345,7 @@ export default function PatientFormModal({
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Date of birth</Form.Label>
+                <Form.Label>Date de naissance</Form.Label>
                 <Controller
                   control={control}
                   name="birthdate"
@@ -367,7 +367,7 @@ export default function PatientFormModal({
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>National Register Number (SSIN)</Form.Label>
+                <Form.Label>Numéro de Registre National (SSIN)</Form.Label>
                 <Form.Control
                   disabled={isDisabled}
                   {...register('ssin')}
@@ -379,33 +379,33 @@ export default function PatientFormModal({
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Legal gender</Form.Label>
+                <Form.Label>Sexe légal</Form.Label>
                 <Form.Select disabled={isDisabled} {...register('legalGender')}>
-                  <option value="">Select</option>
-                  <option value="M">Male</option>
-                  <option value="F">Female</option>
+                  <option value="">Sélectionner</option>
+                  <option value="M">Masculin</option>
+                  <option value="F">Féminin</option>
                 </Form.Select>
               </Form.Group>
             </Col>
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Status</Form.Label>
+                <Form.Label>Statut</Form.Label>
                 <Form.Select disabled={isDisabled} {...register('status')}>
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
+                  <option value="ACTIVE">Actif</option>
+                  <option value="INACTIVE">Inactif</option>
                 </Form.Select>
               </Form.Group>
             </Col>
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Language</Form.Label>
+                <Form.Label>Langue</Form.Label>
                 <Form.Select disabled={isDisabled} {...register('language')}>
-                  <option value="">Select</option>
-                  <option value="fr">French</option>
-                  <option value="nl">Dutch</option>
-                  <option value="en">English</option>
-                  <option value="de">German</option>
+                  <option value="">Sélectionner</option>
+                  <option value="fr">Français</option>
+                  <option value="nl">Néerlandais</option>
+                  <option value="en">Anglais</option>
+                  <option value="de">Allemand</option>
                 </Form.Select>
               </Form.Group>
             </Col>
@@ -431,7 +431,7 @@ export default function PatientFormModal({
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Phone</Form.Label>
+                <Form.Label>Téléphone</Form.Label>
                 <Form.Control
                   disabled={isDisabled}
                   type="text"
@@ -450,21 +450,21 @@ export default function PatientFormModal({
           <Row className="g-3">
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Street</Form.Label>
+                <Form.Label>Rue</Form.Label>
                 <Form.Control disabled={isDisabled} {...register('addressStreet')} />
               </Form.Group>
             </Col>
 
             <Col md={2}>
               <Form.Group>
-                <Form.Label>Number</Form.Label>
+                <Form.Label>Numéro</Form.Label>
                 <Form.Control disabled={isDisabled} {...register('addressNumber')} />
               </Form.Group>
             </Col>
 
             <Col md={4}>
               <Form.Group>
-                <Form.Label>Postal code</Form.Label>
+                <Form.Label>Code postal</Form.Label>
                 <Form.Control
                   disabled={isDisabled}
                   {...register('addressZip')}
@@ -478,18 +478,18 @@ export default function PatientFormModal({
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>City</Form.Label>
+                <Form.Label>Ville</Form.Label>
                 <Form.Control disabled={isDisabled} {...register('addressCity')} />
               </Form.Group>
             </Col>
 
             <Col md={6}>
               <Form.Group>
-                <Form.Label>Country</Form.Label>
+                <Form.Label>Pays</Form.Label>
                 <Form.Select disabled={isDisabled} {...register('addressCountry')}>
                   {countryOptions.map((x) => (
                     <option key={x} value={x}>
-                      {x === '' ? 'Select' : x}
+                      {x === '' ? 'Sélectionner' : x}
                     </option>
                   ))}
                 </Form.Select>
@@ -507,19 +507,19 @@ export default function PatientFormModal({
 
         <Modal.Footer>
           <Button variant="link" onClick={onClose} disabled={submitting}>
-            Cancel
+            Annuler
           </Button>
 
           <Button type="submit" variant="primary" disabled={isDisabled}>
             {submitting ? (
               <>
                 <Spinner as="span" animation="border" size="sm" />{' '}
-                {mode === 'create' ? 'Creating...' : 'Saving...'}
+                {mode === 'create' ? 'Création...' : 'Enregistrement...'}
               </>
             ) : mode === 'create' ? (
-              'Create patient'
+              'Créer un patient'
             ) : (
-              'Save changes'
+              'Enregistrer les modifications'
             )}
           </Button>
         </Modal.Footer>

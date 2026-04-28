@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     default: DEFAULT_PAGE_TITLE,
   },
   description:
-    'A fully responsive premium admin dashboard template, Real Estate Management Admin Template',
+    'Une application de gestion de patients et de rendez-vous pour les professionnels de la santé.',
 };
 
 const splashScreenStyles = `
@@ -59,7 +59,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="fr">
       <head>
         <style suppressHydrationWarning>{splashScreenStyles}</style>
       </head>

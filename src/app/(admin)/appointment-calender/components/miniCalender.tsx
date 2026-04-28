@@ -34,6 +34,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ selectedDate, onChange }) =
             view="month"
             showNeighboringMonth={false}
             className="w-100"
+            locale="fr-FR"
           />
         </Card>
       </div>
@@ -67,6 +68,7 @@ const MiniCalendar: React.FC<MiniCalendarProps> = ({ selectedDate, onChange }) =
             view="month"
             showNeighboringMonth={false}
             className="w-100"
+            locale="fr-FR"
           />
         </Modal.Body>
       </Modal>

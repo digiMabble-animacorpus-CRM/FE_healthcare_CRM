@@ -88,12 +88,12 @@ export default function MotivesListPage() {
     const ok = await updateMotivesBulk(payload);
     if (ok) {
       showNotification({
-        message: `Motive ${newStatus === 'ARCHIVED' ? 'archived' : 'restored'}.`,
+        message: `Motif ${newStatus === 'ARCHIVED' ? 'archivé' : 'restauré'}.`,
         variant: 'success',
       });
       fetchAll();
     } else {
-      showNotification({ message: 'Failed to update motive status', variant: 'danger' });
+      showNotification({ message: 'Échec de la mise à jour du statut du motif', variant: 'danger' });
     }
   };
 
@@ -123,10 +123,10 @@ export default function MotivesListPage() {
 
     const ok = await updateMotivesBulk([payload]);
     if (ok) {
-      showNotification({ message: 'Calendars updated', variant: 'success' });
+      showNotification({ message: 'Calendriers mis à jour', variant: 'success' });
       fetchAll();
     } else {
-      showNotification({ message: 'Failed to update calendars', variant: 'danger' });
+      showNotification({ message: 'Échec de la mise à jour des calendriers', variant: 'danger' });
     }
 
     setEditingCalendarsFor(null);
@@ -135,10 +135,10 @@ export default function MotivesListPage() {
   const handlePatternSaved = async (id: string, payload: Partial<MotiveDto>) => {
     const ok = await updateMotivesBulk([{ id, ...payload } as MotiveDto]);
     if (ok) {
-      showNotification({ message: 'Pattern updated', variant: 'success' });
+      showNotification({ message: 'Motif mis à jour', variant: 'success' });
       fetchAll();
     } else {
-      showNotification({ message: 'Failed to update pattern', variant: 'danger' });
+      showNotification({ message: 'Échec de la mise à jour du motif', variant: 'danger' });
     }
     setEditingPatternFor(null);
   };
@@ -166,7 +166,7 @@ export default function MotivesListPage() {
 
   return (
     <>
-      <PageTitle subName="Patterns" title="Motives / Patterns" />
+      <PageTitle subName="Motifs" title="Motifs / Types" />
 
       <Row>
         <Col xl={12}>
@@ -175,10 +175,10 @@ export default function MotivesListPage() {
             <CardHeader className="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center gap-3 flex-wrap">
               <div className="d-flex align-items-center justify-content-between w-100">
                 <CardTitle as="h4" className="mb-0">
-                  Motives
+                  Motifs
                 </CardTitle>
                 <Button variant="primary" size="sm" onClick={() => setShowCreateMotive(true)}>
-                  + Add Motive
+                  + Ajouter un motif
                 </Button>
               </div>
 
@@ -194,7 +194,7 @@ export default function MotivesListPage() {
                   value={hpFilter || ''}
                   onChange={(e) => setHpFilter(e.target.value || undefined)}
                 >
-                  <option value="">All specialties</option>
+                  <option value="">Toutes les spécialités</option>
                   {hps.map((hp) => (
                     <option key={hp.id} value={hp.id}>
                       {hp.firstName ? `${hp.firstName} ${hp.lastName ?? ''}` : hp.id}
@@ -209,7 +209,7 @@ export default function MotivesListPage() {
                   value={calendarFilter || ''}
                   onChange={(e) => setCalendarFilter(e.target.value || undefined)}
                 >
-                  <option value="">All calendars</option>
+                  <option value="">Tous les calendriers</option>
                   {calendars.map((c) => (
                     <option key={c.id} value={c.id}>
                       {c.label}
@@ -224,17 +224,17 @@ export default function MotivesListPage() {
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value as any)}
                 >
-                  <option value="">All statuses</option>
-                  <option value="ACTIVE">Active</option>
-                  <option value="INACTIVE">Inactive</option>
-                  <option value="ARCHIVED">Archived</option>
+                  <option value="">Tous les statuts</option>
+                  <option value="ACTIVE">Actif</option>
+                  <option value="INACTIVE">Inactif</option>
+                  <option value="ARCHIVED">Archivé</option>
                 </select>
 
                 {/* Search Input */}
                 <input
                   type="text"
                   className="form-control form-control-sm"
-                  placeholder="Search motives..."
+                  placeholder="Rechercher des motifs..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   style={{ flex: '1 1 220px', minWidth: 180 }}
@@ -251,7 +251,7 @@ export default function MotivesListPage() {
               ) : (
                 <div className="p-3">
                   {filteredMotives.length === 0 ? (
-                    <div className="text-center text-muted py-4">No motives found</div>
+                    <div className="text-center text-muted py-4">Aucun motif trouvé</div>
                   ) : (
                     <div className="list-group">
                       {filteredMotives.map((m) => (
@@ -281,7 +281,7 @@ export default function MotivesListPage() {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage - 1)}
                     >
-                      Prev
+                      Précédent
                     </Button>
                   </li>
 
@@ -308,7 +308,7 @@ export default function MotivesListPage() {
                       className="page-link"
                       onClick={() => handlePageChange(currentPage + 1)}
                     >
-                      Next
+                      Suivant
                     </Button>
                   </li>
                 </ul>
@@ -345,7 +345,7 @@ export default function MotivesListPage() {
           show
           onClose={() => setShowCreateMotive(false)}
           onSaved={() => {
-            showNotification({ message: 'Motive created successfully', variant: 'success' });
+            showNotification({ message: 'Motif créé avec succès', variant: 'success' });
             fetchAll(); // ✅ refresh list on success
           }}
         />

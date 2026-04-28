@@ -94,6 +94,36 @@ export default function AppointmentsSection({
     }));
   };
 
+  const translateLabel = (label: string) => {
+    const mapping: Record<string, string> = {
+      // Statuses
+      ACTIVE: 'Actif',
+      CANCELED: 'Annulé',
+      LEAVE: 'Congé',
+      NO_SHOW: 'Non présenté',
+      IN_CONSULTATION: 'En consultation',
+      SEEN: 'Terminé',
+      CONFIRMED: 'Confirmé',
+      ARCHIVED: 'Archivé',
+      DELETED: 'Supprimé',
+      OVERDUE: 'En retard',
+      PENDING: 'En attente',
+      IN_WAITING_ROOM: 'En salle d attente',
+
+      // Types
+      APPOINTMENT: 'Rendez-vous',
+      PERSONAL: 'Personnel',
+      EXTERNAL_EVENT: 'Événement externe',
+
+      // Time of Day
+      morning: 'Matin',
+      afternoon: 'Après-midi',
+      evening: 'Soir',
+      night: 'Nuit',
+    };
+    return mapping[label] || label;
+  };
+
   const statusBars = makeBars(data.statusCounts);
   const typeBars = makeBars(data.typeCounts);
   const timeBars = makeBars(data.timeOfDayCounts);
@@ -115,7 +145,7 @@ export default function AppointmentsSection({
             {statusBars.map((item, i) => (
               <div key={i} className="mb-3">
                 <div className="d-flex justify-content-between mb-1">
-                  <span className="text-capitalize">{item.label}</span>
+                  <span className="text-capitalize">{translateLabel(item.label)}</span>
                   <strong>{item.value}</strong>
                 </div>
                 <ProgressBar
@@ -136,7 +166,7 @@ export default function AppointmentsSection({
             {typeBars.map((item, i) => (
               <div key={i} className="mb-3">
                 <div className="d-flex justify-content-between mb-1">
-                  <span className="text-capitalize">{item.label}</span>
+                  <span className="text-capitalize">{translateLabel(item.label)}</span>
                   <strong>{item.value}</strong>
                 </div>
                 <ProgressBar
@@ -157,7 +187,7 @@ export default function AppointmentsSection({
             {timeBars.map((item, i) => (
               <div key={i} className="mb-3">
                 <div className="d-flex justify-content-between mb-1">
-                  <span className="text-capitalize">{item.label}</span>
+                  <span className="text-capitalize">{translateLabel(item.label)}</span>
                   <strong>{item.value}</strong>
                 </div>
                 <ProgressBar

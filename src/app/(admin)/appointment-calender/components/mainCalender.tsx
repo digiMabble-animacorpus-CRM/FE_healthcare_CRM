@@ -83,6 +83,23 @@ const MainCalendar: React.FC<MainCalendarProps> = ({
           backgroundColor: c.color,
         }))}
         onClickEvent={handleClickEvent}
+        template={{
+          allday: (event: any) => {
+            return `<span style="color: gray;">${event.title}</span>`;
+          },
+          alldayTitle: () => {
+            return '<span class="tui-full-calendar-left-content">Journée</span>';
+          },
+          taskTitle: () => {
+            return '<span class="tui-full-calendar-left-content">Tâche</span>';
+          },
+          milestoneTitle: () => {
+            return '<span class="tui-full-calendar-left-content">Jalon</span>';
+          },
+          time: (event: any) => {
+            return `<span>${event.title}</span>`;
+          },
+        }}
       />
     </div>
   );

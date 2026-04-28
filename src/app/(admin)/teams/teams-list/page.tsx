@@ -122,7 +122,7 @@ const TeamsListPage = () => {
   const handleConfirmDelete = async () => {
     if (!selectedTeamId) return;
     try {
-      await fetch(`http://164.92.220.65/api/v1/team-members/${selectedTeamId}`, {
+      await fetch(`http://146.190.225.64/api/v1/team-members/${selectedTeamId}`, {
         method: 'DELETE',
       });
       setAllTeamMembers(allTeamMembers.filter((t) => t.team_id.toString() !== selectedTeamId));

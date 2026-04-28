@@ -241,6 +241,16 @@ export default function PatientsSection({
     }));
   };
 
+  const translateLabel = (label: string) => {
+    const mapping: Record<string, string> = {
+      male: 'Homme',
+      female: 'Femme',
+      active: 'Actif',
+      inactive: 'Inactif',
+    };
+    return mapping[label.toLowerCase()] || label;
+  };
+
   const statusBars = makeBars(data.statusCounts);
 
   return (
@@ -271,7 +281,7 @@ export default function PatientsSection({
                       marginRight: 8,
                     }}
                   />
-                  <strong>Homme :</strong>&nbsp;{data.genderCounts.male}
+                  <strong>{translateLabel('male')} :</strong>&nbsp;{data.genderCounts.male}
                 </div>
 
                 <div className="d-flex align-items-center">
@@ -284,7 +294,7 @@ export default function PatientsSection({
                       marginRight: 8,
                     }}
                   />
-                  <strong>Femme :</strong>&nbsp;{data.genderCounts.female}
+                  <strong>{translateLabel('female')} :</strong>&nbsp;{data.genderCounts.female}
                 </div>
               </div>
             </div>
@@ -329,7 +339,7 @@ export default function PatientsSection({
             {statusBars.map((item) => (
               <div key={item.label} className="mb-3">
                 <div className="d-flex justify-content-between mb-1">
-                  <span className="text-capitalize">{item.label}</span>
+                  <span className="text-capitalize">{translateLabel(item.label)}</span>
                   <strong>{item.count}</strong>
                 </div>
 
