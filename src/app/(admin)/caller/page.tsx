@@ -306,7 +306,7 @@ const CallerListPage = () => {
       });
 
       const items = Array.isArray(response.data) ? response.data : [];
-    const enriched = await Promise.all(items.map((c: any) => enrichCall(c, patientList)));
+      const enriched = await Promise.all(items.map((c: any) => enrichCall(c, patientList)));
 
       if (reset) {
         // Reset all calls
