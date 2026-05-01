@@ -138,6 +138,53 @@ const CallerListPage = () => {
     return allPatients;
   };
 
+  const translateApiValue = (val: string | boolean | undefined | null) => {
+    if (val === null || val === undefined) return '-';
+    const s = String(val).toLowerCase();
+    const map: Record<string, string> = {
+      // Call Status
+      ended: 'Terminé',
+      error: 'Erreur',
+      ongoing: 'En cours',
+
+      // Disconnection Reason
+      user_hangup: 'Raccroché par l’utilisateur',
+      agent_hangup: 'Raccroché par l’agent',
+      call_transfer: 'Transfert d’appel',
+      inactivity: 'Inactivité',
+      machine_detected: 'Répondeur détecté',
+
+      // Sentiment
+      positive: 'Positif',
+      negative: 'Négatif',
+      neutral: 'Neutre',
+
+      // Roles
+      agent: 'Agent',
+      user: 'Utilisateur',
+      intervention: 'Intervention',
+
+      // Boolean
+      true: 'Oui',
+      false: 'Non',
+    };
+    return map[s] || val;
+  };
+
+  const translateText = async (text: string) => {
+    if (!text || text === 'Aucun résumé.' || text === '—') return text;
+    try {
+      const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=fr&dt=t&q=${encodeURIComponent(text)}`;
+      const res = await fetch(url);
+      const json = await res.json();
+      // Google returns an array of arrays, we need to join the parts
+      return json[0].map((part: any) => part[0]).join('');
+    } catch (err) {
+      console.warn('Translation failed', err);
+      return text;
+    }
+  };
+
   const openDetailModal = async (callId: string) => {
     setSelectedCallId(callId);
     setShowDetailModal(true);
@@ -151,7 +198,11 @@ const CallerListPage = () => {
         },
       });
 
-      setCallDetail(response.data);
+      const rawDetail = response.data;
+      if (rawDetail.call_analysis?.call_summary) {
+        rawDetail.call_analysis.call_summary = await translateText(rawDetail.call_analysis.call_summary);
+      }
+      setCallDetail(rawDetail);
     } catch (err) {
       console.error('Failed to fetch call detail', err);
       showNotification?.({
@@ -170,10 +221,14 @@ const CallerListPage = () => {
     setCallDetail(null);
   };
 
-  const enrichCall = (c: any, patients: Patient[]): CallType => {
+  const enrichCall = async (c: any, patients: Patient[]): Promise<CallType> => {
     const text = (c.transcript || '').toLowerCase();
-    const summary = (c.call_analysis?.call_summary || '').toLowerCase();
+    const rawSummary = c.call_analysis?.call_summary || '';
+    const summary = rawSummary.toLowerCase();
     const fullText = text + " " + summary;
+
+    // Translate summary on the fly
+    const translatedSummary = await translateText(rawSummary);
 
     let extractedName = '';
     const crmTool = c.tool_calls?.find((t: any) => t.name === 'create_crm_ticket');
@@ -207,7 +262,7 @@ const CallerListPage = () => {
       action = 'Fournir les infos standard';
     }
 
-    return {
+    const enriched = {
       ...c,
       agent_name: match ? `${match.firstName} ${match.lastName}` : (extractedName || `Contact #TMP-${phone.slice(-4)}`),
       urgency,
@@ -215,6 +270,12 @@ const CallerListPage = () => {
       suggestedAction: action,
       isNewPatient: !match
     };
+
+    if (enriched.call_analysis) {
+      enriched.call_analysis.call_summary = translatedSummary;
+    }
+
+    return enriched;
   };
 
   const fetchCalls = async (reset = false) => {
@@ -245,7 +306,7 @@ const CallerListPage = () => {
       });
 
       const items = Array.isArray(response.data) ? response.data : [];
-      const enriched = items.map((c: any) => enrichCall(c, patientList));
+      const enriched = await Promise.all(items.map((c: any) => enrichCall(c, patientList)));
 
       if (reset) {
         // Reset all calls
@@ -637,11 +698,11 @@ const CallerListPage = () => {
                     : '-'}
                 </Col>
                 <Col md={4}>
-                  <strong>Statut de l’appel :</strong> {callDetail.call_status ?? '-'}
+                  <strong>Statut de l’appel :</strong> {translateApiValue(callDetail.call_status)}
                 </Col>
                 <Col md={4}>
                   <strong>Raison de la déconnexion :</strong>{' '}
-                  {callDetail.disconnection_reason ?? '-'}
+                  {translateApiValue(callDetail.disconnection_reason)}
                 </Col>
               </Row>
 
@@ -652,20 +713,18 @@ const CallerListPage = () => {
                 <Col md={6}>
                   <div>
                     <strong>Appel réussi :</strong>{' '}
-                    {callDetail.call_analysis?.call_successful != null
-                      ? callDetail.call_analysis.call_successful.toString()
-                      : '-'}
+                    {translateApiValue(callDetail.call_analysis?.call_successful)}
                   </div>
                   <div>
-                    <strong>Statut de l’appel :</strong> {callDetail.call_status ?? '-'}
+                    <strong>Statut de l’appel :</strong> {translateApiValue(callDetail.call_status)}
                   </div>
                   <div>
                     <strong>Sentiment de l’utilisateur :</strong>{' '}
-                    {callDetail.call_analysis?.user_sentiment ?? '-'}
+                    {translateApiValue(callDetail.call_analysis?.user_sentiment)}
                   </div>
                   <div>
                     <strong>Raison de la déconnexion :</strong>{' '}
-                    {callDetail.disconnection_reason ?? '-'}
+                    {translateApiValue(callDetail.disconnection_reason)}
                   </div>
                   <div>
                     <strong>Latence de bout en bout :</strong>{' '}
@@ -726,7 +785,7 @@ const CallerListPage = () => {
                       {Array.isArray(callDetail.transcript_object) &&
                         callDetail.transcript_object.map((t, i) => (
                           <div key={i} style={{ marginBottom: 8 }}>
-                            <strong>{t.role ?? 'intervention'} :</strong> {t.content}
+                            <strong>{translateApiValue(t.role)} :</strong> {t.content}
                           </div>
                         ))}
                     </div>
