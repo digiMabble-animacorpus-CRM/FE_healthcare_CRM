@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import axios from 'axios';
-import avatar1 from '@/assets/images/users/main-image.jpeg';
+import avatar1 from '@/assets/images/users/dummy-avatar.jpg';
 import IconifyIcon from '@/components/wrappers/IconifyIcon';
 import Image from 'next/image';
 import Link from 'next/link';
