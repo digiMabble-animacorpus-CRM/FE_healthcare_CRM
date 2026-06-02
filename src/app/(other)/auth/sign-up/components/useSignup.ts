@@ -30,7 +30,7 @@ const useSignup = () => {
       password: formData.password,
     });
     try {
-      const res = await fetch(`${API_BASE_PATH}/auth/signup-super-admin`, {
+      const res = await fetch(`${API_BASE_PATH}/auth/signup-admin`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data: encryptedPayload }),
